@@ -88,7 +88,7 @@
       msg: "{{ item }}"
     loop: "{{ ontap.ontap_info.storage_volumes.records }}"
 
-- hosts:              "{{ pocenv_lin_hosts }}"
+- hosts:              "{{ testenv_lin_hosts }}"
   name:               BSS-03-06 - Linux Play
   gather_facts:       false
   vars_files:
@@ -104,7 +104,7 @@
   - name: Mount NFS export on Linux host
     ansible.posix.mount:
       state:                      "mounted"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ pocenv_secondary_dns_domain }}:/{{ ontap_03_volume_name }}"
+      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_primary_dns_domain }}:/{{ ontap_03_volume_name }}"
       path:                       "{{ ontap_03_mount_path }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"

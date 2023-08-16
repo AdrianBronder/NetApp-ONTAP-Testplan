@@ -1,22 +1,3 @@
-# General - Environment
-pocenv_default_gateway:           "192.168.0.1"
-pocenv_primary_dns_domain:        "demo.netapp.com"
-pocenv_secondary_dns_domain:      "demo.netapp.com"
-pocenv_dns_domains:
-- "{{ pocenv_secondary_dns_domain }}"
-pocenv_default_dns_nameservers:
-- "192.168.0.253"
-pocenv_default_ntp_serveres:
-- "0.us.pool.ntp.org"
-- "2.us.pool.ntp.org"
-pocenv_timezone:                  "America/New_York"
-pocenv_default_ad_domain:         "{{ pocenv_primary_dns_domain }}"
-pocenv_default_ad_ou_path:        "OU=ServersOther,DC=DEMO,DC=NETAPP,DC=COM"
-pocenv_lin_hosts:
-- "centos1"
-pocenv_win_hosts:
-- "jumphost"
-
 # General - Storage Objects
 ontap_primary_test_cluster:       "cluster1"
 ontap_secondary_test_cluster:     "cluster2"
@@ -27,11 +8,11 @@ ontap_primary_backup_svm:         "ntap-backup-svm01"
 # General - Users
 ontap_admin_user:                 "admin"
 ontap_admin_password:             "Netapp1!"
-pocenv_ad_join_user:              "Administrator"
-# pocenv_ad_join_pw - "*_setup" variable is only used for lab initialization
+testenv_ad_join_user:              "Administrator"
+# testenv_ad_join_pw - "*_setup" variable is only used for lab initialization
 # for execution, vars_prompt is used in the playbook
-pocenv_ad_join_pw_setup:          "Netapp1!"
-pocenv_keymanager_passphrase:     "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
+testenv_ad_join_pw_setup:          "Netapp1!"
+testenv_keymanager_passphrase:     "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
 
 # General - Config Defaults
 ontap_default_vol_size_gb:        500

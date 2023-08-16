@@ -10,7 +10,7 @@
 #
 ################################################################################
 
-- hosts:              "{{ pocenv_lin_hosts }}"
+- hosts:              "{{ testenv_lin_hosts }}"
   name:               revert_BSS-08 - Linux Play
   gather_facts:       false
   vars_files:
@@ -20,7 +20,7 @@
   - name: Unmount NFS export on Linux host and remove mount point
     ansible.posix.mount:
       state:                      "absent"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ pocenv_secondary_dns_domain }}:/{{ ontap_08_mixed_vol_name }}"
+      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_primary_dns_domain }}:/{{ ontap_08_mixed_vol_name }}"
       path:                       "{{ ontap_08_mount_path }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"

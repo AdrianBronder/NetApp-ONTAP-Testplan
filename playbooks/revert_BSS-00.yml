@@ -14,8 +14,8 @@
   name:               revert_BSS-00
   gather_facts:       false
   vars_prompt:
-    - name:           pocenv_ad_join_pw
-      prompt:         "Please enter password for user  {{ pocenv_ad_join_user }}"
+    - name:           testenv_ad_join_pw
+      prompt:         "Please enter password for user  {{ testenv_ad_join_user }}"
       private:        true
   vars:
     input: &input
@@ -35,10 +35,10 @@
       state:                      absent
       name:                       "{{ item.cifs_name }}"                  
       vserver:                    "{{ item.name }}"
-      domain:                     "{{ pocenv_default_ad_domain }}"
-      ou:                         "{{ pocenv_default_ad_ou_path }}"
-      admin_user_name:            "{{ pocenv_ad_join_user }}"
-      admin_password:             "{{ pocenv_ad_join_pw }}"
+      domain:                     "{{ testenv_ad_domain }}"
+      ou:                         "{{ testenv_storage_ad_ou_path }}"
+      admin_user_name:            "{{ testenv_ad_join_user }}"
+      admin_password:             "{{ testenv_ad_join_pw }}"
       hostname:                   "{{ ontap_hostname }}"
       <<: *input
     loop:
@@ -120,4 +120,4 @@
       use_rest:                   "Always"
       <<: *input
     loop:
-      "{{ pocenv_default_ntp_serveres }}"
+      "{{ testenv_ntp_serveres }}"

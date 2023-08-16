@@ -58,7 +58,7 @@
       state:                      present
       name:                       "{{ ontap_10_policy_name }}"
       vserver:                    "{{ ontap_secondary_nas_svm }}"
-      client_match:               "{{ pocenv_lin_hosts }}"
+      client_match:               "{{ testenv_lin_hosts }}"
       ro_rule:                    "any"                    
       rw_rule:                    "any"
       protocol:                   "nfs"

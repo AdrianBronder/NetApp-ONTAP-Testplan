@@ -9,7 +9,7 @@ centos1 ansible_host=centos1.demo.netapp.com
 jumphost ansible_host=jumphost.demo.netapp.com
 
 [win_domain_controllers]
-dc1 ansible_host=jumphost.demo.netapp.com
+dc1 ansible_host=dc1.demo.netapp.com
 
 [windows:children]
 win_hosts

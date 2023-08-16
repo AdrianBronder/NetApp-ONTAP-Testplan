@@ -25,7 +25,7 @@
       validate_certs: false
       use_rest:       "Always"
   vars_files:
-    - ../../playbooks/vars/vars_devlab.yml
+    - ../../playbooks/vars/vars_labondemand.yml
   collections:
     - netapp.ontap
 
@@ -144,7 +144,7 @@
       state:                        present
       vserver:                      "{{ ontap_tier_svm.name }}"
       destination:                  0.0.0.0/0
-      gateway:                      "{{ pocenv_default_gateway }}"
+      gateway:                      "{{ testenv_default_gateway }}"
       metric:                       30
       hostname:                     "{{ ontap_hostname }}"
       <<: *input_02

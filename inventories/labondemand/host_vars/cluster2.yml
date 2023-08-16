@@ -8,7 +8,36 @@ cluster_nodes:
     location:                     "Virtual DC02 | Virtual Rack 02"
 
 svm_svms:
-  -
+  - name:                         "ntap-backup-svm01"
+    cifs_name:                    "backup-svm01"
+
+protocols_cifs_services:
+  - name:                         "backup-svm01"
+    svm:
+      name:                       "{{ svm_svms[0].name }}"
+    ad_domain:
+      fqdn:                       "{{ testenv_ad_domain }}"
+      organizational_unit":       "{{ testenv_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is the default NAS backup \
+                                   location"
+    enabled:                      true
 
 network_ip_interfaces:
-  -
+  - name:                         "{{ svm_svms[0].name }}"
+    svm:
+      name:                       "{{ svm_svms[0].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.231"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      failover:                   "default"
+      auto_revert: true
+    ipspace:
+      name:                       "Default"
+    service_policy:
+      name:                       "default-data-files"

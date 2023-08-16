@@ -1,27 +1,15 @@
 ################################################################################
 #
-# Title:        BSS-00-01.yml
+# Title:        ONTAP-00-01.yml
 # Author:       NetApp Inc. (badrian)
 # Date:         2023-07-25
-# Description:  Preparing storage array for PoC test steps
+# Description:  Initial cluster configuration for testing
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
 #
 # Built-in help:
-# ansible-doc netapp.ontap.na_ontap_dns
-# ansible-doc netapp.ontap.na_ontap_ntp
-# ansible-doc netapp.ontap.na_ontap_cluster
-# ansible-doc netapp.ontap.na_ontap_security_key_manager
-# ansible-doc netapp.ontap.netapp.ontap.na_ontap_svm_options
-# ansible-doc netapp.ontap.na_ontap_svm
-# ansible-doc netapp.ontap.na_ontap_rest_cli
-# ansible-doc netapp.ontap.na_ontap_interface
-# ansibel-doc netapp.ontap.na_ontap_net_routes
-# ansible-doc netapp.ontap.na_ontap_cifs_server
-# ansible-doc netapp.ontap.na_ontap_export_policy
-# ansible-doc netapp.ontap.na_ontap_export_policy_rule
-# ansible-doc netapp.ontap.na_ontap_volume
+# ansible-doc <module.name>
 # 
 ################################################################################
 
@@ -29,8 +17,8 @@
   name:               ONTAP-00-01
   gather_facts:       false
   vars_prompt:
-    - name:           pocenv_ad_join_pw
-      prompt:         "Please enter password for user  {{ pocenv_ad_join_user }}"
+    - name:           testenv_ad_join_pw
+      prompt:         "Please enter password for user  {{ testenv_ad_join_user }}"
       private:        true
   vars:
     input: &input
@@ -52,8 +40,8 @@
     netapp.ontap.na_ontap_dns:
       state:                      present
       vserver:                    "{{ ontap_primary_cluster }}"
-      domains:                    "{{ pocenv_dns_domains }}"
-      nameservers:                "{{ pocenv_default_dns_nameservers }}"
+      domains:                    "{{ testenv_dns_domains }}"
+      nameservers:                "{{ testenv_dns_nameservers }}"
       hostname:                   "{{ ontap_hostname }}"
       use_rest:                   "never"
       <<: *input
@@ -67,13 +55,13 @@
       use_rest:                   "Always"
       <<: *input
     loop:
-      "{{ pocenv_default_ntp_serveres }}"
+      "{{ testenv_ntp_serveres }}"
 
   - name: Set timezone on storage cluster
     netapp.ontap.na_ontap_cluster:
       state:                      present
       timezone:
-        name:                     "{{ pocenv_timezone }}"
+        name:                     "{{ testenv_timezone }}"
       hostname:                   "{{ ontap_hostname }}"
       use_rest:                   "Always"
       <<: *input
@@ -82,7 +70,7 @@
     netapp.ontap.na_ontap_security_key_manager:
       state:                      present
       onboard:
-        passphrase:               "{{ pocenv_keymanager_passphrase }}!"
+        passphrase:               "{{ testenv_keymanager_passphrase }}!"
       hostname:                   "{{ ontap_hostname }}"
       use_rest:                   "Always"
       <<: *input
@@ -178,7 +166,7 @@
       state:                      present
       vserver:                    "{{ item.name }}"
       destination:                "0.0.0.0/0"
-      gateway:                    "{{ pocenv_default_gateway }}"
+      gateway:                    "{{ testenv_default_gateway }}"
       hostname:                   "{{ ontap_hostname }}"
       use_rest:                   "Always"
       <<: *input
@@ -191,8 +179,8 @@
     netapp.ontap.na_ontap_dns:
       state:                      present
       vserver:                    "{{ item.name }}"
-      domains:                    "{{ pocenv_dns_domains }}"
-      nameservers:                "{{ pocenv_default_dns_nameservers }}"
+      domains:                    "{{ testenv_dns_domains }}"
+      nameservers:                "{{ testenv_dns_nameservers }}"
       hostname:                   "{{ ontap_hostname }}"
       use_rest:                   "Always"
       <<: *input
@@ -207,10 +195,10 @@
       name:                       "{{ item.cifs_name }}"                  
       vserver:                    "{{ item.name }}"
       service_state:              started
-      domain:                     "{{ pocenv_default_ad_domain }}"
-      ou:                         "{{ pocenv_default_ad_ou_path }}"
-      admin_user_name:            "{{ pocenv_ad_join_user }}"
-      admin_password:             "{{ pocenv_ad_join_pw }}"
+      domain:                     "{{ testenv_ad_domain }}"
+      ou:                         "{{ testenv_storage_ad_ou_path }}"
+      admin_user_name:            "{{ testenv_ad_join_user }}"
+      admin_password:             "{{ testenv_ad_join_pw }}"
       hostname:                   "{{ ontap_hostname }}"
       use_rest:                   "Always"
       <<: *input

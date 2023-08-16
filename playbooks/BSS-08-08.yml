@@ -162,7 +162,7 @@
       msg: "{{ item }}"
     loop: "{{ ontap_cifs.ontap_info.protocols_cifs_shares.records }}"
 
-- hosts:              "{{ pocenv_lin_hosts }}"
+- hosts:              "{{ testenv_lin_hosts }}"
   name:               BSS-08-08 - Linux Play
   gather_facts:       false
   vars_files:
@@ -172,7 +172,7 @@
   - name: Ensure stale mounts are removed before proceding (in case a mount exists)
     ansible.posix.mount:
       state:                      "absent"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ pocenv_secondary_dns_domain }}:/{{ ontap_03_volume_name }}"
+      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_primary_dns_domain }}:/{{ ontap_03_volume_name }}"
       path:                       "{{ ontap_08_mount_path }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
@@ -186,7 +186,7 @@
   - name: Mount NFS export on Linux host
     ansible.posix.mount:
       state:                      "mounted"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ pocenv_secondary_dns_domain }}:/{{ ontap_08_mixed_vol_name }}"
+      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_primary_dns_domain }}:/{{ ontap_08_mixed_vol_name }}"
       path:                       "{{ ontap_08_mount_path }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
