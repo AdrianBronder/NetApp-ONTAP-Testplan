@@ -64,7 +64,7 @@ echo "Installing OpenSSL..."
 sudo make install > /dev/null
 sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
 sudo ldconfig
-rm -rf $DOWNLOADPATH/openssl-*
+rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz
 export PATH=$PATH:$OPENSSLPATH/bin
 cd $SCRIPTPATH
 
@@ -83,7 +83,7 @@ sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3
 sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
 sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
 sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
-rm -rf $DOWNLOADPATH/Python-*
+rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
 export PATH=$PATH:~/.local/bin
 cd $SCRIPTPATH
 

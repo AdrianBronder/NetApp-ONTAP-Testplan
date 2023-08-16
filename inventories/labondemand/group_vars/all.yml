@@ -1,7 +1,7 @@
-testenv_default_gateway:           "192.168.0.1"
-testenv_default_dns_domain:        "demo.netapp.com"
-testenv_ad_domain:                 "{{ testenv_default_dns_domain }}"
-testenv_storage_ad_ou_path:        "OU=Storage,DC=DEMO,DC=NETAPP,DC=COM"
+testenv_default_gateway:          "192.168.0.1"
+testenv_default_dns_domain:       "demo.netapp.com"
+testenv_ad_domain:                "{{ testenv_default_dns_domain }}"
+testenv_storage_ad_ou_path:       "OU=Storage,DC=DEMO,DC=NETAPP,DC=COM"
 testenv_dns_domains:
 - "{{ testenv_default_dns_domain }}"
 testenv_dns_nameservers:
@@ -9,9 +9,11 @@ testenv_dns_nameservers:
 testenv_ntp_serveres:
 - "0.us.pool.ntp.org"
 - "2.us.pool.ntp.org"
-testenv_timezone:                  "America/New_York"
+testenv_timezone:                 "America/New_York"
 
 testenv_lin_hosts:
 - "centos1"
 testenv_win_hosts:
 - "jumphost"
+
+testenv_default_storage_net_port: "e0c"
