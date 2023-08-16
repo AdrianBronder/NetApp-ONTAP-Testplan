@@ -11,8 +11,9 @@
 #
 ################################################################################
 
-- hosts:              dc1
-  gather_facts: false
+- hosts:              "dc1"
+  name:               "Initialize Lab DC"
+  gather_facts:       false
   vars_prompt:
     - name:           ansible_user
       prompt:         "Please enter the username for connecting to {{ ansible_host }}"
@@ -37,6 +38,7 @@
     - ../../playbooks/vars/vars_labondemand.yml
   collections:
     - community.windows
+    - microsoft.ad
 
   tasks:
   - name: Create DNS record for centos1
@@ -69,13 +71,13 @@
       zone:                        "{{ testenv_default_dns_domain }}"
 
   - name: Create OU in Active Directory
-    community.windows.win_domain_ou:
+    microsoft.ad.win_domain_ou:
       state:                       present
       name:                        "{{ testenv_storage_ad_ou_path.split(',')[0].split('=')[1] }}"
       path:                        "{{ ','.join(testenv_storage_ad_ou_path.split(',')[1:]) }}"
 
   - name: Create LoD Groups in AD
-    community.windows.win_domain_group:
+    microsoft.ad.win_domain_group:
       state:                       present
       name:                        "{{ item.name }}"
       scope:                       "global"
@@ -84,7 +86,7 @@
       "{{ ad_org_groups }}"
 
   - name: Create LoD Users in AD
-    community.windows.win_domain_user:
+    microsoft.ad.win_domain_user:
       state:                       present
       name:                        "{{ item.1 }}"
       path:                        "CN=Users,DC=demo,DC=netapp,DC=com"
