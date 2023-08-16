@@ -66,7 +66,7 @@ echo "--> Installing Asnible"
 pip3 install 'ansible-core==2.15.2'
 
 echo "--> Installing additional ansible collections"
-ansible-galaxy collection install -r ./requirements.yml --ignore-certs
+ansible-galaxy collection install -r $(dirname $0)/requirements.yml --ignore-certs
 
 echo "--> Creating Users and groups in AD (dc1)"
 ansible-playbook -i $(dirname $0)/init_helper/init_inventory $(dirname $0)/init_helper/init_ad.yml
