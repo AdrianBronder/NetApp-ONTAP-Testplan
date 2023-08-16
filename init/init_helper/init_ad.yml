@@ -78,6 +78,15 @@
     loop:
       "{{ ad_org_groups }}"
 
+  - name: debug LoD Users
+    ansible.builtin.debug:
+      msg:
+        - "{{ item.1 }}"
+        - "{{ item.0.name }}"
+    with_subelements:
+      - "{{ ad_org_groups }}"
+      - users
+
   - name: Create LoD Users in AD
     microsoft.ad.user:
       state:                       present
@@ -88,7 +97,8 @@
       password_never_expires:      "yes"
       user_cannot_change_password: "yes"
       groups:
-        - "{{ item.0.name }}"
+        add:
+          - "{{ item.0.name }}"
     with_subelements:
       - "{{ ad_org_groups }}"
       - users
