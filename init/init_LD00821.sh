@@ -4,7 +4,7 @@
 #
 # Title:        init_LD00821.sh
 # Author:       Adrian Bronder
-# Initial Date: 2023-07-25
+# Initial Date: 2023-08-16
 # Description:  Prepare linux host "centos1" in LoD lab LD00821
 #               --> "Early Adopter Lab for ONTAP 9.13.1"
 #
@@ -14,6 +14,8 @@
 #
 ################################################################################
 
+echo ""
+echo ""
 echo "--> Setting variables & paths"
 OPENSSLVERS="1.1.1u"
 PYTHON3VERS="3.9.17"
@@ -28,9 +30,13 @@ echo "Path to this script:  $SCRIPTPATH"
 echo "Download path:        $DOWNLOADPATH"
 echo "OpenSSL path:         $OPENSSLPATH" 
 
+echo ""
+echo ""
 echo "--> Updating Cetnos system"
 sudo yum -y update
 
+echo ""
+echo ""
 echo "--> Remove Python3"
 sudo yum remove -y python3
 sudo rm -f /usr/bin/python3
@@ -38,10 +44,14 @@ sudo rm -f /usr/bin/pip3
 sudo rm -rf /usr/local/lib
 rm -rf ~/.local/*
 
+echo ""
+echo ""
 echo "--> Installing additional packages"
 sudo yum install -y wget gcc libffi-devel epel-release zlib-devel jq libxml2 git krb5-devel sshpass --skip-broken
 sudo yum erase -y openssl
 
+echo ""
+echo ""
 echo "--> Install OpenSSL"
 sudo mkdir $DOWNLOADPATH
 sudo wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
@@ -57,6 +67,8 @@ sudo ldconfig
 export PATH=$PATH:$OPENSSLPATH/bin
 cd $SCRIPTPATH
 
+echo ""
+echo ""
 echo "--> Install Python3"
 sudo mkdir $DOWNLOADPATH
 sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
@@ -73,22 +85,33 @@ sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
 export PATH=$PATH:~/.local/bin
 cd $SCRIPTPATH
 
-
+echo ""
+echo ""
 echo "--> Upgrading pip"
 sudo pip3 install --upgrade pip
 
+echo ""
+echo ""
 echo "--> Installing additional Python libs"
 sudo pip3 install --upgrade requests six netapp_lib selinux
 sudo pip3 install --upgrade "pywinrm[kerberos]>=0.3.0"
 
+echo ""
+echo ""
 echo "--> Installing Asnible"
 pip3 install ansible-core==$ANSIBLEVERS
 
+echo ""
+echo ""
 echo "--> Installing additional ansible collections"
 ansible-galaxy collection install -r $SCRIPTPATH/requirements.yml --ignore-certs
 
+echo ""
+echo ""
 echo "--> Creating Users and groups in AD (dc1)"
 ansible-playbook -i $SCRIPTPATH/init_helper/init_inventory $SCRIPTPATH/init_helper/init_ad.yml
 
+echo ""
+echo ""
 echo "--> Prepare primary storage system (cluster1)"
 ansible-playbook -i $SCRIPTPATH/init_helper/init_inventory $SCRIPTPATH/init_helper/init_ontap.yml
