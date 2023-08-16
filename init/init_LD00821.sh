@@ -114,9 +114,9 @@ ansible-galaxy collection install -r $SCRIPTPATH/requirements.yml --ignore-certs
 echo ""
 echo ""
 echo "--> Creating Users and groups in AD (dc1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
 
 echo ""
 echo ""
 echo "--> Prepare primary storage system (cluster1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ontap.yml
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ontap.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
