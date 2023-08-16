@@ -39,7 +39,7 @@ sudo make install
 sudo echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
 sudo ldconfig
 export PATH=$PATH:/usr/local/openssl/bin
-cd (dirname $0)
+cd $(dirname $0)
 
 echo "--> Install Python3"
 sudo mkdir /tmp/download-python
@@ -53,7 +53,7 @@ sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
 sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
 sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
 export PATH=$PATH:~/.local/bin
-cd (dirname $0)
+cd $(dirname $0)
 
 echo "--> Upgrading pip"
 sudo pip3 install --upgrade pip

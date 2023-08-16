@@ -26,7 +26,7 @@
 ################################################################################
 
 - hosts:              "{{ ontap_primary_cluster }}"
-  name:               BSS-00-01
+  name:               ONTAP-00-01
   gather_facts:       false
   vars_prompt:
     - name:           pocenv_ad_join_pw
