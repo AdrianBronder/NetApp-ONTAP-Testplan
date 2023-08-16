@@ -47,9 +47,11 @@ sudo mkdir $DOWNLOADPATH
 sudo wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
 sudo tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
 cd $DOWNLOADPATH/openssl-$OPENSSLVERS
-sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH
+echo "Configuring OpenSSL..."
+sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH > /dev/null
 sudo make
-sudo make install
+echo "Installing OpenSSL..."
+sudo make install > /dev/null
 sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
 sudo ldconfig
 export PATH=$PATH:$OPENSSLPATH/bin
@@ -60,8 +62,10 @@ sudo mkdir $DOWNLOADPATH
 sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
 sudo tar xfo $DOWNLOADPATH/Python-$PYTHON3VERS.tgz -C $DOWNLOADPATH
 cd $DOWNLOADPATH/Python-$PYTHON3VERS
-sudo ./configure --enable-optimizations --with-openssl="$OPENSSLPATH"
-sudo make altinstall
+echo "Configuring Python3..."
+sudo ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
+echo "Installing Python3..."
+sudo make altinstall > /dev/null
 sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3
 sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
 sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
