@@ -14,13 +14,6 @@
 - hosts:              "dc1"
   name:               "Initialize Lab DC"
   gather_facts:       false
-#  vars_prompt:
-#    - name:           ansible_user
-#      prompt:         "Please enter the username for connecting to {{ ansible_host }}"
-#      private:        false
-#    - name:           ansible_password
-#      prompt:         "Please enter password for user  {{ ansible_user }}"
-#      private:        true
   vars:
     separator: '\'
     ad_org_groups:
