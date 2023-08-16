@@ -11,7 +11,7 @@
 #
 ################################################################################
 
-- hosts: dc1
+- hosts:              dc1
   gather_facts: false
   vars_prompt:
     - name:           ansible_user
