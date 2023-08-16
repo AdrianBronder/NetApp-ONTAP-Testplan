@@ -17,6 +17,7 @@
 echo ""
 echo ""
 echo "--> Setting variables & paths"
+source ~/.bashrc
 OPENSSLVERS="1.1.1u"
 PYTHON3VERS="3.9.17"
 ANSIBLEVERS="2.15.2"
@@ -32,7 +33,7 @@ echo "OpenSSL path:         $OPENSSLPATH"
 
 echo ""
 echo ""
-echo "--> Updating Cetnos system"
+echo "--> Updating Centos system"
 sudo yum -y update
 
 echo ""
