@@ -37,7 +37,7 @@
       fields:
       - "svm"
       use_python_keys:            true
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: vol_info
 
@@ -47,7 +47,7 @@
       name:                       "{{ item.name }}"
       vserver:                    "{{ item.svm.name }}"
       wait_for_completion:        true
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
     - vol_info.ontap_info['storage/volumes'].num_records|int > 0
