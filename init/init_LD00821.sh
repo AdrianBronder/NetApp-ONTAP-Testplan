@@ -49,7 +49,7 @@ sudo tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
 cd $DOWNLOADPATH/openssl-$OPENSSLVERS
 echo "Configuring OpenSSL..."
 sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH > /dev/null
-sudo make
+sudo make > /dev/null
 echo "Installing OpenSSL..."
 sudo make install > /dev/null
 sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
