@@ -54,49 +54,41 @@ sudo yum erase -y openssl
 echo ""
 echo ""
 echo "--> Install OpenSSL"
-if [[ $(openssl version | awk '{print $2}') == $OPENSSLVERS ]]; then
-    echo "OpenSSL $OPENSSLVERS already installed - skipping"
-else
-    sudo mkdir $DOWNLOADPATH
-    sudo wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
-    sudo tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
-    cd $DOWNLOADPATH/openssl-$OPENSSLVERS
-    echo "Configuring OpenSSL..."
-    sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH > /dev/null
-    sudo make > /dev/null
-    echo "Installing OpenSSL..."
-    sudo make install > /dev/null
-    sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
-    sudo ldconfig
-    rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz#
-    echo "export PATH=$PATH:$OPENSSLPATH/bin" >> ~/.bashrc
-    source ~/.bashrc
-    cd $SCRIPTPATH
-fi
+sudo mkdir $DOWNLOADPATH
+sudo wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
+sudo tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
+cd $DOWNLOADPATH/openssl-$OPENSSLVERS
+echo "Configuring OpenSSL..."
+sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH > /dev/null
+sudo make > /dev/null
+echo "Installing OpenSSL..."
+sudo make install > /dev/null
+sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
+sudo ldconfig
+rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz#
+echo "export PATH=$PATH:$OPENSSLPATH/bin" >> ~/.bashrc
+source ~/.bashrc
+cd $SCRIPTPATH
 
 echo ""
 echo ""
 echo "--> Install Python3"
-if [[ $(python3 --version | awk '{print $2}') == $PYTHONVERS ]]; then
-    echo "Python $PYTHONVERS already installed - skipping"
-else
-    sudo mkdir $DOWNLOADPATH
-    sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
-    sudo tar xfo $DOWNLOADPATH/Python-$PYTHON3VERS.tgz -C $DOWNLOADPATH
-    cd $DOWNLOADPATH/Python-$PYTHON3VERS
-    echo "Configuring Python3..."
-    sudo ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
-    echo "Installing Python3..."
-    sudo make altinstall > /dev/null
-    sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3
-    sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
-    sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
-    sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
-    rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
-    echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
-    source ~/.bashrc
-    cd $SCRIPTPATH
-fi
+sudo mkdir $DOWNLOADPATH
+sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
+sudo tar xfo $DOWNLOADPATH/Python-$PYTHON3VERS.tgz -C $DOWNLOADPATH
+cd $DOWNLOADPATH/Python-$PYTHON3VERS
+echo "Configuring Python3..."
+sudo ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
+echo "Installing Python3..."
+sudo make altinstall > /dev/null
+sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3
+sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
+sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
+sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
+rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
+echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
+source ~/.bashrc
+cd $SCRIPTPATH
 
 echo ""
 echo ""
