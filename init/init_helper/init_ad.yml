@@ -71,13 +71,13 @@
       zone:                        "{{ testenv_default_dns_domain }}"
 
   - name: Create OU in Active Directory
-    microsoft.ad.win_domain_ou:
+    microsoft.ad.ou:
       state:                       present
       name:                        "{{ testenv_storage_ad_ou_path.split(',')[0].split('=')[1] }}"
       path:                        "{{ ','.join(testenv_storage_ad_ou_path.split(',')[1:]) }}"
 
   - name: Create LoD Groups in AD
-    microsoft.ad.win_domain_group:
+    microsoft.ad.group:
       state:                       present
       name:                        "{{ item.name }}"
       scope:                       "global"
@@ -86,7 +86,7 @@
       "{{ ad_org_groups }}"
 
   - name: Create LoD Users in AD
-    microsoft.ad.win_domain_user:
+    microsoft.ad.user:
       state:                       present
       name:                        "{{ item.1 }}"
       path:                        "CN=Users,DC=demo,DC=netapp,DC=com"
