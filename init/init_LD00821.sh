@@ -14,6 +14,20 @@
 #
 ################################################################################
 
+echo "--> Setting variables & paths"
+OPENSSLVERS="1.1.1u"
+PYTHON3VERS="3.9.17"
+ANSIBLEVERS="2.15.2"
+SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+DOWNLOADPATH="/tmp/downloads"
+OPENSSLPATH="/usr/local/openssl"
+echo "OpenSSL version to be installed: $OPENSSLVERS"
+echo "Python3 version to be installed: $PYTHON3VERS"
+echo "Ansible version to be installed: $ANSIBLEVERS"
+echo "Path to this script:  $SCRIPTPATH"
+echo "Download path:        $DOWNLOADPATH"
+echo "OpenSSL path:         $OPENSSLPATH" 
+
 echo "--> Updating Cetnos system"
 sudo yum -y update
 
@@ -29,31 +43,32 @@ sudo yum install -y wget gcc libffi-devel epel-release zlib-devel jq libxml2 git
 sudo yum erase -y openssl
 
 echo "--> Install OpenSSL"
-sudo mkdir /tmp/download-openssl
-sudo wget -P /tmp/download-openssl https://www.openssl.org/source/openssl-1.1.1u.tar.gz
-sudo tar xfo /tmp/download-openssl/openssl-1.1.1u.tar.gz -C /opt/
-cd /opt/openssl-1.1.1u
-sudo ./config --prefix=/usr/local/openssl --openssldir=/usr/local/openssl
+sudo mkdir $DOWNLOADPATH
+sudo wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
+sudo tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
+cd $DOWNLOADPATH/openssl-$OPENSSLVERS
+sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH
 sudo make
 sudo make install
-sudo echo "/usr/local/openssl/lib" > /etc/ld.so.conf.d/openssl.conf
+sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
 sudo ldconfig
-export PATH=$PATH:/usr/local/openssl/bin
-cd $(dirname $0)
+export PATH=$PATH:$OPENSSLPATH/bin
+cd $SCRIPTPATH
 
 echo "--> Install Python3"
-sudo mkdir /tmp/download-python
-sudo wget -P /tmp/download-python https://www.python.org/ftp/python/3.9.17/Python-3.9.17.tgz
-sudo tar xfo /tmp/download-python/Python-3.9.17.tgz -C /opt/
-cd /opt/Python-3.9.17
-sudo ./configure --enable-optimizations --with-openssl="/usr/local/openssl"
+sudo mkdir $DOWNLOADPATH
+sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
+sudo tar xfo $DOWNLOADPATH/Python-$PYTHON3VERS.tgz -C $DOWNLOADPATH
+cd $DOWNLOADPATH/Python-$PYTHON3VERS
+sudo ./configure --enable-optimizations --with-openssl="$OPENSSLPATH"
 sudo make altinstall
 sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3
 sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
 sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
 sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
 export PATH=$PATH:~/.local/bin
-cd $(dirname $0)
+cd $SCRIPTPATH
+
 
 echo "--> Upgrading pip"
 sudo pip3 install --upgrade pip
@@ -63,13 +78,13 @@ sudo pip3 install --upgrade requests six netapp_lib selinux
 sudo pip3 install --upgrade "pywinrm[kerberos]>=0.3.0"
 
 echo "--> Installing Asnible"
-pip3 install 'ansible-core==2.15.2'
+pip3 install ansible-core==$ANSIBLEVERS
 
 echo "--> Installing additional ansible collections"
-ansible-galaxy collection install -r $(dirname $0)/requirements.yml --ignore-certs
+ansible-galaxy collection install -r $SCRIPTPATH/requirements.yml --ignore-certs
 
 echo "--> Creating Users and groups in AD (dc1)"
-ansible-playbook -i $(dirname $0)/init_helper/init_inventory $(dirname $0)/init_helper/init_ad.yml
+ansible-playbook -i $SCRIPTPATH/init_helper/init_inventory $SCRIPTPATH/init_helper/init_ad.yml
 
 echo "--> Prepare primary storage system (cluster1)"
-ansible-playbook -i $(dirname $0)/init_helper/init_inventory $(dirname $0)/init_helper/init_ontap.yml
+ansible-playbook -i $SCRIPTPATH/init_helper/init_inventory $SCRIPTPATH/init_helper/init_ontap.yml
