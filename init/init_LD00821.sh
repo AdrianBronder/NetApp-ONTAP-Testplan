@@ -67,8 +67,9 @@ else
     sudo make install > /dev/null
     sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
     sudo ldconfig
-    rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz
-    export PATH=$PATH:$OPENSSLPATH/bin
+    rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz#
+    echo "export PATH=$PATH:$OPENSSLPATH/bin" >> ~/.bashrc
+    source ~/.bashrc
     cd $SCRIPTPATH
 fi
 
@@ -76,7 +77,7 @@ echo ""
 echo ""
 echo "--> Install Python3"
 if [[ $(python3 --version | awk '{print $2}') == $PYTHONVERS ]]; then
-    echo "Python $OPENSSLVERS already installed - skipping"
+    echo "Python $PYTHONVERS already installed - skipping"
 else
     sudo mkdir $DOWNLOADPATH
     sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
@@ -91,7 +92,8 @@ else
     sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
     sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
     rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
-    export PATH=$PATH:~/.local/bin
+    echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
+    source ~/.bashrc
     cd $SCRIPTPATH
 fi
 
