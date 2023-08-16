@@ -38,7 +38,7 @@
       name:                        "centos1"
       type:                        "A"
       value:                       "192.168.0.61"
-      zone:                        "{{ testenv_primary_dns_domain }}"
+      zone:                        "{{ testenv_default_dns_domain }}"
 
   - name: Create DNS records for test SVMs (first IP of each SVM)
     community.windows.win_dns_record:
@@ -46,7 +46,7 @@
       name:                        "{{ item.name }}"
       type:                        "A"
       value:                       "{{ item.ip.address }}"
-      zone:                        "{{ testenv_primary_dns_domain }}"
+      zone:                        "{{ testenv_default_dns_domain }}"
     loop:
       "{{ hostvars['cluster1'].network_ip_interfaces | list + 
           hostvars['cluster2'].network_ip_interfaces | list }}"
@@ -59,7 +59,7 @@
       name:                        "s3server"
       type:                        "A"
       value:                       "192.168.0.233"
-      zone:                        "demo.netapp.com"
+      zone:                        "{{ testenv_default_dns_domain }}"
 
   - name: Create OU in Active Directory
     community.windows.win_domain_ou:

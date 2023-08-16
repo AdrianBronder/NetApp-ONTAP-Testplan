@@ -20,7 +20,7 @@
   - name: Unmount NFS export on Linux host and remove mount point
     ansible.posix.mount:
       state:                      "absent"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_primary_dns_domain }}:/{{ ontap_03_volume_name }}"
+      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_default_dns_domain }}:/{{ ontap_03_volume_name }}"
       path:                       "{{ ontap_03_mount_path }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"

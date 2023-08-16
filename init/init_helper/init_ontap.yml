@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:              "{{ ontap_primary_cluster }}"
+- hosts:              "{{ ontap_primary_test_cluster }}"
   name:               Initialize primary ONTAP cluster
   gather_facts:       false
   vars:
