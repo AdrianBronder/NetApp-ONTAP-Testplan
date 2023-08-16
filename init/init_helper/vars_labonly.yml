@@ -1,0 +1,32 @@
+# Fabric Pool varibles for setting up second cluster - cluster2
+ontap_secondary_cluster:          "cluster2"
+ontap_secondary_cluster_node01:   "cluster2-01"
+ontap_secondary_cluster_node02:   "cluster2-02"
+ontap_secondary_cluster_aggr01:   "cluster2_01_SSD_1"
+ontap_secondary_cluster_aggr02:   "cluster2_02_SSD_1"
+ontap_secondary_aggr_disks:       12
+ontap_tier_svm:
+  name:                           "s3server"
+  comment:                        "Fabric Pool Target"
+  mgmt_node:                      "{{ ontap_secondary_cluster_node02 }}"
+  mgmt_port:                      "e0c"
+  mgmt_int:                       "s3server_mgmt01"
+  mgmt_ip:                        "192.168.0.232"
+  mgmt_mask:                      "255.255.255.0"
+  data_node:                      "{{ ontap_secondary_cluster_node02 }}"
+  data_port:                      "e0c"
+  data_int:                       "s3server_data01"
+  data_ip:                        "192.168.0.233"
+  data_mask:                      "255.255.255.0"
+s3:
+  server_name:                    "s3server.demo.netapp.com"
+  server_ip:                      "{{ ontap_tier_svm.data_ip }}"
+  service_policy:                 "fabricpool_service_policy"
+  bucket_name:                    "bss-10-04-fabricpool-bucket"
+  bucket_size:                    838860800  # Bytes = 840 Mb 
+  policy:                         "fabricpool_policy"
+  user:                           "s3user"
+  user_access:                    "440355182AKPOISBTPUQ"
+  user_secret:                    "Dqt39fyc0_KUPErakNBNZbBpn9g6jZQtx__88rFc"
+  objectstore_name:               "s3objectstore"
+  ontap_cert_name:                "ontap_cert"

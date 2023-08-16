@@ -1,0 +1,14 @@
+cluster:
+  - name:                         "cluster2"
+
+cluster_nodes:
+  - name:                         "cluster2-01"
+    location:                     "Virtual DC02 | Virtual Rack 01"
+  - name:                         "cluster2-02"
+    location:                     "Virtual DC02 | Virtual Rack 02"
+
+svm_svms:
+  -
+
+network_ip_interfaces:
+  -

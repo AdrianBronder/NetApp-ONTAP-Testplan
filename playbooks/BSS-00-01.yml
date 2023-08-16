@@ -1,0 +1,266 @@
+################################################################################
+#
+# Title:        BSS-00-01.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-07-25
+# Description:  Preparing storage array for PoC test steps
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_dns
+# ansible-doc netapp.ontap.na_ontap_ntp
+# ansible-doc netapp.ontap.na_ontap_cluster
+# ansible-doc netapp.ontap.na_ontap_security_key_manager
+# ansible-doc netapp.ontap.netapp.ontap.na_ontap_svm_options
+# ansible-doc netapp.ontap.na_ontap_svm
+# ansible-doc netapp.ontap.na_ontap_rest_cli
+# ansible-doc netapp.ontap.na_ontap_interface
+# ansibel-doc netapp.ontap.na_ontap_net_routes
+# ansible-doc netapp.ontap.na_ontap_cifs_server
+# ansible-doc netapp.ontap.na_ontap_export_policy
+# ansible-doc netapp.ontap.na_ontap_export_policy_rule
+# ansible-doc netapp.ontap.na_ontap_volume
+# 
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-00-01
+  gather_facts:       false
+  vars_prompt:
+    - name:           pocenv_ad_join_pw
+      prompt:         "Please enter password for user  {{ pocenv_ad_join_user }}"
+      private:        true
+  vars:
+    input: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: PLACEHOLDER - 2FA Setup
+    ansible.builtin.debug:
+      msg: "PLACEHOLDER - 2FA Setup"
+  
+  - name: Create DNS config on storage cluster
+    netapp.ontap.na_ontap_dns:
+      state:                      present
+      vserver:                    "{{ ontap_primary_cluster }}"
+      domains:                    "{{ pocenv_dns_domains }}"
+      nameservers:                "{{ pocenv_default_dns_nameservers }}"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "never"
+      <<: *input
+
+  - name: Create NTP server on storage cluster
+    netapp.ontap.na_ontap_ntp:
+      state:                      present
+      server_name:                "{{ item }}"
+      version:                    auto
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ pocenv_default_ntp_serveres }}"
+
+  - name: Set timezone on storage cluster
+    netapp.ontap.na_ontap_cluster:
+      state:                      present
+      timezone:
+        name:                     "{{ pocenv_timezone }}"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+
+  - name: Configure onboard Key Manager
+    netapp.ontap.na_ontap_security_key_manager:
+      state:                      present
+      onboard:
+        passphrase:               "{{ pocenv_keymanager_passphrase }}!"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+
+  - name: Disable automatic encryption of storage objects
+    netapp.ontap.na_ontap_svm_options:
+      vserver:                    "{{ ontap_primary_cluster }}"
+      name:                       "encryption.data_at_rest_encryption.disable_by_default"
+      value:                      "on"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+
+  - name: Create SVMs for testing
+    netapp.ontap.na_ontap_svm:
+      state:                      present
+      name:                       "{{ item.name }}"
+      services:
+        cifs:
+          allowed: true
+        nfs:
+          allowed: true
+          enabled: true
+        fcp:
+          allowed: false
+        iscsi:
+          allowed: false
+        nvme:
+          allowed: false
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Patch SVM parameters for automatic analytics and activity tracking features
+    netapp.ontap.na_ontap_rest_cli:
+      command:                    'vserver'
+      verb:                       'PATCH'
+      params: 
+        vserver:                  "{{ item.name }}"
+      body:
+        auto-enable-analytics:    true
+        auto-enable-activity-tracking: true
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Patch SVM NFS service to support 64-bit file identifiers by default
+    netapp.ontap.na_ontap_rest_cli:
+      command:                    'vserver/nfs'
+      verb:                       'PATCH'
+      params: 
+        vserver:                  "{{ item.name }}"
+      body:
+        v3-64bit-identifiers:     "enabled"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+  
+  - name: Create network interfaces on SVMs
+    netapp.ontap.na_ontap_interface:
+      state:                      present
+      vserver:                    "{{ item[0].name }}"
+      interface_name:             "{{ item[1].lifname }}"
+      home_node:                  "{{ item[1].node }}"
+      home_port:                  "{{ item[1].port }}"
+      address:                    "{{ item[1].ip }}"
+      netmask:                    "{{ item[1].netmask }}"
+      service_policy:             "{{ item[1].service_policy }}"
+      is_auto_revert:             true
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+#      "{{ ontap_svms | subelements('lifs', 'skip_missing=True') }}"
+      "{{ q('ansible.builtin.subelements', ontap_svms, 'lifs', {'skip_missing': True}) }}"
+    loop_control:
+      label: "{{ item[0].name }} - {{ item[1].lifname }}"
+
+  - name: Configure default route on SVMs
+    netapp.ontap.na_ontap_net_routes:
+      state:                      present
+      vserver:                    "{{ item.name }}"
+      destination:                "0.0.0.0/0"
+      gateway:                    "{{ pocenv_default_gateway }}"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Configure DNS on SVMs
+    netapp.ontap.na_ontap_dns:
+      state:                      present
+      vserver:                    "{{ item.name }}"
+      domains:                    "{{ pocenv_dns_domains }}"
+      nameservers:                "{{ pocenv_default_dns_nameservers }}"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Create CIFS server on SVMs
+    netapp.ontap.na_ontap_cifs_server:
+      state:                      present
+      name:                       "{{ item.cifs_name }}"                  
+      vserver:                    "{{ item.name }}"
+      service_state:              started
+      domain:                     "{{ pocenv_default_ad_domain }}"
+      ou:                         "{{ pocenv_default_ad_ou_path }}"
+      admin_user_name:            "{{ pocenv_ad_join_user }}"
+      admin_password:             "{{ pocenv_ad_join_pw }}"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Create ro export policy (aka "storage group") for SVM root volume
+    netapp.ontap.na_ontap_export_policy:
+      state:                      present
+      name:                       "ro_{{ item.name }}"
+      vserver:                    "{{ item.name }}"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Create ro export policy rules for SVM root volume
+    na_ontap_export_policy_rule:
+      state:                      present
+      name:                       "ro_{{ item.name }}"
+      vserver:                    "{{ item.name }}"
+      client_match:               "0.0.0.0/0"
+      ro_rule:                    "any"
+      rw_rule:                    "none"
+      protocol:                   "nfs"
+      super_user_security:        "none"
+      allow_suid:                 false
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+
+  - name: Apply RO export policy to SVM root volume
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ item.name.replace('-','_') }}_root"
+      vserver:                    "{{ item.name }}"
+      export_policy:              "ro_{{ item.name }}"
+      hostname:                   "{{ ontap_hostname }}"
+      use_rest:                   "Always"
+      <<: *input
+    loop:
+      "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}" 

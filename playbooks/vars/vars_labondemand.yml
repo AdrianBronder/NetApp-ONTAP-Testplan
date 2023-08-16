@@ -1,0 +1,171 @@
+# General - Environment
+pocenv_default_gateway:           "192.168.0.1"
+pocenv_primary_dns_domain:        "demo.netapp.com"
+pocenv_secondary_dns_domain:      "demo.netapp.com"
+pocenv_dns_domains:
+- "{{ pocenv_secondary_dns_domain }}"
+pocenv_default_dns_nameservers:
+- "192.168.0.253"
+pocenv_default_ntp_serveres:
+- "0.us.pool.ntp.org"
+- "2.us.pool.ntp.org"
+pocenv_timezone:                  "America/New_York"
+pocenv_default_ad_domain:         "{{ pocenv_primary_dns_domain }}"
+pocenv_default_ad_ou_path:        "OU=ServersOther,DC=DEMO,DC=NETAPP,DC=COM"
+pocenv_lin_hosts:
+- "centos1"
+pocenv_win_hosts:
+- "jumphost"
+
+# General - Storage Objects
+ontap_primary_test_cluster:       "cluster1"
+ontap_secondary_test_cluster:     "cluster2"
+ontap_primary_nas_svm:            "ntap-nas-svm01"
+ontap_secondary_nas_svm:          "ntap-nas-svm02"
+ontap_primary_backup_svm:         "ntap-backup-svm01"
+
+# General - Users
+ontap_admin_user:                 "admin"
+ontap_admin_password:             "Netapp1!"
+pocenv_ad_join_user:              "Administrator"
+# pocenv_ad_join_pw - "*_setup" variable is only used for lab initialization
+# for execution, vars_prompt is used in the playbook
+pocenv_ad_join_pw_setup:          "Netapp1!"
+pocenv_keymanager_passphrase:     "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
+
+# General - Config Defaults
+ontap_default_vol_size_gb:        500
+ontap_default_vol_size_increment_gb: 50
+ontap_default_fg_size_gb:         307200
+ontap_default_fg_size_increment_gb: 1024
+ontap_default_fg_multiplier:      8
+
+# BSS-02-01
+ontap_local_admin_user:           "poc_local_admin"
+ontap_local_admin_pw:             "CustomPoC1!"
+
+# BSS-02-02
+ontap_local_ro_user:              "poc_local_ro"
+ontap_local_ro_pw:                "CustomPoC2!"
+
+# BSS-02-03
+# using primary SVM for domain tunneling (cluster-level AD authentication)
+ontap_02_ad_tunnel_svm:           "{{ ontap_primary_nas_svm }}"
+
+# BSS-02-04
+ontap_ad_admin_group:             "DEMO\\poc_ad_admin_users"
+ontap_ad_admin_user:              "DEMO\\poc_ad_admin"
+# ontap_ad_admin_pw - "*_setup" variable is only used for lab initialization
+# for execution, vars_prompt is used in the playbook
+ontap_ad_admin_pw_setup:          "CustomPoC01ad!"
+
+# BSS-02-05
+ontap_ad_ro_group:                "DEMO\\poc_ad_ro_users"
+ontap_ad_ro_user:                 "DEMO\\poc_ad_ro"
+# ontap_ad_ro_pw - "*_setup" variable is only used for lab initialization
+# for execution, vars_prompt is used in the playbook
+ontap_ad_ro_pw_setup:             "CustomPoC01ad!"
+
+# BSS-02-06
+ontap_02_local_vol_name:          "bss_02_06_vol"
+
+# BSS-02-07
+ontap_02_ad_vol_name:             "bss_02_07_vol"
+
+# BSS-02-08
+ontap_02_local_cifs_share:        "bss_02_08_share"
+
+# BSS-02-09
+
+# BSS-02-10
+ontap_02_cifs_share:              "bss_02_10_share"
+
+# BSS-02-11
+ontap_02_snapshot_name:           "bss_02_11_snapshot"
+
+# BSS-02-12
+ontap_02_nondef_volume_name:      "bss_02_12_vol"
+ontap_02_nondef_snapshot_name:    "bss_02_12_snapshot"
+
+# BSS-02-13
+ontap_02_ro_snapshot_name:        "bss_02_13_snapshot"
+
+# BSS-03-01
+ontap_secondry_aggr_disks:
+- "VMw-1.21"
+- "VMw-1.22"
+- "VMw-1.23"
+- "VMw-1.24"
+- "VMw-1.25"
+- "VMw-1.26"
+- "VMw-1.27"
+- "VMw-1.28"
+- "VMw-1.29"
+- "VMw-1.30"
+- "VMw-1.31"
+- "VMw-1.32"
+- "VMw-1.33"
+
+# BSS-03-02
+ontap_03_policy_name:             "bss_03_policy"
+
+# BSS-03-03
+ontap_03_volume_name:             "bss_03_vol"
+
+# BSS-03-04
+
+# BSS-03-05
+
+# BSS-03-06
+ontap_03_mount_path:              "/mnt/bss_03"
+
+# BSS-03-07
+
+# BSS-03-08
+
+# BSS-03-09
+ontap_03_snapshot_name:           "bss_03_09_snapshot"
+
+# BSS-06-01
+ontap_06_policy_name:             "bss_06_01_policy"
+ontap_06_lin_vol_name:            "bss_06_01_linux_fg"
+ontap_06_win_vol_name:            "bss_06_01_win_fg"
+ontap_06_share_name:              "bss_06_01_share"
+
+# BSS-07-01
+ontap_07_policy_name:             "bss_07_01_policy"
+ontap_07_lin_vol_name:            "bss_07_01_linux_fg"
+ontap_07_win_vol_name:            "bss_07_01_win_fg"
+ontap_07_share_name:              "bss_07_01_share"
+
+# BSS-07-03
+ontap_07_encrypt_vol_name:        "bss_07_03_encrypt_vol"
+ontap_07_encrypt_share_name:      "bss_07_03_share"
+
+# BSS-08-02
+ontap_08_policy_name:             "bss_08_02_policy"
+
+# BSS-08-03
+ontap_08_mixed_vol_name:          "bss_08_03_mixed_vol"
+
+# BSS-08-06
+ontap_08_share_name:              "bss_08_06_share"
+ontap_08_mount_path:              "/mnt/bss_08_06"
+
+# BSS-08-09
+ontap_08_snapshot_name:           "bss_08_09_snapshot"
+
+# BSS-10-02
+ontap_10_policy_name:             "bss_10_02_policy"
+
+# BSS-10-03
+ontap_10_mixed_vol_name:          "bss_10_03_mixed_vol"
+ontap_10_mixed_share_name:        "bss_10_03_share"
+
+# BSS-10-04
+ontap_10_s3_objectstore_name:     "bss_10_04_s3objectstore"
+ontap_10_s3_provider_type:        "ONTAP_S3"
+ontap_10_s3_server_name:          "s3server.demo.netapp.com"
+ontap_10_s3_bucket_name:          "bss-10-04-fabricpool-bucket"  # Can't use underscores
+ontap_10_s3_user_access:          "Q1WO731BIPNR5HIET3JE"
+ontap_10_s3_user_secret:          "_P_bXfEX9sCa6JqmiP6xZ__dP4T1eJz996rpco4Z"

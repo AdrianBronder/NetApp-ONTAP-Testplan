@@ -1,0 +1,7 @@
+collections:
+  - name:     "netapp.ontap"
+    version:  "22.7.0"
+  - name:     "ansible.posix"
+    version:  "1.5.4"
+  - name:     "community.windows"
+    version:  "2.0.0"

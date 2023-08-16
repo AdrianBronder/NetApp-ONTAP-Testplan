@@ -1,0 +1,66 @@
+cluster:
+  - name:                         "cluster1"
+
+cluster_nodes:
+  - name:                         "cluster1-01"
+    location:                     "Virtual DC01 | Virtual Rack 01"
+  - name:                         "cluster1-02"
+    location:                     "Virtual DC01 | Virtual Rack 02"
+
+svm_svms:
+  - name:                         "ntap-nas-svm01"
+    cifs_name:                    "nas-svm01"
+    lifs:
+    - lifname:                    "ntap-nas-svm01_data01"
+      node:                       "{{ ontap_primary_cluster_node01 }}"
+      port:                       "e0c"
+      ip:                         "192.168.0.211"
+      netmask:                    "255.255.255.0"
+      service_policy:             "default-data-files"
+  - name:                         "ntap-nas-svm02"
+    cifs_name:                    "nas-svm02"
+    lifs:
+    - lifname:                    "ntap-nas-svm01_data01"
+      node:                       "{{ ontap_primary_cluster_node01 }}"
+      port:                       "e0c"
+      ip:                         "192.168.0.221"
+      netmask:                    "255.255.255.0"
+      service_policy:             "default-data-files"
+
+network_ip_interfaces:
+  - name:                         "{{ svm_svms[0].name }}_data01"
+    svm:
+      name:                       "{{ svm_svms[0].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.211"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      failover:                   "default"
+      auto_revert: true
+    ipspace:
+      name:                       "Default"
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "{{ svm_svms[1].name }}_data01"
+    svm:
+      name:                       "{{ svm_svms[1].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.221"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[1].name }}"
+      home_port:
+        name:                     "e0c"
+      failover:                   "default"
+      auto_revert: true
+    ipspace:
+      name:                       "Default"
+    service_policy:
+      name:                       "default-data-files"

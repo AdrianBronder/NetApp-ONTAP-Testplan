@@ -1,0 +1,38 @@
+################################################################################
+#
+# Title:        BSS-08-12.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-08-02
+# Description:  Recover volume from a snapshot
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_volume
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-08-12
+  gather_facts:       false
+  vars:
+    input: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Recover volume from a snapshot
+    netapp.ontap.na_ontap_volume:
+      name:                       "{{ ontap_08_mixed_vol_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      snapshot_restore:           "{{ ontap_08_snapshot_name }}"
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input

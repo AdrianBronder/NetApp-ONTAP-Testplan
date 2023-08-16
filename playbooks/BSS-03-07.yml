@@ -1,0 +1,83 @@
+################################################################################
+#
+# Title:        BSS-03-07.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-08-01
+# Description:  Remove volume masking (remove NFS access to volume)
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_volume
+#
+################################################################################
+
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-03-06 - Storage Play
+  gather_facts:       false
+  vars:
+    input: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+  - name: Get all FlexVols
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - storage/volumes
+      fields:
+        - name
+        - size
+        - nas
+      parameters:
+        name: "!vol0,!*_root"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: pre_ontap
+
+  - name: Show all FlexVols
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ pre_ontap.ontap_info.storage_volumes.records }}"
+
+  tasks:
+  - name: Modify FlexVol
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ ontap_03_volume_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      export_policy:              "default"
+      junction_path:              ""
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  post_tasks:
+  - name: Get all FlexVols
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - storage/volumes
+      fields:
+        - name
+        - size
+        - nas
+      parameters:
+        name: "!vol0,!*_root"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: pre_ontap
+
+  - name: Show all FlexVols
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ pre_ontap.ontap_info.storage_volumes.records }}"

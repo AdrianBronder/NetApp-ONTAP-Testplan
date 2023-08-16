@@ -1,0 +1,119 @@
+################################################################################
+#
+# Title:        BSS-02-10.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-07-31
+# Description:  Create CIFS share and ACLs
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_cifs
+# ansible-doc netapp.ontap.na_ontap_cifs_acl
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-02-10
+  gather_facts:       false
+  vars:
+    input: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+  - name: Get CIFS share with ACLs
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - protocols/cifs/shares
+      fields:
+        - name
+        - acls
+      parameters:
+        name: "!c$,!ipc$"
+      use_python_keys:          true
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+    register: pre_ontap
+
+  - name: Show all CIFS shares with ACLs
+    ansible.builtin.debug:
+      msg:
+        - "Share: {{ item.name }}"
+        - "ACLs: {{ item.acls }}"
+    loop: "{{ pre_ontap.ontap_info.protocols_cifs_shares.records }}"
+
+  tasks:
+  - name: Create a test share
+    netapp.ontap.na_ontap_cifs:
+      state:                      present
+      name:                       "{{ ontap_02_cifs_share }}"
+      path:                       "/{{ ontap_02_local_vol_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      browsable:                  true
+      oplocks:                    true
+      show_snapshot:              true
+      unix_symlink:               "local"
+      comment:                    "Share created with admin account"
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  - name: Remove "Full Control" for "Everyone"
+    netapp.ontap.na_ontap_cifs_acl:
+      state:                      absent
+      share_name:                 "{{ ontap_02_cifs_share }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      user_or_group:              "Everyone"
+      permission:                 "full_control"
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+  
+  - name: Create ACL on test share (admins - Full Control)
+    netapp.ontap.na_ontap_cifs_acl:
+      state:                      present
+      share_name:                 "{{ ontap_02_cifs_share }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      user_or_group:              "{{ ontap_ad_admin_user }}"
+      permission:                 "full_control"
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  - name: Create ACL on test share (read-only users - Read)
+    netapp.ontap.na_ontap_cifs_acl:
+      state:                      present
+      share_name:                 "{{ ontap_02_cifs_share }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      user_or_group:              "{{ ontap_ad_ro_user }}"
+      permission:                 "read"
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  post_tasks:
+  - name: Get CIFS share with ACLs
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - protocols/cifs/shares
+      fields:
+        - name
+        - acls
+      parameters:
+        name: "!c$,!ipc$"
+      use_python_keys:          true
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+    register: ontap
+
+  - name: Show all CIFS shares with ACLs
+    ansible.builtin.debug:
+      msg:
+        - "Share: {{ item.name }}"
+        - "ACLs: {{ item.acls }}"
+    loop: "{{ ontap.ontap_info.protocols_cifs_shares.records }}"

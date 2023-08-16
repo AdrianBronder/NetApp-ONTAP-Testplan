@@ -1,0 +1,53 @@
+################################################################################
+#
+# Title:        BSS-05-03.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-08-02
+# Description:  Invoke AutoSupport and show history
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_autosupport_invoke
+# ansible-doc netapp.ontap.na_ontap_rest_info
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-05-03
+  gather_facts:       false
+  vars:
+    input: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Send Test AutoSupport (Call Home)
+    netapp.ontap.na_ontap_autosupport_invoke:
+      autosupport_message:        "Invoked test autosupport as part of PoC test plan"
+      type:                       "test"
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  - name: Get list of sent autosupports
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "support/autosupport/messages"
+      fields:
+      - "*"
+      use_python_keys:            true
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+    register: ontap_info
+
+  - name: Print of sent AutoSupports (last 10)
+    ansible.builtin.debug:
+      msg: "{{ ontap_info.ontap_info.support_autosupport_messages.records[:10] }}"

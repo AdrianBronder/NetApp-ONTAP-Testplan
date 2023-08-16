@@ -1,0 +1,46 @@
+################################################################################
+#
+# Title:        BSS-02-12.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-07-31
+# Description:  Create snap on non-existing volume
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_snapshot
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-02-12
+  gather_facts:       false
+  vars:
+    input: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Error handling block
+    block:
+    - name: Create a test snapshot on non-existing volume
+      netapp.ontap.na_ontap_snapshot:
+        state:                      present
+        snapshot:                   "{{ ontap_02_nondef_snapshot_name }}"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        volume:                     "{{ ontap_02_nondef_volume_name }}"
+        hostname:                   "{{ ontap_hostname }}"
+        <<: *input
+    rescue:
+    - name: Printing rescue message
+      ansible.builtin.debug:
+        msg: "This error was expected - \
+              volume {{ ontap_02_nondef_volume_name }} does not exist"

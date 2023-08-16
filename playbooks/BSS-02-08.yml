@@ -1,0 +1,88 @@
+################################################################################
+#
+# Title:        BSS-02-08.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-07-28
+# Description:  Create CIFS share with a read-only as well as admin user
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_cifs
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-02-08 - Part 1 (read-only user)
+  gather_facts:       false
+  vars:
+    input_01: &input_01
+      username:       "{{ ontap_local_ro_user }}"
+      password:       "{{ ontap_local_ro_pw }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Error handling block
+    block:
+      - name: Create share with local read-only user
+        netapp.ontap.na_ontap_cifs:
+          state:                      present
+          name:                       "{{ ontap_02_local_cifs_share }}"
+          path:                       "/{{ ontap_02_local_vol_name }}"
+          vserver:                    "{{ ontap_primary_nas_svm }}"
+          browsable:                  true
+          oplocks:                    true
+          show_snapshot:              true
+          unix_symlink:               "local"
+          comment:                    "Share created with local read-only account"
+          hostname:                   "{{ ontap_hostname }}"
+          <<: *input_01
+    rescue:
+      - name: Printing rescue message
+        ansible.builtin.debug:
+          msg: "This error was expected - \
+                RO user cannot create ressources on storage array"
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-02-08 - Part 2 (admin user)
+  gather_facts:       false
+  vars:
+    input_02: &input_02
+      username:       "{{ ontap_local_admin_user }}"
+      password:       "{{ ontap_local_admin_pw }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Error handling block
+    block:
+      - name: Create share with local admin user
+        netapp.ontap.na_ontap_cifs:
+          state:                      present
+          name:                       "{{ ontap_02_local_cifs_share }}"
+          path:                       "/{{ ontap_02_local_vol_name }}"
+          vserver:                    "{{ ontap_primary_nas_svm }}"
+          browsable:                  true
+          oplocks:                    true
+          show_snapshot:              true
+          unix_symlink:               "local"
+          comment:                    "Share created with local admin account"
+          <<: *input_02
+          hostname:                   "{{ ontap_hostname }}"
+    rescue:
+      - name: Printing rescue message
+        ansible.builtin.debug:
+          msg: "This message should not appear - \
+                the admin user is allowed to create ressources on the storage array"

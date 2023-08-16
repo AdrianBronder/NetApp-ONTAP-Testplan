@@ -1,0 +1,133 @@
+################################################################################
+#
+# Title:        BSS-07-03.yml
+# Author:       NetApp. Inc (badrian)
+# Date:         2023-08-02
+# Description:  Create encrypted volume
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_volume
+# ansible-doc netapp.ontap.na_ontap_cifs
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-07-03
+  gather_facts:       false
+  vars:
+    input_01: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+  - name: Get all volumes
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - storage/volumes
+      fields:
+        - name
+        - encryption
+      parameters:
+        name: "!vol0,!*_root"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: pre_ontap_vols
+
+  - name: Show all volumes
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ pre_ontap_vols.ontap_info.storage_volumes.records }}"
+
+  - name: Get all export CIFS shares
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - protocols/cifs/shares
+      parameters:
+        name: "!ipc$,!c$"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: pre_ontap_cifs
+
+  - name: Show all CIFS shares
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ pre_ontap_cifs.ontap_info.protocols_cifs_shares.records }}"
+
+  tasks:
+  - name: Create encrypted FlexVol
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ ontap_07_encrypt_vol_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      volume_security_style:      "ntfs"
+      aggregate_name:             "{{ ontap_primary_cluster_aggr02 }}"
+      size:                       "{{ ontap_default_vol_size_gb }}"
+      size_unit:                  gb
+      space_guarantee:            "none"
+      tiering_policy:             "auto"
+      junction_path:              "/{{ ontap_07_encrypt_vol_name }}"
+      encrypt:                    True
+      wait_for_completion:        True
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  - name: Create a test share
+    netapp.ontap.na_ontap_cifs:
+      state:                      present
+      name:                       "{{ ontap_07_encrypt_share_name }}"
+      path:                       "/{{ ontap_07_encrypt_vol_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      browsable:                  true
+      oplocks:                    true
+      show_snapshot:              true
+      show_previous_versions:     true
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  post_tasks:
+  - name: Get all volumes
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - storage/volumes
+      fields:
+        - name
+        - encryption
+      parameters:
+        name: "!vol0,!*_root"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: ontap_vols
+
+  - name: Show all volumes
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ ontap_vols.ontap_info.storage_volumes.records }}"
+
+  - name: Get all export CIFS shares
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - protocols/cifs/shares
+      parameters:
+        name: "!ipc$,!c$"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: ontap_cifs
+
+  - name: Show all CIFS shares
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ ontap_cifs.ontap_info.protocols_cifs_shares.records }}"

@@ -1,0 +1,86 @@
+################################################################################
+#
+# Title:        BSS-03-03.yml
+# Author:       NetApp. Inc (shatfield)
+# Date:         2023-07-26
+# Description:  Create volume
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_aggregate
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-03-03
+  gather_facts:       false
+  vars:
+    input_01: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+  - name: Get all FlexVols
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - storage/volumes
+      fields:
+        - name
+        - size
+      parameters:
+        name: "!vol0,!*_root"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: pre_ontap
+
+  - name: Show all FlexVols
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ pre_ontap.ontap_info.storage_volumes.records }}"
+
+  tasks:
+  - name: Create FlexVol
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ ontap_03_volume_name }}"
+      aggregate_name:             "{{ ontap_primary_cluster_aggr02 }}"
+      size:                       "{{ ontap_default_vol_size_gb }}"
+      size_unit:                  gb
+      space_guarantee:            none
+      tiering_policy:             auto
+      export_policy:              default
+      junction_path:              "/{{ ontap_03_volume_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      wait_for_completion:        True
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+
+  post_tasks:
+  - name: Get all FlexVols
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - storage/volumes
+      fields:
+        - name
+        - size
+      parameters:
+        name: "!vol0,!*_root"
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      <<: *input
+    register: ontap
+
+  - name: Show all FlexVols
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ ontap.ontap_info.storage_volumes.records }}"

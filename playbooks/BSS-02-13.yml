@@ -1,0 +1,46 @@
+################################################################################
+#
+# Title:        BSS-02-13.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2023-07-31
+# Description:  Create a snapshot with non-privileged user
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.na_ontap_snapshot
+#
+################################################################################
+
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-02-13
+  gather_facts:       false
+  vars:
+    input: &input
+      username:       "{{ ontap_local_ro_user }}"
+      password:       "{{ ontap_local_ro_pw }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "Always"
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Error handling block
+    block:
+    - name: Create a test snapshot on volume
+      netapp.ontap.na_ontap_snapshot:
+        state:                      present
+        snapshot:                   "{{ ontap_02_ro_snapshot_name }}"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        volume:                     "{{ ontap_02_local_vol_name }}"
+        hostname:                   "{{ ontap_hostname }}"
+        <<: *input
+    rescue:
+    - name: Printing rescue message
+      ansible.builtin.debug:
+        msg: "This error was expected - \
+              user {{ ontap_local_ro_user }} is not allowed to create snapshots"

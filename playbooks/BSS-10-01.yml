@@ -1,0 +1,94 @@
+################################################################################
+#
+# Title:        BSS-10-01.yml
+# Author:       NetApp. Inc (badrian)
+# Date:         2023-08-03
+# Description:  Create Storage Pool (data aggregate)
+#               Ensuring aggregate exists when executing this test frame
+#               stand-alone
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+################################################################################
+
+### Does not work in lab with ansible 2.10.3 basic install
+#- hosts: localhost
+#  gather_facts: false
+#
+#- name: Include plays from BSS-03-01
+#  ansible.builtin.import_playbook:
+#    ./BSS-03-01.yml
+
+### Copy of BSS-03-01
+- hosts:              "{{ ontap_primary_cluster }}"
+  name:               BSS-10-01
+  gather_facts:       false
+  vars:
+    input: &input
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+  vars_files:
+    - vars/vars_labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: run ONTAP gather facts for aggregate info and volume info
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - storage/aggregates
+      fields:
+      - block_storage
+      parameters: 
+        name:                     "{{ ontap_primary_cluster_aggr02 }}"
+      use_python_keys:            true
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+    register: aggr_info
+  
+  # check if the aggregate exists
+  # - name: debug aggr_info num_records
+  #   debug:
+  #     msg: "{{ aggr_info.ontap_info['storage/aggregates'].num_records }}"
+
+  # retreive the aggregates disk_count
+  # - name: debug aggr_info num_records
+  #   debug:
+  #     msg: "{{ aggr_info.ontap_info['storage/aggregates'].records[0].block_storage.primary.disk_count }}"
+
+
+# note: na_ontap_aggregate is not idempotent
+# task is skipped if the aggregate exists to avoid adding disks
+# if disk add is desired see the commented debugs above to retreive the current disk count
+  - name: Create data aggregate (aka "Storage Pool")
+    netapp.ontap.na_ontap_aggregate:
+      state:                      present
+      #service_state:              online
+      name:                       "{{ ontap_primary_cluster_aggr02 }}"
+      disks:                      "{{ ontap_secondry_aggr_disks }}"
+      snaplock_type:              "non_snaplock"
+      <<: *input 
+      use_rest:                   "never"
+      hostname:                   "{{ ontap_hostname }}"
+    when: aggr_info.ontap_info.storage_aggregates.num_records|int == 0
+
+  post_tasks:
+  - name: Get all aggregates
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - storage/aggregates
+      fields:
+        - block_storage
+      use_python_keys:          true
+      hostname:                 "{{ ontap_hostname }}"
+      use_rest:                 "Always"
+      <<: *input
+    register: ontap
+
+  - name: Show all aggregates
+    ansible.builtin.debug:
+      msg: "{{ item }}"
+    loop: "{{ ontap.ontap_info.storage_aggregates.records }}"
