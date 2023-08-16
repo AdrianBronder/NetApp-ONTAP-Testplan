@@ -45,12 +45,12 @@
     netapp.ontap.na_ontap_volume:
       state:                      absent
       name:                       "{{ item.name }}"
-      vserver:                    "{{ item.svm.name }}"
+      vserver:                    "{{ item.svm.name }}" 
       wait_for_completion:        true
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-    - vol_info.ontap_info['storage/volumes'].num_records|int > 0
+    - vol_info.ontap_info.storage_volumes.num_records|int > 0
     - item.name is defined
     loop:
       "{{ vol_info.ontap_info.storage_volumes.records }}"
