@@ -36,6 +36,8 @@
       - "storage/volumes"
       fields:
       - "svm"
+      parameters:
+        is_svm_root: false
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input

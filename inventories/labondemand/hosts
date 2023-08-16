@@ -1,6 +1,6 @@
 [ontap]
 cluster1 ansible_host=cluster1.demo.netapp.com
-cluster2 ansible_host=cluster2.demo.netapp.coms
+cluster2 ansible_host=cluster2.demo.netapp.com
 
 [linux]
 centos1 ansible_host=centos1.demo.netapp.com
