@@ -56,7 +56,7 @@
     loop:
       - "{{ network_ethernet_ports }}"
     loop_control:
-      label: "{{ item }}"
+      label: "{{ item.name }}"
     when:
       - item.name is defined
 
@@ -88,6 +88,8 @@
       <<: *input
     loop:
       "{{ testenv_ntp_serveres }}"
+    retries: 5
+    delay:   5
 
   - name: Set timezone on storage cluster
     netapp.ontap.na_ontap_cluster:
