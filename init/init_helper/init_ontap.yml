@@ -30,20 +30,20 @@
     - netapp.ontap
 
   tasks:
-  - name: Get all volumes from clusters
+  - name: Get all non-root volumes from lab clusters
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
       - "storage/volumes"
       fields:
       - "svm"
       parameters:
-        is_svm_root: false
+        is_svm_root:              false
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
     register: vol_info
 
-  - name: Move volumes to standard test aggregate
+  - name: Delete all volumes from lab clusters
     netapp.ontap.na_ontap_volume:
       state:                      absent
       name:                       "{{ item.name }}"
@@ -57,9 +57,77 @@
     loop:
       "{{ vol_info.ontap_info.storage_volumes.records }}"
 
-#  - name: Delete non-standard aggregate
-#    netapp.ontap.na_ontap_aggregate:
-#      state:                      absent
-#      name:                       "{{ ontap_primary_cluster_aggr02 }}"
-#      hostname:                   "{{ ontap_hostname }}"
-#      <<: *input
+  - name: Get all SVM interfaces from lab clusters
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "network/ip/interfaces"
+      fields:
+      - "svm"
+      parameters:
+        scope:                    "svm"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: ip_int_info
+
+  - name: Delete all SVM network interfaces from lab clusters
+    netapp.ontap.na_ontap_volume:
+      state:                      absent
+      interface_name:             "{{ item.svm.name }}"
+      vserver: svm1
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    when:
+    - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
+    - item.name is defined
+    loop:
+      "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
+
+  - name: Get all SVM CIFS servers
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "protocols/cifs/services"
+      fields:
+      - "*"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: cifs_service_info
+
+  - name: Delete all SVM CIFS servers
+    netapp.ontap.na_ontap_cifs_server:
+      state:                      absent
+      name:                       "{{ item.name }}"                  
+      vserver:                    "{{ item.svm.name }}"
+      domain:                     "{{ item.ad.fqdn }}"
+      ou:                         "{{ item.ad.ou }}"
+      admin_user_name:            "{{ testenv_ad_join_user }}"
+      admin_password:             "{{ testenv_ad_join_pw }}"
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+    when:
+    - cifs_service_info.ontap_info.protocols_cifs_services.num_records|int > 0
+    - item.name is defined
+    loop:
+      "{{ cifs_service_info.ontap_info.protocols_cifs_services.records }}"
+
+  - name: Get all SVMs
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "svm/svms"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: svm_info
+
+  - name: Delete all SVMs
+    netapp.ontap.na_ontap_svm:
+      state:                      absent
+      name:                       "{{ item.name }}"                  
+      hostname:                   "{{ ontap_hostname }}"
+      <<: *input
+    when:
+    - svm_info.ontap_info.svm_svms.num_records|int > 0
+    - item.name is defined
+    loop:
+      "{{ svm_info.ontap_info.svm_svms.records }}"
