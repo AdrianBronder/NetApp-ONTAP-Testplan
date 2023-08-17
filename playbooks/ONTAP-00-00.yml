@@ -33,17 +33,19 @@
     ansible.builtin.debug:
       msg: "{{ ansible_host }} from {{ inventory_dir }}"
 
-  - name: Get Ontap Info
+  - name: Get ONTAP version info
     na_ontap_rest_info:
       gather_subset:
         - "cluster/software"
       fields:
-        - "nodes"
+        - "nodes.name"
+        - "nodes.version"
+      use_python_keys:            true
       <<: *input
       hostname:       "{{ ansible_host }}"
     register: netapp
 
-  - name: Print cluster details
+  - name: Print ONTAP version info
     ansible.builtin.debug:
       msg:
         - "{{ netapp }}"

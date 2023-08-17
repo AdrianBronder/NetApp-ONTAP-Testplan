@@ -39,19 +39,19 @@
   - name: Create DNS config on storage cluster
     netapp.ontap.na_ontap_dns:
       state:                      present
-      vserver:                    "{{ ontap_primary_cluster }}"
+      vserver:                    "{{ inventory_hostname }}"
       domains:                    "{{ testenv_dns_domains }}"
       nameservers:                "{{ testenv_dns_nameservers }}"
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "never"
+      hostname:                   "{{ ansible_host }}"
+      use_rest:                   "always"
       <<: *input
 
   - name: Create NTP server on storage cluster
     netapp.ontap.na_ontap_ntp:
       state:                      present
       server_name:                "{{ item }}"
-      version:                    auto
-      hostname:                   "{{ ontap_hostname }}"
+      version:                    "auto"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -62,7 +62,7 @@
       state:                      present
       timezone:
         name:                     "{{ testenv_timezone }}"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
 
@@ -71,7 +71,7 @@
       state:                      present
       onboard:
         passphrase:               "{{ testenv_keymanager_passphrase }}!"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
 
@@ -80,7 +80,7 @@
       vserver:                    "{{ ontap_primary_cluster }}"
       name:                       "encryption.data_at_rest_encryption.disable_by_default"
       value:                      "on"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
 
@@ -100,7 +100,7 @@
           allowed: false
         nvme:
           allowed: false
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -117,7 +117,7 @@
       body:
         auto-enable-analytics:    true
         auto-enable-activity-tracking: true
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -133,7 +133,7 @@
         vserver:                  "{{ item.name }}"
       body:
         v3-64bit-identifiers:     "enabled"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -152,7 +152,7 @@
       netmask:                    "{{ item[1].netmask }}"
       service_policy:             "{{ item[1].service_policy }}"
       is_auto_revert:             true
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -167,7 +167,7 @@
       vserver:                    "{{ item.name }}"
       destination:                "0.0.0.0/0"
       gateway:                    "{{ testenv_default_gateway }}"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -181,7 +181,7 @@
       vserver:                    "{{ item.name }}"
       domains:                    "{{ testenv_dns_domains }}"
       nameservers:                "{{ testenv_dns_nameservers }}"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -199,7 +199,7 @@
       ou:                         "{{ testenv_storage_ad_ou_path }}"
       admin_user_name:            "{{ testenv_ad_join_user }}"
       admin_password:             "{{ testenv_ad_join_pw }}"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -212,7 +212,7 @@
       state:                      present
       name:                       "ro_{{ item.name }}"
       vserver:                    "{{ item.name }}"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -231,7 +231,7 @@
       protocol:                   "nfs"
       super_user_security:        "none"
       allow_suid:                 false
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:
@@ -245,7 +245,7 @@
       name:                       "{{ item.name.replace('-','_') }}_root"
       vserver:                    "{{ item.name }}"
       export_policy:              "ro_{{ item.name }}"
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       use_rest:                   "always"
       <<: *input
     loop:

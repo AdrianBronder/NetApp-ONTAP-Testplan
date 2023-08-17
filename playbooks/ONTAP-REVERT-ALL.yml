@@ -186,3 +186,36 @@
     - item.name is defined
     loop:
       "{{ aggr_info.ontap_info.storage_aggregates.records }}"
+
+  - name: Remove DNS config from cluster
+    netapp.ontap.na_ontap_dns:
+      state:                      absent
+      vserver:                    "{{ inventory_hostname }}"
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+
+  - name: Remove NTP servers from cluster
+    netapp.ontap.na_ontap_ntp:
+      state:                      absent
+      server_name:                "{{ item }}"
+      hostname:                   "{{ ansible_host }}"
+      use_rest:                   "always"
+      <<: *input
+    loop:
+      "{{ testenv_ntp_serveres }}"
+
+  - name: Reset timezone on storage cluster to Etc/UTC
+    netapp.ontap.na_ontap_cluster:
+      state:                      present
+      timezone:
+        name:                     "Etc/UTC"
+      hostname:                   "{{ ansible_host }}"
+      use_rest:                   "always"
+      <<: *input
+
+  - name: Remove onboard key manager configuration
+    netapp.ontap.na_ontap_security_key_manager:
+      state:                      absent
+      hostname:                   "{{ ansible_host }}"
+      use_rest:                   "always"
+      <<: *input
