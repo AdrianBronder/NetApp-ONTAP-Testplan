@@ -71,7 +71,7 @@
     register: ip_int_info
 
   - name: Delete all SVM network interfaces from lab clusters
-    netapp.ontap.na_ontap_volume:
+    netapp.ontap.na_ontap_interface:
       state:                      absent
       interface_name:             "{{ item.svm.name }}"
       vserver: svm1
