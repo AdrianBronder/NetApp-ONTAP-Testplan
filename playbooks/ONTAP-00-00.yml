@@ -36,9 +36,9 @@
   - name: Get Ontap Info
     na_ontap_rest_info:
       gather_subset:
-        - "cluster"
-        - "cluster/nodes"
         - "cluster/software"
+      fields:
+        - "nodes"
       <<: *input
       hostname:       "{{ ansible_host }}"
     register: netapp
