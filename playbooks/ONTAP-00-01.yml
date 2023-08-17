@@ -58,7 +58,7 @@
     loop:
       "{{ network_ethernet_ports }}"
     loop_control:
-      label: "{{ item.name }}"
+      label: "{{ item.node.name }}:{{ item.name }}"
     when:
       - item.name is defined
 
@@ -74,7 +74,6 @@
   - name: Create DNS config on storage cluster
     netapp.ontap.na_ontap_dns:
       state:                      present
-      vserver:                    
       domains:                    "{{ testenv_dns_domains }}"
       nameservers:                "{{ testenv_dns_nameservers }}"
       hostname:                   "{{ ansible_host }}"
