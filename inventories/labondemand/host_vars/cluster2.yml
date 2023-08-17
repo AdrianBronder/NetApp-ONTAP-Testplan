@@ -13,8 +13,8 @@ network_ethernet_ports:
       name:                       "{{ cluster_nodes[0].name }}"
     lag:
       member_ports:
-        - name:                   "e1f"
-        - name:                   "e1g"
+        - name:                   "e0f"
+        - name:                   "e0g"
       distribution_policy:        "port"
       mode:                       "singlemode"
     broadcast_domain:
@@ -27,8 +27,8 @@ network_ethernet_ports:
       name:                       "{{ cluster_nodes[1].name }}"
     lag:
       member_ports:
-        - name:                   "e1f"
-        - name:                   "e1g"
+        - name:                   "e0f"
+        - name:                   "e0g"
       distribution_policy:        "port"
       mode:                       "singlemode"
     broadcast_domain:
