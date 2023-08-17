@@ -93,6 +93,8 @@
       - "svm"
       - "scope"
       - "service_policy"
+      parameters:
+        scope:                    "svm"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
@@ -111,6 +113,22 @@
     - item.scope == "svm"
     loop:
       "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
+
+  - name: Get all intercluster interfaces from lab clusters
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "network/ip/interfaces"
+      fields:
+      - "svm"
+      - "scope"
+      - "service_policy"
+      parameters:
+        scope:                    "cluster"
+        service_policy.name:      "default-intercluster"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: ip_int_info
 
   - name: Delete intercluster interfaces from lab clusters
     netapp.ontap.na_ontap_interface:
