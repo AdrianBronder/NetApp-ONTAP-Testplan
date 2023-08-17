@@ -7,6 +7,36 @@ cluster_nodes:
   - name:                         "cluster2-02"
     location:                     "Virtual DC02 | Virtual Rack 02"
 
+network_ethernet_ports:
+  - name:                         "a0a"
+    node:
+      name:                       "cluster_nodes[0].name"
+    lag:
+      member_ports:
+        - name:                   "e1f"
+        - name:                   "e1g"
+      distribution_policy:        "port"
+      mode:                       "singlemode"
+    broadcast_domain:
+      name:                       "bc_data"
+      ipspace:
+        name:                     "Default"
+    type:                         "lag"
+  - name:                         "a0a"
+    node:
+      name:                       "cluster_nodes[1].name"
+    lag:
+      member_ports:
+        - name:                   "e1f"
+        - name:                   "e1g"
+      distribution_policy:        "port"
+      mode:                       "singlemode"
+    broadcast_domain:
+      name:                       "bc_data"
+      ipspace:
+        name:                     "Default"
+    type:                         "lag"
+
 storage_aggregates:
   - name:                         "{{ cluster_nodes[0].name }}_aggr01"
     node:
