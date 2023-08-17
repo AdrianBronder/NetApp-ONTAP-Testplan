@@ -124,7 +124,7 @@
     netapp.ontap.na_ontap_svm:
       state:                      absent
       name:                       "{{ item.name }}"                  
-      hostname:                   "{{ ontap_hostname }}"
+      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
     - svm_info.ontap_info.svm_svms.num_records|int > 0
