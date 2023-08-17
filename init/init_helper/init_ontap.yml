@@ -156,7 +156,7 @@
   - name: Delete all SVMs
     netapp.ontap.na_ontap_svm:
       state:                      absent
-      name:                       "{{ item.name }}"                  
+      name:                       "{{ item.name }}"
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
@@ -164,3 +164,25 @@
     - item.name is defined
     loop:
       "{{ svm_info.ontap_info.svm_svms.records }}"
+
+# by default, ONTAP does only return data aggregates via REST API
+  - name: Get all non-root aggregates
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "storage/aggregates"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: aggr_info
+
+  - name: Delete all SVMs
+    netapp.ontap.na_ontap_svm:
+      state:                      absent
+      name:                       "{{ item.name }}"
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    when:
+    - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
+    - item.name is defined
+    loop:
+      "{{ aggr_info.ontap_info.storage_aggregates.records }}"
