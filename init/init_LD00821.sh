@@ -113,10 +113,16 @@ ansible-galaxy collection install -r $SCRIPTPATH/requirements.yml --ignore-certs
 
 echo ""
 echo ""
+echo "--> Adding centos1 to known hosts"
+mkdir ~/.ssh
+ssh-keyscan -t ecdsa centos1 centos1.demo.netapp.com 192.168.0.61 >> ~/.ssh/known_hosts
+
+echo ""
+echo ""
 echo "--> Creating Users and groups in AD (dc1)"
 ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
 
 echo ""
 echo ""
 echo "--> Prepare primary storage system (cluster1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ontap.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-REVERT-ALL.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
