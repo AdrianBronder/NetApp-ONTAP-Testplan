@@ -57,32 +57,6 @@
     loop:
       "{{ vol_info.ontap_info.storage_volumes.records }}"
 
-  - name: Get all SVM interfaces from lab clusters
-    netapp.ontap.na_ontap_rest_info:
-      gather_subset:
-      - "network/ip/interfaces"
-      fields:
-      - "svm"
-      parameters:
-        scope:                    "svm"
-      use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
-      <<: *input
-    register: ip_int_info
-
-  - name: Delete all SVM network interfaces from lab clusters
-    netapp.ontap.na_ontap_interface:
-      state:                      absent
-      interface_name:             "{{ item.name }}"
-      vserver:                    "{{ item.svm.name }}"
-      hostname:                   "{{ ansible_host }}"
-      <<: *input
-    when:
-    - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
-    - item.name is defined
-    loop:
-      "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
-
   - name: Get all SVM CIFS servers
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
@@ -110,6 +84,32 @@
     - item.name is defined
     loop:
       "{{ cifs_service_info.ontap_info.protocols_cifs_services.records }}"
+
+  - name: Get all SVM interfaces from lab clusters
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "network/ip/interfaces"
+      fields:
+      - "svm"
+      parameters:
+        scope:                    "svm"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: ip_int_info
+
+  - name: Delete all SVM network interfaces from lab clusters
+    netapp.ontap.na_ontap_interface:
+      state:                      absent
+      interface_name:             "{{ item.name }}"
+      vserver:                    "{{ item.svm.name }}"
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    when:
+    - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
+    - item.name is defined
+    loop:
+      "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
 
   - name: Get all SVMs
     netapp.ontap.na_ontap_rest_info:
