@@ -65,7 +65,7 @@ echo "Installing OpenSSL..."
 sudo make install > /dev/null
 sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
 sudo ldconfig
-rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz#
+rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz
 echo "export PATH=$PATH:$OPENSSLPATH/bin" >> ~/.bashrc
 source ~/.bashrc
 cd $SCRIPTPATH
