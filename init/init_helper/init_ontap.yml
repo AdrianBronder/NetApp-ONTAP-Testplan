@@ -73,8 +73,8 @@
   - name: Delete all SVM network interfaces from lab clusters
     netapp.ontap.na_ontap_interface:
       state:                      absent
-      interface_name:             "{{ item.svm.name }}"
-      vserver: svm1
+      interface_name:             "{{ item.name }}"
+      vserver:                    "{{ item.svm.name }}"
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
@@ -99,8 +99,8 @@
       state:                      absent
       name:                       "{{ item.name }}"                  
       vserver:                    "{{ item.svm.name }}"
-      domain:                     "{{ item.ad.fqdn }}"
-      ou:                         "{{ item.ad.ou }}"
+      domain:                     "{{ item.ad_domain.fqdn }}"
+      ou:                         "{{ item.ad_domain.ou }}"
       admin_user_name:            "{{ testenv_ad_join_user }}"
       admin_password:             "{{ testenv_ad_join_pw }}"
       hostname:                   "{{ ontap_hostname }}"
