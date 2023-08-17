@@ -91,6 +91,7 @@
       - "network/ip/interfaces"
       fields:
       - "svm"
+      - "scope"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
