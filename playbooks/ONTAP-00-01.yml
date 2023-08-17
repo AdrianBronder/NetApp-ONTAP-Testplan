@@ -39,6 +39,8 @@
       <<: *input
     loop:
       "{{ network_ethernet_broadcast_domains }}"
+    loop_control:
+      label: "{{ item.name }}"
     when:
       - item.name is defined
 
@@ -54,7 +56,7 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
-      - "{{ network_ethernet_ports }}"
+      "{{ network_ethernet_ports }}"
     loop_control:
       label: "{{ item.name }}"
     when:
