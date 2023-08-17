@@ -92,6 +92,7 @@
       fields:
       - "svm"
       - "scope"
+      - "service_policy"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
