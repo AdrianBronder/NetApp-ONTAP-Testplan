@@ -40,7 +40,7 @@
     loop:
       "{{ network_ethernet_broadcast_domains }}"
     when:
-      - item.name is defnied
+      - item.name is defined
 
   - name: Create interface groups on storage cluster
     netapp.ontap.na_ontap_net_ifgrp:
