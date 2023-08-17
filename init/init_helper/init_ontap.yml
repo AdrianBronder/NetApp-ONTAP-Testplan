@@ -91,8 +91,6 @@
       - "network/ip/interfaces"
       fields:
       - "svm"
-      parameters:
-        scope:                    "svm"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
@@ -109,6 +107,20 @@
     - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
     - item.name is defined
     - item.scope == "svm"
+    loop:
+      "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
+
+  - name: Delete intercluster interfaces from lab clusters
+    netapp.ontap.na_ontap_interface:
+      state:                      absent
+      interface_name:             "{{ item.name }}"
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    when:
+    - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
+    - item.name is defined
+    - item.scope == "cluster"
+    - item.service_policy.name == "default-intercluster"
     loop:
       "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
 
