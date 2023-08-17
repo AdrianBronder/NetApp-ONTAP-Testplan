@@ -8,11 +8,8 @@ ontap_primary_backup_svm:         "ntap-backup-svm01"
 # General - Users
 ontap_admin_user:                 "admin"
 ontap_admin_password:             "Netapp1!"
-testenv_ad_join_user:              "Administrator"
-# testenv_ad_join_pw - "*_setup" variable is only used for lab initialization
-# for execution, vars_prompt is used in the playbook
-testenv_ad_join_pw_setup:          "Netapp1!"
-testenv_keymanager_passphrase:     "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
+
+testenv_keymanager_passphrase:    "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
 
 # General - Config Defaults
 ontap_default_vol_size_gb:        500
