@@ -1,4 +1,4 @@
-- hosts:              "{{ ontap_primary_cluster }}"
+- hosts:              "ontap"
   name:               ONTAP-00-01 - Cluster Network Config
   gather_facts:       false
   vars:
