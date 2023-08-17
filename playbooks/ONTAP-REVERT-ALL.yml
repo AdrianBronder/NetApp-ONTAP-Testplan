@@ -190,8 +190,9 @@
   - name: Remove DNS config from cluster
     netapp.ontap.na_ontap_dns:
       state:                      absent
-      vserver:                    
+      vserver:                    "{{ inventory_hostname }}"
       hostname:                   "{{ ansible_host }}"
+      use_rest:                   "never"
       <<: *input
 
   - name: Get all NTP servers from cluster
@@ -211,7 +212,7 @@
       <<: *input
     when:
     - ntp_servers_info.ontap_info.cluster_ntp_servers.num_records|int > 0
-    - item.name is defined
+    - item.server is defined
     loop:
       "{{ ntp_servers_info.ontap_info.cluster_ntp_servers.records }}"
 
