@@ -30,7 +30,7 @@
     - netapp.ontap
 
   tasks:
-  - name: Get all non-root volumes from lab clusters
+  - name: Get all non-root volumes from clusters
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
       - "storage/volumes"
@@ -43,7 +43,7 @@
       <<: *input
     register: vol_info
 
-  - name: Delete all volumes from lab clusters
+  - name: Delete all volumes from clusters
     netapp.ontap.na_ontap_volume:
       state:                      absent
       name:                       "{{ item.name }}"
@@ -85,7 +85,7 @@
     loop:
       "{{ cifs_service_info.ontap_info.protocols_cifs_services.records }}"
 
-  - name: Get all SVM interfaces from lab clusters
+  - name: Get all SVM interfaces from clusters
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
       - "network/ip/interfaces"
@@ -100,7 +100,7 @@
       <<: *input
     register: ip_int_info
 
-  - name: Delete all SVM network interfaces from lab clusters
+  - name: Delete all SVM network interfaces from clusters
     netapp.ontap.na_ontap_interface:
       state:                      absent
       interface_name:             "{{ item.name }}"
@@ -114,7 +114,7 @@
     loop:
       "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
 
-  - name: Get all intercluster interfaces from lab clusters
+  - name: Get all intercluster interfaces from clusters
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
       - "network/ip/interfaces"
@@ -130,7 +130,7 @@
       <<: *input
     register: ip_int_info
 
-  - name: Delete intercluster interfaces from lab clusters
+  - name: Delete intercluster interfaces from clusters
     netapp.ontap.na_ontap_interface:
       state:                      absent
       interface_name:             "{{ item.name }}"
@@ -175,8 +175,8 @@
       <<: *input
     register: aggr_info
 
-  - name: Delete all SVMs
-    netapp.ontap.na_ontap_svm:
+  - name: Delete all non-root aggregates from clusters
+    netapp.ontap.na_ontap_aggregate:
       state:                      absent
       name:                       "{{ item.name }}"
       hostname:                   "{{ ansible_host }}"
