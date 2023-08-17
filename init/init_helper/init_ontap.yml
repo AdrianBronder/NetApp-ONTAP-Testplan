@@ -108,6 +108,7 @@
     when:
     - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
     - item.name is defined
+    - item.scope == "svm"
     loop:
       "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
 
