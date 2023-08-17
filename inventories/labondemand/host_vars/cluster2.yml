@@ -10,7 +10,7 @@ cluster_nodes:
 network_ethernet_ports:
   - name:                         "a0a"
     node:
-      name:                       "cluster_nodes[0].name"
+      name:                       "{{ cluster_nodes[0].name }}"
     lag:
       member_ports:
         - name:                   "e1f"
@@ -24,7 +24,7 @@ network_ethernet_ports:
     type:                         "lag"
   - name:                         "a0a"
     node:
-      name:                       "cluster_nodes[1].name"
+      name:                       "{{ cluster_nodes[1].name }}"
     lag:
       member_ports:
         - name:                   "e1f"
