@@ -2,8 +2,9 @@
 #
 # Title:        NTAP-00-00.yml
 # Author:       NetApp Inc. (badrian)
-# Date:         2023-07-25
-# Description:  Basic test playbook gathering information from ONTAP inventory
+# Initial 
+# Create Date:  2023-08-17
+# Description:  Basic connection validation and cluster info
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -21,21 +22,25 @@
       password:       "{{ ontap_admin_password }}"
       https:          true
       validate_certs: false
-      use_rest:       "Always"
+      use_rest:       "always"
   vars_files:
-    - vars/vars_labondemand.yml
+    - ../vars/labondemand.yml
   collections:
     - netapp.ontap
 
   tasks:
-  - name: Print vars
+  - name: Print hosts and inventory source
     ansible.builtin.debug:
-      msg: "{{ ontap_hostname }}"
+      msg: "{{ ansible_host }} from {{ inventory_dir }}"
 
   - name: Get Ontap Info
     na_ontap_rest_info:
+      gather_subset:
+        - "cluster"
+        - "cluster/nodes"
+        - "cluster/software"
       <<: *input
-      hostname:       "{{ ontap_hostname }}"
+      hostname:       "{{ ansible_host }}"
     register: netapp
 
   - name: Print cluster details

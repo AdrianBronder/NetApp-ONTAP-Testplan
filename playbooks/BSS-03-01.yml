@@ -78,7 +78,7 @@
 #      body:
 #        encrypt-with-aggr-key:    false
 #      hostname:                   "{{ ontap_hostname }}"
-#      use_rest:                   "Always"
+#      use_rest:                   "always"
 #      <<: *input
 
   post_tasks:
@@ -90,7 +90,7 @@
         - block_storage
       use_python_keys:          true
       hostname:                 "{{ ontap_hostname }}"
-      use_rest:                 "Always"
+      use_rest:                 "always"
       <<: *input
     register: ontap
 

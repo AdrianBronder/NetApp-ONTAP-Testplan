@@ -23,7 +23,7 @@
       password:       "{{ ontap_admin_password }}"
       https:          true
       validate_certs: false
-      use_rest:       "Always"
+      use_rest:       "always"
   vars_files:
     - vars/vars_labondemand.yml
   collections:
@@ -117,7 +117,7 @@
       state:                      absent
       server_name:                "{{ item }}"
       hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "Always"
+      use_rest:                   "always"
       <<: *input
     loop:
       "{{ testenv_ntp_serveres }}"

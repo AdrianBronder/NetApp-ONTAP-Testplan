@@ -22,7 +22,7 @@
       password:       "{{ ontap_local_ro_pw }}"
       https:          true
       validate_certs: false
-      use_rest:       "Always"
+      use_rest:       "always"
   vars_files:
     - vars/vars_labondemand.yml
   collections:

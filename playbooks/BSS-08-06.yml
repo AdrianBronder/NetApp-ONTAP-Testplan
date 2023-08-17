@@ -24,7 +24,7 @@
       password:       "{{ ontap_admin_password }}"
       https:          true
       validate_certs: false
-      use_rest:       "Always"
+      use_rest:       "always"
   vars_files:
     - vars/vars_labondemand.yml
   collections:

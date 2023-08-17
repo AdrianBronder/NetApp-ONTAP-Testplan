@@ -23,7 +23,7 @@
       password:       "{{ ontap_admin_password }}"
       https:          true
       validate_certs: false
-      use_rest:       "Always"
+      use_rest:       "always"
   vars_files:
     - ../../playbooks/vars/vars_labondemand.yml
   collections:
@@ -74,7 +74,7 @@
       password:       "{{ ontap_admin_password }}"
       https:          true
       validate_certs: false
-      use_rest:       "Always"
+      use_rest:       "always"
   vars_files:
     - ../../playbooks/vars/vars_devlab.yml
     - ./vars_labonly.yml
