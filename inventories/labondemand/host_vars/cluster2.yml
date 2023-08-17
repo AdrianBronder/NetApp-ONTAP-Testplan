@@ -7,9 +7,37 @@ cluster_nodes:
   - name:                         "cluster2-02"
     location:                     "Virtual DC02 | Virtual Rack 02"
 
+storage_aggregates:
+  - name:                         "{{ cluster_nodes[0].name }}_aggr01"
+    node:
+      name:                       "{{ cluster_nodes[0].name }}"
+    block_storage:
+      primary:
+        disk_count:               13
+    snaplock_type:                "non_snaplock"
+
 svm_svms:
   - name:                         "ntap-backup-svm01"
-    cifs_name:                    "backup-svm01"
+    dns:
+      domains:                    "{{ testenv_default_dns_domain }}"
+      servers:                    "{{ testenv_dns_nameservers }}"
+    auto_enable_analytics:        true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "This is the primary backup SVM for testing"
 
 protocols_cifs_services:
   - name:                         "backup-svm01"
