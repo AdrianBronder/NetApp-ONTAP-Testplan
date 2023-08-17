@@ -100,7 +100,7 @@
       name:                       "{{ item.name }}"                  
       vserver:                    "{{ item.svm.name }}"
       domain:                     "{{ item.ad_domain.fqdn }}"
-      ou:                         "{{ item.ad_domain.ou }}"
+      ou:                         "{{ item.ad_domain.organizational_unit }}"
       admin_user_name:            "{{ testenv_ad_join_user }}"
       admin_password:             "{{ testenv_ad_join_pw }}"
       hostname:                   "{{ ontap_hostname }}"
