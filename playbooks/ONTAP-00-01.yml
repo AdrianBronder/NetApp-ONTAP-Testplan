@@ -74,7 +74,7 @@
   - name: Create DNS config on storage cluster
     netapp.ontap.na_ontap_dns:
       state:                      present
-      vserver:                    "{{ inventory_hostname }}"
+      vserver:                    
       domains:                    "{{ testenv_dns_domains }}"
       nameservers:                "{{ testenv_dns_nameservers }}"
       hostname:                   "{{ ansible_host }}"
