@@ -194,14 +194,26 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
 
+  - name: Get all NTP servers from cluster
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "cluster/ntp/servers"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: ntp_servers_info
+
   - name: Remove NTP servers from cluster
     netapp.ontap.na_ontap_ntp:
       state:                      absent
-      server_name:                "{{ item }}"
+      server_name:                "{{ item.server }}"
       hostname:                   "{{ ansible_host }}"
       <<: *input
+    when:
+    - ntp_servers_info.ontap_info.cluster_ntp_servers.num_records|int > 0
+    - item.name is defined
     loop:
-      "{{ testenv_ntp_serveres }}"
+      "{{ ntp_servers_info.ontap_info.cluster_ntp_servers.records }}"
 
   - name: Reset timezone on storage cluster to Etc/UTC
     netapp.ontap.na_ontap_cluster:
@@ -216,3 +228,18 @@
       state:                      absent
       hostname:                   "{{ ansible_host }}"
       <<: *input
+
+  - name: Get interface groups from cluster
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+      - "network/ethernet/ports"
+      fields:
+      - "*"
+      parameters:
+        type:                     "lag"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: ntp_servers_info
+
+#  - name: Remove interface groups from cluster
