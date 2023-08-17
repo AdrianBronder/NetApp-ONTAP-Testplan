@@ -49,6 +49,8 @@
       type:                        "A"
       value:                       "{{ item.ip.address }}"
       zone:                        "{{ testenv_default_dns_domain }}"
+    when:
+      - item.scope == "svm"
     loop:
       "{{ hostvars['cluster1'].network_ip_interfaces | list + 
           hostvars['cluster2'].network_ip_interfaces | list }}"
@@ -77,15 +79,6 @@
       path:                        "CN=Users,DC=demo,DC=netapp,DC=com"
     loop:
       "{{ ad_org_groups }}"
-
-  - name: debug LoD Users
-    ansible.builtin.debug:
-      msg:
-        - "{{ item.1 }}"
-        - "{{ item.0.name }}"
-    with_subelements:
-      - "{{ ad_org_groups }}"
-      - users
 
   - name: Create LoD Users in AD
     microsoft.ad.user:
