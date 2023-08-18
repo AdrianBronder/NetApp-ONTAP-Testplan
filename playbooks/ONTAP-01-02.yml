@@ -1,8 +1,9 @@
 ################################################################################
 #
-# Title:        ONTAP-00-01 - Cluster Network Config 
+# Title:        ONTAP-01-02 - Cluster Network Config 
 # Author:       NetApp Inc. (badrian)
-# Date:         2023-07-25
+# Initial 
+# Create Date:  2023-08-17
 # Description:  Initial cluster configuration for testing
 #               - Network and network services
 #
@@ -10,15 +11,16 @@
 #               https://galaxy.ansible.com/netapp/ontap
 #
 # Built-in help:
-# ansible-doc <module.name>
+# ansible-doc netapp.ontap.<module_name>
 # 
 ################################################################################
 
 - hosts:              "ontap"
-  name:               ONTAP-00-01 - Cluster Network Config
+  name:               "ONTAP-01-02 - Cluster Network Config"
   gather_facts:       false
   vars:
     input: &input
+      hostname:       "{{ ansible_host }}"
       username:       "{{ ontap_admin_user }}"
       password:       "{{ ontap_admin_password }}"
       https:          true
@@ -36,7 +38,6 @@
       name:                       "{{ item.name }}"
       mtu:                        "{{ item.mtu }}"
       ipspace:                    "{{ item.ipspace.name }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
       "{{ network_ethernet_broadcast_domains }}"
@@ -54,7 +55,6 @@
       ports:                      "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
       distribution_function:      "{{ item.lag.distribution_policy }}"
       mode:                       "{{ item.lag.mode }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
       "{{ network_ethernet_ports }}"
@@ -69,7 +69,6 @@
       vserver:                    
       destination:                "0.0.0.0/0"
       gateway:                    "{{ testenv_default_gateway }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
 
   - name: Create DNS config on storage cluster
@@ -78,7 +77,6 @@
       vserver:                    "{{ inventory_hostname }}"
       domains:                    "{{ testenv_dns_domains }}"
       nameservers:                "{{ testenv_dns_nameservers }}"
-      hostname:                   "{{ ansible_host }}"
       use_rest:                   "never"
       <<: *input
 
@@ -87,8 +85,6 @@
       state:                      present
       server_name:                "{{ item }}"
       version:                    "auto"
-      hostname:                   "{{ ansible_host }}"
-      use_rest:                   "always"
       <<: *input
     loop:
       "{{ testenv_ntp_serveres }}"
@@ -102,6 +98,4 @@
       state:                      present
       timezone:
         name:                     "{{ testenv_timezone }}"
-      hostname:                   "{{ ansible_host }}"
-      use_rest:                   "always"
       <<: *input

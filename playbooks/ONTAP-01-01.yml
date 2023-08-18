@@ -1,0 +1,59 @@
+################################################################################
+#
+# Title:        ONTAP-01-01 - Cluster Basic Config 
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-17
+# Description:  Initial cluster configuration for testing
+#               - Basic configuration
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "ontap"
+  name:               "ONTAP-01-01 - Cluster Basic Config"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../vars/labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Create login banner and message of the day (MOTD) on storage cluster
+    netapp.ontap.na_ontap_login_messages:
+      banner:                     "{{ item.banner }}"
+      message:                    "{{ item.message }}"
+      show_cluster_motd:          true
+      <<: *input
+    loop:
+      "{{ security_login_messages }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - item.name is defined
+      - item.scope == "cluster"
+
+  - name: Install licenses on storage cluster
+    netapp.ontap.na_ontap_license:
+      state:                      present
+      license_codes:              "{{ item.node.name }}"
+      <<: *input
+    loop:
+      "{{ cluster_liensing_licenses.keys }}"
+    loop_control:
+      label: "{{ item.node.name }}:{{ item.name }}"
+    when:
+      - cluster_liensing_licenses.keys | length > 0

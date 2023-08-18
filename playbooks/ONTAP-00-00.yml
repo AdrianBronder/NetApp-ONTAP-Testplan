@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        NTAP-00-00.yml
+# Title:        ONTAP-00-00 - Cluster Basic Connect 
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
@@ -10,14 +10,16 @@
 #               https://galaxy.ansible.com/netapp/ontap
 #
 # Built-in help:
-# ansible-doc netapp.ontap.na_ontap_rest_info
+# ansible-doc netapp.ontap.<module_name>
 #
 ################################################################################
 
-- hosts:              ontap
+- hosts:              "ontap"
+  name:               "ONTAP-00-00 - Cluster Basic Connect"
   gather_facts:       false
   vars:
     input: &input
+      hostname:       "{{ ansible_host }}"
       username:       "{{ ontap_admin_user }}"
       password:       "{{ ontap_admin_password }}"
       https:          true
@@ -42,7 +44,6 @@
         - "nodes.version"
       use_python_keys:            true
       <<: *input
-      hostname:       "{{ ansible_host }}"
     register: netapp
 
   - name: Print ONTAP version info

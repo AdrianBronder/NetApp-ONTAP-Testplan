@@ -1,24 +1,27 @@
 ################################################################################
 #
-# Title:        init_ontap.yml
+# Title:        ONTAP-revert-00.yml
 # Author:       NetApp Inc. (badrian)
-# Date:         2023-07-31
-# Description:  Prepare lab system
+# Initial 
+# Create Date:  2023-08-17
+# Description:  Revert all systems to initial state
+#               - Cluster is configured and reachable via cluster management
+#                 interface
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
 # 
 # Built-in help:
-# ansible-doc netapp.ontap.na_ontap_aggregate
-# ansible-doc netapp.ontap.na_ontap_rest_info
+# ansible-doc netapp.ontap.<module_name>
 #
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "Initialize ONTAP clusters"
+  name:               "ONTAP-revert-00 - Return to Day0"
   gather_facts:       false
   vars:
     input: &input
+      hostname:       "{{ ansible_host }}"
       username:       "{{ ontap_admin_user }}"
       password:       "{{ ontap_admin_password }}"
       https:          true
@@ -39,7 +42,6 @@
       parameters:
         is_svm_root:              false
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: vol_info
 
@@ -49,7 +51,6 @@
       name:                       "{{ item.name }}"
       vserver:                    "{{ item.svm.name }}" 
       wait_for_completion:        true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
       - vol_info.ontap_info.storage_volumes.num_records|int > 0
@@ -64,7 +65,6 @@
       fields:
         - "*"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: cifs_service_info
 
@@ -77,7 +77,6 @@
       ou:                         "{{ item.ad_domain.organizational_unit }}"
       admin_user_name:            "{{ testenv_ad_join_user }}"
       admin_password:             "{{ testenv_ad_join_password }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
     - cifs_service_info.ontap_info.protocols_cifs_services.num_records|int > 0
@@ -96,7 +95,6 @@
       parameters:
         scope:                    "svm"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: svm_ip_int_info
 
@@ -105,7 +103,6 @@
       state:                      absent
       interface_name:             "{{ item.name }}"
       vserver:                    "{{ item.svm.name }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
       - svm_ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
@@ -126,7 +123,6 @@
         scope:                    "cluster"
         service_policy.name:      "default-intercluster"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: cluster_ip_int_info
 
@@ -149,7 +145,6 @@
       gather_subset:
         - "svm/svms"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: svm_info
 
@@ -157,7 +152,6 @@
     netapp.ontap.na_ontap_svm:
       state:                      absent
       name:                       "{{ item.name }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
       - svm_info.ontap_info.svm_svms.num_records|int > 0
@@ -171,7 +165,6 @@
       gather_subset:
         - "storage/aggregates"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: aggr_info
 
@@ -179,7 +172,6 @@
     netapp.ontap.na_ontap_aggregate:
       state:                      absent
       name:                       "{{ item.name }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
       - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
@@ -191,7 +183,6 @@
     netapp.ontap.na_ontap_dns:
       state:                      absent
       vserver:                    "{{ inventory_hostname }}"
-      hostname:                   "{{ ansible_host }}"
       use_rest:                   "never"
       <<: *input
 
@@ -200,7 +191,6 @@
       gather_subset:
         - "cluster/ntp/servers"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: ntp_servers_info
 
@@ -208,7 +198,6 @@
     netapp.ontap.na_ontap_ntp:
       state:                      absent
       server_name:                "{{ item.server }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
       - ntp_servers_info.ontap_info.cluster_ntp_servers.num_records|int > 0
@@ -221,13 +210,11 @@
       state:                      present
       timezone:
         name:                     "Etc/UTC"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
 
   - name: Remove onboard key manager configuration
     netapp.ontap.na_ontap_security_key_manager:
       state:                      absent
-      hostname:                   "{{ ansible_host }}"
       <<: *input
 
   - name: Get interface groups and VLANs from cluster
@@ -239,7 +226,6 @@
       parameters:
         type:                     "lag|vlan"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: ifgrp_info
 
@@ -249,7 +235,6 @@
       node:                       "{{ item.vlan.base_port.node.name }}"
       parent_interface:           "{{ item.vlan.base_port.name }}"
       vlanid:                     "{{ item.vlan.tag }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
       "{{ ifgrp_info.ontap_info.network_ethernet_ports.records }}"
@@ -265,7 +250,6 @@
       state:                      absent
       node:                       "{{ item.node.name }}"
       ports:                      "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
       "{{ ifgrp_info.ontap_info.network_ethernet_ports.records }}"
@@ -283,7 +267,6 @@
       fields:
         - "ipspace"
       use_python_keys:            true
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     register: bc_domain_info
 
@@ -292,7 +275,6 @@
       state:                      absent
       name:                       "{{ item.name }}"
       ipspace:                    "{{ item.ipspace.name }}"
-      hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
       "{{ bc_domain_info.ontap_info.network_ethernet_broadcast_domains.records }}"
@@ -303,3 +285,10 @@
       - item.name is defined
       - not (item.ipspace.name == "Default" and item.name == "Default")
       - not (item.ipspace.name == "Cluster" and item.name == "Cluster")
+
+  - name: Reset banner and message of the day on cluster
+    netapp.ontap.na_ontap_login_messages:
+      banner:                     ""
+      message:                    ""
+      show_cluster_motd:          false
+      <<: *input
