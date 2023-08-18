@@ -5,7 +5,7 @@
 # Initial 
 # Create Date:  2023-08-17
 # Description:  Initial cluster configuration for testing
-#               - Network and network services
+#               - Network Config
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -69,33 +69,4 @@
       vserver:                    
       destination:                "0.0.0.0/0"
       gateway:                    "{{ testenv_default_gateway }}"
-      <<: *input
-
-  - name: Create DNS config on storage cluster
-    netapp.ontap.na_ontap_dns:
-      state:                      present
-      vserver:                    "{{ inventory_hostname }}"
-      domains:                    "{{ testenv_dns_domains }}"
-      nameservers:                "{{ testenv_dns_nameservers }}"
-      use_rest:                   "never"
-      <<: *input
-
-  - name: Create NTP server on storage cluster
-    netapp.ontap.na_ontap_ntp:
-      state:                      present
-      server_name:                "{{ item }}"
-      version:                    "auto"
-      <<: *input
-    loop:
-      "{{ testenv_ntp_serveres }}"
-    retries: 5
-    delay: 3
-    register: result
-    until: not result.failed
-
-  - name: Set timezone on storage cluster
-    netapp.ontap.na_ontap_cluster:
-      state:                      present
-      timezone:
-        name:                     "{{ testenv_timezone }}"
       <<: *input

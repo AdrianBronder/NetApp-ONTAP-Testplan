@@ -32,6 +32,13 @@
     - netapp.ontap
 
   tasks:
+  - name: Set timezone on storage cluster
+    netapp.ontap.na_ontap_cluster:
+      state:                      present
+      timezone:
+        name:                     "{{ testenv_timezone }}"
+      <<: *input
+      
   - name: Create login banner and message of the day (MOTD) on storage cluster
     netapp.ontap.na_ontap_login_messages:
       banner:                     "{{ item.banner | default(omit) }}"
