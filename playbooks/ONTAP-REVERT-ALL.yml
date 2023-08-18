@@ -244,7 +244,7 @@
     register: ifgrp_info
 
   - name: Remove VLANs from cluster
-    netapp.ontap.na_ontap_port:
+    netapp.ontap.na_ontap_net_port:
       state:                      absent
       node:                       "{{ item.node.name }}"
       ports:                      "{{ item.name }}"
