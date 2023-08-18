@@ -248,7 +248,7 @@
       state:                      absent
       node:                       "{{ item.vlan.base_port.node.name }}"
       parent_interface:           "{{ item.vlan.base_port.name }}"
-      vlanid:                     "{{ item.vlan.tag }}""
+      vlanid:                     "{{ item.vlan.tag }}"
       hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
