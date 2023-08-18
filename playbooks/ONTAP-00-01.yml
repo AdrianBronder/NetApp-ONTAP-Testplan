@@ -92,11 +92,10 @@
       <<: *input
     loop:
       "{{ testenv_ntp_serveres }}"
-    retries: 10
-    delay: 20
+    retries: 5
+    delay: 3
     register: result
     until: not result.failed
-    ignore_errors: true
 
   - debug:
       msg: "{{ result }}"
