@@ -300,5 +300,5 @@
     when:
       - bc_domain_info.ontap_info.network_ethernet_broadcast_domains.num_records|int > 0
       - item.name is defined
-      - item.ipspace.name != "Default" and item.name != "Default" or
-        item.ipspace.name != "Cluster" and item.name != "Cluster"
+      - not (item.ipspace.name == "Default" and item.name == "Default")
+      - not (item.ipspace.name == "Cluster" and item.name == "Cluster")
