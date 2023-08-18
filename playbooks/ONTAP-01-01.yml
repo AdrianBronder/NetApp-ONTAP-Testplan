@@ -34,8 +34,8 @@
   tasks:
   - name: Create login banner and message of the day (MOTD) on storage cluster
     netapp.ontap.na_ontap_login_messages:
-      banner:                     "{{ item.banner }}"
-      message:                    "{{ item.message }}"
+      banner:                     "{{ item.banner | default(omit) }}"
+      message:                    "{{ item.message | default(omit) }}"
       show_cluster_motd:          true
       <<: *input
     loop:
@@ -43,7 +43,7 @@
     loop_control:
       label: "{{ item.name }}"
     when:
-      - item.name is defined
+      - item.banner is defined or item.message is defined
       - item.scope == "cluster"
 
   - name: Install licenses on storage cluster
