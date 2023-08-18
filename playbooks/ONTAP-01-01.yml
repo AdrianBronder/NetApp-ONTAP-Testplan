@@ -41,7 +41,7 @@
     loop:
       "{{ security_login_messages }}"
     loop_control:
-      label: "{{ item.name }}"
+      label: "{{ item }}"
     when:
       - item.banner is defined or item.message is defined
       - item.scope == "cluster"
