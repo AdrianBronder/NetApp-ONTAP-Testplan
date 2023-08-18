@@ -4,6 +4,7 @@
 # Author:       NetApp Inc. (badrian)
 # Date:         2023-07-25
 # Description:  Initial cluster configuration for testing
+#               - Network and network services
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -91,8 +92,13 @@
       <<: *input
     loop:
       "{{ testenv_ntp_serveres }}"
-    retries: 3
-    delay:   20
+    retries: 10
+    delay: 20
+    register: result
+    ignore_errors: true
+
+  - debug:
+      msg: "{{ result }}"
 
   - name: Set timezone on storage cluster
     netapp.ontap.na_ontap_cluster:
