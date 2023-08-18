@@ -97,9 +97,6 @@
     register: result
     until: not result.failed
 
-  - debug:
-      msg: "{{ result }}"
-
   - name: Set timezone on storage cluster
     netapp.ontap.na_ontap_cluster:
       state:                      present
