@@ -52,8 +52,8 @@
       license_codes:              "{{ item.node.name }}"
       <<: *input
     loop:
-      "{{ cluster_licensing_licenses.keys }}"
+      "{{ cluster_licensing_licenses | default([]) }}"
     loop_control:
       label: "{{ item }}"
     when:
-      - cluster_licensing_licenses.keys | length > 0
+      - cluster_licensing_licenses | length > 0
