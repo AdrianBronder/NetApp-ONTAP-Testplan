@@ -33,9 +33,9 @@
   - name: Get all non-root volumes from clusters
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
-      - "storage/volumes"
+        - "storage/volumes"
       fields:
-      - "svm"
+        - "svm"
       parameters:
         is_svm_root:              false
       use_python_keys:            true
@@ -52,17 +52,17 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-    - vol_info.ontap_info.storage_volumes.num_records|int > 0
-    - item.name is defined
+      - vol_info.ontap_info.storage_volumes.num_records|int > 0
+      - item.name is defined
     loop:
       "{{ vol_info.ontap_info.storage_volumes.records }}"
 
   - name: Get all SVM CIFS servers
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
-      - "protocols/cifs/services"
+        - "protocols/cifs/services"
       fields:
-      - "*"
+        - "*"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
@@ -90,15 +90,15 @@
       gather_subset:
       - "network/ip/interfaces"
       fields:
-      - "svm"
-      - "scope"
-      - "service_policy"
+        - "svm"
+        - "scope"
+        - "service_policy"
       parameters:
         scope:                    "svm"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
-    register: ip_int_info
+    register: svm_ip_int_info
 
   - name: Delete all SVM network interfaces from clusters
     netapp.ontap.na_ontap_interface:
@@ -108,27 +108,27 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-    - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
-    - item.name is defined
-    - item.scope == "svm"
+      - svm_ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
+      - item.name is defined
+      - item.scope == "svm"
     loop:
-      "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
+      "{{ svm_ip_int_info.ontap_info.network_ip_interfaces.records }}"
 
   - name: Get all intercluster interfaces from clusters
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
       - "network/ip/interfaces"
       fields:
-      - "svm"
-      - "scope"
-      - "service_policy"
+        - "svm"
+        - "scope"
+        - "service_policy"
       parameters:
         scope:                    "cluster"
         service_policy.name:      "default-intercluster"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
-    register: ip_int_info
+    register: cluster_ip_int_info
 
   - name: Delete intercluster interfaces from clusters
     netapp.ontap.na_ontap_interface:
@@ -137,17 +137,17 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-    - ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
-    - item.name is defined
-    - item.scope == "cluster"
-    - item.service_policy.name == "default-intercluster"
+      - cluster_.ontap_info.network_ip_interfaces.num_records|int > 0
+      - item.name is defined
+      - item.scope == "cluster"
+      - item.service_policy.name == "default-intercluster"
     loop:
-      "{{ ip_int_info.ontap_info.network_ip_interfaces.records }}"
+      "{{ cluster_.ontap_info.network_ip_interfaces.records }}"
 
   - name: Get all SVMs
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
-      - "svm/svms"
+        - "svm/svms"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
@@ -160,8 +160,8 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-    - svm_info.ontap_info.svm_svms.num_records|int > 0
-    - item.name is defined
+      - svm_info.ontap_info.svm_svms.num_records|int > 0
+      - item.name is defined
     loop:
       "{{ svm_info.ontap_info.svm_svms.records }}"
 
@@ -169,7 +169,7 @@
   - name: Get all non-root aggregates
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
-      - "storage/aggregates"
+        - "storage/aggregates"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
@@ -182,8 +182,8 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-    - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
-    - item.name is defined
+      - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
+      - item.name is defined
     loop:
       "{{ aggr_info.ontap_info.storage_aggregates.records }}"
 
@@ -198,7 +198,7 @@
   - name: Get all NTP servers from cluster
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
-      - "cluster/ntp/servers"
+        - "cluster/ntp/servers"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
@@ -211,8 +211,8 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-    - ntp_servers_info.ontap_info.cluster_ntp_servers.num_records|int > 0
-    - item.server is defined
+      - ntp_servers_info.ontap_info.cluster_ntp_servers.num_records|int > 0
+      - item.server is defined
     loop:
       "{{ ntp_servers_info.ontap_info.cluster_ntp_servers.records }}"
 
@@ -233,14 +233,55 @@
   - name: Get interface groups from cluster
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
-      - "network/ethernet/ports"
+        - "network/ethernet/ports"
       fields:
-      - "*"
+        - "*"
       parameters:
         type:                     "lag"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
-    register: ntp_servers_info
+    register: ifgrp_info
 
-#  - name: Remove interface groups from cluster
+  - name: Remove interface groups from cluster
+    netapp.ontap.na_ontap_net_ifgrp:
+      state:                      absent
+      node:                       "{{ item.node.name }}"
+      ports:                      "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    loop:
+      "{{ ifgrp_info }}"
+    loop_control:
+      label: "{{ item.node.name }}:{{ item.name }}"
+    when:
+      - ifgrp_info.ontap_info.network_ethernet_ports.num_records|int > 0
+      - item.name is defined
+
+  - name: Get broadcast domains from cluster
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - "network/ethernet/broadcast-domains"
+      fields:
+        - "ipspace"
+      use_python_keys:            true
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    register: bc_domain_info
+
+  - name: Remove broadcast domains from cluster
+    netapp.ontap.na_ontap_broadcast_domain:
+      state:                      absent
+      name:                       "{{ item.name }}"
+      ipspace:                    "{{ item.ipspace.name }}"
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    loop:
+      "{{ bc_domain_info }}"
+    loop_control:
+      label: "{{ item.name }} | IPspace: {{ item.ipspace.name }}"
+    when:
+      - bc_domain_info.ontap_info.network_ethernet_broadcast_domains.num_records|int > 0
+      - item.name is defined
+      - item.ipspace.name != "Default" and item.name != "Default"
+      - item.ipspace.name != "Cluster" and item.name != "Cluster"
