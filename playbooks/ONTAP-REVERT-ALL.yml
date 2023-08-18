@@ -277,7 +277,7 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
-      "{{ bc_domain_info }}"
+      "{{ bc_domain_info.ontap_info.network_ethernet_broadcast_domains.records }}"
     loop_control:
       label: "{{ item.name }} | IPspace: {{ item.ipspace.name }}"
     when:
