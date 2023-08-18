@@ -2,11 +2,13 @@ ansible_connection:               "local"
 ansible_python_interpreter:       "{{ansible_playbook_python}}"
 
 security_login_messages:
-  - banner:                       "################ TEST BANNER ################
+  - banner: |
+                                  "################ TEST BANNER ################
                                    # This system is currently in testing state #
                                    #############################################"
     scope:                        "cluster"
-    message:                      "Welcome! Please note:
+    message: |                     
+                                  "Welcome! Please note:\
                                    This system is not ready for production yet!"
 
 network_ethernet_broadcast_domains:
