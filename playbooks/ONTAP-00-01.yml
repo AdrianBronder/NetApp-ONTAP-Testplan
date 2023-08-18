@@ -95,6 +95,7 @@
     retries: 10
     delay: 20
     register: result
+    until: not result.failed
     ignore_errors: true
 
   - debug:
