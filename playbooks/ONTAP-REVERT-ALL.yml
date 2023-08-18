@@ -137,12 +137,12 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     when:
-      - cluster_.ontap_info.network_ip_interfaces.num_records|int > 0
+      - cluster_ip_int_info.ontap_info.network_ip_interfaces.num_records|int > 0
       - item.name is defined
       - item.scope == "cluster"
       - item.service_policy.name == "default-intercluster"
     loop:
-      "{{ cluster_.ontap_info.network_ip_interfaces.records }}"
+      "{{ cluster_ip_int_info.ontap_info.network_ip_interfaces.records }}"
 
   - name: Get all SVMs
     netapp.ontap.na_ontap_rest_info:
