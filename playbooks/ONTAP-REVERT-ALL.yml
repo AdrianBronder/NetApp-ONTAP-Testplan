@@ -251,7 +251,7 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
-      "{{ ifgrp_info }}"
+      "{{ ifgrp_info.ontap_info.network_ethernet_ports.records }}"
     loop_control:
       label: "{{ item.node.name }}:{{ item.name }}"
     when:
