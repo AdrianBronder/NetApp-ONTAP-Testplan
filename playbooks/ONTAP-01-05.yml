@@ -37,7 +37,7 @@
       state:                      present
       name:                       "{{ item.name }}"
       nodes:                      "{{ item.node.name }}"
-      disks:                      "{{ item.block_storage.primary.disk_count }}"
+      disk_count:                 "{{ item.block_storage.primary.disk_count }}"
       snaplock_type:              "{{ item.snaplock_type }}"
       <<: *input 
     loop:
