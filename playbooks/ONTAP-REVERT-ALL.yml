@@ -244,10 +244,11 @@
     register: ifgrp_info
 
   - name: Remove VLANs from cluster
-    netapp.ontap.na_ontap_net_port:
+    netapp.ontap.na_ontap_net_vlan:
       state:                      absent
-      node:                       "{{ item.node.name }}"
-      ports:                      "{{ item.name }}"
+      node:                       "{{ item.vlan.base_port.node.name }}"
+      parent_interface:           "{{ item.vlan.base_port.name }}"
+      vlanid:                     "{{ item.vlan.tag }}""
       hostname:                   "{{ ansible_host }}"
       <<: *input
     loop:
