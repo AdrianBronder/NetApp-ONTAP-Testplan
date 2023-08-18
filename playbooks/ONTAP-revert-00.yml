@@ -289,6 +289,6 @@
   - name: Reset banner and message of the day on cluster
     netapp.ontap.na_ontap_login_messages:
       banner:                     ""
-      message:                    ""
+      motd_message:               ""
       show_cluster_motd:          false
       <<: *input
