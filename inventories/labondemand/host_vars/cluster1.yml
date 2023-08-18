@@ -7,9 +7,8 @@ cluster_nodes:
   - name:                         "cluster1-02"
     location:                     "Virtual DC01 | Virtual Rack 02"
 
-cluster_liensing_licenses:
-  keys:
-    - 
+cluster_licensing_licenses:
+  keys: []
 
 network_ethernet_ports:
   - name:                         "a0a"
