@@ -230,18 +230,34 @@
       hostname:                   "{{ ansible_host }}"
       <<: *input
 
-  - name: Get interface groups from cluster
+  - name: Get interface groups and VLANs from cluster
     netapp.ontap.na_ontap_rest_info:
       gather_subset:
         - "network/ethernet/ports"
       fields:
         - "*"
       parameters:
-        type:                     "lag"
+        type:                     "lag|vlan"
       use_python_keys:            true
       hostname:                   "{{ ansible_host }}"
       <<: *input
     register: ifgrp_info
+
+  - name: Remove VLANs from cluster
+    netapp.ontap.na_ontap_port:
+      state:                      absent
+      node:                       "{{ item.node.name }}"
+      ports:                      "{{ item.name }}"
+      hostname:                   "{{ ansible_host }}"
+      <<: *input
+    loop:
+      "{{ ifgrp_info.ontap_info.network_ethernet_ports.records }}"
+    loop_control:
+      label: "{{ item.node.name }}:{{ item.name }}"
+    when:
+      - ifgrp_info.ontap_info.network_ethernet_ports.num_records|int > 0
+      - item.type == "vlan"
+      - item.name is defined
 
   - name: Remove interface groups from cluster
     netapp.ontap.na_ontap_net_ifgrp:
@@ -256,6 +272,7 @@
       label: "{{ item.node.name }}:{{ item.name }}"
     when:
       - ifgrp_info.ontap_info.network_ethernet_ports.num_records|int > 0
+      - item.type == "lag"
       - item.name is defined
 
   - name: Get broadcast domains from cluster
