@@ -1,5 +1,5 @@
 cluster:
-  - name:                         "cluster1"
+  name:                           "cluster1"
 
 cluster_nodes:
   - name:                         "cluster1-01"
