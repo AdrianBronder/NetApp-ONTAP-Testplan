@@ -20,7 +20,7 @@
   gather_facts:       false
   vars_prompt:
     - name:           testenv_ad_join_pw
-      prompt:         "Please enter password for user  {{ testenv_ad_join_user }}"
+      prompt:         "Please enter password for user domain join user"
       private:        true
   vars:
     input: &input
