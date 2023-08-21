@@ -55,5 +55,6 @@
   - name: Display key manager configuration and backup
     ansible.builtin.debug:
       msg:
-        - "Enabled: {{ ontap_key_manager.enabled }}"
-        - "{{ ontap_key_manager.key_backup }}"
+        - "{{ ontap_key_manager.ontap_info.security_key_managers.records }}"
+    when:
+      - ontap_key_manager.ontap_info.security_key_managers.num_records|int > 0
