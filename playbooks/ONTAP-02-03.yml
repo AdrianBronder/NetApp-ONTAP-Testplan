@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-01-03 - Cluster Network Services 
+# Title:        ONTAP-02-03 - Network services 
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
-# Description:  Initial cluster configuration for testing
-#               - Network Services
+# Description:  Basic Cluster Configuration
+#               - Network services
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,16 +16,16 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-01-02 - Cluster Network Services"
+  name:               "ONTAP-02-03 - Network services"
   gather_facts:       false
   vars:
     input: &input
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
   vars_files:
     - ../vars/labondemand.yml
   collections:

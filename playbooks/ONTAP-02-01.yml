@@ -1,0 +1,45 @@
+################################################################################
+#
+# Title:        ONTAP-02-01 - Licenses 
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-17
+# Description:  Basic Cluster Configuration
+#               - Licenses
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "ontap"
+  name:               "ONTAP-02-01 - Licenses"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Install licenses on storage cluster
+    netapp.ontap.na_ontap_license:
+      state:                      present
+      license_codes:              "{{ item.node.name }}"
+      <<: *input
+    loop:
+      "{{ cluster_licensing_licenses }}"
+    loop_control:
+      label: "{{ item }}"
+    when:
+      - cluster_licensing_licenses | length > 0

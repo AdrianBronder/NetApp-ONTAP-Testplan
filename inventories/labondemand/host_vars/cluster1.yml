@@ -9,6 +9,10 @@ cluster_nodes:
 
 cluster_licensing_licenses: []
 
+security_authentication_cluster_ad_proxy:
+  svm:
+    name:                        "{{ cluster.name }}_ad"
+
 network_ethernet_ports:
   - name:                         "a0a"
     node:
@@ -56,6 +60,27 @@ storage_aggregates:
     snaplock_type:                "non_snaplock"
 
 svm_svms:
+  - name:                         "{{ cluster.name }}_ad"
+    dns:
+      domains:                    "{{ testenv_default_dns_domain }}"
+      servers:                    "{{ testenv_dns_nameservers }}"
+    auto_enable_analytics:        true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    false
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "This is the tunnel SVM for cluster AD authentication"
   - name:                         "ntap-nas-svm01"
     dns:
       domains:                    "{{ testenv_default_dns_domain }}"
@@ -100,20 +125,28 @@ svm_svms:
     comment:                      "This is the secondary NAS SVM for testing"
 
 protocols_cifs_services:
-  - name:                         "nas-svm01"
+  - name:                         "{{ svm_svms[0].name }}"
     svm:
       name:                       "{{ svm_svms[0].name }}"
     ad_domain:
       fqdn:                       "{{ testenv_ad_domain }}"
-      organizational_unit":       "{{ testenv_storage_ad_ou_path }}"
-    comment:                      "This CIFS Server is the primary NAS server"
+      organizational_unit:        "{{ testenv_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is for cluster AD authentication"
     enabled:                      true
-  - name:                         "nas-svm02"
+  - name:                         "nas-svm01"
     svm:
       name:                       "{{ svm_svms[1].name }}"
     ad_domain:
       fqdn:                       "{{ testenv_ad_domain }}"
-      organizational_unit":       "{{ testenv_storage_ad_ou_path }}"
+      organizational_unit:        "{{ testenv_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is the primary NAS server"
+    enabled:                      true
+  - name:                         "nas-svm02"
+    svm:
+      name:                       "{{ svm_svms[2].name }}"
+    ad_domain:
+      fqdn:                       "{{ testenv_ad_domain }}"
+      organizational_unit:        "{{ testenv_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is the secondary NAS server"
     enabled:                      true
 
@@ -135,6 +168,25 @@ network_ip_interfaces:
       name:                       "{{ svm_svms[0].name }}"
     ip:
       netmask:                    "24"
+      address:                    "192.168.0.210"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      failover:                   "default"
+      auto_revert:                true
+    ipspace:
+      name:                       "Default"
+    service_policy:
+      name:                       "default-management"
+  - name:                         "{{ svm_svms[1].name }}"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[1].name }}"
+    ip:
+      netmask:                    "24"
       address:                    "192.168.0.211"
       family:                     "ipv4"
     location:
@@ -148,13 +200,13 @@ network_ip_interfaces:
       name:                       "Default"
     service_policy:
       name:                       "default-data-files"
-  - name:                         "{{ svm_svms[1].name }}"
+  - name:                         "{{ svm_svms[2].name }}"
     scope:                        "svm"
     svm:
-      name:                       "{{ svm_svms[1].name }}"
+      name:                       "{{ svm_svms[2].name }}"
     ip:
       netmask:                    "24"
-      address:                    "192.168.0.221"
+      address:                    "192.168.0.212"
       family:                     "ipv4"
     location:
       home_node:
