@@ -48,6 +48,7 @@
       fields:
         - "*"
       use_python_keys:            true
+      <<: *input
     register:
       ontap_key_manager
 
