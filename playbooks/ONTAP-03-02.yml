@@ -18,10 +18,10 @@
 - hosts:              "ontap"
   name:               "ONTAP-03-02 - Cluster AD Authentication"
   gather_facts:       false
-  vars_prompt:
-    - name:           testenv_ad_join_password
-      prompt:         "Please enter password for user domain join user: {{ testenv_ad_join_user }}"
-      private:        true
+  #vars_prompt:
+  #  - name:           testenv_ad_join_password
+  #    prompt:         "Please enter password for user domain join user: {{ testenv_ad_join_user }}"
+  #    private:        true
   vars:
     input: &input
       hostname:                   "{{ ansible_host }}"
@@ -124,7 +124,7 @@
       nameservers:                "{{ item.dns.servers }}"
       <<: *input
     loop:
-      "{{ ontap_svms }}"
+      "{{ svm_svms }}"
     when:
       - svm_svms.lenght > 0
       - security_authentication_cluster_ad_proxy.svm.name is defined
