@@ -19,8 +19,8 @@
   name:               "ONTAP-03-02 - Cluster AD Authentication"
   gather_facts:       false
   vars_prompt:
-    - name:           testenv_ad_join_pw
-      prompt:         "Please enter password for user domain join user"
+    - name:           testenv_ad_join_password
+      prompt:         "Please enter password for user domain join user: {{ testenv_ad_join_user }}"
       private:        true
   vars:
     input: &input
@@ -31,7 +31,7 @@
       validate_certs:             false
       use_rest:                   "always"
   vars_files:
-    - vars/vars_labondemand.yml
+    - ../vars/labondemand.yml
   collections:
     - netapp.ontap
 
@@ -140,7 +140,7 @@
       domain:                     "{{ ad_domain.fqdn }}"
       ou:                         "{{ ad_domain.organizational_unit }}"
       admin_user_name:            "{{ testenv_ad_join_user }}"
-      admin_password:             "{{ testenv_ad_join_pw }}"
+      admin_password:             "{{ testenv_ad_join_password }}"
       <<: *input
     loop:
       "{{ protocols_cifs_services }}"
