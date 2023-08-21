@@ -138,8 +138,6 @@ network_ip_interfaces:
         name:                     "e0c"
       failover:                   "default"
       auto_revert:                true
-    ipspace:
-      name:                       "Default"
     service_policy:
       name:                       "default-management"
   - name:                         "{{ svm_svms[1].name }}"
@@ -157,8 +155,6 @@ network_ip_interfaces:
         name:                     "e0c"
       failover:                   "default"
       auto_revert:                true
-    ipspace:
-      name:                       "Default"
     service_policy:
       name:                       "default-data-files"
   - name:                         "{{ cluster_nodes[0].name }}_ic01"
@@ -174,8 +170,6 @@ network_ip_interfaces:
         name:                     "e0c"
       failover:                   "default"
       auto_revert:                true
-    ipspace:
-      name:                       "Default"
     service_policy:
       name:                       "default-intercluster"
   - name:                         "{{ cluster_nodes[1].name }}_ic01"
@@ -191,7 +185,5 @@ network_ip_interfaces:
         name:                     "e0c"
       failover:                   "default"
       auto_revert:                true
-    ipspace:
-      name:                       "Default"
     service_policy:
       name:                       "default-intercluster"

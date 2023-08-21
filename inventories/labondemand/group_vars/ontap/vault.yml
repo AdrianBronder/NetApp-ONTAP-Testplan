@@ -1,0 +1,2 @@
+vault_testenv_ad_join_user:       "Administrator@DEMO.NETAPP.COM"
+vault_testenv_ad_join_password:   "Netapp1!"
