@@ -16,6 +16,3 @@ network_ethernet_broadcast_domains:
     ipspace:
       name:                       "Default"
     mtu:                          1500
-
-testenv_ad_join_user:             "{{ vault_testenv_ad_join_user }}"
-testenv_ad_join_password:         "{{ vault_testenv_ad_join_password }}"

@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "{{ ontap_primary_cluster }}"
+- hosts:              "ontap"
   name:               "ONTAP-03-02 - Cluster AD Authentication"
   gather_facts:       false
   vars_prompt:
