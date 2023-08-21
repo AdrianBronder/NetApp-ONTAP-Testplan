@@ -1,0 +1,3 @@
+vault_security_key_managers:
+  onboard:
+    passphrase:                   "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"

@@ -9,8 +9,6 @@ ontap_primary_backup_svm:         "ntap-backup-svm01"
 ontap_admin_user:                 "admin"
 ontap_admin_password:             "Netapp1!"
 
-testenv_keymanager_passphrase:    "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
-
 # General - Config Defaults
 ontap_default_vol_size_gb:        500
 ontap_default_vol_size_increment_gb: 50

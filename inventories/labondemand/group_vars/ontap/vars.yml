@@ -16,3 +16,7 @@ network_ethernet_broadcast_domains:
     ipspace:
       name:                       "Default"
     mtu:                          1500
+
+security_key_managers:
+  onboard:
+    passphrase:                   "{{ vault_security_key_managers.onboard.passphrase }}"

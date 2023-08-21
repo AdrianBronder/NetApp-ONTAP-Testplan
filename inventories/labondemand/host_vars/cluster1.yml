@@ -11,7 +11,7 @@ cluster_licensing_licenses: []
 
 security_authentication_cluster_ad_proxy:
   svm:
-    name:                        "{{ cluster.name }}_ad"
+    name:                        "{{ cluster.name }}_ad"       
 
 network_ethernet_ports:
   - name:                         "a0a"
