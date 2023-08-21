@@ -40,11 +40,19 @@
       <<: *input
     when:
       security_key_managers.onboard is defined
-    register:
-      ontap_onboard_key_backup
 
-  - name: Display key backup
+  post_tasks:
+  - name: Get key manager configuration and backup
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:              "security/key-managers"
+      fields:
+        - "*"
+      use_python_keys:            true
+    register:
+      ontap_key_manager
+
+  - name: Display key manager configuration and backup
     ansible.builtin.debug:
       msg:
-        - "This is the ONTAP onboard backup key:\n"
-        - "{{ ontap_onboard_key_backup }}"
+        - "Enabled: {{ ontap_key_manager.enabled }}"
+        - "{{ ontap_key_manager.key_backup }}"
