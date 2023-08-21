@@ -76,7 +76,7 @@
     loop:
       "{{ svm_svms }}"
     when:
-      - svm_svms.lenght > 0
+      - svm_svms.length > 0
       - security_authentication_cluster_ad_proxy.svm.name is defined
       - item.name is defined 
       - item.name == security_authentication_cluster_ad_proxy.svm.name
@@ -96,7 +96,7 @@
     loop:
       "{{ network_ip_interfaces }}"
     when:
-      - network_ip_interfaces.lenght > 0
+      - network_ip_interfaces.length > 0
       - security_authentication_cluster_ad_proxy.svm.name is defined
       - item.svm.name is defined 
       - item.svm.name == security_authentication_cluster_ad_proxy.svm.name
@@ -111,7 +111,7 @@
     loop:
       "{{ ontap_svms }}"
     when:
-      - svm_svms.lenght > 0
+      - svm_svms.length > 0
       - security_authentication_cluster_ad_proxy.svm.name is defined
       - item.name is defined 
       - item.name == security_authentication_cluster_ad_proxy.svm.name
@@ -126,7 +126,7 @@
     loop:
       "{{ svm_svms }}"
     when:
-      - svm_svms.lenght > 0
+      - svm_svms.length > 0
       - security_authentication_cluster_ad_proxy.svm.name is defined
       - item.name is defined 
       - item.name == security_authentication_cluster_ad_proxy.svm.name
@@ -145,7 +145,7 @@
     loop:
       "{{ protocols_cifs_services }}"
     when:
-      - protocols_cifs_services.lenght > 0
+      - protocols_cifs_services.length > 0
       - security_authentication_cluster_ad_proxy.svm.name is defined
       - item.svm.name is defined 
       - item.svm.name == security_authentication_cluster_ad_proxy.svm.name
