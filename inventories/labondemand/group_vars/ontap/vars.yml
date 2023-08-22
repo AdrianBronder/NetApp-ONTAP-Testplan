@@ -27,7 +27,7 @@ security_key_managers:
     passphrase:                   "{{ vault_security_key_managers.onboard.passphrase }}"
 
 security_accounts:
-  - name:                         "ontap_local_admin_user"
+  - name:                         "na_local_admin"
     owner:
       name:
     locked:                       false
@@ -47,7 +47,7 @@ security_accounts:
     comment:                      "Local user with admin privileges for testing"
     role:
       name:                       "admin"
-  - name:                         "ontap_local_ro_user"
+  - name:                         "na_local_ro"
     owner:
       name:
     locked:                       false
