@@ -17,12 +17,12 @@ ontap_default_fg_size_increment_gb: 1024
 ontap_default_fg_multiplier:      8
 
 # BSS-02-01
-ontap_local_admin_user:           "poc_local_admin"
-ontap_local_admin_pw:             "CustomPoC1!"
+#ontap_local_admin_user:           "poc_local_admin"
+#ontap_local_admin_pw:             "CustomPoC1!"
 
 # BSS-02-02
-ontap_local_ro_user:              "poc_local_ro"
-ontap_local_ro_pw:                "CustomPoC2!"
+#ontap_local_ro_user:              "poc_local_ro"
+#ontap_local_ro_pw:                "CustomPoC2!"
 
 # BSS-02-03
 # using primary SVM for domain tunneling (cluster-level AD authentication)
