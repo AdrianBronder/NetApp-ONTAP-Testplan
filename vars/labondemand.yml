@@ -1,9 +1,9 @@
 # General - Storage Objects
 ontap_primary_test_cluster:       "cluster1"
 ontap_secondary_test_cluster:     "cluster2"
-ontap_primary_nas_svm:            "ntap-nas-svm01"
-ontap_secondary_nas_svm:          "ntap-nas-svm02"
-ontap_primary_backup_svm:         "ntap-backup-svm01"
+ontap_primary_nas_svm:            "ntap-svm01-nas"
+ontap_secondary_nas_svm:          "ntap-svm02-san"
+ontap_primary_backup_svm:         "ntap-svm03-backup"
 
 # General - Users
 ontap_admin_user:                 "admin"

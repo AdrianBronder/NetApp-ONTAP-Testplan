@@ -81,7 +81,7 @@ svm_svms:
       allowed:                    false
     language:                     "utf8mb4"
     comment:                      "This is the tunnel SVM for cluster AD authentication"
-  - name:                         "ntap-backup-svm01"
+  - name:                         "ntap-svm03-backup"
     dns:
       domains:                    "{{ testenv_default_dns_domain }}"
       servers:                    "{{ testenv_dns_nameservers }}"
@@ -112,7 +112,7 @@ protocols_cifs_services:
       organizational_unit:        "{{ testenv_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is for cluster AD authentication"
     enabled:                      true
-  - name:                         "backup-svm01"
+  - name:                         "svm03-backup"
     svm:
       name:                       "{{ svm_svms[1].name }}"
     ad_domain:
@@ -121,6 +121,17 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is the default NAS backup \
                                    location"
     enabled:                      true
+
+protocols_nfs_services:
+  - svm:
+      name:                       "ntap-svm03-backup"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                false
+      v41_enabled:                false
+      v3_64bit_identifiers_enabled: true
+    showmount_enabled:            true
 
 network_ip_interfaces:
   - name:                         "{{ svm_svms[0].name }}"
