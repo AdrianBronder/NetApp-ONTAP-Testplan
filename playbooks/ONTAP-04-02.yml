@@ -50,6 +50,6 @@
     when:
       - security_accounts | length > 0
       - item.name is defined and item.role.name is defined
-      - item.role.name == "readonly"
+      - item.role.name == "admin"
 
   post_tasks:
