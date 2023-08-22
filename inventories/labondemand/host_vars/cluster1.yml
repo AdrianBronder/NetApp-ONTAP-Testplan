@@ -151,17 +151,6 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is the secondary NAS server"
     enabled:                      true
 
-protocols_nfs_services:
-  - svm:
-      name:                       "ntap-svm01-nas"
-    enabled:                      true
-    protocol:
-      v3_enabled:                 true
-      v40_enabled:                false
-      v41_enabled:                false
-      v3_64bit_identifiers_enabled: true
-    showmount_enabled:            true
-
 network_ip_interfaces:
   - name:                         "{{ svm_svms[0].name }}"
     scope:                        "svm"
