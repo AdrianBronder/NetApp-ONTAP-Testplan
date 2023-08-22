@@ -104,7 +104,8 @@
       label: "{{ item.name }}"
     when:
       - network_ip_interfaces | length > 0
-      - item.svm.name is defined 
+      - item.svm.name is defined
+      - item.scope == "svm"
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.svm.name 
 
@@ -121,7 +122,7 @@
       label: "{{ item.name }}"
     when:
       - svm_svms | length > 0
-      - item.name is defined 
+      - item.name is defined
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
 
@@ -138,14 +139,14 @@
       label: "{{ item.name }}"
     when:
       - svm_svms | length > 0
-      - item.name is defined 
+      - item.name is defined
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
 
   - name: Create CIFS server on SVMs
     netapp.ontap.na_ontap_cifs_server:
       state:                      present
-      name:                       "{{ item.name }}"                  
+      name:                       "{{ item.name }}"
       vserver:                    "{{ item.svm.name }}"
       service_state:              started
       domain:                     "{{ item.ad_domain.fqdn }}"

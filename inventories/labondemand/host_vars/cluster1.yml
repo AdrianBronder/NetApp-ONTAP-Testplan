@@ -112,7 +112,7 @@ svm_svms:
     nfs:
       allowed:                    false
     cifs:
-      allowed:                    false
+      allowed:                    true
     iscsi:
       allowed:                    true
     fcp:
