@@ -56,6 +56,8 @@
       <<: *input
     loop:
       "{{ svm_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
     when:
       - svm_svms | length > 0
       - item.name is defined 
@@ -77,6 +79,12 @@
       "{{ ontap_svms }}"
     loop_control:
       label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - item.nfs.allowed
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
 
   - name: Create network interfaces on test SVMs
     netapp.ontap.na_ontap_interface:
@@ -92,6 +100,8 @@
       <<: *input
     loop:
       "{{ network_ip_interfaces }}"
+    loop_control:
+      label: "{{ item.name }}"
     when:
       - network_ip_interfaces | length > 0
       - item.svm.name is defined 
@@ -107,6 +117,8 @@
       <<: *input
     loop:
       "{{ ontap_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
     when:
       - svm_svms | length > 0
       - item.name is defined 
@@ -122,6 +134,8 @@
       <<: *input
     loop:
       "{{ svm_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
     when:
       - svm_svms | length > 0
       - item.name is defined 
@@ -141,107 +155,29 @@
       <<: *input
     loop:
       "{{ protocols_cifs_services }}"
+    loop_control:
+      label: "{{ item.name }}"
     when:
       - protocols_cifs_services | length > 0
       - item.name is defined 
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
-  - name: Patch SVM parameters for automatic analytics and activity tracking features
-    netapp.ontap.na_ontap_rest_cli:
-      command:                    'vserver'
-      verb:                       'PATCH'
-      params: 
-        vserver:                  "{{ item.name }}"
-      body:
-        auto-enable-analytics:    true
-        auto-enable-activity-tracking: true
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
-      <<: *input
-    loop:
-      "{{ ontap_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-  
-  - name: Create network interfaces on SVMs
-    netapp.ontap.na_ontap_interface:
-      state:                      present
-      vserver:                    "{{ item[0].name }}"
-      interface_name:             "{{ item[1].lifname }}"
-      home_node:                  "{{ item[1].node }}"
-      home_port:                  "{{ item[1].port }}"
-      address:                    "{{ item[1].ip }}"
-      netmask:                    "{{ item[1].netmask }}"
-      service_policy:             "{{ item[1].service_policy }}"
-      is_auto_revert:             true
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
-      <<: *input
-    loop:
-#      "{{ ontap_svms | subelements('lifs', 'skip_missing=True') }}"
-      "{{ q('ansible.builtin.subelements', ontap_svms, 'lifs', {'skip_missing': True}) }}"
-    loop_control:
-      label: "{{ item[0].name }} - {{ item[1].lifname }}"
-
-  - name: Configure default route on SVMs
-    netapp.ontap.na_ontap_net_routes:
-      state:                      present
-      vserver:                    "{{ item.name }}"
-      destination:                "0.0.0.0/0"
-      gateway:                    "{{ testenv_default_gateway }}"
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
-      <<: *input
-    loop:
-      "{{ ontap_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-
-  - name: Configure DNS on SVMs
-    netapp.ontap.na_ontap_dns:
-      state:                      present
-      vserver:                    "{{ item.name }}"
-      domains:                    "{{ testenv_dns_domains }}"
-      nameservers:                "{{ testenv_dns_nameservers }}"
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
-      <<: *input
-    loop:
-      "{{ ontap_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-
-  - name: Create CIFS server on SVMs
-    netapp.ontap.na_ontap_cifs_server:
-      state:                      present
-      name:                       "{{ item.cifs_name }}"                  
-      vserver:                    "{{ item.name }}"
-      service_state:              started
-      domain:                     "{{ testenv_ad_domain }}"
-      ou:                         "{{ testenv_storage_ad_ou_path }}"
-      admin_user_name:            "{{ testenv_ad_join_user }}"
-      admin_password:             "{{ testenv_ad_join_pw }}"
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
-      <<: *input
-    loop:
-      "{{ ontap_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-
   - name: Create ro export policy (aka "storage group") for SVM root volume
     netapp.ontap.na_ontap_export_policy:
       state:                      present
       name:                       "ro_{{ item.name }}"
       vserver:                    "{{ item.name }}"
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
       <<: *input
     loop:
       "{{ ontap_svms }}"
     loop_control:
       label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined 
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
 
   - name: Create ro export policy rules for SVM root volume
     na_ontap_export_policy_rule:
@@ -255,8 +191,6 @@
       super_user_security:        "none"
       allow_suid:                 false
       hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
-      <<: *input
     loop:
       "{{ ontap_svms }}"
     loop_control:
@@ -268,8 +202,6 @@
       name:                       "{{ item.name.replace('-','_') }}_root"
       vserver:                    "{{ item.name }}"
       export_policy:              "ro_{{ item.name }}"
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
       <<: *input
     loop:
       "{{ ontap_svms }}"
