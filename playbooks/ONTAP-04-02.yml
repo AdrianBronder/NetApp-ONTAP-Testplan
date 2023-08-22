@@ -34,15 +34,22 @@
   pre_tasks:
 
   tasks:
-  - name: Create local user with admin privileges
+  - name: Create local users with read-only privileges
     netapp.ontap.na_ontap_user:
       state:                      present
-      name:                       "{{ ontap_local_admin_user }}"
-      applications:               ssh,http,ontapi
-      authentication_method:      password
-      set_password:               "{{ ontap_local_admin_pw }}"
-      lock_user:                  False
-      role_name:                  admin
+      name:                       "{{ item.name }}"
+      application_dicts:          "{{ item.applications }}"
+      set_password:               "{{ vault_security_accounts[item.name].password }}"
+      lock_user:                  "{{ item.locked }}"
+      role_name:                  "{{ item.role.name }}"
       <<: *input
+    loop:
+      "{{ security_accounts }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - security_accounts | length > 0
+      - item.name is defined and item.role.name is defined
+      - item.role.name == "readonly"
 
   post_tasks:
