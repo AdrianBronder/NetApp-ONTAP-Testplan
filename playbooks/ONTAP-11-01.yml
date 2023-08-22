@@ -72,8 +72,7 @@
         vserver:                  "{{ item.name }}"
       body:
         v3-64bit-identifiers:     "enabled"
-      hostname:                   "{{ ontap_hostname }}"
-      use_rest:                   "always"
+        v4-64bit-identifiers:     "enabled"
       <<: *input
     loop:
       "{{ svm_svms }}"
