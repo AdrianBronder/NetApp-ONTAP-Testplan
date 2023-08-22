@@ -5,7 +5,7 @@ vault_security_key_managers:
 # ATTENTION - not following standard ONTAP REST model here for passwords
 # but it is more practical...
 vault_security_accounts:
-  ontap_local_admin_user:
+  na_local_admin:
     password:                     "CustomTest1!"
-  ontap_local_ro_user:
+  na_local_ro:
     password:                     "CustomTest2!"
