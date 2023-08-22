@@ -38,7 +38,7 @@
     netapp.ontap.na_ontap_user:
       state:                      present
       name:                       "{{ item.name }}"
-      authentication_dicts:       "{{ item.applications }}"
+      application_dicts:          "{{ item.applications }}"
       set_password:               "{{ item.applications[0].password }}"
       lock_user:                  "{{ item.locked }}"
       role_name:                  "{{ item.role.name }}"
