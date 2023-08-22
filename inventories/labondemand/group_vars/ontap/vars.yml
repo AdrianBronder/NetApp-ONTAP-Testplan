@@ -1,6 +1,11 @@
+# Ansible Variables
 ansible_connection:               "local"
 ansible_python_interpreter:       "{{ansible_playbook_python}}"
 
+# Custom Variables
+
+# Variables basedon ONTAP REST model
+# https://<ontap_cluster_mgmt>/docs/api
 security_login_messages:
   - banner: |
       ################ TEST BANNER ################
@@ -20,3 +25,51 @@ network_ethernet_broadcast_domains:
 security_key_managers:
   onboard:
     passphrase:                   "{{ vault_security_key_managers.onboard.passphrase }}"
+
+security_accounts:
+  - name:                         "ontap_local_admin_user"
+    owner:
+      name:
+    locked:                       false
+    applications:
+      - application:              "ssh"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+        password:                 "{{ vault_security_accounts.ontap_local_admin_user.password }}"
+      - application:              "ontapi"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+        password:                 "{{ vault_security_accounts.ontap_local_admin_user.password }}"
+      - application:              "http"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+        password:                 "{{ vault_security_accounts.ontap_local_admin_user.password }}"
+    comment:                      "Local user with admin privileges for testing"
+    role:
+      name:                       "admin"
+  - name:                         "ontap_local_ro_user"
+    owner:
+      name:
+    locked:                       false
+    applications:
+      - application:              "ssh"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+        password:                 "{{ vault_security_accounts.ontap_local_ro_user.password }}"
+      - application:              "ontapi"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+        password:                 "{{ vault_security_accounts.ontap_local_ro_user.password }}"
+      - application:              "http"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+        password:                 "{{ vault_security_accounts.ontap_local_ro_user.password }}"
+    comment:                      "Local user with read-only privileges for testing"
+    role:
+      name:                       "readonly"

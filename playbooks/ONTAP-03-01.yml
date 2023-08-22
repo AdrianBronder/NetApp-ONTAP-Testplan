@@ -31,6 +31,8 @@
   collections:
     - netapp.ontap
 
+  pre_tasks:
+
   tasks:
   - name: Set timezone on storage cluster
     netapp.ontap.na_ontap_cluster:
@@ -52,3 +54,5 @@
     when:
       - item.banner is defined or item.message is defined
       - item.scope == "cluster"
+
+  post_tasks:

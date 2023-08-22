@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-02-03 - Network services 
+# Title:        ONTAP-04-02 - Local admin user
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
-# Description:  Basic Cluster Configuration
-#               - Network services
+# Description:  Cluster User Management
+#               - Local admin user
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-02-03 - Network services"
+  name:               "ONTAP-04-02 - Local admin user"
   gather_facts:       false
   vars:
     input: &input
@@ -34,26 +34,15 @@
   pre_tasks:
 
   tasks:
-  - name: Create DNS config on storage cluster
-    netapp.ontap.na_ontap_dns:
+  - name: Create local user with admin privileges
+    netapp.ontap.na_ontap_user:
       state:                      present
-      vserver:                    "{{ inventory_hostname }}"
-      domains:                    "{{ testenv_dns_domains }}"
-      nameservers:                "{{ testenv_dns_nameservers }}"
-      use_rest:                   "never"
+      name:                       "{{ ontap_local_admin_user }}"
+      applications:               ssh,http,ontapi
+      authentication_method:      password
+      set_password:               "{{ ontap_local_admin_pw }}"
+      lock_user:                  False
+      role_name:                  admin
       <<: *input
-
-  - name: Create NTP server on storage cluster
-    netapp.ontap.na_ontap_ntp:
-      state:                      present
-      server_name:                "{{ item }}"
-      version:                    "auto"
-      <<: *input
-    loop:
-      "{{ testenv_ntp_serveres }}"
-    retries: 5
-    delay: 3
-    register: result
-    until: not result.failed
 
   post_tasks:

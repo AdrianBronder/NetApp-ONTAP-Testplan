@@ -31,6 +31,8 @@
   collections:
     - netapp.ontap
 
+  pre_tasks:
+
   tasks:
   - name: Configure onboard Key Manager
     netapp.ontap.na_ontap_security_key_manager:
@@ -58,3 +60,5 @@
         - "{{ ontap_key_manager.ontap_info.security_key_managers.records }}"
     when:
       - ontap_key_manager.ontap_info.security_key_managers.num_records|int > 0
+
+  post_tasks:

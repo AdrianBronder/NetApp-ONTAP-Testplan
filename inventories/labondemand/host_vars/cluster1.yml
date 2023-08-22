@@ -1,3 +1,9 @@
+# Ansible Variables
+
+# Custom Variables
+
+# Variables basedon ONTAP REST model
+# https://<ontap_cluster_mgmt>/docs/api
 cluster:
   name:                           "cluster1"
 

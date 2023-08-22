@@ -31,6 +31,8 @@
   collections:
     - netapp.ontap
 
+  pre_tasks:
+
   tasks:
   - name: Create all SVMs for testing on "{{ ontap_primary_test_cluster }}"
     netapp.ontap.na_ontap_svm:
@@ -195,3 +197,5 @@
       - item.name is defined
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
+
+  post_tasks:

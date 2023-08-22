@@ -31,6 +31,8 @@
   collections:
     - netapp.ontap
 
+  pre_tasks:
+
   tasks:
   - name: Install licenses on storage cluster
     netapp.ontap.na_ontap_license:
@@ -43,3 +45,5 @@
       label: "{{ item }}"
     when:
       - cluster_licensing_licenses | length > 0
+
+  post_tasks:

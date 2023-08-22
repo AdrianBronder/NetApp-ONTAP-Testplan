@@ -1,3 +1,6 @@
+# Ansible Variables
+
+# Custom Variables
 testenv_default_gateway:          "192.168.0.1"
 testenv_default_dns_domain:       "demo.netapp.com"
 testenv_ad_domain:                "{{ testenv_default_dns_domain }}"

@@ -31,6 +31,8 @@
   collections:
     - netapp.ontap
 
+  pre_tasks:
+
   tasks:
   - name: Create data aggregates on storage cluster 
     netapp.ontap.na_ontap_aggregate:
@@ -46,3 +48,5 @@
       label: "{{ item.node.name }}:{{ item.name }}"
     when:
       - item.name is defined
+
+  post_tasks:
