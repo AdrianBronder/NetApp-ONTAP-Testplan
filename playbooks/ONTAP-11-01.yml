@@ -76,7 +76,7 @@
       use_rest:                   "always"
       <<: *input
     loop:
-      "{{ ontap_svms }}"
+      "{{ svm_svms }}"
     loop_control:
       label: "{{ item.name }}"
     when:
@@ -117,7 +117,7 @@
       gateway:                    "{{ testenv_default_gateway }}"
       <<: *input
     loop:
-      "{{ ontap_svms }}"
+      "{{ svm_svms }}"
     loop_control:
       label: "{{ item.name }}"
     when:
