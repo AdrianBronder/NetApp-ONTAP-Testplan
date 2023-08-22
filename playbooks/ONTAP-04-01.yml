@@ -39,7 +39,7 @@
       state:                      present
       name:                       "{{ item.name }}"
       application_dicts:          "{{ item.applications }}"
-      set_password:               "{{ item.applications[0].password }}"
+      set_password:               "{{ vault_security_accounts[ontap_local_admin_user].password }}"
       lock_user:                  "{{ item.locked }}"
       role_name:                  "{{ item.role.name }}"
       <<: *input
