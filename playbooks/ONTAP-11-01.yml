@@ -171,7 +171,7 @@
       vserver:                    "{{ item.name }}"
       <<: *input
     loop:
-      "{{ ontap_svms }}"
+      "{{ svm_svms }}"
     loop_control:
       label: "{{ item.name }}"
     when:
@@ -193,9 +193,14 @@
       allow_suid:                 false
       hostname:                   "{{ ontap_hostname }}"
     loop:
-      "{{ ontap_svms }}"
+      "{{ svm_svms }}"
     loop_control:
       label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
 
   - name: Apply RO export policy to SVM root volume
     netapp.ontap.na_ontap_volume:
@@ -205,6 +210,11 @@
       export_policy:              "ro_{{ item.name }}"
       <<: *input
     loop:
-      "{{ ontap_svms }}"
+      "{{ svm_svms }}"
     loop_control:
-      label: "{{ item.name }}" 
+      label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
