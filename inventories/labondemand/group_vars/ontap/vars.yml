@@ -36,17 +36,14 @@ security_accounts:
         authentication_methods:
           - "password"
         second_authentication_method: "none"
-        password:                 "{{ vault_security_accounts.ontap_local_admin_user.password }}"
       - application:              "ontapi"
         authentication_methods:
           - "password"
         second_authentication_method: "none"
-        password:                 "{{ vault_security_accounts.ontap_local_admin_user.password }}"
       - application:              "http"
         authentication_methods:
           - "password"
         second_authentication_method: "none"
-        password:                 "{{ vault_security_accounts.ontap_local_admin_user.password }}"
     comment:                      "Local user with admin privileges for testing"
     role:
       name:                       "admin"
@@ -59,17 +56,14 @@ security_accounts:
         authentication_methods:
           - "password"
         second_authentication_method: "none"
-        password:                 "{{ vault_security_accounts.ontap_local_ro_user.password }}"
       - application:              "ontapi"
         authentication_methods:
           - "password"
         second_authentication_method: "none"
-        password:                 "{{ vault_security_accounts.ontap_local_ro_user.password }}"
       - application:              "http"
         authentication_methods:
           - "password"
         second_authentication_method: "none"
-        password:                 "{{ vault_security_accounts.ontap_local_ro_user.password }}"
     comment:                      "Local user with read-only privileges for testing"
     role:
       name:                       "readonly"
