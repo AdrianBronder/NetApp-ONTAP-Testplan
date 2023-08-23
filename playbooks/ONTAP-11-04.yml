@@ -56,39 +56,6 @@
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
 
-  - name: Create ro export policy (aka "storage group") for SVM root volume
-    netapp.ontap.na_ontap_export_policy:
-      state:                      present
-      name:                       "ro_{{ item.name }}"
-      vserver:                    "{{ item.name }}"
-      <<: *input
-    loop:
-      "{{ svm_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - svm_svms | length > 0
-      - item.name is defined 
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.name
-
-  - name: Apply RO export policy to SVM root volume
-    netapp.ontap.na_ontap_volume:
-      state:                      present
-      name:                       "{{ item.name.replace('-','_') }}_root"
-      vserver:                    "{{ item.name }}"
-      export_policy:              "ro_{{ item.name }}"
-      <<: *input
-    loop:
-      "{{ svm_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - svm_svms | length > 0
-      - item.name is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.name
-
   - name: Create CIFS server on SVMs
     netapp.ontap.na_ontap_cifs_server:
       state:                      present

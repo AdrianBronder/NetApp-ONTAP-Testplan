@@ -4,6 +4,7 @@ cluster2 ansible_host=cluster2.demo.netapp.com
 
 [linux]
 centos1 ansible_host=centos1.demo.netapp.com
+centos2 ansible_host=centos1.demo.netapp.com
 
 [win_hosts]
 jumphost win_hostname=jumphost.demo.netapp.com

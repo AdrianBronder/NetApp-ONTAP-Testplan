@@ -1,0 +1,96 @@
+################################################################################
+#
+# Title:        ONTAP-11-01 - Storage Virtual Machines (SVMs)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-22
+# Description:  Basic SVM Setup
+#               - Storage Virtual Machines (SVMs)
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "{{ ontap_primary_test_cluster }}"
+  name:               "ONTAP-11-01 - Storage Virtual Machines (SVMs)"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+  - name: Create ro export policy for SVM root volume
+    netapp.ontap.na_ontap_export_policy:
+      state:                      present
+      name:                       "ro_{{ item.name }}"
+      vserver:                    "{{ item.name }}"
+      <<: *input
+    loop:
+      "{{ svm_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - item.nfs.allowed
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
+
+  - name: Create ro export policy rules for SVM root volume
+    na_ontap_export_policy_rule:
+      state:                      present
+      name:                       "ro_{{ item.name }}"
+      vserver:                    "{{ item.name }}"
+      client_match:               "0.0.0.0/0"
+      ro_rule:                    "any"
+      rw_rule:                    "none"
+      protocol:                   "nfs"
+      super_user_security:        "none"
+      allow_suid:                 false
+      <<: *input
+    loop:
+      "{{ svm_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - item.nfs.allowed
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
+
+  - name: Apply RO export policy to SVM root volume
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ item.name.replace('-','_') }}_root"
+      vserver:                    "{{ item.name }}"
+      export_policy:              "ro_{{ item.name }}"
+      <<: *input
+    loop:
+      "{{ svm_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - item.nfs.allowed
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
+
+  post_tasks:
