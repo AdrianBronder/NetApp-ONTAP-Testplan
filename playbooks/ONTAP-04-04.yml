@@ -40,7 +40,7 @@
       state:                      present
       name:                       "{{ item.name }}"
       application_dicts:          "{{ item.applications }}"
-      set_password:               "{{ vault_security_accounts[item.name].password }}"
+      set_password:               "{{ vault_security_accounts[item.name].password | default(omit) }}"
       lock_user:                  "{{ item.locked }}"
       role_name:                  "{{ item.role.name }}"
       <<: *input
