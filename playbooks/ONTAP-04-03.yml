@@ -34,7 +34,7 @@
       validate_certs:             false
       use_rest:                   "always"
   vars_files:
-    - ../vars/labondemand/
+    - ../vars/labondemand/*
   collections:
     - netapp.ontap
 

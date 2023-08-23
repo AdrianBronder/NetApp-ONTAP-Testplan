@@ -12,7 +12,7 @@
       - name:                   "e1f"
       - name:                   "e1g"
   vars_files:
-    - ../vars/labondemand/
+    - ../vars/labondemand/*
   collections:
     - netapp.ontap
 
