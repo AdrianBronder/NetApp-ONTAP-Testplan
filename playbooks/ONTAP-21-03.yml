@@ -19,7 +19,11 @@
   name:               ONTAP-21-03 - Mount & write
   gather_facts:       false
   vars_files:
-    - vars/vars_labondemand.yml
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
 
   pre_tasks:
 
