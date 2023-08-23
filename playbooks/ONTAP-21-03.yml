@@ -38,7 +38,7 @@
     loop:
       "{{ ontap_21_qtree_names }}"
 
-  - name: Create mount directory
+  - name: Create mount directories
     ansible.builtin.file:
       path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
       state:                      "directory"
