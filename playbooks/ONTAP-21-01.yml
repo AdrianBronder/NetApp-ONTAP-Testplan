@@ -57,7 +57,7 @@
       state:                      present
       name:                       "ro_{{ item.name }}"
       vserver:                    "{{ item.name }}"
-      client_match:               "0.0.0.0/0"
+      client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}""
       ro_rule:                    "any"
       rw_rule:                    "none"
       protocol:                   "nfs"

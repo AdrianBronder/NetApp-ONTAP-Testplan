@@ -50,4 +50,4 @@
 
     - name: test debug hosts
       ansible.builtin.debug:
-        msg: "{{ hostvars[groups['linux']] | map(attribute='ansible_host') | flatten }}"
+        msg: "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
