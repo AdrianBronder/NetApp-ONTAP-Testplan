@@ -10,9 +10,9 @@ ontap_admin_user:                 "admin"
 ontap_admin_password:             "Netapp1!"
 
 # General - Config Defaults
-ontap_default_vol_size_gb:        500
-ontap_default_vol_size_increment_gb: 50
-ontap_default_fg_size_gb:         307200
+ontap_default_vol_size_gb:        10
+ontap_default_vol_size_increment_gb: 2
+ontap_default_fg_size_gb:         102400
 ontap_default_fg_size_increment_gb: 1024
 ontap_default_fg_multiplier:      8
 
@@ -30,8 +30,15 @@ ontap_04_ad_admin_user_pw:        "{{ vault_ontap_04_ad_admin_user_pw }}"
 ontap_04_ad_test_account:         "ontap_04_user02"
 ontap_04_ad_test_account_pw:      "{{ vault_ontap_04_ad_test_account_pw }}"
 
-
-
+# ONTAP-21 - NFS
+ontap_21_policy_name:             "ontap_21_policy"
+ontap_21_volume_name:             "ontap_21_vol01"
+ontap_21_qtree_names:
+  - "ontap_21_qt01"
+  - "ontap_21_qt02"
+  - "ontap_21_qt03"
+  - "ontap_21_qt04"
+  - "ontap_21_qt05"
 
 # BSS-02-06
 ontap_02_local_vol_name:          "bss_02_06_vol"

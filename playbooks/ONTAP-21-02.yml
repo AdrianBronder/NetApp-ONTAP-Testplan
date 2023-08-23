@@ -1,0 +1,64 @@
+################################################################################
+#
+# Title:        ONTAP-21-02 - Volumes & qtrees
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-22
+# Description:  NFS
+#               - Volumes & qtrees
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "{{ ontap_primary_test_cluster }}"
+  name:               "ONTAP-21-02 - Volumes & qtrees"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+  - name: Create FlexVol
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ ontap_21_volume_name }}"
+      aggregate_name:             "{{ hostvars[ontap_primary_test_cluster].storage_aggregates[0].name }}"
+      size:                       "{{ ontap_default_vol_size_gb }}"
+      size_unit:                  gb
+      space_guarantee:            none
+      tiering_policy:             auto
+      export_policy:              "ro_{{ ontap_primary_nas_svm }}"
+      junction_path:              "/{{ ontap_21_volume_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      security_style:             "unix"
+      <<: *input
+
+  - name: Create qtrees
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ item }}"
+      flexvol_name:               "{{ ontap_21_volume_name }}"
+      export_policy:              "{{ ontap_21_policy_name }}"
+      security_style:             "unix"
+      unix_permissions:           0777
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      <<: *input
+
+  post_tasks:
