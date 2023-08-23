@@ -60,5 +60,7 @@
       unix_permissions:           0777
       vserver:                    "{{ ontap_primary_nas_svm }}"
       <<: *input
+    loop:
+      "{{ ontap_21_qtree_names }}"
 
   post_tasks:
