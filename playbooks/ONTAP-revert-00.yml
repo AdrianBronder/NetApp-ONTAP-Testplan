@@ -179,7 +179,7 @@
 
   - name: Remove all additional users from cluster
     netapp.ontap.na_ontap_user:
-      state:                      present
+      state:                      absent
       name:                       "{{ item.name }}"
       <<: *input
     loop:
