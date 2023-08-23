@@ -51,7 +51,7 @@
       <<: *input
 
   - name: Create qtrees
-    netapp.ontap.na_ontap_volume:
+    netapp.ontap.na_ontap_qtree:
       state:                      present
       name:                       "{{ item }}"
       flexvol_name:               "{{ ontap_21_volume_name }}"
