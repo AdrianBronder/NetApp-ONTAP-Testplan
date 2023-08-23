@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "{{ testenv_lin_hosts }}"
+- hosts:              "linux"
   name:               ONTAP-21-03 - Mount & write
   gather_facts:       false
   vars_files:
