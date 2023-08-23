@@ -49,7 +49,8 @@
       label: "{{ item.name }}"
     when:
       - security_accounts | length > 0
-      - item.name is defined and item.role.name is defined
+      - item.name is defined
+      - item.scope == "cluster"
       - item.role.name == "readonly"
 
   post_tasks:

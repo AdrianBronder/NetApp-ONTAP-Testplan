@@ -20,7 +20,7 @@ network_ethernet_broadcast_domains:
   - name:                         "bc_data"
     ipspace:
       name:                       "Default"
-    mtu:                          1500
+    mtu:                          9000
 
 security_key_managers:
   onboard:
@@ -28,6 +28,7 @@ security_key_managers:
 
 security_accounts:
   - name:                         "na_local_admin"
+    scope:                        "cluster"
     owner:
       name:
     locked:                       false
@@ -48,6 +49,7 @@ security_accounts:
     role:
       name:                       "admin"
   - name:                         "na_local_ro"
+    scope:                        "cluster"
     owner:
       name:
     locked:                       false

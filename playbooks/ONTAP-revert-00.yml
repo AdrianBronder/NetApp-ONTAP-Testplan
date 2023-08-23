@@ -159,6 +159,29 @@
     loop:
       "{{ svm_info.ontap_info.svm_svms.records }}"
 
+  - name: Get all users
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - "security/accounts"
+      use_python_keys:            true
+      <<: *input
+    register: accounts_info
+
+  - name: Remove all additional users from cluster
+    netapp.ontap.na_ontap_user:
+      state:                      present
+      name:                       "{{ item.name }}"
+      <<: *input
+    loop:
+      "{{ accounts_info.ontap_info.security_accounts.records }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - accounts_info.ontap_info.security_accounts.num_records|int > 0
+      - item.name is defined
+      - item.name not in ["admin", "autosupport"]
+      - item.scope == "cluster"
+
 # by default, ONTAP does only return data aggregates via REST API
   - name: Get all non-root aggregates
     netapp.ontap.na_ontap_rest_info:
@@ -168,7 +191,7 @@
       <<: *input
     register: aggr_info
 
-  - name: Delete all non-root aggregates from clusters
+  - name: Remove all non-root aggregates from clusters
     netapp.ontap.na_ontap_aggregate:
       state:                      absent
       name:                       "{{ item.name }}"
