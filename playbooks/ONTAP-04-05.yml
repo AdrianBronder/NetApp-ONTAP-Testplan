@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-04-01 - Local read-only user
+# Title:        ONTAP-04-05 - Domain admin group
 # Author:       NetApp Inc. (badrian)
 # Initial 
-# Create Date:  2023-08-17
+# Create Date:  2023-08-23
 # Description:  Cluster User Management
-#               - Local read-only user
+#               - Domain admin group
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-04-01 - Local read-only user"
+  name:               "ONTAP-04-05 - Domain admin group"
   gather_facts:       false
   vars:
     input: &input
@@ -52,6 +52,8 @@
       - security_accounts | length > 0
       - item.name is defined
       - item.scope == "cluster"
-      - item.role.name == "readonly"
+      - item.role.name == "admin"
+      - ('domain') in security_accounts[0].applications | map(attribute='authentication_methods') | flatten
+      - not ('password') in security_accounts[0].applications | map(attribute='authentication_methods') | flatten
 
   post_tasks:
