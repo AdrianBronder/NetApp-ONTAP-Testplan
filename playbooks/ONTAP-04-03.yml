@@ -46,19 +46,19 @@
         - name: Create local testuser with read-only account
           netapp.ontap.na_ontap_user:
             state:                      present
-            name:                       "{{ ontap_04_security_account }}"
+            name:                       "{{ ontap_04_local_test_account }}"
             application_dicts:
               - application:              "ssh"
                 authentication_methods:
                 - "password"
                 second_authentication_method: "none"
-            set_password:               "{{ ontap_04_security_account_pw }}"
+            set_password:               "{{ ontap_04_local_test_account_pw }}"
             lock_user:                  "false"
             role_name:                  "readonly"
             <<: *input_ro
           when:
-            - ontap_04_security_account is defined
-            - ontap_04_security_account_pw is defined
+            - ontap_04_local_test_account is defined
+            - ontap_04_local_test_account_pw is defined
           register: ro_create_result
 
       rescue:
@@ -81,18 +81,18 @@
         - name: Create local testuser with admin account
           netapp.ontap.na_ontap_user:
             state:                      present
-            name:                       "{{ ontap_04_security_account }}"
+            name:                       "{{ ontap_04_local_test_account }}"
             application_dicts:
               - application:              "ssh"
                 authentication_methods:
                 - "password"
                 second_authentication_method: "none"
-            set_password:               "{{ ontap_04_security_account_pw }}"
+            set_password:               "{{ ontap_04_local_test_account_pw }}"
             lock_user:                  "false"
             role_name:                  "readonly"
             <<: *input_admin
           when:
-            - ontap_04_security_account is defined
-            - ontap_04_security_account_pw is defined
+            - ontap_04_local_test_account is defined
+            - ontap_04_local_test_account_pw is defined
   
   post_tasks:
