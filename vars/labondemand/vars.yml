@@ -39,6 +39,7 @@ ontap_21_qtree_names:
   - "ontap_21_qt03"
   - "ontap_21_qt04"
   - "ontap_21_qt05"
+linux_21_default_mount_dir:       "/mnt"
 
 # BSS-02-06
 ontap_02_local_vol_name:          "bss_02_06_vol"
