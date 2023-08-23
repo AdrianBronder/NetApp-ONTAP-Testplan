@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-11-01 - Storage Virtual Machines (SVMs)
+# Title:        ONTAP-11-03 - SVM network services
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-22
 # Description:  Basic SVM Setup
-#               - Storage Virtual Machines (SVMs)
+#               - SVM network services
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ ontap_primary_test_cluster }}"
-  name:               "ONTAP-11-01 - Storage Virtual Machines (SVMs)"
+  name:               "ONTAP-11-03 - SVM network services"
   gather_facts:       false
   vars:
     input: &input
@@ -35,27 +35,12 @@
   pre_tasks:
 
   tasks:
-  - name: Create all SVMs for testing on "{{ ontap_primary_test_cluster }}"
-    netapp.ontap.na_ontap_svm:
+  - name: Configure DNS on test SVMs
+    netapp.ontap.na_ontap_dns:
       state:                      present
-      name:                       "{{ item.name }}"
-      services:
-        cifs:
-          allowed:                "{{ item.cifs.allowed | default(omit) }}"
-        ndmp:
-          allowed:                "{{ item.ndmp.allowed | default(omit) }}"
-        nfs:
-          allowed:                "{{ item.nfs.allowed | default(omit) }}"
-          enabled:                "{{ item.nfs.enabled | default(omit) }}"
-        fcp:
-          allowed:                "{{ item.fcp.allowed | default(omit) }}"
-          enabled:                "{{ item.fcp.enabled | default(omit) }}"
-        iscsi:
-          allowed:                "{{ item.iscsi.allowed | default(omit) }}"
-          enabled:                "{{ item.iscsi.enabled | default(omit) }}"
-        nvme:
-          allowed:                "{{ item.nvme.allowed | default(omit) }}"
-          enabled:                "{{ item.nvme.enabled | default(omit) }}"
+      vserver:                    "{{ item.name }}"
+      domains:                    "{{ item.dns.domains }}"
+      nameservers:                "{{ item.dns.servers }}"
       <<: *input
     loop:
       "{{ svm_svms }}"
@@ -63,7 +48,7 @@
       label: "{{ item.name }}"
     when:
       - svm_svms | length > 0
-      - item.name is defined 
+      - item.name is defined
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
 

@@ -41,7 +41,7 @@
       value:                       "192.168.0.61"
       zone:                        "{{ testenv_default_dns_domain }}"
 
-  - name: Create DNS records for test SVMs (first IP of each SVM)
+  - name: Create DNS records for SVM interfaces (DNS name = interace name)
     community.windows.win_dns_record:
       state:                       "present"
       name:                        "{{ item.name }}"
