@@ -46,7 +46,7 @@
 
     - name: test debug hosts
       ansible.builtin.debug:
-        msg: "{{ hostvars['linux'] }}"
+        msg: "{{ groups['linux'] }}"
 
     - name: test debug hosts
       ansible.builtin.debug:
