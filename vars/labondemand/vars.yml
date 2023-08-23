@@ -16,29 +16,22 @@ ontap_default_fg_size_gb:         307200
 ontap_default_fg_size_increment_gb: 1024
 ontap_default_fg_multiplier:      8
 
-# ONTAP-04-03
+# ONTAP-04 - Cluster User Management
 ontap_04_local_ro:                "na_local_ro"
 ontap_04_local_admin:             "na_local_admin"
-ontap_04_security_account:        "ontap_04_user"
-ontap_04_security_account_pw:     "ONTAP_TestPW1!"
+ontap_04_local_test_account:      "ontap_04_user01"
+ontap_04_local_test_account_pw:   "{{ vault_ontap_04_local_test_account_pw }}"
+ontap_04_ad_ro_group:             "DEMO\\na_ad_ro_group"
+ontap_04_ad_ro_user:              "DEMO\\na_ad_ro_user"
+ontap_04_ad_ro_user_pw:           "{{ vault_ontap_04_ad_ro_user_pw }}"
+ontap_04_ad_admin_group:          "DEMO\\na_ad_admin_group"
+ontap_04_ad_admin_user:           "DEMO\\na_ad_admin_user"
+ontap_04_ad_admin_user_pw:        "{{ vault_ontap_04_ad_admin_user_pw }}"
+ontap_04_ad_test_account:         "ontap_04_user02"
+ontap_04_ad_test_account_pw:      "{{ vault_ontap_04_ad_test_account_pw }}"
 
-# BSS-02-03
-# using primary SVM for domain tunneling (cluster-level AD authentication)
-ontap_02_ad_tunnel_svm:           "{{ ontap_primary_nas_svm }}"
 
-# BSS-02-04
-ontap_ad_admin_group:             "DEMO\\poc_ad_admin_users"
-ontap_ad_admin_user:              "DEMO\\poc_ad_admin"
-# ontap_ad_admin_pw - "*_setup" variable is only used for lab initialization
-# for execution, vars_prompt is used in the playbook
-ontap_ad_admin_pw_setup:          "CustomPoC01ad!"
 
-# BSS-02-05
-ontap_ad_ro_group:                "DEMO\\poc_ad_ro_users"
-ontap_ad_ro_user:                 "DEMO\\poc_ad_ro"
-# ontap_ad_ro_pw - "*_setup" variable is only used for lab initialization
-# for execution, vars_prompt is used in the playbook
-ontap_ad_ro_pw_setup:             "CustomPoC01ad!"
 
 # BSS-02-06
 ontap_02_local_vol_name:          "bss_02_06_vol"

@@ -34,7 +34,7 @@
       validate_certs:             false
       use_rest:                   "always"
   vars_files:
-    - ../vars/labondemand.yml
+    - ../vars/labondemand/
   collections:
     - netapp.ontap
 
@@ -62,15 +62,15 @@
           register: ro_create_result
 
       rescue:
-        - name: Printing rescue message
+        - name: Printing rescue message - Expected error
           ansible.builtin.debug:
             msg:
-              - "This error was expected - \
-                 RO user cannot create ressources on storage array"
+              - "This error was expected"
+              - "RO user cannot create ressources on the cluster"
           when:
             - ("not authorized for that command") in ro_create_result.msg
 
-        - name: Printing rescue message
+        - name: Printing rescue message - Unexpected error
           ansible.builtin.debug:
             msg:
               - "Unexpected test result:"

@@ -3,7 +3,7 @@ vault_security_key_managers:
     passphrase:                   "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
 
 # ATTENTION - not following standard ONTAP REST model here for passwords
-# but it is more practical...
+# but it is more convenient...
 vault_security_accounts:
   na_local_admin:
     password:                     "CustomTest1!"

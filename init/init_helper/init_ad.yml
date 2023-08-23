@@ -17,18 +17,16 @@
   vars:
     separator: '\'
     ad_org_groups:
-      - name: "{{ ontap_ad_admin_group.split(separator)[-1] }}"
+      - name: "{{ ontap_04_ad_ro_group.split(separator)[-1] }}"
         users:
-          - LoD_Org_Admin_01
-          - LoD_Org_Admin_02
-          - "{{ ontap_ad_admin_user.split(separator)[-1] }}"
-      - name: "{{ ontap_ad_ro_group.split(separator)[-1] }}"
+          - name:     "{{ ontap_04_ad_ro_user.split(separator)[-1] }}"
+            password: "{{ ontap_04_ad_ro_user_pw }}"
+      - name: "{{ ontap_04_ad_admin_group.split(separator)[-1] }}"
         users:
-          - LoD_Org_User_01
-          - LoD_Org_User_02
-          - "{{ ontap_ad_ro_user.split(separator)[-1] }}"
+          - name:     "{{ ontap_04_ad_admin_user.split(separator)[-1] }}"
+            password: "{{ ontap_04_ad_admin_user_pw }}"
   vars_files:
-    - ../../playbooks/vars/vars_labondemand.yml
+    - ../../vars/labondemand/
   collections:
     - community.windows
     - microsoft.ad
@@ -83,9 +81,9 @@
   - name: Create LoD Users in AD
     microsoft.ad.user:
       state:                       present
-      name:                        "{{ item.1 }}"
+      name:                        "{{ item.1.name }}"
       path:                        "CN=Users,DC=demo,DC=netapp,DC=com"
-      password:                    "{{ ontap_ad_admin_pw_setup }}"
+      password:                    "{{ item.1.password }}"
       update_password:             "on_create"
       password_never_expires:      "yes"
       user_cannot_change_password: "yes"
