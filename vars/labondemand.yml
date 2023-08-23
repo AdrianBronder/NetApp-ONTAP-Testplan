@@ -19,7 +19,7 @@ ontap_default_fg_multiplier:      8
 # ONTAP-04-03
 ontap_04_local_ro:                "na_local_ro"
 ontap_04_local_admin:             "na_local_admin"
-ontap_04_security_account:        "ontap_04_testuser"
+ontap_04_security_account:        "ontap_04_user"
 ontap_04_security_account_pw:     "ONTAP_TestPW1!"
 
 # BSS-02-03
