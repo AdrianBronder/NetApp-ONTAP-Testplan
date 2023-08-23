@@ -89,7 +89,7 @@ security_accounts:
         second_authentication_method: "none"
     comment:                      "Domain group with admin privileges for testing"
     role:
-      name:                       "read-only"
+      name:                       "admin"
   - name:                         "DEMO\\na_ad_ro_group"
     scope:                        "cluster"
     owner:
@@ -110,4 +110,4 @@ security_accounts:
         second_authentication_method: "none"
     comment:                      "Domain group with read-only privileges for testing"
     role:
-      name:                       "read-only"
+      name:                       "readonly"
