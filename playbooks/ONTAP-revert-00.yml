@@ -162,7 +162,7 @@
     loop:
       "{{ svm_info.ontap_info.svm_svms.records }}"
     loop_control:
-      "{{ item.name }}"
+      label: "{{ item.name }}"
     when:
       - svm_info.ontap_info.svm_svms.num_records|int > 0
       - item.name is defined
