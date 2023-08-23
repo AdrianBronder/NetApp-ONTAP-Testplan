@@ -53,7 +53,7 @@
       - item.name is defined
       - item.scope == "cluster"
       - item.role.name == "admin"
-      - ('password') in security_accounts[0].applications | map(attribute='authentication_methods') | flatten
-      - not ('domain') in security_accounts[0].applications | map(attribute='authentication_methods') | flatten
+      - ('password') in item.applications | map(attribute='authentication_methods') | flatten
+      - not ('domain') in item.applications | map(attribute='authentication_methods') | flatten
 
   post_tasks:
