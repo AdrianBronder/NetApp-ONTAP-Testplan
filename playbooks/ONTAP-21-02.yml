@@ -47,7 +47,7 @@
       export_policy:              "ro_{{ ontap_primary_nas_svm }}"
       junction_path:              "/{{ ontap_21_volume_name }}"
       vserver:                    "{{ ontap_primary_nas_svm }}"
-      security_style:             "unix"
+      volume_security_style:      "unix"
       <<: *input
 
   - name: Create qtrees
