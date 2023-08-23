@@ -68,7 +68,7 @@
               - "This error was expected - \
                  RO user cannot create ressources on storage array"
           when:
-            - 'not authorized for that command' in ro_create_result.msg
+            - ("not authorized for this command") in ro_create_result.msg
 
         - name: Printing rescue message
           ansible.builtin.debug:
@@ -76,7 +76,7 @@
               - "Unexpected test result:"
               - "{{ ro_create_result }}"
           when:
-            - 'not authorized for that command' not in ro_create_result.msg
+            - not ("not authorized for this command") in ro_create_result.msg
 
         - name: Create local testuser with admin account
           netapp.ontap.na_ontap_user:
