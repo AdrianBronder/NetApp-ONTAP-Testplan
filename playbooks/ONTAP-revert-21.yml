@@ -43,7 +43,7 @@
     loop:
       "{{ ontap_21_qtree_names }}"
 
-- hosts:              "ontap"
+- hosts:              "{{ ontap_primary_test_cluster }}"
   name:               "ONTAP-revert-21 - NFS - ONTAP"
   gather_facts:       false
   vars:
@@ -73,6 +73,14 @@
       state:                      absent
       name:                       "{{ ontap_21_policy_name }}"
       vserver:                    "{{ ontap_primary_nas_svm }}"
+      <<: *input
+
+  - name: Apply default export policy to root volume
+    netapp.ontap.na_ontap_volume:
+      state:                      present
+      name:                       "{{ ontap_primary_nas_svm.replace('-','_') }}_root"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      export_policy:              "default"
       <<: *input
 
   - name: Remove read-only export policy
