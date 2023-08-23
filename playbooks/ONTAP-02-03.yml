@@ -27,7 +27,8 @@
       validate_certs:             false
       use_rest:                   "always"
   vars_files:
-    - ../vars/labondemand/*
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
   collections:
     - netapp.ontap
 
