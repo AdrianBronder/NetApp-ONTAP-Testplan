@@ -76,7 +76,7 @@
               - "Unexpected test result:"
               - "{{ ro_create_result }}"
           when:
-            - not 'not authorized for that command' in ro_create_result.msg
+            - 'not authorized for that command' not in ro_create_result.msg
 
         - name: Create local testuser with admin account
           netapp.ontap.na_ontap_user:
