@@ -11,6 +11,28 @@
     member_ports:
       - name:                   "e1f"
       - name:                   "e1g"
+    security_accounts:
+      - name:                         "na_local_admin"
+        scope:                        "cluster"
+        owner:
+          name:
+        locked:                       false
+        applications:
+          - application:              "ssh"
+            authentication_methods:
+              - "password"
+            second_authentication_method: "none"
+          - application:              "ontapi"
+            authentication_methods:
+              - "password"
+            second_authentication_method: "none"
+          - application:              "http"
+            authentication_methods:
+              - "password"
+            second_authentication_method: "none"
+        comment:                      "Local user with admin privileges for testing"
+        role:
+          name:                       "admin"
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
@@ -20,4 +42,4 @@
   tasks:
     - name: test debug
       ansible.builtin.debug:
-        msg: "{{ member_ports | map(attribute='name') | flatten }}"
+        msg: "{{ security_accounts[0].applications | map(attribute='authentication_methods') | flatten }}"

@@ -69,7 +69,7 @@ security_accounts:
     comment:                      "Local user with read-only privileges for testing"
     role:
       name:                       "readonly"
-  - name:                         "na_local_admin"
+  - name:                         "DEMO\\na_ad_admin_group"
     scope:                        "cluster"
     owner:
       name:
@@ -77,16 +77,37 @@ security_accounts:
     applications:
       - application:              "ssh"
         authentication_methods:
-          - "password"
+          - "domain"
         second_authentication_method: "none"
       - application:              "ontapi"
         authentication_methods:
-          - "password"
+          - "domain"
         second_authentication_method: "none"
       - application:              "http"
         authentication_methods:
-          - "password"
+          - "domain"
         second_authentication_method: "none"
-    comment:                      "Local user with admin privileges for testing"
+    comment:                      "Domain group with admin privileges for testing"
     role:
-      name:                       "admin"
+      name:                       "read-only"
+  - name:                         "DEMO\\na_ad_ro_group"
+    scope:                        "cluster"
+    owner:
+      name:
+    locked:                       false
+    applications:
+      - application:              "ssh"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+      - application:              "ontapi"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+      - application:              "http"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+    comment:                      "Domain group with read-only privileges for testing"
+    role:
+      name:                       "read-only"
