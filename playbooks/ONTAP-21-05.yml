@@ -1,9 +1,9 @@
 ################################################################################
 #
-# Title:        ONTAP-21-03 - Mount & write to FlexGroup
+# Title:        ONTAP-21-05 - Mount & write (qtrees on FlexGroup)
 # Author:       NetApp Inc. (badrian)
 # Initial 
-# Create Date:  2023-08-23
+# Create Date:  2023-08-25
 # Description:  NFS
 #               - Mount & write
 #
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               ONTAP-21-03 - Mount & write to FlexGroup
+  name:               ONTAP-21-05 - Mount & write (qtrees on FlexGroup)
   gather_facts:       false
   vars_files:
     - ../vars/labondemand/vars.yml

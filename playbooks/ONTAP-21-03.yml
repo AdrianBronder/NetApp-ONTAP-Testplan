@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-21-03 - Mount & write to volume
+# Title:        ONTAP-21-03 - Mount & write (qtrees on volume)
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-23
 # Description:  NFS
-#               - Mount & write to volume
+#               - Mount & write (qtrees on volume)
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-21-03 - Mount & write to volume"
+  name:               "ONTAP-21-03 - Mount & write (qtrees on volume)"
   gather_facts:       false
   vars_files:
     - ../vars/labondemand/vars.yml

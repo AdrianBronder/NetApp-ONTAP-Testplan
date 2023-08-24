@@ -65,6 +65,12 @@ ontap_22_fg_qtree_names:
   - "ontap_22_fg_qt05"
 ontap_22_ad_ro_group:             "{{ ontap_04_ad_ro_group }}"
 ontap_22_ad_admin_group:          "{{ ontap_04_ad_admin_group }}"
+windows_22_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\ontap_shares"
+ontap_22_ad_admin_user:           "{{ ontap_04_ad_admin_user }}"
+ontap_22_ad_admin_user_pw:        "{{ ontap_04_ad_admin_user_pw }}"
+
+
+
 
 
 # BSS-02-06
