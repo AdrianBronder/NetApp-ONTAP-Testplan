@@ -50,18 +50,18 @@
             dest:                 "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk"
           loop:
             "{{ ontap_22_fg_qtree_names }}"
+
+        - name: Create test file on each share
+          ansible.windows.win_file:
+            path:                     "\\\\{{ ontap_primary_nas_svm }}\\{{ item }}"\\{{ item }}_testfile"
+            state:                    touch
+          loop:
+            "{{ ontap_22_fg_qtree_names }}"
       vars:
         # become is required to save and retrieve the credentials in the tasks
         ansible_become:           "yes"
         ansible_become_method:    "runas"
         ansible_become_user:      "{{ ansible_user }}"
         ansible_become_pass:      "{{ ansible_password }}"
-
-    - name: Create test file on each share
-      ansible.windows.win_file:
-        path:                     "{{ windows_22_default_mount_dir }}\\{{ item }}\\{{ item }}_testfile"
-        state:                    touch
-      loop:
-            "{{ ontap_22_fg_qtree_names }}"
             
   post_tasks:
