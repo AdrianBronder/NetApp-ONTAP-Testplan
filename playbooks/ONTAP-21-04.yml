@@ -41,8 +41,7 @@
       name:                       "{{ ontap_21_fg_name }}"
       size:                       "{{ ontap_default_fg_size_gb }}"
       volume_security_style:      "unix"
-      aggr_list:
-      - "{{ storage_aggregates | map(attribute='name') | flatten }}"
+      aggr_list:                  "{{ storage_aggregates | map(attribute='name') | flatten }}"
       aggr_list_multiplier:       "{{ ontap_default_fg_multiplier }}"
       size_unit:                  gb
       space_guarantee:            "none"
