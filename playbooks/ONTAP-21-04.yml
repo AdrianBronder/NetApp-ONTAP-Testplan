@@ -35,34 +35,34 @@
   pre_tasks:
 
   tasks:
-  - name: Create FlexGroup
-    netapp.ontap.na_ontap_volume:
-      state:                      present
-      name:                       "{{ ontap_21_fg_name }}"
-      size:                       "{{ ontap_default_fg_size_gb }}"
-      volume_security_style:      "unix"
-      aggr_list:                  "{{ storage_aggregates | map(attribute='name') | flatten }}"
-      aggr_list_multiplier:       "{{ ontap_default_fg_multiplier }}"
-      size_unit:                  gb
-      space_guarantee:            "none"
-      tiering_policy:             "auto"
-      export_policy:              "{{ ontap_21_policy_name }}"
-      junction_path:              "/{{ ontap_21_fg_name }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      wait_for_completion:        True
-      <<: *input
-
-  - name: Create qtrees
-    netapp.ontap.na_ontap_qtree:
-      state:                      present
-      name:                       "{{ item }}"
-      flexvol_name:               "{{ ontap_21_fg_name }}"
-      export_policy:              "{{ ontap_21_policy_name }}"
-      security_style:             "unix"
-      unix_permissions:           0777
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      <<: *input
-    loop:
-      "{{ ontap_21_fg_qtree_names }}"
-
+    - name: Create FlexGroup
+      netapp.ontap.na_ontap_volume:
+        state:                      present
+        name:                       "{{ ontap_21_fg_name }}"
+        size:                       "{{ ontap_default_fg_size_gb }}"
+        volume_security_style:      "unix"
+        aggr_list:                  "{{ storage_aggregates | map(attribute='name') | flatten }}"
+        aggr_list_multiplier:       "{{ ontap_default_fg_multiplier }}"
+        size_unit:                  gb
+        space_guarantee:            "none"
+        tiering_policy:             "auto"
+        export_policy:              "{{ ontap_21_policy_name }}"
+        junction_path:              "/{{ ontap_21_fg_name }}"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        wait_for_completion:        True
+        <<: *input
+  
+    - name: Create qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                      present
+        name:                       "{{ item }}"
+        flexvol_name:               "{{ ontap_21_fg_name }}"
+        export_policy:              "{{ ontap_21_policy_name }}"
+        security_style:             "unix"
+        unix_permissions:           0777
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        <<: *input
+      loop:
+        "{{ ontap_21_fg_qtree_names }}"
+  
   post_tasks:

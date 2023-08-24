@@ -35,52 +35,52 @@
   pre_tasks:
 
   tasks:
-  - name: Create read-only export policy
-    netapp.ontap.na_ontap_export_policy:
-      state:                      present
-      name:                       "ro_{{ ontap_primary_nas_svm }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      <<: *input
-
-  - name: Create read-only export policy rules for SVM root volume
-    na_ontap_export_policy_rule:
-      state:                      present
-      name:                       "ro_{{ ontap_primary_nas_svm }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-      ro_rule:                    "any"
-      rw_rule:                    "none"
-      protocol:                   "nfs"
-      super_user_security:        "none"
-      allow_suid:                 false
-      <<: *input
-
-  - name: Apply read-only export policy to SVM's root volume
-    netapp.ontap.na_ontap_volume:
-      state:                      present
-      name:                       "{{ ontap_primary_nas_svm.replace('-','_') }}_root"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      export_policy:              "ro_{{ ontap_primary_nas_svm }}"
-      <<: *input
+    - name: Create read-only export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "ro_{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        <<: *input
   
-  - name: Create read-write export policy
-    netapp.ontap.na_ontap_export_policy:
-      state:                      present
-      name:                       "{{ ontap_21_policy_name }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      <<: *input
-
-  - name: Create read-write export policy rules for SVM root volume
-    na_ontap_export_policy_rule:
-      state:                      present
-      name:                       "{{ ontap_21_policy_name }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-      ro_rule:                    "any"
-      rw_rule:                    "any"
-      protocol:                   "nfs"
-      super_user_security:        "any"
-      allow_suid:                 true
-      <<: *input
+    - name: Create read-only export policy rules for SVM root volume
+      na_ontap_export_policy_rule:
+        state:                      present
+        name:                       "ro_{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                    "any"
+        rw_rule:                    "none"
+        protocol:                   "nfs"
+        super_user_security:        "none"
+        allow_suid:                 false
+        <<: *input
+  
+    - name: Apply read-only export policy to SVM's root volume
+      netapp.ontap.na_ontap_volume:
+        state:                      present
+        name:                       "{{ ontap_primary_nas_svm.replace('-','_') }}_root"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        export_policy:              "ro_{{ ontap_primary_nas_svm }}"
+        <<: *input
+    
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "{{ ontap_21_policy_name }}"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        <<: *input
+  
+    - name: Create read-write export policy rules for SVM root volume
+      na_ontap_export_policy_rule:
+        state:                      present
+        name:                       "{{ ontap_21_policy_name }}"
+        vserver:                    "{{ ontap_primary_nas_svm }}"
+        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                    "any"
+        rw_rule:                    "any"
+        protocol:                   "nfs"
+        super_user_security:        "any"
+        allow_suid:                 true
+        <<: *input
 
   post_tasks:

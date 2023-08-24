@@ -63,7 +63,9 @@ ontap_22_fg_qtree_names:
   - "ontap_22_fg_qt03"
   - "ontap_22_fg_qt04"
   - "ontap_22_fg_qt05"
-windows_22_default_mount_dir:     "/mnt"
+ontap_22_ad_ro_group:             "{{ ontap_04_ad_ro_group }}"
+ontap_22_ad_admin_group:          "{{ ontap_04_ad_admin_group }}"
+
 
 # BSS-02-06
 ontap_02_local_vol_name:          "bss_02_06_vol"
