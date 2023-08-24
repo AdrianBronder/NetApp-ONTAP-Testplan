@@ -35,21 +35,6 @@
   pre_tasks:
 
   tasks:
-  - name: Create FlexGroup
-    netapp.ontap.na_ontap_volume:
-      state:                      present
-      name:                       "{{ ontap_21_volume_name }}"
-      aggregate_name:             "{{ hostvars[ontap_primary_test_cluster].storage_aggregates[0].name }}"
-      size:                       "{{ ontap_default_vol_size_gb }}"
-      size_unit:                  gb
-      space_guarantee:            none
-      tiering_policy:             auto
-      export_policy:              "ro_{{ ontap_primary_nas_svm }}"
-      junction_path:              "/{{ ontap_21_volume_name }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
-      volume_security_style:      "unix"
-      <<: *input
-
   - name: Create FlexGroup for Linux Host
     netapp.ontap.na_ontap_volume:
       state:                      present
