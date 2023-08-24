@@ -57,4 +57,11 @@
         ansible_become_user:      "{{ ansible_user }}"
         ansible_become_pass:      "{{ ansible_password }}"
 
+    - name: Create test file on each share
+      ansible.windows.win_file:
+        path:                     "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk\\{{ item }}_testfile"
+        state:                    touch
+      loop:
+            "{{ ontap_22_vol_qtree_names }}"
+
   post_tasks:
