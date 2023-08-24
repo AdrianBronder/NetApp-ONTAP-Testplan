@@ -61,7 +61,7 @@
     loop:
       "{{ aggr_info.ontap_info.storage_aggregates.records }}"
     loop_control:
-      label:
+      label: "{{ item.name }}"
     when:
       - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
       - item.name is defined
