@@ -46,7 +46,7 @@
 
     - name: test debug hosts
       ansible.builtin.debug:
-        msg: "{{ groups['linux'] }}"
+        msg: "{{ storage_aggregates | map(attribute='name') | flatten }}"
 
     - name: test debug hosts
       ansible.builtin.debug:
