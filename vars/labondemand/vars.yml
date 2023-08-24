@@ -32,13 +32,20 @@ ontap_04_ad_test_account_pw:      "{{ vault_ontap_04_ad_test_account_pw }}"
 
 # ONTAP-21 - NFS
 ontap_21_policy_name:             "ontap_21_policy"
-ontap_21_volume_name:             "ontap_21_vol01"
-ontap_21_qtree_names:
-  - "ontap_21_qt01"
-  - "ontap_21_qt02"
-  - "ontap_21_qt03"
-  - "ontap_21_qt04"
-  - "ontap_21_qt05"
+ontap_21_vol_name:                "ontap_21_nfs_vol01"
+ontap_21_vol_qtree_names:
+  - "ontap_21_vol_qt01"
+  - "ontap_21_vol_qt02"
+  - "ontap_21_vol_qt03"
+  - "ontap_21_vol_qt04"
+  - "ontap_21_vol_qt05"
+ontap_21_fg_name:                 "ontap_21_nfs_fg01"
+ontap_21_fg_qtree_names:
+  - "ontap_21_fg_qt01"
+  - "ontap_21_fg_qt02"
+  - "ontap_21_fg_qt03"
+  - "ontap_21_fg_qt04"
+  - "ontap_21_fg_qt05"
 linux_21_default_mount_dir:       "/mnt"
 
 # BSS-02-06

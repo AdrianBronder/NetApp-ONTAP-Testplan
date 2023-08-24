@@ -33,7 +33,8 @@
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
     loop:
-      "{{ ontap_21_qtree_names }}"
+      "{{ ontap_21_vol_qtree_names + 
+          ontap_21_fg_qtree_names }}"
 
   - name: Remove mount directories
     ansible.builtin.file:
@@ -41,7 +42,8 @@
       state:                      "absent"
       mode:                       "0755"
     loop:
-      "{{ ontap_21_qtree_names }}"
+      "{{ ontap_21_vol_qtree_names + 
+          ontap_21_fg_qtree_names }}"
 
 - hosts:              "{{ ontap_primary_test_cluster }}"
   name:               "ONTAP-revert-21 - NFS - ONTAP"
@@ -61,10 +63,17 @@
     - netapp.ontap
 
   tasks:
-  - name: Remove FlexVol
+  - name: Remove volume
     netapp.ontap.na_ontap_volume:
       state:                      absent
-      name:                       "{{ ontap_21_volume_name }}"
+      name:                       "{{ ontap_21_vol_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      <<: *input
+
+  - name: Remove FlexGroup
+    netapp.ontap.na_ontap_volume:
+      state:                      absent
+      name:                       "{{ ontap_21_fg_name }}"
       vserver:                    "{{ ontap_primary_nas_svm }}"
       <<: *input
 
