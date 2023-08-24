@@ -44,6 +44,28 @@
     when:
       security_key_managers.onboard is defined
 
+  - name: Get all non-root aggregates
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - "storage/aggregates"
+      use_python_keys:            true
+      <<: *input
+    register: aggr_info
+
+  - name: Enable aggregate encryption on all aggregates
+    netapp.ontap.na_ontap_aggregate:
+      state:                      present
+      name:                       "{{ item.name }}"
+      encryption:                 true
+      <<: *input
+    loop:
+      "{{ aggr_info.ontap_info.storage_aggregates.records }}"
+    loop_control:
+      label:
+    when:
+      - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
+      - item.name is defined
+
   post_tasks:
   - name: Get key manager configuration and backup
     netapp.ontap.na_ontap_rest_info:
@@ -61,5 +83,3 @@
         - "{{ ontap_key_manager.ontap_info.security_key_managers.records }}"
     when:
       - ontap_key_manager.ontap_info.security_key_managers.num_records|int > 0
-
-  post_tasks:
