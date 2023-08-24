@@ -45,6 +45,7 @@
         
         - name: Map shares
           community.windows.win_shortcut:
+            state:                present
             src:                  "\\\\{{ ontap_primary_nas_svm }}\\{{ item }}"
             dest:                 "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk"
           loop:
