@@ -1,0 +1,69 @@
+################################################################################
+#
+# Title:        ONTAP-revert-22 - CIFS
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-17
+# Description:  Revert all steps performed in test frame 22
+#               - CIFS
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:              "windows"
+  name:               "ONTAP-revert-22 - CIFS - Windows"
+  gather_facts:       false
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+
+  tasks:
+
+- hosts:              "{{ ontap_primary_test_cluster }}"
+  name:               "ONTAP-revert-22 - CIFS - ONTAP"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Remove shares
+    netapp.ontap.na_ontap_cifs:
+      state:                      absent
+      name:                       "{{ item }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      <<: *input
+    loop:
+      "{{ ontap_22_vol_qtree_names +
+          ontap_22_fg_qtree_names }}"
+
+  - name: Remove volume
+    netapp.ontap.na_ontap_volume:
+      state:                      absent
+      name:                       "{{ ontap_22_vol_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      <<: *input
+
+  - name: Remove FlexGroup
+    netapp.ontap.na_ontap_volume:
+      state:                      absent
+      name:                       "{{ ontap_22_fg_name }}"
+      vserver:                    "{{ ontap_primary_nas_svm }}"
+      <<: *input
