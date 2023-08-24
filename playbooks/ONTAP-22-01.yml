@@ -44,7 +44,6 @@
         size_unit:                  gb
         space_guarantee:            none
         tiering_policy:             auto
-        export_policy:              "ro_{{ ontap_primary_nas_svm }}"
         junction_path:              "/{{ ontap_22_vol_name }}"
         vserver:                    "{{ ontap_primary_nas_svm }}"
         volume_security_style:      "ntfs"
@@ -55,7 +54,6 @@
         state:                      present
         name:                       "{{ item }}"
         flexvol_name:               "{{ ontap_22_vol_name }}"
-        export_policy:              "{{ ontap_22_policy_name }}"
         security_style:             "ntfs"
         vserver:                    "{{ ontap_primary_nas_svm }}"
         <<: *input
