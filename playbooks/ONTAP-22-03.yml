@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "windows"
+- hosts:              "win_hosts"
   name:               "ONTAP-22-03 - Mount & write (qtrees on volume)"
   gather_facts:       false
   vars_files:
@@ -33,19 +33,27 @@
         path:                     "{{ windows_22_default_mount_dir }}"
         state:                    directory
 
-    - name: Create credential for mounting share
-      community.windows.win_credential:
-        state:                    present
-        name:                     "{{ ontap_primary_nas_svm }}"
-        type:                     "domain_password"
-        username:                 "{{ ontap_22_ad_admin_user }}"
-        secret:                   "{{ ontap_22_ad_admin_user_pw }}"
-    
-    - name: Create shortcuts to shares
-      community.windows.win_shortcut:
-        src:                      "\\\\{{ ontap_primary_nas_svm }}\\{{ item }}"
-        dest:                     "{{ windows_22_default_mount_dir }}\\{{ item }}"
-      loop:
-        "{{ ontap_22_vol_qtree_names }}"
-  
+    - name: 
+      block:
+        - name: Save network credentials
+          community.windows.win_credential:
+            state:                present
+            name:                 "{{ ontap_primary_nas_svm }}"
+            type:                 "domain_password"
+            username:             "{{ ontap_22_ad_admin_user }}"
+            secret:               "{{ ontap_22_ad_admin_user_pw }}"
+        
+        - name: Map shares
+          community.windows.win_shortcut:
+            src:                  "\\\\{{ ontap_primary_nas_svm }}\\{{ item }}"
+            dest:                 "{{ windows_22_default_mount_dir }}\\{{ item }}"
+          loop:
+            "{{ ontap_22_vol_qtree_names }}"
+      vars:
+        # become is required to save and retrieve the credentials in the tasks
+        ansible_become:           "yes"
+        ansible_become_method:    "runas"
+        ansible_become_user:      "{{ ansible_user }}"
+        ansible_become_pass:      "{{ ansible_password }}"
+
   post_tasks:
