@@ -5,7 +5,7 @@
 # Initial 
 # Create Date:  2023-08-17
 # Description:  Revert all systems to initial state
-#               - Cluster is configured and reachable via cluster management
+#               - Clusters are configured and reachable via cluster management
 #                 interface
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
@@ -15,76 +15,6 @@
 # ansible-doc netapp.ontap.<module_name>
 #
 ################################################################################
-
-- hosts:              "linux"
-  name:               "ONTAP-revert-00 - Return to Day0 - Linux"
-  gather_facts:       false
-  vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
-  collections:
-    - ansible.posix
-
-  tasks:
-  - name: Unmount exports
-    ansible.posix.mount:
-      state:                      "absent"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_default_dns_domain }}:/{{ item }}"
-      path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
-      opts:                       "rw,sync,hard,vers=3"
-      fstype:                     "nfs"
-    loop:
-      "{{ ontap_21_vol_qtree_names + 
-          ontap_21_fg_qtree_names }}"
-
-  - name: Remove mount directories
-    ansible.builtin.file:
-      path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
-      state:                      "absent"
-      mode:                       "0755"
-    loop:
-      "{{ ontap_21_vol_qtree_names + 
-          ontap_21_fg_qtree_names }}"
-
-- hosts:              "win_hosts"
-  name:               "ONTAP-revert-00 - Return to Day0 - Windows"
-  gather_facts:       false
-  vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
-  collections:
-    - ansible.windows
-    - community.windows
-
-  pre_tasks:
-
-  tasks:
-    - name: 
-      block:
-        - name: Remove mapped shares
-          community.windows.win_shortcut:
-            state:                absent
-            dest:                 "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk"
-          loop:
-            "{{ ontap_22_vol_qtree_names +
-                ontap_22_fg_qtree_names }}"
-
-        - name: Remove network credentials
-          community.windows.win_credential:
-            state:                absent
-            name:                 "{{ ontap_primary_nas_svm }}"
-            type:                 "domain_password"
-      vars:
-        # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
-
-    - name: Remove mount directory
-      ansible.windows.win_file:
-        path:                     "{{ windows_22_default_mount_dir }}"
-        state:                    absent
 
 - hosts:              "ontap"
   name:               "ONTAP-revert-00 - Return to Day0 - ONTAP"

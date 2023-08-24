@@ -124,5 +124,5 @@ ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_help
 
 echo ""
 echo ""
-echo "--> Prepare primary storage system (cluster1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-REVERT-ALL.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-revert-00.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
