@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-  - name: Create FlexVol
+  - name: Create volume
     netapp.ontap.na_ontap_volume:
       state:                      present
       name:                       "{{ ontap_21_vol_name }}"

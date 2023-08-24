@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-21-04 - FlexGroups & qtrees
+# Title:        ONTAP-22-01 - Volumes & qtrees
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-24
-# Description:  NFS
-#               - FlexGroups & qtrees
+# Description:  CIFS
+#               - Volumes & qtrees
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -15,9 +15,9 @@
 # 
 ################################################################################
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
-  name:               "ONTAP-21-04 - FlexGroups & qtrees"
-  gather_facts:       false
+- hosts:                          "{{ ontap_primary_test_cluster }}"
+  name:                           "ONTAP-22-01 - Volumes & qtrees"
+  gather_facts:                   false
   vars:
     input: &input
       hostname:                   "{{ ansible_host }}"
@@ -35,34 +35,32 @@
   pre_tasks:
 
   tasks:
-  - name: Create FlexGroup
+  - name: Create volume
     netapp.ontap.na_ontap_volume:
       state:                      present
-      name:                       "{{ ontap_21_fg_name }}"
-      size:                       "{{ ontap_default_fg_size_gb }}"
-      volume_security_style:      "unix"
-      aggr_list:                  "{{ storage_aggregates | map(attribute='name') | flatten }}"
-      aggr_list_multiplier:       "{{ ontap_default_fg_multiplier }}"
+      name:                       "{{ ontap_22_vol_name }}"
+      aggregate_name:             "{{ hostvars[ontap_primary_test_cluster].storage_aggregates[0].name }}"
+      size:                       "{{ ontap_default_vol_size_gb }}"
       size_unit:                  gb
-      space_guarantee:            "none"
-      tiering_policy:             "auto"
-      export_policy:              "{{ ontap_21_policy_name }}"
-      junction_path:              "/{{ ontap_21_fg_name }}"
+      space_guarantee:            none
+      tiering_policy:             auto
+      export_policy:              "ro_{{ ontap_primary_nas_svm }}"
+      junction_path:              "/{{ ontap_22_vol_name }}"
       vserver:                    "{{ ontap_primary_nas_svm }}"
-      wait_for_completion:        True
+      volume_security_style:      "ntfs"
       <<: *input
 
   - name: Create qtrees
     netapp.ontap.na_ontap_qtree:
       state:                      present
       name:                       "{{ item }}"
-      flexvol_name:               "{{ ontap_21_fg_name }}"
-      export_policy:              "{{ ontap_21_policy_name }}"
-      security_style:             "unix"
+      flexvol_name:               "{{ ontap_22_vol_name }}"
+      export_policy:              "{{ ontap_22_policy_name }}"
+      security_style:             "ntfs"
       unix_permissions:           0777
       vserver:                    "{{ ontap_primary_nas_svm }}"
       <<: *input
     loop:
-      "{{ ontap_21_fg_qtree_names }}"
+      "{{ ontap_22_vol_qtree_names }}"
 
   post_tasks:
