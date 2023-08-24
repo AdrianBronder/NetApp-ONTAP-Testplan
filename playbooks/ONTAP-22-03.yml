@@ -59,7 +59,7 @@
 
     - name: Create test file on each share
       ansible.windows.win_file:
-        path:                     "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk\\{{ item }}_testfile"
+        path:                     "{{ windows_22_default_mount_dir }}\\{{ item }}\\{{ item }}_testfile"
         state:                    touch
       loop:
             "{{ ontap_22_vol_qtree_names }}"
