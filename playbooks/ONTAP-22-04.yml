@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-21-04 - FlexGroup & qtrees
+# Title:        ONTAP-22-04 - FlexGroup & qtrees
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-24
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ ontap_primary_test_cluster }}"
-  name:               "ONTAP-21-04 - FlexGroup & qtrees"
+  name:               "ONTAP-22-04 - FlexGroup & qtrees"
   gather_facts:       false
   vars:
     input: &input
@@ -57,7 +57,6 @@
         name:                       "{{ item }}"
         flexvol_name:               "{{ ontap_22_fg_name }}"
         security_style:             "ntfs"
-        unix_permissions:           0777
         vserver:                    "{{ ontap_primary_nas_svm }}"
         <<: *input
       loop:
