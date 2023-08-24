@@ -46,23 +46,6 @@
       "{{ ontap_21_vol_qtree_names + 
           ontap_21_fg_qtree_names }}"
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
-  name:               "ONTAP-revert-21 - NFS - ONTAP"
-  gather_facts:       false
-  vars:
-    input: &input
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
-  vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
-  collections:
-    - netapp.ontap
-
 - hosts:              "win_hosts"
   name:               "ONTAP-revert-00 - Return to Day0 - Windows"
   gather_facts:       false
