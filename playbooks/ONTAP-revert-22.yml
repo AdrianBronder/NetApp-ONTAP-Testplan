@@ -35,7 +35,8 @@
             state:                absent
             dest:                 "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk"
           loop:
-            "{{ ontap_22_vol_qtree_names }}"
+            "{{ ontap_22_vol_qtree_names +
+                ontap_22_fg_qtree_names }}"
 
         - name: Remove network credentials
           community.windows.win_credential:
