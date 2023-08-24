@@ -1,54 +1,74 @@
+# Contents
+1. [Introduction](#Introduction)
+2. [Quick Start with Lab on Demand](#Quick-Start-with-Lab-on-Demand)
+3. [Further Execution Examples](#Further-Execution-Examples)
+4. [Instructions for Changing the Environment](#Instructions-for-Changing-the-Environment)
+5. [Additional References](#Additional-References)
+6. [Changelog](#Changelog)
+
+
 # Introduction
-This repository contains playbooks and vars used for automating execution of PoC tests.
-- Main artificats (aside of this README) are located in the subfolder "playbooks".
-- Additional ressoruces used for internal development lab environment setup can be reviewed in "init".
+This repository contains Ansible artifacts (inventories, vars, playbooks...) for executing test and demos against ONTAP automatically.
+They can be used out of the box in Lab on Demand or tuned to any other environment
 
-# Pre-requisits & Assumptions
-Following assumptions have been made for executing playbooks successfully:
-- "playbooks/vars/vars_labondemand.yml" and "playbooks/inventory/hosts_poclab" are reviewed and adjusted/completed to lab specific values.
-- Ansible host is set up wiht latest collection of "netapp.ontap" from Ansible Galaxy (currently: 22.7.0).
-- Ansible host is configured with minimum versions provided by customer:
-  - Python 3.7.5 (recommended: 3.8+)
-  - Ansible 2.10.3 (recommended: 2.12+)
-- Playbooks contain plays for Linux hosts to mount/unmount NFS exports. Proper SSH key and known hosts setup on Ansible host is required to connect to test Linux machines. It is also possible providing SSH password by using "--ask-pass" parameter when executing playbooks.
-- If executing mount/umount operations on Linux hosts is not desired, Linux Plays have to be removed from the playbooks.
-- DNS records exist for the cluster as well as for every SVM and test host within the test environment.
 
-# Playbooks General
-- A dedicated playbook exists for every automated test case documented in customer PoC test plan, e.g. "BSS-02-01.yml"
-- Test plan instructions are executed as tasks
-- Almost every playbook contains built-in verification by displaying storage array configuration prior to executing test plan instructions (pre_tasks) and after executing test plan instructinos (post_tasks)
-- There is a revert playbook for every test frame documented in the PoC test plan, e.g. revert_BSS-02. These playbooks can be executed to get the system to the known state prior to executing the test steps.
+# Quick Start with Lab on Demand
+For NetApp internal and partner use - ready to go in less than 15 minutes
+1. Please use the virtual hands-on lab (log in with your NetApp support account):
+   - https://labondemand.netapp.com/node/497
+2. Log into the Linux host ("centos1.demo.netapp.com") and clone this repository:
+   ```
+   git clone https://github.com/AdrianBronder/NetApp-ONTAP-Testplan.git
+   ```
+3. Initialize the environment by running the lab init script:
+   ```
+   cd ./NetApp-ONTAP-Testplan
+   ./init/init_LD00821.sh
+   ```
+4. Execute test steps, e.g. general test playbook "ONTAP-00-00.yml"
+   ```
+   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00-00.yml
+   ```
 
-# Execution Examples
-- Executing a test step (BSS-00-01 - initial preparation & configuration):
+
+# Further Execution Examples
+- Execute a single test step (e.g. ONTAP-02-02 - Network):
   ```
-  ansible-playbook -i ./playbooks/inventory/hosts_poclab ./playbooks/BSS-00-01.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-02-02.yml
   ```
-- Executing a test step containing instructions for Linux (BSS-03-06 - create and mount a volume):
+- Executing an entire test frame (e.g. ONTAP-02 - Basic Cluster Configuration)
   ```
-  ansible-playbook -i ./playbooks/inventory/hosts_poclab ./playbooks/BSS-03-06.yml --ask-pass
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-02-*.yml
   ```
-- Executing a revert playbook to get all tests in section 3 (BSS-03-*) reverted:
+- Revert configuration changed and objects created during a test frame:
   ```
-  ansible-playbook -i ./playbooks/inventory/hosts_poclab ./playbooks/BSS-*.yml --ask-pass
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-21.yml
   ```
-- Executing all tests steps of the test plan in a single command
+- Executing ALL tests with a single command (and track the execution time)
   ```
-  ansible-playbook -i ./playbooks/inventory/hosts_poclab ./playbooks/BSS-*.yml --ask-pass
+  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-[0-9]*.yml
   ```
-- Revert all test steps of the test plan in a single command
+- Revert all test steps of the test plan (back to initial state)
   ```
-  ansible-playbook -i ./playbooks/inventory/hosts_poclab ./playbooks/revert_BSS-10.yml ./playbooks/revert_BSS-08.yml ./playbooks/revert_BSS-07.yml ./playbooks/revert_BSS-06.yml ./playbooks/revert_BSS-03.yml ./playbooks/revert_BSS-02.yml ./playbooks/revert_BSS-00.yml --ask-pass
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-00_linux.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-00_windows.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-00.yml
   ```
 
-# Additional Info
-- Initial cluster setup (Day0/1) is a wide area with a lot of possible customization. This repository covers only a small portion showcasing some automation capabilities. Further tasks can be added easily, when knowing more detailed requirements and customer's desired standard install procedure.
-- Automated attaching of storage devices (volumes/shares/exports) to hosts is out of scope for this PoC.
-  - However, Linux tasks have been implemented for speeding up testing.
-  - Same could be applied with shares and Windows hosts (community.windows). Additional development and testing of these tasks could not be completed in time.
 
-# References
+# Instructions for Changing the Environment
+The playbooks can be executed in any other non-production environments for demos and testing.
+* Ansible host is configured with minimum recommended versions (as of now - August 2023):
+  - Python 3.8+
+  - Ansible 2.12+
+* Inventory folder id created for new environment in ./inventories (as per exmple "labondemand")
+  - hosts file and variables have to match specific environment
+  - a sinlge file can be used as well, but is not recommended with a large amount of variables and secrets like passwords
+* Variable folder is created for new environment in ./vars (as per example "labondemand")
+  - it can be a single file, but is not recommended with a large amount of variables and secrets like passwords
+
+
+# Additional References
 - Public documentation of NetApp Modules
   - https://docs.ansible.com/ansible/latest/collections/netapp/ontap/
 - NetApp ONTAP Modules on Ansible Galaxy
@@ -56,22 +76,6 @@ Following assumptions have been made for executing playbooks successfully:
 - Public GitHub for NetApp ONTAP Modules
   - https://github.com/ansible-collections/netapp.ontap
 
-# For NetApp Internal use: Quick Start with Lab on Demand
-1. Please use the virtual hands-on lab (log in with your NetApp support account):
-   - https://labondemand.netapp.com/node/497
-2. Log into the Ansible Linux host ("centos1.demo.netapp.com") and clone this repository:
-   ```
-   git clone https://github.com/CXO-Automation/Roche_PDT_Test_NetApp.git
-   ```
-3. Initialize the environment by running the lab init script:
-   ```
-   ./Roche_PDT_Test_NetApp/init/init_LD00821.sh
-   ```
-4. Go to the playbook folder and start executing test steps, e.g. general test playbook "NTAP-00-00.yml"
-   ```
-   cd ./Roche_PDT_Test_NetApp
-   ansible-playbook -i ./playbooks/inventory/hosts_devlab ./playbooks/NTAP-00-00.yml -e "@playbooks/vars/vars_devlab.yml"
-   ```
 
 # Changelog
 ## v1.0
