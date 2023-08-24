@@ -113,9 +113,11 @@ ansible-galaxy collection install -r $SCRIPTPATH/requirements.yml --ignore-certs
 
 echo ""
 echo ""
-echo "--> Adding centos1 to known hosts"
+echo "--> Adding centos1 to known hosts and setting up SSH keys"
 mkdir ~/.ssh
 ssh-keyscan -t ecdsa centos1 centos1.demo.netapp.com 192.168.0.61 >> ~/.ssh/known_hosts
+ssh-keygen -t rsa -N "" -f ~/.ssh/id_rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 echo ""
 echo ""
