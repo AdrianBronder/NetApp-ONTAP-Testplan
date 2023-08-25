@@ -55,7 +55,7 @@
         path:                     "{{ windows_22_default_mount_dir }}"
         state:                    absent
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
+- hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-revert-22 - CIFS - ONTAP"
   gather_facts:       false
   vars:

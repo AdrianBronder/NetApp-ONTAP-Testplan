@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
+- hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-21-01 - Export policies & rules"
   gather_facts:       false
   vars:

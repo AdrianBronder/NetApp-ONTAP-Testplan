@@ -28,7 +28,7 @@
   - name: Unmount exports
     ansible.posix.mount:
       state:                      "absent"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ testenv_default_dns_domain }}:/{{ item }}"
+      src:                        "{{ ontap_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
       path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"

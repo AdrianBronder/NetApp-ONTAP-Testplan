@@ -3,6 +3,8 @@ ansible_connection:               "local"
 ansible_python_interpreter:       "{{ansible_playbook_python}}"
 
 # Custom Variables
+ontap_admin_user:                 "{{ vault_ontap_admin_user }}"
+ontap_admin_password:             "{{ vault_ontap_admin_password }}"
 
 # Variables basedon ONTAP REST model
 # https://<ontap_cluster_mgmt>/docs/api

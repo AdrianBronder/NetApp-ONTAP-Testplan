@@ -19,8 +19,8 @@
   name:               "ONTAP-03-02 - Cluster AD Authentication"
   gather_facts:       false
   #vars_prompt:
-  #  - name:           testenv_ad_join_password
-  #    prompt:         "Please enter password for user domain join user: {{ testenv_ad_join_user }}"
+  #  - name:           all_ad_join_password
+  #    prompt:         "Please enter password for user domain join user: {{ all_ad_join_user }}"
   #    private:        true
   vars:
     input: &input
@@ -107,7 +107,7 @@
       state:                      present
       vserver:                    "{{ item.name }}"
       destination:                "0.0.0.0/0"
-      gateway:                    "{{ testenv_default_gateway }}"
+      gateway:                    "{{ all_default_gateway }}"
       <<: *input
     loop:
       "{{ ontap_svms }}"
@@ -140,8 +140,8 @@
       service_state:              started
       domain:                     "{{ item.ad_domain.fqdn }}"
       ou:                         "{{ item.ad_domain.organizational_unit }}"
-      admin_user_name:            "{{ testenv_ad_join_user }}"
-      admin_password:             "{{ testenv_ad_join_password }}"
+      admin_user_name:            "{{ all_ad_join_user }}"
+      admin_password:             "{{ all_ad_join_password }}"
       <<: *input
     loop:
       "{{ protocols_cifs_services }}"

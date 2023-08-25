@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ ontap_primary_test_cluster }}"
+- hosts:                          "{{ global_primary_test_cluster }}"
   name:                           "ONTAP-22-01 - Volumes & qtrees"
   gather_facts:                   false
   vars:
@@ -39,7 +39,7 @@
       netapp.ontap.na_ontap_volume:
         state:                      present
         name:                       "{{ ontap_22_vol_name }}"
-        aggregate_name:             "{{ hostvars[ontap_primary_test_cluster].storage_aggregates[0].name }}"
+        aggregate_name:             "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
         size:                       "{{ ontap_default_vol_size_gb }}"
         size_unit:                  gb
         space_guarantee:            none

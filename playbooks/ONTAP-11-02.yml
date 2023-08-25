@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
+- hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-11-02 - SVM network interfaces (LIFs)"
   gather_facts:       false
   vars:
@@ -63,7 +63,7 @@
       state:                      present
       vserver:                    "{{ item.name }}"
       destination:                "0.0.0.0/0"
-      gateway:                    "{{ testenv_default_gateway }}"
+      gateway:                    "{{ all_default_gateway }}"
       <<: *input
     loop:
       "{{ svm_svms }}"

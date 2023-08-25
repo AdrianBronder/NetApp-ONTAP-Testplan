@@ -76,8 +76,8 @@
       vserver:                    "{{ item.svm.name }}"
       domain:                     "{{ item.ad_domain.fqdn }}"
       ou:                         "{{ item.ad_domain.organizational_unit }}"
-      admin_user_name:            "{{ testenv_ad_join_user }}"
-      admin_password:             "{{ testenv_ad_join_password }}"
+      admin_user_name:            "{{ all_ad_join_user }}"
+      admin_password:             "{{ all_ad_join_password }}"
       <<: *input
     loop:
       "{{ cifs_service_info.ontap_info.protocols_cifs_services.records }}"

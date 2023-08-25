@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
+- hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-11-01 - Storage Virtual Machines (SVMs)"
   gather_facts:       false
   vars:
@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-  - name: Create all SVMs for testing on "{{ ontap_primary_test_cluster }}"
+  - name: Create all SVMs for testing on "{{ global_primary_test_cluster }}"
     netapp.ontap.na_ontap_svm:
       state:                      present
       name:                       "{{ item.name }}"

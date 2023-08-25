@@ -1,7 +1,8 @@
-vault_security_key_managers:
-  onboard:
-    passphrase:                   "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
+# Ansible Variables
 
+# Custom Variables
+vault_ontap_admin_user:           "admin"
+vault_ontap_admin_password:       "Netapp1!"
 # ATTENTION - not following standard ONTAP REST model here for passwords
 # but it is more convenient...
 vault_security_accounts:
@@ -9,3 +10,10 @@ vault_security_accounts:
     password:                     "CustomTest1!"
   na_local_ro:
     password:                     "CustomTest2!"
+
+# Variables basedon ONTAP REST model
+# https://<ontap_cluster_mgmt>/docs/api
+vault_security_key_managers:
+  onboard:
+    passphrase:                   "ThisPassphraseIsUsedForPoCTestingToAllowVolEncryption"
+

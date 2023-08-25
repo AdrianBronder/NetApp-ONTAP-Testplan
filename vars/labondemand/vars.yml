@@ -1,13 +1,9 @@
 # General - Storage Objects
-ontap_primary_test_cluster:       "cluster1"
-ontap_secondary_test_cluster:     "cluster2"
-ontap_primary_nas_svm:            "ntap-svm01-nas"
-ontap_secondary_nas_svm:          "ntap-svm02-san"
-ontap_primary_backup_svm:         "ntap-svm03-backup"
-
-# General - Users
-ontap_admin_user:                 "admin"
-ontap_admin_password:             "Netapp1!"
+global_primary_test_cluster:      "cluster1"
+global_secondary_test_cluster:    "cluster2"
+global_primary_nas_svm:            "ntap-svm01-nas"
+global_primary_san_svm:          "ntap-svm02-san"
+global_primary_backup_svm:         "ntap-svm03-backup"
 
 # General - Config Defaults
 ontap_default_vol_size_gb:        10

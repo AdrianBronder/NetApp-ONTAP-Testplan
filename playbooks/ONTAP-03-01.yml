@@ -39,7 +39,7 @@
     netapp.ontap.na_ontap_cluster:
       state:                      present
       timezone:
-        name:                     "{{ testenv_timezone }}"
+        name:                     "{{ all_timezone }}"
       <<: *input
       
   - name: Create login banner and message of the day (MOTD) on storage cluster

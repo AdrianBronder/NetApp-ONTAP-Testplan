@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
+- hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-11-03 - SVM network services"
   gather_facts:       false
   vars:

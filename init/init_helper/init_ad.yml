@@ -39,7 +39,7 @@
       name:                        "centos1"
       type:                        "A"
       value:                       "192.168.0.61"
-      zone:                        "{{ testenv_default_dns_domain }}"
+      zone:                        "{{ all_default_dns_domain }}"
 
   - name: Create DNS records for SVM interfaces (DNS name = interace name)
     community.windows.win_dns_record:
@@ -47,7 +47,7 @@
       name:                        "{{ item.name }}"
       type:                        "A"
       value:                       "{{ item.ip.address }}"
-      zone:                        "{{ testenv_default_dns_domain }}"
+      zone:                        "{{ all_default_dns_domain }}"
     when:
       - item.scope == "svm"
     loop:
@@ -62,13 +62,13 @@
       name:                        "s3server"
       type:                        "A"
       value:                       "192.168.0.233"
-      zone:                        "{{ testenv_default_dns_domain }}"
+      zone:                        "{{ all_default_dns_domain }}"
 
   - name: Create OU in Active Directory
     microsoft.ad.ou:
       state:                       present
-      name:                        "{{ testenv_storage_ad_ou_path.split(',')[0].split('=')[1] }}"
-      path:                        "{{ ','.join(testenv_storage_ad_ou_path.split(',')[1:]) }}"
+      name:                        "{{ all_storage_ad_ou_path.split(',')[0].split('=')[1] }}"
+      path:                        "{{ ','.join(all_storage_ad_ou_path.split(',')[1:]) }}"
 
   - name: Create LoD Groups in AD
     microsoft.ad.group:

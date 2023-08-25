@@ -68,8 +68,8 @@ storage_aggregates:
 svm_svms:
   - name:                         "{{ cluster.name }}_ad"
     dns:
-      domains:                    "{{ testenv_default_dns_domain }}"
-      servers:                    "{{ testenv_dns_nameservers }}"
+      domains:                    "{{ all_default_dns_domain }}"
+      servers:                    "{{ all_dns_nameservers }}"
     auto_enable_analytics:        true
     ipspace:
       name:                       "Default"
@@ -89,8 +89,8 @@ svm_svms:
     comment:                      "This is the tunnel SVM for cluster AD authentication"
   - name:                         "ntap-svm03-backup"
     dns:
-      domains:                    "{{ testenv_default_dns_domain }}"
-      servers:                    "{{ testenv_dns_nameservers }}"
+      domains:                    "{{ all_default_dns_domain }}"
+      servers:                    "{{ all_dns_nameservers }}"
     auto_enable_analytics:        true
     ipspace:
       name:                       "Default"
@@ -115,16 +115,16 @@ protocols_cifs_services:
     svm:
       name:                       "{{ svm_svms[0].name }}"
     ad_domain:
-      fqdn:                       "{{ testenv_ad_domain }}"
-      organizational_unit:        "{{ testenv_storage_ad_ou_path }}"
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is for cluster AD authentication"
     enabled:                      true
   - name:                         "svm03-backup"
     svm:
       name:                       "{{ svm_svms[1].name }}"
     ad_domain:
-      fqdn:                       "{{ testenv_ad_domain }}"
-      organizational_unit:        "{{ testenv_storage_ad_ou_path }}"
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is the default NAS backup \
                                    location"
     enabled:                      true

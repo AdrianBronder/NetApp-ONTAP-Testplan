@@ -39,8 +39,8 @@
     netapp.ontap.na_ontap_dns:
       state:                      present
       vserver:                    "{{ inventory_hostname }}"
-      domains:                    "{{ testenv_dns_domains }}"
-      nameservers:                "{{ testenv_dns_nameservers }}"
+      domains:                    "{{ all_dns_domains }}"
+      nameservers:                "{{ all_dns_nameservers }}"
       use_rest:                   "never"
       <<: *input
 
@@ -51,7 +51,7 @@
       version:                    "auto"
       <<: *input
     loop:
-      "{{ testenv_ntp_serveres }}"
+      "{{ all_ntp_serveres }}"
     retries: 5
     delay: 3
     register: result

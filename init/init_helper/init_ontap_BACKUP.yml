@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:              "{{ ontap_primary_test_cluster }}"
+- hosts:              "{{ global_primary_test_cluster }}"
   name:               "Initialize primary ONTAP cluster"
   gather_facts:       false
   vars:
@@ -144,7 +144,7 @@
       state:                        present
       vserver:                      "{{ ontap_tier_svm.name }}"
       destination:                  0.0.0.0/0
-      gateway:                      "{{ testenv_default_gateway }}"
+      gateway:                      "{{ all_default_gateway }}"
       metric:                       30
       hostname:                     "{{ ontap_hostname }}"
       <<: *input_02

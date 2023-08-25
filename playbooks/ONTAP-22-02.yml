@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ ontap_primary_test_cluster }}"
+- hosts:                          "{{ global_primary_test_cluster }}"
   name:                           "ONTAP-22-02 - Shares & ACLs on volume"
   gather_facts:                   false
   vars:

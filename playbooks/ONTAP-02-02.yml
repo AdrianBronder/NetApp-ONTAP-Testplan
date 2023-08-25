@@ -71,7 +71,7 @@
       state:                      present
       vserver:                    
       destination:                "0.0.0.0/0"
-      gateway:                    "{{ testenv_default_gateway }}"
+      gateway:                    "{{ all_default_gateway }}"
       <<: *input
 
 
