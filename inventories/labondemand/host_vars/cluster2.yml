@@ -68,7 +68,7 @@ storage_aggregates:
 svm_svms:
   - name:                         "{{ cluster.name }}_ad"
     dns:
-      domains:                    "{{ all_default_dns_domain }}"
+      domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
     auto_enable_analytics:        true
     ipspace:
@@ -89,7 +89,7 @@ svm_svms:
     comment:                      "This is the tunnel SVM for cluster AD authentication"
   - name:                         "ntap-svm03-backup"
     dns:
-      domains:                    "{{ all_default_dns_domain }}"
+      domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
     auto_enable_analytics:        true
     ipspace:

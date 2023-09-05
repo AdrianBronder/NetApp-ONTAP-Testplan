@@ -23,6 +23,7 @@ network_ethernet_ports:
   - name:                         "a0a"
     node:
       name:                       "{{ cluster_nodes[0].name }}"
+    type:                         "lag"
     lag:
       member_ports:
         - name:                   "e0f"
@@ -33,7 +34,6 @@ network_ethernet_ports:
       name:                       "bc_data"
       ipspace:
         name:                     "Default"
-    type:                         "lag"
   - name:                         "a0a"
     node:
       name:                       "{{ cluster_nodes[1].name }}"
@@ -68,7 +68,7 @@ storage_aggregates:
 svm_svms:
   - name:                         "{{ cluster.name }}_ad"
     dns:
-      domains:                    "{{ all_default_dns_domain }}"
+      domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
     auto_enable_analytics:        true
     ipspace:
@@ -89,7 +89,7 @@ svm_svms:
     comment:                      "This is the tunnel SVM for cluster AD authentication"
   - name:                         "ntap-svm01-nas"
     dns:
-      domains:                    "{{ all_default_dns_domain }}"
+      domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
     auto_enable_analytics:        true
     ipspace:
@@ -111,7 +111,7 @@ svm_svms:
     comment:                      "This is the first SVM for NAS testing"
   - name:                         "ntap-svm02-san"
     dns:
-      domains:                    "{{ all_default_dns_domain }}"
+      domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
     auto_enable_analytics:        true
     ipspace:
@@ -146,7 +146,7 @@ protocols_cifs_services:
     ad_domain:
       fqdn:                       "{{ all_ad_domain }}"
       organizational_unit:        "{{ all_storage_ad_ou_path }}"
-    comment:                      "This CIFS Server is the primary NAS server"
+    comment:                      "This CIFS Server is created for the primary NAS SVM"
     enabled:                      true
   - name:                         "svm02-san"
     svm:
@@ -154,7 +154,7 @@ protocols_cifs_services:
     ad_domain:
       fqdn:                       "{{ all_ad_domain }}"
       organizational_unit:        "{{ all_storage_ad_ou_path }}"
-    comment:                      "This CIFS Server is the secondary NAS server"
+    comment:                      "This CIFS Server is created for the primary SAN SVM"
     enabled:                      true
 
 network_ip_interfaces:
