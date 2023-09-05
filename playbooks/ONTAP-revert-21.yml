@@ -28,7 +28,7 @@
   - name: Unmount exports
     ansible.posix.mount:
       state:                      "absent"
-      src:                        "{{ ontap_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
+      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
       path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
@@ -67,34 +67,34 @@
     netapp.ontap.na_ontap_volume:
       state:                      absent
       name:                       "{{ ontap_21_vol_name }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
+      vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input
 
   - name: Remove FlexGroup
     netapp.ontap.na_ontap_volume:
       state:                      absent
       name:                       "{{ ontap_21_fg_name }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
+      vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input
 
   - name: Remove read-write export policy
     netapp.ontap.na_ontap_export_policy:
       state:                      absent
       name:                       "{{ ontap_21_policy_name }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
+      vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input
 
   - name: Apply default export policy to root volume
     netapp.ontap.na_ontap_volume:
       state:                      present
-      name:                       "{{ ontap_primary_nas_svm.replace('-','_') }}_root"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
+      name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
+      vserver:                    "{{ global_primary_nas_svm }}"
       export_policy:              "default"
       <<: *input
 
   - name: Remove read-only export policy
     netapp.ontap.na_ontap_export_policy:
       state:                      absent
-      name:                       "ro_{{ ontap_primary_nas_svm }}"
-      vserver:                    "{{ ontap_primary_nas_svm }}"
+      name:                       "ro_{{ global_primary_nas_svm }}"
+      vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input

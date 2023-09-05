@@ -47,7 +47,7 @@
         space_guarantee:            "none"
         tiering_policy:             "auto"
         junction_path:              "/{{ ontap_22_fg_name }}"
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         wait_for_completion:        True
         <<: *input
   
@@ -57,7 +57,7 @@
         name:                       "{{ item }}"
         flexvol_name:               "{{ ontap_22_fg_name }}"
         security_style:             "ntfs"
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
       loop:
         "{{ ontap_22_fg_qtree_names }}"

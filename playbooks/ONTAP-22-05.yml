@@ -40,7 +40,7 @@
         state:                      present
         name:                       "{{ item }}"
         path:                       "/{{ ontap_22_fg_name }}/{{ item }}"
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         browsable:                  true
         oplocks:                    true
         show_snapshot:              true
@@ -53,7 +53,7 @@
       netapp.ontap.na_ontap_cifs_acl:
         state:                      absent
         share_name:                 "{{ item }}"
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         user_or_group:              "Everyone"
         permission:                 "full_control"
         <<: *input
@@ -64,7 +64,7 @@
       netapp.ontap.na_ontap_cifs_acl:
         state:                      present
         share_name:                 "{{ item }}"
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         user_or_group:              "{{ ontap_22_ad_admin_group }}"
         permission:                 "full_control"
         <<: *input
@@ -75,7 +75,7 @@
       netapp.ontap.na_ontap_cifs_acl:
         state:                      present
         share_name:                 "{{ item }}"
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         user_or_group:              "{{ ontap_22_ad_ro_group }}"
         permission:                 "read"
         <<: *input

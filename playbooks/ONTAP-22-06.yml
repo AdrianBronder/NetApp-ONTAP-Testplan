@@ -38,7 +38,7 @@
         - name: Save network credentials
           community.windows.win_credential:
             state:                present
-            name:                 "{{ ontap_primary_nas_svm }}"
+            name:                 "{{ global_primary_nas_svm }}"
             type:                 "domain_password"
             username:             "{{ ontap_22_ad_admin_user }}"
             secret:               "{{ ontap_22_ad_admin_user_pw }}"
@@ -46,14 +46,14 @@
         - name: Map shares
           community.windows.win_shortcut:
             state:                present
-            src:                  "\\\\{{ ontap_primary_nas_svm }}\\{{ item }}"
+            src:                  "\\\\{{ global_primary_nas_svm }}\\{{ item }}"
             dest:                 "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk"
           loop:
             "{{ ontap_22_fg_qtree_names }}"
 
         - name: Create test file on each share
           ansible.windows.win_file:
-            path:                     "\\\\{{ ontap_primary_nas_svm }}\\{{ item }}\\{{ item }}_testfile"
+            path:                     "\\\\{{ global_primary_nas_svm }}\\{{ item }}\\{{ item }}_testfile"
             state:                    touch
           loop:
             "{{ ontap_22_fg_qtree_names }}"

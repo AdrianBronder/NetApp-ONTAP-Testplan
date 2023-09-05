@@ -31,7 +31,7 @@
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
         state:                      "absent"
-        src:                        "{{ ontap_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
         path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
         opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
@@ -49,7 +49,7 @@
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
         state:                      "mounted"
-        src:                        "{{ ontap_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
                                      {{ ontap_21_vol_name }}/{{ item }}"
         path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
         opts:                       "rw,sync,hard,vers=3"

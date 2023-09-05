@@ -48,7 +48,7 @@
         tiering_policy:             "auto"
         export_policy:              "{{ ontap_21_policy_name }}"
         junction_path:              "/{{ ontap_21_fg_name }}"
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         wait_for_completion:        True
         <<: *input
   
@@ -60,7 +60,7 @@
         export_policy:              "{{ ontap_21_policy_name }}"
         security_style:             "unix"
         unix_permissions:           0777
-        vserver:                    "{{ ontap_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
       loop:
         "{{ ontap_21_fg_qtree_names }}"

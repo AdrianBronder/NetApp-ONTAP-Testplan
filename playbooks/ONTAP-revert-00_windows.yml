@@ -41,7 +41,7 @@
         - name: Remove network credentials
           community.windows.win_credential:
             state:                absent
-            name:                 "{{ ontap_primary_nas_svm }}"
+            name:                 "{{ global_primary_nas_svm }}"
             type:                 "domain_password"
       vars:
         # become is required to save and retrieve the credentials in the tasks
