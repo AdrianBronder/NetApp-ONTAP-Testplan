@@ -78,12 +78,12 @@
           when:
             - ontap_12_test_svm01 is defined
 
-      - name: Clean-up test SVM with admin account
-        netapp.ontap.na_ontap_svm:
-          state:                      absent
-          name:                       "{{ ontap_12_test_svm01 }}"
-          <<: *input_admin
-        when:
-          - ontap_12_test_svm01 is defined
+    - name: Clean-up test SVM with admin account
+      netapp.ontap.na_ontap_svm:
+        state:                      absent
+        name:                       "{{ ontap_12_test_svm01 }}"
+        <<: *input_admin
+      when:
+        - ontap_12_test_svm01 is defined
   
   post_tasks:
