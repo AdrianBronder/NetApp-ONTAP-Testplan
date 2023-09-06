@@ -154,7 +154,6 @@ network_ip_interfaces:
         name:                     "{{ cluster_nodes[0].name }}"
       home_port:
         name:                     "e0c"
-      failover:                   "default"
       auto_revert:                true
     service_policy:
       name:                       "default-management"
@@ -171,7 +170,6 @@ network_ip_interfaces:
         name:                     "{{ cluster_nodes[0].name }}"
       home_port:
         name:                     "e0c"
-      failover:                   "default"
       auto_revert:                true
     service_policy:
       name:                       "default-data-files"
@@ -186,7 +184,6 @@ network_ip_interfaces:
         name:                     "{{ cluster_nodes[0].name }}"
       home_port:
         name:                     "e0c"
-      failover:                   "default"
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"
@@ -201,7 +198,6 @@ network_ip_interfaces:
         name:                     "{{ cluster_nodes[1].name }}"
       home_port:
         name:                     "e0c"
-      failover:                   "default"
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"

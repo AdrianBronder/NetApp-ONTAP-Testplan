@@ -85,7 +85,7 @@
       name:                        "{{ item.1.name }}"
       path:                        "CN=Users,DC=demo,DC=netapp,DC=com"
       password:                    "{{ item.1.password }}"
-      update_password:             "on_create"
+      update_password:             "always"
       password_never_expires:      "yes"
       user_cannot_change_password: "yes"
       groups:

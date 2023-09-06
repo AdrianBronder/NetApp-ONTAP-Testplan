@@ -13,16 +13,14 @@ ontap_default_fg_multiplier:      8
 # ONTAP-12 - Cluster User Management
 ontap_12_local_ro:                "na_local_ro"
 ontap_12_local_admin:             "na_local_admin"
-ontap_12_local_test_account:      "ontap_12_user01"
-ontap_12_local_test_account_pw:   "{{ vault_ontap_12_local_test_account_pw }}"
+ontap_12_test_svm01:              "svm_ontap_12_01"
 ontap_12_ad_ro_group:             "DEMO\\na_ad_ro_group"
 ontap_12_ad_ro_user:              "DEMO\\na_ad_ro_user"
 ontap_12_ad_ro_user_pw:           "{{ vault_ontap_12_ad_ro_user_pw }}"
 ontap_12_ad_admin_group:          "DEMO\\na_ad_admin_group"
 ontap_12_ad_admin_user:           "DEMO\\na_ad_admin_user"
 ontap_12_ad_admin_user_pw:        "{{ vault_ontap_12_ad_admin_user_pw }}"
-ontap_12_ad_test_account:         "ontap_12_user02"
-ontap_12_ad_test_account_pw:      "{{ vault_ontap_12_ad_test_account_pw }}"
+ontap_12_test_svm02:              "svm_ontap_12_02"
 
 # ONTAP-31 - NFS
 ontap_31_policy_name:             "ontap_31_policy"

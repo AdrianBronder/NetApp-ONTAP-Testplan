@@ -42,24 +42,15 @@
   pre_tasks:
 
   tasks:
-    - name: Creating a test user with different accounts having different privileges
+    - name: Creating a test SVM with different accounts having different privileges
       block:
-        - name: Create local testuser with read-only account
-          netapp.ontap.na_ontap_user:
+        - name: Create test SVM with read-only account
+          netapp.ontap.na_ontap_svm:
             state:                      present
-            name:                       "{{ ontap_12_local_test_account }}"
-            application_dicts:
-              - application:              "ssh"
-                authentication_methods:
-                - "password"
-                second_authentication_method: "none"
-            set_password:               "{{ ontap_12_local_test_account_pw }}"
-            lock_user:                  "false"
-            role_name:                  "readonly"
+            name:                       "{{ ontap_12_test_svm01 }}"
             <<: *input_ro
           when:
-            - ontap_12_local_test_account is defined
-            - ontap_12_local_test_account_pw is defined
+            - ontap_12_test_svm01 is defined
           register: ro_create_result
 
       rescue:
@@ -79,21 +70,20 @@
           when:
             - not ("not authorized for that command") in ro_create_result.msg
 
-        - name: Create local testuser with admin account
-          netapp.ontap.na_ontap_user:
+        - name: Create test SVM with admin account
+          netapp.ontap.na_ontap_svm:
             state:                      present
-            name:                       "{{ ontap_12_local_test_account }}"
-            application_dicts:
-              - application:              "ssh"
-                authentication_methods:
-                - "password"
-                second_authentication_method: "none"
-            set_password:               "{{ ontap_12_local_test_account_pw }}"
-            lock_user:                  "false"
-            role_name:                  "readonly"
+            name:                       "{{ ontap_12_test_svm01 }}"
             <<: *input_admin
           when:
-            - ontap_12_local_test_account is defined
-            - ontap_12_local_test_account_pw is defined
+            - ontap_12_test_svm01 is defined
+
+      - name: Clean-up test SVM with admin account
+        netapp.ontap.na_ontap_svm:
+          state:                      absent
+          name:                       "{{ ontap_12_test_svm01 }}"
+          <<: *input_admin
+        when:
+          - ontap_12_test_svm01 is defined
   
   post_tasks:
