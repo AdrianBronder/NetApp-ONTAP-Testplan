@@ -17,14 +17,14 @@
   vars:
     separator: '\'
     ad_org_groups:
-      - name: "{{ ontap_04_ad_ro_group.split(separator)[-1] }}"
+      - name: "{{ ontap_12_ad_ro_group.split(separator)[-1] }}"
         users:
-          - name:     "{{ ontap_04_ad_ro_user.split(separator)[-1] }}"
-            password: "{{ ontap_04_ad_ro_user_pw }}"
-      - name: "{{ ontap_04_ad_admin_group.split(separator)[-1] }}"
+          - name:     "{{ ontap_12_ad_ro_user.split(separator)[-1] }}"
+            password: "{{ ontap_12_ad_ro_user_pw }}"
+      - name: "{{ ontap_12_ad_admin_group.split(separator)[-1] }}"
         users:
-          - name:     "{{ ontap_04_ad_admin_user.split(separator)[-1] }}"
-            password: "{{ ontap_04_ad_admin_user_pw }}"
+          - name:     "{{ ontap_12_ad_admin_user.split(separator)[-1] }}"
+            password: "{{ ontap_12_ad_admin_user_pw }}"
   vars_files:
     - ../../vars/labondemand/vars.yml
     - ../../vars/labondemand/vault.yml

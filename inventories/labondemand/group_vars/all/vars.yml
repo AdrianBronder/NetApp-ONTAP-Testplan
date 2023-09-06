@@ -11,7 +11,7 @@ all_dns_nameservers:
 - "192.168.0.253"
 all_ntp_serveres:
 - "0.us.pool.ntp.org"
-- "2.us.pool.ntp.org"
+- "1.us.pool.ntp.org"
 all_timezone:                 "America/New_York"
 
 all_ad_join_user:             "{{ vault_all_ad_join_user }}"

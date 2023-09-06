@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-11-04 - SVM protocol setup
+# Title:        ONTAP-20-04 - SVM Protocol Setup
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-22
-# Description:  Logical Storage Management
-#               - SVM protocol setup
+# Description:  Basic SVM Setup
+#               - SVM Protocol Setup
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-11-04 - SVM protocol setup"
+  name:               "ONTAP-20-04 - SVM Protocol Setup"
   gather_facts:       false
   vars:
     input: &input

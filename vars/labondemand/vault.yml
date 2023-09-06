@@ -1,4 +1,4 @@
-vault_ontap_04_local_test_account_pw: "ONTAP_TestPW1!"
-vault_ontap_04_ad_ro_user_pw:     "CustomPoC01ad!"
-vault_ontap_04_ad_admin_user_pw:  "CustomPoC02ad!"
-vault_ontap_04_ad_test_account_pw: "ONTAP_TestPW2!"
+vault_ontap_12_local_test_account_pw: "ONTAP_TestPW1!"
+vault_ontap_12_ad_ro_user_pw:     "CustomPoC01ad!"
+vault_ontap_12_ad_admin_user_pw:  "CustomPoC02ad!"
+vault_ontap_12_ad_test_account_pw: "ONTAP_TestPW2!"

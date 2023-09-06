@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-21-04 - FlexGroup & qtrees
+# Title:        ONTAP-31-04 - FlexGroups & Qtrees
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-24
 # Description:  NFS
-#               - FlexGroup & qtrees
+#               - FlexGroup & Qtrees
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-21-04 - FlexGroup & qtrees"
+  name:               "ONTAP-31-04 - FlexGroup & Qtrees"
   gather_facts:       false
   vars:
     input: &input
@@ -38,7 +38,7 @@
     - name: Create FlexGroup
       netapp.ontap.na_ontap_volume:
         state:                      present
-        name:                       "{{ ontap_21_fg_name }}"
+        name:                       "{{ ontap_31_fg_name }}"
         size:                       "{{ ontap_default_fg_size_gb }}"
         volume_security_style:      "unix"
         aggr_list:                  "{{ storage_aggregates | map(attribute='name') | flatten }}"
@@ -46,8 +46,8 @@
         size_unit:                  gb
         space_guarantee:            "none"
         tiering_policy:             "auto"
-        export_policy:              "{{ ontap_21_policy_name }}"
-        junction_path:              "/{{ ontap_21_fg_name }}"
+        export_policy:              "{{ ontap_31_policy_name }}"
+        junction_path:              "/{{ ontap_31_fg_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         wait_for_completion:        True
         <<: *input
@@ -56,13 +56,13 @@
       netapp.ontap.na_ontap_qtree:
         state:                      present
         name:                       "{{ item }}"
-        flexvol_name:               "{{ ontap_21_fg_name }}"
-        export_policy:              "{{ ontap_21_policy_name }}"
+        flexvol_name:               "{{ ontap_31_fg_name }}"
+        export_policy:              "{{ ontap_31_policy_name }}"
         security_style:             "unix"
         unix_permissions:           0777
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
       loop:
-        "{{ ontap_21_fg_qtree_names }}"
+        "{{ ontap_31_fg_qtree_names }}"
   
   post_tasks:

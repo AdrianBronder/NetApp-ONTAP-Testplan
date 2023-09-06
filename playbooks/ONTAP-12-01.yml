@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-04-01 - Local read-only user
+# Title:        ONTAP-12-01 - Read-only Local User
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
 # Description:  Cluster User Management
-#               - Local read-only user
+#               - Read-only Local User
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-04-01 - Local read-only user"
+  name:               "ONTAP-12-01 - Read-only Local User"
   gather_facts:       false
   vars:
     input: &input

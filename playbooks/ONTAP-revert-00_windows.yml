@@ -33,10 +33,10 @@
         - name: Remove mapped shares
           community.windows.win_shortcut:
             state:                absent
-            dest:                 "{{ windows_22_default_mount_dir }}\\{{ item }}.lnk"
+            dest:                 "{{ windows_32_default_mount_dir }}\\{{ item }}.lnk"
           loop:
-            "{{ ontap_22_vol_qtree_names +
-                ontap_22_fg_qtree_names }}"
+            "{{ ontap_32_vol_qtree_names +
+                ontap_32_fg_qtree_names }}"
 
         - name: Remove network credentials
           community.windows.win_credential:
@@ -52,5 +52,5 @@
 
     - name: Remove mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_22_default_mount_dir }}"
+        path:                     "{{ windows_32_default_mount_dir }}"
         state:                    absent

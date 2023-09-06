@@ -29,21 +29,21 @@
     ansible.posix.mount:
       state:                      "absent"
       src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-      path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
+      path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
       opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
     loop:
-      "{{ ontap_21_vol_qtree_names + 
-          ontap_21_fg_qtree_names }}"
+      "{{ ontap_31_vol_qtree_names + 
+          ontap_31_fg_qtree_names }}"
 
   - name: Remove mount directories
     ansible.builtin.file:
-      path:                       "{{ linux_21_default_mount_dir }}/{{ item }}"
+      path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
       state:                      "absent"
       mode:                       "0755"
     loop:
-      "{{ ontap_21_vol_qtree_names + 
-          ontap_21_fg_qtree_names }}"
+      "{{ ontap_31_vol_qtree_names + 
+          ontap_31_fg_qtree_names }}"
 
 - hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-revert-21 - NFS - ONTAP"
@@ -66,21 +66,21 @@
   - name: Remove volume
     netapp.ontap.na_ontap_volume:
       state:                      absent
-      name:                       "{{ ontap_21_vol_name }}"
+      name:                       "{{ ontap_31_vol_name }}"
       vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input
 
   - name: Remove FlexGroup
     netapp.ontap.na_ontap_volume:
       state:                      absent
-      name:                       "{{ ontap_21_fg_name }}"
+      name:                       "{{ ontap_31_fg_name }}"
       vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input
 
   - name: Remove read-write export policy
     netapp.ontap.na_ontap_export_policy:
       state:                      absent
-      name:                       "{{ ontap_21_policy_name }}"
+      name:                       "{{ ontap_31_policy_name }}"
       vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input
 

@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-21-01 - Export policies & rules
+# Title:        ONTAP-31-01 - Export Policies & Rules
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-22
 # Description:  NFS
-#               - Storage Virtual Machines (SVMs)
+#               - Export Policies & Rules
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-21-01 - Export policies & rules"
+  name:               "ONTAP-31-01 - Export Policies & Rules"
   gather_facts:       false
   vars:
     input: &input
@@ -66,14 +66,14 @@
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                      present
-        name:                       "{{ ontap_21_policy_name }}"
+        name:                       "{{ ontap_31_policy_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
   
     - name: Create read-write export policy rules for SVM root volume
       na_ontap_export_policy_rule:
         state:                      present
-        name:                       "{{ ontap_21_policy_name }}"
+        name:                       "{{ ontap_31_policy_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                    "any"

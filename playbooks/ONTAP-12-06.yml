@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-04-03 - Local user access
+# Title:        ONTAP-04-06 - Domain User Access
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-23
 # Description:  Cluster User Management
-#               - Local user access
+#               - Domain User Access
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,20 +16,20 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-04-03 - Local user access"
+  name:               "ONTAP-04-06 - Domain User Access"
   gather_facts:       false
   vars:
     input_ro: &input_ro
       hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_04_local_ro }}"
-      password:                   "{{ vault_security_accounts[ontap_04_local_ro].password }}"
+      username:                   "{{ ontap_12_ad_ro_user }}"
+      password:                   "{{ ontap_12_ad_ro_user_pw }}"
       https:                      true
       validate_certs:             false
       use_rest:                   "always"
     input_admin: &input_admin
       hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_04_local_admin }}"
-      password:                   "{{ vault_security_accounts[ontap_04_local_admin].password }}"
+      username:                   "{{ ontap_12_ad_admin_user }}"
+      password:                   "{{ ontap_12_ad_admin_user_pw }}"
       https:                      true
       validate_certs:             false
       use_rest:                   "always"
@@ -47,19 +47,19 @@
         - name: Create local testuser with read-only account
           netapp.ontap.na_ontap_user:
             state:                      present
-            name:                       "{{ ontap_04_local_test_account }}"
+            name:                       "{{ ontap_12_ad_test_account }}"
             application_dicts:
               - application:              "ssh"
                 authentication_methods:
                 - "password"
                 second_authentication_method: "none"
-            set_password:               "{{ ontap_04_local_test_account_pw }}"
+            set_password:               "{{ ontap_12_ad_test_account_pw }}"
             lock_user:                  "false"
             role_name:                  "readonly"
             <<: *input_ro
           when:
-            - ontap_04_local_test_account is defined
-            - ontap_04_local_test_account_pw is defined
+            - ontap_12_ad_test_account is defined
+            - ontap_12_ad_test_account_pw is defined
           register: ro_create_result
 
       rescue:
@@ -82,18 +82,18 @@
         - name: Create local testuser with admin account
           netapp.ontap.na_ontap_user:
             state:                      present
-            name:                       "{{ ontap_04_local_test_account }}"
+            name:                       "{{ ontap_12_ad_test_account }}"
             application_dicts:
               - application:              "ssh"
                 authentication_methods:
                 - "password"
                 second_authentication_method: "none"
-            set_password:               "{{ ontap_04_local_test_account_pw }}"
+            set_password:               "{{ ontap_12_ad_test_account_pw }}"
             lock_user:                  "false"
             role_name:                  "readonly"
             <<: *input_admin
           when:
-            - ontap_04_local_test_account is defined
-            - ontap_04_local_test_account_pw is defined
+            - ontap_12_ad_test_account is defined
+            - ontap_12_ad_test_account_pw is defined
   
   post_tasks:

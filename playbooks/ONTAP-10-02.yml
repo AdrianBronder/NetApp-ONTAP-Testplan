@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-02-02 - Network 
+# Title:        ONTAP-10-02 - Physical Network 
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
 # Description:  Basic Cluster Configuration
-#               - Network
+#               - Physical Network
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-02-02 - Network"
+  name:               "ONTAP-10-02 - Physical Network"
   gather_facts:       false
   vars:
     input: &input

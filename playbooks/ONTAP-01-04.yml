@@ -1,10 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-00-00 - Cluster Basic Checks 
+# Title:        ONTAP-01-04 - Ansible 
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
-# Description:  Basic connection validation and cluster info
+# Description:  Cluster Basic Connection Checks
+#               - Ansible
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -15,7 +16,7 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-00-00 - Cluster Basic Checks"
+  name:               "ONTAP-01-04 - Ansible"
   gather_facts:       false
   vars:
     input: &input
