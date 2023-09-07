@@ -28,7 +28,7 @@
   tasks:
     - name: test debug
       ansible.builtin.debug:
-        msg: "{{ protocols_active_directorys | map(attribute='preferred-domain-controllers') | flatten }}"
+        msg: "{{ protocols_active_directory | map(attribute='preferred-domain-controllers') | flatten }}"
 
 #    - name: test debug hosts
 #      ansible.builtin.debug:
