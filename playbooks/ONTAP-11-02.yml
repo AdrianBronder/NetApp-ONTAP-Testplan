@@ -63,16 +63,12 @@
           allowed:                "{{ item.ndmp.allowed | default(omit) }}"
         nfs:
           allowed:                "{{ item.nfs.allowed | default(omit) }}"
-          enabled:                "{{ item.nfs.enabled | default(omit) }}"
         fcp:
           allowed:                "{{ item.fcp.allowed | default(omit) }}"
-          enabled:                "{{ item.fcp.enabled | default(omit) }}"
         iscsi:
           allowed:                "{{ item.iscsi.allowed | default(omit) }}"
-          enabled:                "{{ item.iscsi.enabled | default(omit) }}"
         nvme:
           allowed:                "{{ item.nvme.allowed | default(omit) }}"
-          enabled:                "{{ item.nvme.enabled | default(omit) }}"
       <<: *input
     loop:
       "{{ svm_svms }}"
@@ -147,8 +143,28 @@
       "{{ protocols_cifs_services }}"
     when:
       - protocols_cifs_services | length > 0
-      - security_authentication_cluster_ad_proxy.svm.name is defined
       - item.svm.name is defined 
+      - security_authentication_cluster_ad_proxy.svm.name is defined
+      - item.svm.name == security_authentication_cluster_ad_proxy.svm.name
+
+  - name: Patch additional SVM CIFS parameters - comment
+    netapp.ontap.na_ontap_rest_cli:
+      command:                    'vserver/cifs'
+      verb:                       'PATCH'
+      params: 
+        vserver:                  "{{ item.svm.name }}"
+      body:
+        comment:                  "{{ item.comment }}"
+      <<: *input
+    loop:
+      "{{ protocols_cifs_services }}"
+    loop_control:
+      label: "{{ item.svm.name }}"
+    when:
+      - protocols_cifs_services | length > 0
+      - item.svm.name is defined
+      - item.comment is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined
       - item.svm.name == security_authentication_cluster_ad_proxy.svm.name
 
   - name: Create domain tunnel for cluster AD authentication

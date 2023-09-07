@@ -98,27 +98,23 @@
   - name: Create active directory preferred domain controllers
     netapp.ontap.na_ontap_active_directory_domain_controllers:
       state:                      present
-      vserver:                    "item"
-      fqdn:                       "test.com"
-      server_ip: 10.10.10.10
+      vserver:                    "{{ item.0.key }}"
+      fqdn:                       "{{ item.1.fqdn }}"
+      server_ip:                  "{{ item.1.ip }}"
       <<: *input
     loop:
-      "{{ protocols_nfs_services }}"
+      "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
     loop_control:
       label: "{{ item.svm.name }}"
     when:
-      - protocols_nfs_services | length > 0
-      - item.svm.name is defined
-      - item.protocol.v4_64bit_identifiers_enabled is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+      - protocols_active_directory | list | length > 0
 
   - name: Create CIFS server on SVMs
     netapp.ontap.na_ontap_cifs_server:
       state:                      present
       name:                       "{{ item.name }}"
       vserver:                    "{{ item.svm.name }}"
-      service_state:              started
+      service_state:              "started"
       domain:                     "{{ item.ad_domain.fqdn }}"
       ou:                         "{{ item.ad_domain.organizational_unit }}"
       admin_user_name:            "{{ all_ad_join_user }}"
@@ -133,5 +129,23 @@
       - item.name is defined 
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+  - name: Patch additional SVM CIFS parameters - comment
+    netapp.ontap.na_ontap_rest_cli:
+      command:                    'vserver/cifs'
+      verb:                       'PATCH'
+      params: 
+        vserver:                  "{{ item.svm.name }}"
+      body:
+        comment:                  "{{ item.comment }}"
+      <<: *input
+    loop:
+      "{{ protocols_cifs_services }}"
+    loop_control:
+      label: "{{ item.svm.name }}"
+    when:
+      - protocols_cifs_services | length > 0
+      - item.svm.name is defined
+      - item.comment is defined
 
   post_tasks:
