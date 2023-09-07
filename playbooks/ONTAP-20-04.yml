@@ -73,7 +73,7 @@
       - item.svm.name is defined
       - item.protocol.v3_64bit_identifiers_enabled is defined
       - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.name
+        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
   - name: Patch additional SVM NFS parameters - v4-64bit-identifiers
     netapp.ontap.na_ontap_rest_cli:
@@ -93,7 +93,7 @@
       - item.svm.name is defined
       - item.protocol.v4_64bit_identifiers_enabled is defined
       - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.name
+        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
   - name: Create CIFS server on SVMs
     netapp.ontap.na_ontap_cifs_server:
