@@ -149,5 +149,7 @@
       - protocols_cifs_services | length > 0
       - item.svm.name is defined
       - item.comment is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
   post_tasks:
