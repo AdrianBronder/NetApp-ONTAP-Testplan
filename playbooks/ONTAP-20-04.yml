@@ -60,7 +60,7 @@
       command:                    'vserver/nfs'
       verb:                       'PATCH'
       params: 
-        vserver:                  "{{ item.name }}"
+        vserver:                  "{{ item.svm.name }}"
       body:
         v3-64bit-identifiers:     "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
       <<: *input
@@ -80,7 +80,7 @@
       command:                    'vserver/nfs'
       verb:                       'PATCH'
       params: 
-        vserver:                  "{{ item.name }}"
+        vserver:                  "{{ item.svm.name }}"
       body:
         v4-64bit-identifiers:     "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
       <<: *input
