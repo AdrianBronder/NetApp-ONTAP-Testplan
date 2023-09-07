@@ -31,7 +31,8 @@
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
         state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                     {{ ontap_31_fg_name }}/{{ item }}"
         path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
