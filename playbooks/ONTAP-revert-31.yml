@@ -1,10 +1,10 @@
 ################################################################################
 #
-# Title:        ONTAP-revert-21 - NFS
+# Title:        ONTAP-revert-31 - NFS
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
-# Description:  Revert all steps performed in test frame 21
+# Description:  Revert all steps performed in test frame 31
 #               - NFS
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-revert-21 - NFS - Linux"
+  name:               "ONTAP-revert-31 - NFS - Linux"
   gather_facts:       false
   vars_files:
     - ../vars/labondemand/vars.yml
@@ -25,16 +25,25 @@
     - ansible.posix
 
   tasks:
-  - name: Unmount exports
+  - name: Unmount exports on volume
     ansible.posix.mount:
       state:                      "absent"
-      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
+      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_31_vol_name }}/{{ item }}"
       path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
 #      opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
     loop:
-      "{{ ontap_31_vol_qtree_names + 
-          ontap_31_fg_qtree_names }}"
+      "{{ ontap_31_vol_qtree_names }}"
+
+  - name: Unmount exports on FlexGroup
+    ansible.posix.mount:
+      state:                      "absent"
+      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_31_fg_qtree_names }}/{{ item }}"
+      path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
+#      opts:                       "rw,sync,hard,vers=3"
+      fstype:                     "nfs"
+    loop:
+      "{{ ontap_31_fg_qtree_names }}"
 
   - name: Remove mount directories
     ansible.builtin.file:
@@ -46,7 +55,7 @@
           ontap_31_fg_qtree_names }}"
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-revert-21 - NFS - ONTAP"
+  name:               "ONTAP-revert-31 - NFS - ONTAP"
   gather_facts:       false
   vars:
     input: &input

@@ -1,10 +1,10 @@
 ################################################################################
 #
-# Title:        ONTAP-revert-22 - CIFS
+# Title:        ONTAP-revert-32 - CIFS
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-17
-# Description:  Revert all steps performed in test frame 22
+# Description:  Revert all steps performed in test frame 32
 #               - CIFS
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "win_hosts"
-  name:               "ONTAP-revert-22 - CIFS - Windows"
+  name:               "ONTAP-revert-32 - CIFS - Windows"
   gather_facts:       false
   vars_files:
     - ../vars/labondemand/vars.yml
@@ -56,7 +56,7 @@
         state:                    absent
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-revert-22 - CIFS - ONTAP"
+  name:               "ONTAP-revert-32 - CIFS - ONTAP"
   gather_facts:       false
   vars:
     input: &input
