@@ -35,27 +35,66 @@
   pre_tasks:
 
   tasks:
-  - name: Patch SVM NFS service to support 64-bit file identifiers by default
+  - name: Configure NFS service on SVMs
+    netapp.ontap.na_ontap_nfs:
+      state:                      present
+      vserver:                    "{{ item.svm.name }}"
+      service_state:              "{{ 'started' if item.enabled else 'stopped'}}"
+      nfsv3:                      "{{ 'enabled' if item.protocol.v3_enabled else 'disabled'}}"
+      nfsv4:                      "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
+      nfsv41:                     "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
+      showmount:                  "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
+      <<: *input
+    loop:
+      "{{ protocols_nfs_services }}"
+    loop_control:
+      label: "{{ item.svm.name }}"
+    when:
+      - protocols_nfs_services | length > 0
+      - item.svm.name is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+  - name: Patch additional SVM NFS parameters - v3-64bit-identifiers
     netapp.ontap.na_ontap_rest_cli:
       command:                    'vserver/nfs'
       verb:                       'PATCH'
       params: 
         vserver:                  "{{ item.name }}"
       body:
-        v3-64bit-identifiers:     "enabled"
-        v4-64bit-identifiers:     "enabled"
+        v3-64bit-identifiers:     "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
       <<: *input
     loop:
-      "{{ svm_svms }}"
+      "{{ protocols_nfs_services }}"
     loop_control:
-      label: "{{ item.name }}"
+      label: "{{ protocols_nfs_services.svm.name }}"
     when:
-      - svm_svms | length > 0
-      - item.name is defined
-      - item.nfs.allowed
+      - protocols_nfs_services | length > 0
+      - item.svm.name is defined
+      - item.protocol.v3_64bit_identifiers_enabled is defined
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
 
+  - name: Patch additional SVM NFS parameters - v4-64bit-identifiers
+    netapp.ontap.na_ontap_rest_cli:
+      command:                    'vserver/nfs'
+      verb:                       'PATCH'
+      params: 
+        vserver:                  "{{ item.name }}"
+      body:
+        v4-64bit-identifiers:     "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
+      <<: *input
+    loop:
+      "{{ protocols_nfs_services }}"
+    loop_control:
+      label: "{{ item.svm.name }}"
+    when:
+      - protocols_nfs_services | length > 0
+      - item.svm.name is defined
+      - item.protocol.v4_64bit_identifiers_enabled is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
+  
   - name: Create CIFS server on SVMs
     netapp.ontap.na_ontap_cifs_server:
       state:                      present

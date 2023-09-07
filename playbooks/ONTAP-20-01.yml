@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-  - name: Create all SVMs for testing on "{{ global_primary_test_cluster }}"
+  - name: Create all SVMs for testing"
     netapp.ontap.na_ontap_svm:
       state:                      present
       name:                       "{{ item.name }}"
