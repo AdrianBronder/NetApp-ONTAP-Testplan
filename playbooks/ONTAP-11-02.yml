@@ -128,6 +128,22 @@
       - item.name is defined 
       - item.name == security_authentication_cluster_ad_proxy.svm.name
 
+  - name: Create active directory preferred domain controllers
+    netapp.ontap.na_ontap_active_directory_domain_controllers:
+      state:                      present
+      vserver:                    "{{ item.0.key }}"
+      fqdn:                       "{{ item.1.fqdn }}"
+      server_ip:                  "{{ item.1.ip }}"
+      <<: *input
+    loop:
+      "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
+    loop_control:
+      label: "{{ item.0.key }}"
+    when:
+      - protocols_active_directory | list | length > 0
+      - security_authentication_cluster_ad_proxy.svm.name is defined
+      - item.0.key == security_authentication_cluster_ad_proxy.svm.name
+
   - name: Create CIFS server on SVMs
     netapp.ontap.na_ontap_cifs_server:
       state:                      present

@@ -105,9 +105,11 @@
     loop:
       "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
     loop_control:
-      label: "{{ item.svm.name }}"
+      label: "{{ item.0.key }}"
     when:
       - protocols_active_directory | list | length > 0
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.0.key
 
   - name: Create CIFS server on SVMs
     netapp.ontap.na_ontap_cifs_server:
