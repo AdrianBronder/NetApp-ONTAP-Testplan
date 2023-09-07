@@ -33,7 +33,7 @@
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
         path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
-        opts:                       "rw,sync,hard,vers=3"
+#        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
       loop:
         "{{ ontap_31_fg_qtree_names }}"
