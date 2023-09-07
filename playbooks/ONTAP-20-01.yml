@@ -67,4 +67,26 @@
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
 
+  - name: Patch additional SVM parameters
+    netapp.ontap.na_ontap_rest_cli:
+      command:                    'vserver'
+      verb:                       'PATCH'
+      params: 
+        vserver:                  "{{ item.name }}"
+      body:
+        auto_enable_analytics:    "{{ item.auto_enable_analytics | default(omit) }}"
+        auto_enable_activity_tracking: "{{ auto_enable_activity_tracking | default(omit) }}"
+      <<: *input
+    loop:
+      "{{ svm_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - item.auto_enable_analytics is defined or
+        item.auto_enable_activity_tracking is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
+
   post_tasks:
