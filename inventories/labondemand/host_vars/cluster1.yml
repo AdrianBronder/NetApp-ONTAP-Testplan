@@ -113,7 +113,7 @@ svm_svms:
     dns:
       domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
-#    auto_enable_analytics:        true
+    auto_enable_analytics:        true
     auto_enable_activity_tracking: true
     ipspace:
       name:                       "Default"
