@@ -67,7 +67,7 @@
     loop:
       "{{ protocols_nfs_services }}"
     loop_control:
-      label: "{{ protocols_nfs_services.svm.name }}"
+      label: "{{ item.svm.name }}"
     when:
       - protocols_nfs_services | length > 0
       - item.svm.name is defined
