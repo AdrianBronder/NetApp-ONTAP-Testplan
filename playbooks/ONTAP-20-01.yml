@@ -46,16 +46,12 @@
           allowed:                "{{ item.ndmp.allowed | default(omit) }}"
         nfs:
           allowed:                "{{ item.nfs.allowed | default(omit) }}"
-          enabled:                "{{ item.nfs.enabled | default(omit) }}"
         fcp:
           allowed:                "{{ item.fcp.allowed | default(omit) }}"
-          enabled:                "{{ item.fcp.enabled | default(omit) }}"
         iscsi:
           allowed:                "{{ item.iscsi.allowed | default(omit) }}"
-          enabled:                "{{ item.iscsi.enabled | default(omit) }}"
         nvme:
           allowed:                "{{ item.nvme.allowed | default(omit) }}"
-          enabled:                "{{ item.nvme.enabled | default(omit) }}"
       <<: *input
     loop:
       "{{ svm_svms }}"

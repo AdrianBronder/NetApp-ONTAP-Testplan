@@ -96,7 +96,6 @@ svm_svms:
       name:                       "Default"
     nfs:
       allowed:                    true
-      enabled:                    true
     cifs:
       allowed:                    true
     iscsi:
