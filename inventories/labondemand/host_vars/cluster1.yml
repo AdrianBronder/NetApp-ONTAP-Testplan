@@ -143,6 +143,12 @@ protocols_nfs_services:
       v4_64bit_identifiers_enabled: true
     showmount_enabled:            true
 
+protocols_active_directory:
+  ntap-svm01-nas:
+    preferred-domain-controllers:
+      - fqdn:                    "dc1.demo.netapp.com"
+        ip:                      "192.168.0.253"
+
 protocols_cifs_services:
   - name:                         "{{ svm_svms[0].name }}"
     svm:

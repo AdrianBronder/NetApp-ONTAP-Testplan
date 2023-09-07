@@ -1,5 +1,5 @@
 - hosts:              "ontap"
-  name:               ONTAP-00-01 - Cluster Network Config
+  name:               ONTAP - TEST
   gather_facts:       false
   vars:
     input: &input
@@ -8,31 +8,17 @@
       https:          true
       validate_certs: false
       use_rest:       "always"
-    member_ports:
-      - name:                   "e1f"
-      - name:                   "e1g"
-    security_accounts:
-      - name:                         "na_local_admin"
-        scope:                        "cluster"
-        owner:
-          name:
-        locked:                       false
-        applications:
-          - application:              "ssh"
-            authentication_methods:
-              - "password"
-            second_authentication_method: "none"
-          - application:              "ontapi"
-            authentication_methods:
-              - "password"
-            second_authentication_method: "none"
-          - application:              "http"
-            authentication_methods:
-              - "password"
-            second_authentication_method: "none"
-        comment:                      "Local user with admin privileges for testing"
-        role:
-          name:                       "admin"
+    protocols_active_directory:
+      ntap-svm01-nas:
+        preferred-domain-controllers:
+          - fqdn:                    "demo.netapp.com"
+            ip:                      "192.168.0.252"
+          - fqdn:                    "demo.netapp.com"
+            ip:                      "192.168.0.253"
+      ntap-svm02-san:
+        preferred-domain-controllers:
+          - fqdn:                    "demo.netapp.com"
+            ip:                      "192.168.0.252"
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
@@ -42,12 +28,12 @@
   tasks:
     - name: test debug
       ansible.builtin.debug:
-        msg: "{{ security_accounts[0].applications | map(attribute='authentication_methods') | flatten }}"
+        msg: "{{ protocols_active_directorys | map(attribute='preferred-domain-controllers') | flatten }}"
 
-    - name: test debug hosts
-      ansible.builtin.debug:
-        msg: "{{ storage_aggregates | map(attribute='name') | flatten }}"
+#    - name: test debug hosts
+#      ansible.builtin.debug:
+#        msg: "{{ storage_aggregates | map(attribute='name') | flatten }}"
 
-    - name: test debug hosts
-      ansible.builtin.debug:
-        msg: "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+#    - name: test debug hosts
+#      ansible.builtin.debug:
+#        msg: "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
