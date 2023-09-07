@@ -94,7 +94,7 @@
       params: 
         vserver:                  "{{ item.name }}"
       body:
-        auto_enable_activity_tracking: "{{ auto_enable_activity_tracking }}"
+        auto_enable_activity_tracking: "{{ item.auto_enable_activity_tracking }}"
       <<: *input
     loop:
       "{{ svm_svms }}"
