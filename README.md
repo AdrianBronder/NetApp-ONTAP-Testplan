@@ -25,24 +25,24 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
    cd ./NetApp-ONTAP-Testplan
    ./init/init_LD00821.sh
    ```
-4. Execute test steps, e.g. general test playbook "ONTAP-00-00.yml"
+4. Execute test steps, e.g. general connection test playbook "ONTAP-01-04.yml"
    ```
-   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00-00.yml
+   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-01-04.yml
    ```
 
 
 # Further Execution Examples
-- Execute a single test step (e.g. ONTAP-02-02 - Network):
+- Execute a single test step (e.g. ONTAP-02-02 - Physical Network):
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-02-02.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10-02.yml
   ```
-- Executing an entire test frame (e.g. ONTAP-02 - Basic Cluster Configuration)
+- Executing an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-02-*.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10-*.yml
   ```
 - Revert configuration changed and objects created during a test frame:
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-21.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-31.yml
   ```
 - Executing ALL tests with a single command (and track the execution time)
   ```
@@ -61,11 +61,14 @@ The playbooks can be executed in any other non-production environments for demos
 * Ansible host is configured with minimum recommended versions (as of now - August 2023):
   - Python 3.8+
   - Ansible 2.12+
-* Inventory folder id created for new environment in ./inventories (as per exmple "labondemand")
-  - hosts file and variables have to match specific environment
-  - a sinlge file can be used as well, but is not recommended with a large amount of variables and secrets like passwords
-* Variable folder is created for new environment in ./vars (as per example "labondemand")
-  - it can be a single file, but is not recommended with a large amount of variables and secrets like passwords
+* Variables are defined at various levels. There are generally two categories of variables for this test:
+  * **Environment**, or: Desired state of a system or a group of systems
+    * Inventory folder id created for new environment in ./inventories (as per exmple "labondemand")
+    * hosts file and variables have to match specific environment
+    * a sinlge file can be used as well, but is not recommended with a large amount of variables and secrets like passwords
+  * **Runtime**, or: Configuration, that is created or changed as part of the test plan
+    * Variable folder is created for new environment in ./vars (as per example "labondemand")
+    * it can be a single file, but is not recommended with a large amount of variables and secrets like passwords
 
 
 # Additional References
