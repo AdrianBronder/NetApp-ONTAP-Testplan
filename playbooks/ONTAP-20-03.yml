@@ -1,0 +1,55 @@
+################################################################################
+#
+# Title:        ONTAP-20-03 - SVM Network Services
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-22
+# Description:  Basic SVM Setup
+#               - SVM Network Services
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-20-03 - SVM Network Services"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+  - name: Configure DNS on test SVMs
+    netapp.ontap.na_ontap_dns:
+      state:                      present
+      vserver:                    "{{ item.name }}"
+      domains:                    "{{ item.dns.domains }}"
+      nameservers:                "{{ item.dns.servers }}"
+      <<: *input
+    loop:
+      "{{ svm_svms }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - svm_svms | length > 0
+      - item.name is defined
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.name
+
+  post_tasks:

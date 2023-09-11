@@ -1,0 +1,62 @@
+# General Defaults
+global_primary_test_cluster:      "cluster1"
+global_secondary_test_cluster:    "cluster2"
+global_primary_nas_svm:           "ntap-svm01-nas"
+global_primary_san_svm:           "ntap-svm02-san"
+global_primary_backup_svm:        "ntap-svm03-backup"
+ontap_default_vol_size_gb:        10
+ontap_default_vol_size_increment_gb: 2
+ontap_default_fg_size_gb:         102400
+ontap_default_fg_size_increment_gb: 1024
+ontap_default_fg_multiplier:      8
+
+# ONTAP-12 - Cluster User Management
+ontap_12_local_ro:                "na_local_ro"
+ontap_12_local_admin:             "na_local_admin"
+ontap_12_test_svm01:              "svm_ontap_12_01"
+ontap_12_ad_ro_group:             "DEMO\\na_ad_ro_group"
+ontap_12_ad_ro_user:              "DEMO\\na_ad_ro_user"
+ontap_12_ad_ro_user_pw:           "{{ vault_ontap_12_ad_ro_user_pw }}"
+ontap_12_ad_admin_group:          "DEMO\\na_ad_admin_group"
+ontap_12_ad_admin_user:           "DEMO\\na_ad_admin_user"
+ontap_12_ad_admin_user_pw:        "{{ vault_ontap_12_ad_admin_user_pw }}"
+ontap_12_test_svm02:              "svm_ontap_12_02"
+
+# ONTAP-31 - NFS
+ontap_31_policy_name:             "ontap_31_policy"
+ontap_31_vol_name:                "ontap_31_nfs_vol01"
+ontap_31_vol_qtree_names:
+  - "ontap_31_vol_qt01"
+  - "ontap_31_vol_qt02"
+  - "ontap_31_vol_qt03"
+  - "ontap_31_vol_qt04"
+  - "ontap_31_vol_qt05"
+ontap_31_fg_name:                 "ontap_31_nfs_fg01"
+ontap_31_fg_qtree_names:
+  - "ontap_31_fg_qt01"
+  - "ontap_31_fg_qt02"
+  - "ontap_31_fg_qt03"
+  - "ontap_31_fg_qt04"
+  - "ontap_31_fg_qt05"
+linux_31_default_mount_dir:       "/mnt"
+
+# ONTAP-32 - CIFS
+ontap_32_vol_name:                "ontap_32_cifs_vol01"
+ontap_32_vol_qtree_names:
+  - "ontap_32_vol_qt01"
+  - "ontap_32_vol_qt02"
+  - "ontap_32_vol_qt03"
+  - "ontap_32_vol_qt04"
+  - "ontap_32_vol_qt05"
+ontap_32_fg_name:                 "ontap_32_cifs_fg01"
+ontap_32_fg_qtree_names:
+  - "ontap_32_fg_qt01"
+  - "ontap_32_fg_qt02"
+  - "ontap_32_fg_qt03"
+  - "ontap_32_fg_qt04"
+  - "ontap_32_fg_qt05"
+ontap_32_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_32_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+windows_32_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\ontap_shares"
+ontap_32_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"

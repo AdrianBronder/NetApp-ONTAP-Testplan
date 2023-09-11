@@ -1,0 +1,86 @@
+################################################################################
+#
+# Title:        ONTAP-31-01 - Export Policies & Rules
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-22
+# Description:  NFS
+#               - Export Policies & Rules
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-31-01 - Export Policies & Rules"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Create read-only export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "ro_{{ global_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        <<: *input
+  
+    - name: Create read-only export policy rules for SVM root volume
+      na_ontap_export_policy_rule:
+        state:                      present
+        name:                       "ro_{{ global_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                    "any"
+        rw_rule:                    "none"
+        protocol:                   "nfs"
+        super_user_security:        "none"
+        allow_suid:                 false
+        <<: *input
+  
+    - name: Apply read-only export policy to SVM's root volume
+      netapp.ontap.na_ontap_volume:
+        state:                      present
+        name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        export_policy:              "ro_{{ global_primary_nas_svm }}"
+        <<: *input
+    
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "{{ ontap_31_policy_name }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        <<: *input
+  
+    - name: Create read-write export policy rules for SVM root volume
+      na_ontap_export_policy_rule:
+        state:                      present
+        name:                       "{{ ontap_31_policy_name }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                    "any"
+        rw_rule:                    "any"
+        protocol:                   "nfs"
+        super_user_security:        "any"
+        allow_suid:                 true
+        <<: *input
+
+  post_tasks:

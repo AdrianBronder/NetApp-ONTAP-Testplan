@@ -1,0 +1,10 @@
+# Ansible Variables
+ansible_connection:               "winrm"
+ansible_winrm_transport:          "kerberos"
+ansible_port:                     "5985"
+ansible_winrm_message_encryption: "auto"
+
+ansible_user:                     "{{ vault_ansible_user }}"
+ansible_password:                 "{{ vault_ansible_password }}"
+
+# Custom Variables

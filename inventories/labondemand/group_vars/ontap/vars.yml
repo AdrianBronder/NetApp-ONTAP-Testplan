@@ -1,0 +1,115 @@
+# Ansible Variables
+ansible_connection:               "local"
+ansible_python_interpreter:       "{{ansible_playbook_python}}"
+
+# Custom Variables
+ontap_admin_user:                 "{{ vault_ontap_admin_user }}"
+ontap_admin_password:             "{{ vault_ontap_admin_password }}"
+
+# Variables basedon ONTAP REST model
+# https://<ontap_cluster_mgmt>/docs/api
+security_login_messages:
+  - banner: |
+      ################ TEST BANNER ################
+      # This system is currently in testing state #
+      #############################################
+    scope:                        "cluster"
+    message: |                     
+      Welcome! Please note:
+      This system is not ready for production yet!
+      
+network_ethernet_broadcast_domains:
+  - name:                         "bc_data"
+    ipspace:
+      name:                       "Default"
+    mtu:                          9000
+
+security_key_managers:
+  onboard:
+    passphrase:                   "{{ vault_security_key_managers.onboard.passphrase }}"
+
+security_accounts:
+  - name:                         "na_local_admin"
+    scope:                        "cluster"
+    owner:
+      name:
+    locked:                       false
+    applications:
+      - application:              "ssh"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+      - application:              "ontapi"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+      - application:              "http"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+    comment:                      "Local user with admin privileges for testing"
+    role:
+      name:                       "admin"
+  - name:                         "na_local_ro"
+    scope:                        "cluster"
+    owner:
+      name:
+    locked:                       false
+    applications:
+      - application:              "ssh"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+      - application:              "ontapi"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+      - application:              "http"
+        authentication_methods:
+          - "password"
+        second_authentication_method: "none"
+    comment:                      "Local user with read-only privileges for testing"
+    role:
+      name:                       "readonly"
+  - name:                         "DEMO\\na_ad_admin_group"
+    scope:                        "cluster"
+    owner:
+      name:
+    locked:                       false
+    applications:
+      - application:              "ssh"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+      - application:              "ontapi"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+      - application:              "http"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+    comment:                      "Domain group with admin privileges for testing"
+    role:
+      name:                       "admin"
+  - name:                         "DEMO\\na_ad_ro_group"
+    scope:                        "cluster"
+    owner:
+      name:
+    locked:                       false
+    applications:
+      - application:              "ssh"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+      - application:              "ontapi"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+      - application:              "http"
+        authentication_methods:
+          - "domain"
+        second_authentication_method: "none"
+    comment:                      "Domain group with read-only privileges for testing"
+    role:
+      name:                       "readonly"
