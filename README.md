@@ -105,5 +105,13 @@ The playbooks can be executed in any other non-production environments for demos
 
 
 # Changelog
+
+## v1.1
+Addition:
+* NFS Flexclone Test Case - ONTAP-41-xx
+
+Changed:
+* Minor task name updates and 
+
 ## v1.0
 Initial Release

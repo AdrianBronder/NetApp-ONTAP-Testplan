@@ -1,0 +1,65 @@
+################################################################################
+#
+# Title:        ONTAP-41-05 - Mount & Write (Volumes)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-10-08
+# Description:  NFS Flexclone
+#               - Mount & Write (Volumes)
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "linux"
+  name:               "ONTAP-41-05 - Mount & Write (Flexclone Volume)"
+  gather_facts:       false
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+    - name: Get and Set Ansible date_time fact
+      set_fact:
+        pipe_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
+
+  tasks:
+    - name: Ensure stale mounts are removed before proceding (in case a mount exists)
+      ansible.posix.mount:
+        state:                      "absent"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                     /clone/{{ ontap_41_snapshot_name }}"
+        path:                       "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}"
+#        opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+  
+    - name: Create mount directories
+      ansible.builtin.file:
+        path:                       "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}"
+        state:                      "directory"
+        mode:                       "0755"
+  
+    - name: Mount NFS export on Linux host
+      ansible.posix.mount:
+        state:                      "mounted"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                     /clone/{{ ontap_41_snapshot_name }}"
+        path:                       "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}"
+        # opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+  
+    - name: Create test file on each export
+      community.general.filesize:
+        path: "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}/newop_{{ pipe_timestamp }}"
+        # path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_{{ pipe_timestamp }}"
+        # path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_testfile"
+        size: 50MB
+  
+  post_tasks:

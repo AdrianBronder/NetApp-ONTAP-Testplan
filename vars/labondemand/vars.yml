@@ -60,3 +60,9 @@ ontap_32_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
 windows_32_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\ontap_shares"
 ontap_32_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+
+# ONTAP-41 - NFS Flexclone
+ontap_41_policy_name:             "ontap_41_policy"
+ontap_41_vol_name:                "ontap_41_nfs_vol01"
+linux_41_default_mount_dir:       "{{ linux_31_default_mount_dir }}"
+ontap_41_snapshot_name:           "db_backup"
