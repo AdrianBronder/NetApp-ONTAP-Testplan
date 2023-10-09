@@ -46,10 +46,10 @@
     - name: Create minimum Clone Junction Path Mountpoint
       netapp.ontap.na_ontap_volume:
         state:                      present
-        name:                       "clone"
+        name:                       "clonedir"
         aggregate_name:             "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
         export_policy:              "{{ ontap_41_policy_name }}"
-        junction_path:              "/clone"
+        junction_path:              "/clonedir"
         vserver:                    "{{ global_primary_nas_svm }}"
         volume_security_style:      "unix"
         <<: *input
