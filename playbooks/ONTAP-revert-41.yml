@@ -29,7 +29,7 @@
     ansible.posix.mount:
       state:                      "absent"
       src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_41_vol_name }}/{{ item }}"
-      path:                       "{{ linux_41_default_mount_dir }}/{{ item }}"
+      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
 #      opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
     loop:
@@ -38,7 +38,7 @@
 
   - name: Remove mount directories
     ansible.builtin.file:
-      path:                       "{{ linux_41_default_mount_dir }}/{{ item }}"
+      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
       state:                      "absent"
       mode:                       "0755"
     loop:
@@ -63,12 +63,28 @@
     - netapp.ontap
 
   tasks:
-  - name: Remove volume
+  - name: Split volume clone
+    na_ontap_volume_clone:
+      state:                      present
+      name:                       "{{ ontap_41_clone_vol_name }}"
+      vserver:                    "{{ global_primary_nas_svm }}"
+      parent_volume:              "{{ ontap_41_vol_name }}"
+      split:                      true
+      parent_snapshot:            "{{ ontap_41_snapshot_name }}"
+      junction_path:              "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+      <<: *input
+
+
+  - name: Remove volumes
     netapp.ontap.na_ontap_volume:
       state:                      absent
-      name:                       "{{ ontap_41_vol_name }}"
+      name:                       "{{ item }}"
       vserver:                    "{{ global_primary_nas_svm }}"
       <<: *input
+    loop:
+      - "{{ ontap_41_clone_vol_name }}"
+      - "{{ ontap_41_vol_name }}"
+      - "{{ ontap_41_clone_dir_name }}"
 
   - name: Remove read-write export policy
     netapp.ontap.na_ontap_export_policy:

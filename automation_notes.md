@@ -18,6 +18,8 @@ Other Prompt Ideas:
 
 [Display git branch in bash prompt](https://gist.github.com/justintv/168835)
 
+Example of an image `![A test image](image.png)`
+
 ![Prompt Image:](https://user-images.githubusercontent.com/3128048/111437981-5fb53300-870c-11eb-94ea-83f83587546f.png)
 
 ```shell

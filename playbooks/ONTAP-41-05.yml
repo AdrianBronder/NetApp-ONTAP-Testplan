@@ -35,14 +35,14 @@
       ansible.posix.mount:
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     /clone/{{ ontap_41_snapshot_name }}"
-        path:                       "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}"
+                                     /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
   
     - name: Create mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}"
+        path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         state:                      "directory"
         mode:                       "0755"
   
@@ -50,16 +50,14 @@
       ansible.posix.mount:
         state:                      "mounted"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     /clone/{{ ontap_41_snapshot_name }}"
-        path:                       "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}"
+                                     /{{ ontap_41_clone_dir_name }}/{{ ontap_41_snapshot_name }}"
+        path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         # opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
   
     - name: Create test file on each export
       community.general.filesize:
-        path: "{{ linux_41_default_mount_dir }}/clone/{{ ontap_41_snapshot_name }}/newop_{{ pipe_timestamp }}"
-        # path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_{{ pipe_timestamp }}"
-        # path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_testfile"
+        path: "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/newop_{{ pipe_timestamp }}"
         size: 50MB
   
   post_tasks:

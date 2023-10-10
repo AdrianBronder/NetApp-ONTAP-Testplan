@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-41-04 - Volumes & Qtrees"
+  name:               "ONTAP-41-04 - Volumes"
   gather_facts:       false
   vars:
     input: &input
@@ -46,10 +46,10 @@
     - name: Create minimum Clone Junction Path Mountpoint
       netapp.ontap.na_ontap_volume:
         state:                      present
-        name:                       "clonedir"
+        name:                       "{{ ontap_41_clone_dir_name }}"
         aggregate_name:             "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
         export_policy:              "{{ ontap_41_policy_name }}"
-        junction_path:              "/clonedir"
+        junction_path:              "/{{ ontap_41_clone_dir_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         volume_security_style:      "unix"
         <<: *input
@@ -59,10 +59,9 @@
         state:                      present
         vserver:                    "{{ global_primary_nas_svm }}"
         parent_volume:              "{{ ontap_41_vol_name }}"
-        name:                       "{{ ontap_41_snapshot_name}}"
-        # space_reserve:              none
+        name:                       "{{ ontap_41_clone_vol_name}}"
         parent_snapshot:            "{{ ontap_41_snapshot_name }}"
-        junction_path:              "/clone/{{ ontap_41_snapshot_name}}"
+        junction_path:              "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         <<: *input
   
   post_tasks:

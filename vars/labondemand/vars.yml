@@ -9,6 +9,7 @@ ontap_default_vol_size_increment_gb: 2
 ontap_default_fg_size_gb:         102400
 ontap_default_fg_size_increment_gb: 1024
 ontap_default_fg_multiplier:      8
+linux_default_mount_dir:          "/mnt"
 
 # ONTAP-12 - Cluster User Management
 ontap_12_local_ro:                "na_local_ro"
@@ -64,5 +65,6 @@ ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 # ONTAP-41 - NFS Flexclone
 ontap_41_policy_name:             "ontap_41_policy"
 ontap_41_vol_name:                "ontap_41_nfs_vol01"
-linux_41_default_mount_dir:       "{{ linux_31_default_mount_dir }}"
 ontap_41_snapshot_name:           "db_backup"
+ontap_41_clone_dir_name:          "clonedir"
+ontap_41_clone_vol_name:          "{{ ontap_41_snapshot_name }}"
