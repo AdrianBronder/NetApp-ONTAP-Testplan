@@ -1,5 +1,79 @@
 # Demonstration Notes
 
+Lab Configuration
+
+Prompt
+
+[Coderwall - Add git branch name to bash prompt](https://coderwall.com/p/fasnya/add-git-branch-name-to-bash-prompt)
+
+```shell
+# GIT Branch Prompt
+parse_git_branch() {
+     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1)/'
+}
+export PS1="[\u@\h \[\033[32m\]\w\[\033[33m\]]\$(parse_git_branch)\[\033[00m\] # "  # <-- user is root
+```
+
+Other Prompt Ideas:
+
+[Display git branch in bash prompt](https://gist.github.com/justintv/168835)
+
+![Prompt Image:](https://user-images.githubusercontent.com/3128048/111437981-5fb53300-870c-11eb-94ea-83f83587546f.png)
+
+```shell
+# prompt
+FMT_BOLD="\e[1m"
+FMT_RESET="\e[0m"
+FMT_UNBOLD="\e[21m"
+FG_BLACK="\e[30m"
+FG_BLUE="\e[34m"
+FG_CYAN="\e[36m"
+FG_GREEN="\e[32m"
+FG_MAGENTA="\e[35m"
+FG_RED="\e[31m"
+FG_WHITE="\e[97m"
+BG_BLUE="\e[44m"
+BG_GREEN="\e[42m"
+BG_MAGENTA="\e[45m"
+
+export GIT_PS1_SHOWDIRTYSTATE=1
+export GIT_PS1_SHOWCOLORHINTS=1
+
+export PS1=\
+"\n\[${BG_GREEN}\] \[${FG_RED}\] \[${FG_BLACK}\]\u \[${FG_GREEN}${BG_BLUE}\] "\
+"\[${FG_BLACK}\]\w \[${FMT_RESET}${FG_BLUE}\]"\
+'$(__git_ps1 "\[${BG_MAGENTA}\] \[${FG_WHITE}\] %s \[${FMT_RESET}${FG_MAGENTA}\]")'\
+"\n \[${FG_GREEN}\]╰ \[${FG_CYAN}\]\$ \[${FMT_RESET}\]"
+```
+
+```shell
+[root@centos1 NetApp-ONTAP-Testplan]# time ./init/init_LD00821.sh ^C
+[root@centos1 NetApp-ONTAP-Testplan]# 
+[root@centos1 NetApp-ONTAP-Testplan]# 
+[root@centos1 NetApp-ONTAP-Testplan]# vi ~/.bashrc
+[root@centos1 NetApp-ONTAP-Testplan]# source !$
+source ~/.bashrc
+root@centos1 ~/NetApp-ONTAP-Testplan (flexclonenfs) $ vi ~/.bashrc
+root@centos1 ~/NetApp-ONTAP-Testplan (flexclonenfs) $ vi ~/.bashrc
+root@centos1 ~/NetApp-ONTAP-Testplan (flexclonenfs) $ 
+```
+Updating **Python** & adding **Ansible**
+
+```shell
+[root@centos1 NetApp-ONTAP-Testplan]# time ./init/init_LD00821.sh 
+
+...
+
+PLAY RECAP *****************************************************************************************************************************************************************************************************************************************************************************************************************
+cluster1                   : ok=19   changed=7    unreachable=0    failed=0    skipped=6    rescued=0    ignored=0   
+cluster2                   : ok=15   changed=3    unreachable=0    failed=0    skipped=10   rescued=0    ignored=0   
+
+
+real    13m21.519s
+user    9m32.267s
+sys     2m25.006s
+```
+
 Cluster Configuration  
 
 ```shell
@@ -77,7 +151,7 @@ changed: [cluster1] => (item={'uuid': '516b2298-66cc-11ee-81f7-00505685c51b', 'n
 ```
 
 Updates to make  
-Change name from db_backup to something software_dev or repo  
-Check if there is a way to scale to mulitple clients and mount points  
-Run complete demo - then walk it back  
-Investigate / fix revert issue  
+* Change name from db_backup to something software_dev or repo  
+* Check if there is a way to scale to mulitple clients and mount points  
+* Run complete demo - then walk it back  
+* Investigate / fix revert issue  
