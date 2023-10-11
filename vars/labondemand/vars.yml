@@ -65,6 +65,6 @@ ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 # ONTAP-41 - NFS Flexclone
 ontap_41_policy_name:             "ontap_41_policy"
 ontap_41_vol_name:                "ontap_41_nfs_vol01"
-ontap_41_snapshot_name:           "db_backup"
+ontap_41_snapshot_name:           "software_source"
 ontap_41_clone_dir_name:          "clonedir"
 ontap_41_clone_vol_name:          "{{ ontap_41_snapshot_name }}"

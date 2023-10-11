@@ -34,7 +34,7 @@
       fstype:                     "nfs"
     loop:
       - "{{ ontap_41_vol_name }}"
-      - "clone"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
 
   - name: Remove mount directories
     ansible.builtin.file:
@@ -43,7 +43,8 @@
       mode:                       "0755"
     loop:
       - "{{ ontap_41_vol_name }}"
-      - "clone"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+      - "{{ ontap_41_clone_dir_name }}"
 
 - hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-revert-41 - NFS - ONTAP"

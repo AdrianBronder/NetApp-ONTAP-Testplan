@@ -55,7 +55,7 @@
         # opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
   
-    - name: Create test file on each export
+    - name: Create test file on NFS export
       community.general.filesize:
         path: "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_{{ pipe_timestamp }}"
         size: 50MB
