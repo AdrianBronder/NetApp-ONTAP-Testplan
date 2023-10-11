@@ -50,7 +50,7 @@
       ansible.posix.mount:
         state:                      "mounted"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     /{{ ontap_41_clone_dir_name }}/{{ ontap_41_snapshot_name }}"
+                                     /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         # opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"

@@ -111,6 +111,7 @@ Additions:
 * NFS Flexclone Test Case - ONTAP-41-xx
 * Added ONTAP-revert-41 to accomadate clones
 * Test Plan Test Case List for ready reference
+* Added ONTAP-41-07 - Creates & Mounts 10 cloned instances
 
 Changes:
 * Minor task name updates
