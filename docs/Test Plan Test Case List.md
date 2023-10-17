@@ -38,8 +38,8 @@
 | 41-03 | NFS Flexclone	                    | Client Mount & Write (origin volume)  |
 | 41-04 | NFS Flexclone	                    | Client Write (origin volume)          |
 | 41-05 | NFS Flexclone	                    | Create FlexClone Volume               |
-| 41-06 | NFS Flexclone	                    | Client Mount of FlexClone Volume      |
-| 41-07 | NFS Flexclone	                    | Client Mount & Write (FlexClone volume) |
+| 41-06 | NFS Flexclone	                    | Client Mount & Write (FlexClone volume) |
+| 41-07 | NFS Flexclone	                    | Client Write (FlexClone volume)       |
 | 41-08 | NFS Flexclone	                    | Client Mount & Write of Nine (9) flexclones |
 |  ---  |                                   |                                       |
 | Revert-00_linux   | Revert all systems to initial state - Linux       |           |
@@ -47,4 +47,4 @@
 | Revert-00         | Revert all systems to initial state - ONTAP       |           |
 | Revert-31         | Revert all steps performed in test frame 31 - NFS |           |
 | Revert-32         | Revert all steps performed in test frame 32 - SMB |           |
-| Revert-41         | Revert all steps performed in test frame 41 - NFS |           |
+| Revert-41         | Revert all steps performed in test frame 41 - NFS FlexClone |           |
