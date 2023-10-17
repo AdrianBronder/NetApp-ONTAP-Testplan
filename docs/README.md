@@ -1,18 +1,25 @@
 # NetApp ONTAP Automation Examples
 
+This *branch* adds NFS Flexclone fprovisioning automation. The script will run through all NFS Flexclone tasks *ONTAP-41*
 
+This automation:
+1. Creates a volume
+2. Mounts on client & writes some data
+3. Snapshots and clones the volume, mounting & writing more data
+4. The final step creates 9 more clones for illustration purposes
+5. The *ONTAP-revert-41.yml* removes all the client and ONTAP config created by these tasks: *ONTAP-41*
 
 ## Automation Grouping & Timing
 
 1. Cluster Configuration
 2. Data Storage Virtual Machine(SVM) Configuration
-3. NAS Provisioning - Standard NFS Exports & SMB Shares
+3. NFS Flexclone Provisioning - Flexclone NFS Exports & SMB Shares
 
 ```shell
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-1*
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-2*
-time ansible-playbook -i inventories/labondemand playbooks/ONTAP-3*
-time ansible-playbook -i inventories/labondemand playbooks/ONTAP-revert-00*
+time ansible-playbook -i inventories/labondemand playbooks/ONTAP-41-*
+time ansible-playbook -i inventories/labondemand playbooks/ONTAP-revert-41.yml
 ```
 
 

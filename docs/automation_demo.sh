@@ -40,11 +40,11 @@ echo "--> NAS Provisioning - Standard NFS Exports & SMB Shares"
 cd ~/NetApp-ONTAP-Testplan
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-4*
 
-echo ""
-echo ""
-echo "--> Revert / Remove all configuration & Reset environment"
-cd ~/NetApp-ONTAP-Testplan
-time ansible-playbook -i inventories/labondemand playbooks/ONTAP-revert-41.yml
+# echo ""
+# echo ""
+# echo "--> Revert / Remove all NFS Flexclone configuration"
+# cd ~/NetApp-ONTAP-Testplan
+# time ansible-playbook -i inventories/labondemand playbooks/ONTAP-revert-41.yml
 
 # echo ""
 # echo ""
