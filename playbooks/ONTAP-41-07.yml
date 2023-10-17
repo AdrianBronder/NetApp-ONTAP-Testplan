@@ -33,22 +33,8 @@
     - netapp.ontap
 
   pre_tasks:
-    # - name: Get and Set Ansible date_time fact
-    #   set_fact:
-    #     pipe_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
 
   tasks:
-
-    # - name: Create Volume clone (Flexclone) - "{{ ontap_41_snapshot_name }}"
-    #   netapp.ontap.na_ontap_volume_clone:
-    #     state:                      present
-    #     vserver:                    "{{ global_primary_nas_svm }}"
-    #     parent_volume:              "{{ ontap_41_vol_name }}"
-    #     name:                       "{{ ontap_41_clone_vol_name}}"
-    #     parent_snapshot:            "{{ ontap_41_snapshot_name }}"
-    #     junction_path:              "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-    #     <<: *input
-
     # - name: Output from index_var
     #   ansible.builtin.debug:
     #     # msg: "{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
@@ -57,7 +43,7 @@
     #   loop_control:
     #     index_var: my_idx
 
-    - name: Create & NFS Mount Clone of Source
+    - name: Create & NFS Mount Nine (9) Clones from Source
       include_tasks: client_copy_n_mount.yml
       loop: "{{ range(1, 10) | list }}"
       loop_control:
