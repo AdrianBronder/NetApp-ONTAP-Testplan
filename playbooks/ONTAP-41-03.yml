@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-41-03 - Mount & Write (Volumes)
-# Author:       NetApp Inc. (badrian)
+# Title:        ONTAP-41-03 - Mount & Write (Volume)
+# Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-08
 # Description:  NFS Flexclone
-#               - Mount & Write (Volumes)
+#               - Mount & Write (Volume)
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-41-03 - Mount & Write (Volumes)"
+  name:               "ONTAP-41-03 - Mount & Write (Volume)"
   gather_facts:       false
   vars_files:
     - ../vars/labondemand/vars.yml
@@ -58,6 +58,6 @@
     - name: Create test file on NFS export
       community.general.filesize:
         path: "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_{{ pipe_timestamp }}"
-        size: 50MB
+        size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-41-07 - Flexclone Volumes
-# Author:       NetApp Inc. (badrian)
+# Title:        ONTAP-41-07- Client Write (flexclone volume)
+# Author:       NetApp Inc. (ken)
 # Initial 
-# Create Date:  2023-10-10
+# Create Date:  2023-10-08
 # Description:  NFS Flexclone
-#               - Make Many Volumes & Mount
+#               - Client Write (flexclone volume)
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -15,38 +15,25 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-41-07 - Make Many Volumes & Mount"
+- hosts:              "linux"
+  name:               "ONTAP-41-07 - Client Write (Flexclone Volume)"
   gather_facts:       false
-  vars:
-    input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
   collections:
-    - netapp.ontap
+    - ansible.posix
+    - community.general
 
   pre_tasks:
+    - name: Get and Set Ansible date_time fact
+      set_fact:
+        pipe_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
 
   tasks:
-    # - name: Output from index_var
-    #   ansible.builtin.debug:
-    #     # msg: "{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
-    #     msg: "{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(my_idx + 1) }}"
-    #   loop: "{{ range(1, 10) | list }}"
-    #   loop_control:
-    #     index_var: my_idx
-
-    - name: Create & NFS Mount Nine (9) Clones from Source
-      include_tasks: client_copy_n_mount.yml
-      loop: "{{ range(1, 10) | list }}"
-      loop_control:
-        index_var: idx
+    - name: Create test file on each export
+      community.general.filesize:
+        path: "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/newop_{{ pipe_timestamp }}"
+        size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

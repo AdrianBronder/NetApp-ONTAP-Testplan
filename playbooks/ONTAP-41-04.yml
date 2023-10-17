@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-41-04 - Flexclone Volumes
-# Author:       NetApp Inc. (badrian)
+# Title:        ONTAP-41-04 - Client Write (origin volume)
+# Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-08
 # Description:  NFS Flexclone
-#               - Volumes
+#               - Client Write (origin volume)
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -15,53 +15,25 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-41-04 - Volumes"
+- hosts:              "linux"
+  name:               "ONTAP-41-04 - Client Write (origin volume)"
   gather_facts:       false
-  vars:
-    input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
   collections:
-    - netapp.ontap
+    - ansible.posix
+    - community.general
 
   pre_tasks:
+    - name: Get and Set Ansible date_time fact
+      set_fact:
+        pipe_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
 
   tasks:
-    - name: Create a snapshot on volume - "{{ ontap_41_vol_name }}"
-      netapp.ontap.na_ontap_snapshot:
-        state:                      present
-        snapshot:                   "{{ ontap_41_snapshot_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        volume:                     "{{ ontap_41_vol_name }}"
-        <<: *input
-
-    - name: Create minimum Clone Junction Path Mountpoint
-      netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ ontap_41_clone_dir_name }}"
-        aggregate_name:             "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
-        export_policy:              "{{ ontap_41_policy_name }}"
-        junction_path:              "/{{ ontap_41_clone_dir_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        volume_security_style:      "unix"
-        <<: *input
-
-    - name: Create Volume clone (Flexclone) - "{{ ontap_41_snapshot_name }}"
-      netapp.ontap.na_ontap_volume_clone:
-        state:                      present
-        vserver:                    "{{ global_primary_nas_svm }}"
-        parent_volume:              "{{ ontap_41_vol_name }}"
-        name:                       "{{ ontap_41_clone_vol_name}}"
-        parent_snapshot:            "{{ ontap_41_snapshot_name }}"
-        junction_path:              "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-        <<: *input
+    - name: Create test file on NFS export
+      community.general.filesize:
+        path: "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_{{ pipe_timestamp }}"
+        size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

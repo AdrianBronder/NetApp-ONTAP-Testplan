@@ -7,22 +7,34 @@ This automation:
 2. Mounts on client & writes some data
 3. Snapshots and clones the volume, mounting & writing more data
 4. The final step creates 9 more clones for illustration purposes
-5. The *ONTAP-revert-41.yml* removes all the client and ONTAP config created by these tasks: *ONTAP-41*
+5. The *ONTAP-revert-41.yml* removes all the client and ONTAP config created by the *ONTAP-41* tasks
 
 ## Automation Grouping & Timing
 
 1. Cluster Configuration
 2. Data Storage Virtual Machine(SVM) Configuration
-3. NFS Flexclone Provisioning - Flexclone NFS Exports & SMB Shares
+3. NFS Flexclone Provisioning - Flexclone NFS Exports
 
 ```shell
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-1*
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-2*
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-41-*
+# Run manualy / seperately to see the config on the client
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-revert-41.yml
 ```
 
+```shell
+root@centos1 ~/NetApp-ONTAP-Testplan (flexclonenfs) $ time ansible-playbook -i inventories/labondemand playbooks/ONTAP-41-06.yml 
 
+TASK [Create test file on NFS export] **********************************************************************************************************************************************************************************************************************************************
+changed: [centos1]
+
+real    0m5.139s
+user    0m1.635s
+sys     0m0.257s
+root@centos1 ~/NetApp-ONTAP-Testplan (flexclonenfs) $ time ansible-playbook -i inventories/labondemand playbooks/ONTAP-41-06.yml -e "filesize=1TB"
+
+```
 
 ## Observations
 

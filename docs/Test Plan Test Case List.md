@@ -34,12 +34,13 @@
 | 32-05 | CIFS	                            | Shares & ACLs (FlexGroup)             |
 | 32-06 | CIFS	                            | Mount & Write (FlexGroup)             |
 | 41-01 | NFS Flexclone	                    | Export Policies & Rules               |
-| 41-02 | NFS Flexclone	                    | Volumes & Qtrees                      |
-| 41-03 | NFS Flexclone	                    | Mount & Write (Volumes)               |
-| 41-04 | NFS Flexclone	                    | Volume Clone                          |
-| 41-05 | NFS Flexclone	                    | Client Mount of Volume Clone          |
-| 41-06 | NFS Flexclone	                    | Client Mount & Write                          |
-| 41-07 | NFS Flexclone	                    | Client Mount & Write of Nine (9) flexclones |
+| 41-02 | NFS Flexclone	                    | Create (origin) Volume                |
+| 41-03 | NFS Flexclone	                    | Client Mount & Write (origin volume)  |
+| 41-04 | NFS Flexclone	                    | Client Write (origin volume)          |
+| 41-05 | NFS Flexclone	                    | Create FlexClone Volume               |
+| 41-06 | NFS Flexclone	                    | Client Mount of FlexClone Volume      |
+| 41-07 | NFS Flexclone	                    | Client Mount & Write (FlexClone volume) |
+| 41-08 | NFS Flexclone	                    | Client Mount & Write of Nine (9) flexclones |
 |  ---  |                                   |                                       |
 | Revert-00_linux   | Revert all systems to initial state - Linux       |           |
 | Revert-00_windows | Revert all systems to initial state - Windows     |           |

@@ -108,10 +108,10 @@ The playbooks can be executed in any other non-production environments for demos
 
 ## v1.1
 Additions:
-* NFS Flexclone Test Case - ONTAP-41-xx
+* NFS Flexclone Test Case workflow - ONTAP-41-xx
 * Added ONTAP-revert-41 to accomadate clones
 * Test Plan Test Case List for ready reference
-* Added ONTAP-41-07 - Creates & Mounts 10 cloned instances
+* Added ONTAP-41-08 - Creates & Mounts 10 cloned instances
 
 Changes:
 * Minor task name updates

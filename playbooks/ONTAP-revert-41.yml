@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-revert-41 - NFS
-# Author:       NetApp Inc. (badrian)
+# Title:        ONTAP-revert-41 - NFS FlexClone
+# Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-10
 # Description:  Revert all steps performed in test frame 41
-#               - NFS
+#               - NFS Flexclone
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-revert-41 - NFS - Linux"
+  name:               "ONTAP-revert-41 - NFS FlexClone - Linux"
   gather_facts:       false
   vars_files:
     - ../vars/labondemand/vars.yml
