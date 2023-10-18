@@ -33,7 +33,7 @@
   tasks:
     - name: Create test file on NFS export
       community.general.filesize:
-        path: "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_{{ pipe_timestamp }}"
+        path: "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_extraop_{{ pipe_timestamp }}"
         size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

@@ -25,26 +25,67 @@
     - ansible.posix
 
   tasks:
-  - name: Unmount exports on volume
+#   - name: Unmount exports on volume
+#     ansible.posix.mount:
+#       state:                      "absent"
+#       src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_41_vol_name }}/{{ item }}"
+#       path:                       "{{ linux_default_mount_dir }}/{{ item }}"
+# #      opts:                       "rw,sync,hard,vers=3"
+#       fstype:                     "nfs"
+#     loop:
+#       - "{{ ontap_41_vol_name }}"
+#       - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+
+  # - name: Remove mount directories
+  #   ansible.builtin.file:
+  #     path:                       "{{ linux_default_mount_dir }}/{{ item }}"
+  #     state:                      "absent"
+  #     mode:                       "0755"
+  #   loop:
+  #     - "{{ ontap_41_vol_name }}"
+  #     - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+  #     - "{{ ontap_41_clone_dir_name }}"
+
+  - name: Unmount exports on Linux Client
     ansible.posix.mount:
       state:                      "absent"
-      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_41_vol_name }}/{{ item }}"
+      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
       path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-#      opts:                       "rw,sync,hard,vers=3"
+      # opts:                       "rw,sync,hard,vers=3"
       fstype:                     "nfs"
     loop:
-      - "{{ ontap_41_vol_name }}"
       - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
+      - "{{ ontap_41_clone_dir_name }}"
+      - "{{ ontap_41_vol_name }}"
 
-  - name: Remove mount directories
+  - name: Remove mount directories from Linux Client
     ansible.builtin.file:
       path:                       "{{ linux_default_mount_dir }}/{{ item }}"
       state:                      "absent"
       mode:                       "0755"
     loop:
-      - "{{ ontap_41_vol_name }}"
       - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
+      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
       - "{{ ontap_41_clone_dir_name }}"
+      - "{{ ontap_41_vol_name }}"
+
 
 - hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-revert-41 - NFS - ONTAP"
@@ -64,45 +105,6 @@
     - netapp.ontap
 
   tasks:
-  - name: Unmount exports
-    ansible.posix.mount:
-      state:                      "absent"
-      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      # opts:                       "rw,sync,hard,vers=3"
-      fstype:                     "nfs"
-    loop:
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
-      - "{{ ontap_41_vol_name }}"
-
-  - name: Remove mount directories
-    ansible.builtin.file:
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      state:                      "absent"
-      mode:                       "0755"
-    loop:
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
-      - "{{ ontap_41_clone_dir_name }}"
-      - "{{ ontap_41_vol_name }}"
-
   # - name: Split volume clone  # Split not needed to delete a clone
   #   na_ontap_volume_clone:
   #     state:                      present

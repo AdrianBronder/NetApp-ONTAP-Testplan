@@ -1,13 +1,13 @@
 # NetApp ONTAP Test Plan - Test Case List
 
-| Task	| Category                          | Decription                        |
-| ---   | ---                               | ---                               |
-| 01-04 | Cluster Basic Connection Checks	| Ansible           |
-| 10-01 | Basic Cluster Configuration	    | Licenses          |
-| 10-02 | Basic Cluster Configuration	    | Physical Network  |
-| 10-03 | Basic Cluster Configuration	    | Network Services  |
-| 10-04 | Basic Cluster Configuration	    | Aggregates        |
-| 10-05 | Basic Cluster Configuration	    | AutoSupport       |
+| ONTAP Task	| Category                          | Decription                    |
+| ---           | ---                               | ---                           |
+| 01-04 | Cluster Basic Connection Checks	| Ansible                               |
+| 10-01 | Basic Cluster Configuration	    | Licenses                              |
+| 10-02 | Basic Cluster Configuration	    | Physical Network                      |
+| 10-03 | Basic Cluster Configuration	    | Network Services                      |
+| 10-04 | Basic Cluster Configuration	    | Aggregates                            |
+| 10-05 | Basic Cluster Configuration	    | AutoSupport                           |
 | 11-01 | Advanced Cluster Configuration	| Cluster/Node Parameters               |
 | 11-02 | Advanced Cluster Configuration	| Administrative Domain Authentication  |
 | 11-03 | Advanced Cluster Configuration	| Key Manager                           |

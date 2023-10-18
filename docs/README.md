@@ -23,6 +23,10 @@ time ansible-playbook -i inventories/labondemand playbooks/ONTAP-41-*
 time ansible-playbook -i inventories/labondemand playbooks/ONTAP-revert-41.yml
 ```
 
+File size defaults to 500MB
+`time ansible-playbook -i inventory/labondemand playbooks/ONTAP-41-04.yml -e "filesize=1GB"`
+`time ansible-playbook -i inventory/labondemand playbooks/ONTAP-41-07.yml -e "filesize=1GB"`
+
 ```shell
 root@centos1 ~/NetApp-ONTAP-Testplan (flexclonenfs) $ time ansible-playbook -i inventories/labondemand playbooks/ONTAP-41-06.yml 
 
@@ -32,8 +36,15 @@ changed: [centos1]
 real    0m5.139s
 user    0m1.635s
 sys     0m0.257s
+
 root@centos1 ~/NetApp-ONTAP-Testplan (flexclonenfs) $ time ansible-playbook -i inventories/labondemand playbooks/ONTAP-41-06.yml -e "filesize=1TB"
 
+TASK [Create test file on NFS export] **********************************************************************************************************************************************************************************************************************************************
+^C [ERROR]: User interrupted execution
+
+real    73m9.386s
+user    4m32.497s
+sys     0m39.492s
 ```
 
 ## Observations
