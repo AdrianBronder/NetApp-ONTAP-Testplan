@@ -112,7 +112,7 @@
     loop:
       "{{ protocols_nvme_services }}"
     loop_control:
-      label: "{{ item.name }}"
+      label: "{{ item.svm.name }}"
     when:
       - protocols_nvme_services | length > 0
       - item.svm.name is defined 
