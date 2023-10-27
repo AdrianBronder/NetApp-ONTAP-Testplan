@@ -233,7 +233,7 @@ network_ip_interfaces:
         name:                     "e0c"
       auto_revert:                true
     service_policy:
-      name:                       "default-data-management"
+      name:                       "default-management"
   - name:                         "{{ svm_svms[2].name }}_iscsi01"
     scope:                        "svm"
     svm:
