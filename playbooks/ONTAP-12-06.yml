@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-04-06 - Domain User Access
+# Title:        ONTAP-12-06 - Domain User Access
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-23
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "ONTAP-04-06 - Domain User Access"
+  name:               "ONTAP-12-06 - Domain User Access"
   gather_facts:       false
   vars:
     input_ro: &input_ro
