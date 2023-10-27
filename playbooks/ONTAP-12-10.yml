@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "ontap"
-  name:               "TAP-12-10 - Admin Multifactor Authentication"
+  name:               "OTAP-12-10 - Admin Multifactor Authentication"
   gather_facts:       false
   vars:
     input_ro: &input_ro
