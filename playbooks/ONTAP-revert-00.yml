@@ -66,7 +66,7 @@
       register: lun_info
 
     - name: Remove all LUNs from clusters
-      netapp.ontap.na_ontap_lun_map:
+      netapp.ontap.na_ontap_lun:
         state:                      absent
         vserver:                    "{{ item.svm.name }}"
         path:                       "{{ item.name }}"
@@ -86,7 +86,7 @@
       register: igroup_info
 
     - name: Remove all iGroups from clusters
-      netapp.ontap.na_ontap_lun_map:
+      netapp.ontap.na_ontap_igroup:
         state:                      absent
         vserver:                    "{{ item.svm.name }}"
         name:                       "{{ item.name }}"
