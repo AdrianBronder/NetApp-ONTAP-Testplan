@@ -81,15 +81,22 @@
         <<: *input
 
     - name: Remove LUNs
-      netapp.ontap.na_ontap_lun:
-        state:                      absent
-        vserver:                    "{{ global_primary_san_svm }}"
-        name:                       "{{ item }}"
-        <<: *input
-      loop:
-        - "{{ ontap_35_lin_lun_name }}"
-        - "{{ ontap_35_win_lun_name }}"
-  
+      block:
+        - name: Remove Linux LUN
+          netapp.ontap.na_ontap_lun:
+            state:                  absent
+            vserver:                "{{ global_primary_san_svm }}"
+            name:                   "{{ ontap_35_lin_lun_name }}"
+            flexvol_name:           "{{ ontap_35_lin_vol_name }}"
+            <<: *input
+        - name: Remove Windows LUN
+          netapp.ontap.na_ontap_lun:
+            state:                  absent
+            vserver:                "{{ global_primary_san_svm }}"
+            name:                   "{{ ontap_35_win_lun_name }}"
+            flexvol_name:           "{{ ontap_35_win_vol_name }}"
+            <<: *input
+    
     - name: Remove iGroups
       netapp.ontap.na_ontap_igroup:
         state:                      absent
