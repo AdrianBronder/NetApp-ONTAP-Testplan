@@ -103,7 +103,23 @@
       - security_authentication_cluster_ad_proxy.svm.name is defined and
         security_authentication_cluster_ad_proxy.svm.name != item.name
 
-  - name: Enable NVMe on SVMs
+  - name: Enable iSCSI on SAN SVM(s)
+    netapp.ontap.na_ontap_iscsi:
+      state:                      present
+      service_state:              "started"
+      vserver:                    "{{ item.svm.name }}"
+      <<: *input
+    loop:
+      "{{ protocols_san_iscsi_services }}"
+    loop_control:
+      label: "{{ item.svm.name }}"
+    when:
+      - protocols_san_iscsi_services | length > 0
+      - item.svm.name is defined 
+      - security_authentication_cluster_ad_proxy.svm.name is defined and
+        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+  - name: Enable NVMe on SAN SVM(s)
     netapp.ontap.na_ontap_nvme:
       state:                      present
       status_admin:               true

@@ -119,7 +119,7 @@ svm_svms:
     nfs:
       allowed:                    false
     cifs:
-      allowed:                    true
+      allowed:                    false
     iscsi:
       allowed:                    true
     fcp:
@@ -179,6 +179,10 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is created for the primary SAN SVM"
     enabled:                      true
 
+protocols_san_iscsi_services:
+  - svm:
+      name:                       "{{ svm_svms[2].name }}"
+    enabled:                      true
 
 protocols_nvme_services:
   - svm:
