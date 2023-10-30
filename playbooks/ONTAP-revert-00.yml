@@ -69,7 +69,7 @@
       netapp.ontap.na_ontap_lun_map:
         state:                      absent
         vserver:                    "{{ item.svm.name }}"
-        path:                       "{{ item.lun.name }}"
+        path:                       "{{ item.name }}"
         <<: *input
       when:
         - lun_info.ontap_info.storage_luns.num_records|int > 0
@@ -80,7 +80,7 @@
     - name: Get all iGroups from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
-          - "storage/luns"
+          - "protocols/san/igroups"
         use_python_keys:            true
         <<: *input
       register: igroup_info
