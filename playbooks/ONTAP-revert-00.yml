@@ -69,7 +69,8 @@
       netapp.ontap.na_ontap_lun:
         state:                      absent
         vserver:                    "{{ item.svm.name }}"
-        name:                       "{{ item.name }}"
+        name:                       "{{ item.name.split('/')[-1] }}"
+        flexvol_name:               "{{ item.name.split('/')[-2] }}"
         <<: *input
       when:
         - lun_info.ontap_info.storage_luns.num_records|int > 0
