@@ -110,7 +110,7 @@
     - name: Remove volumes
       netapp.ontap.na_ontap_volume:
         state:                      absent
-        vserver:                    "{{ global_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_san_svm }}"
         name:                       "{{ item }}"
         <<: *input
       loop:
