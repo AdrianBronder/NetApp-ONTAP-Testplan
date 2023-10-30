@@ -15,9 +15,9 @@
 #
 ################################################################################
 
-- hosts:              "{{ global_primar_linux_host }}"
-  name:               "ONTAP-revert-35 - iSCSI - Linux"
-  gather_facts:       false
+- hosts:                          "{{ global_primary_linux_host }}"
+  name:                           "ONTAP-revert-35 - iSCSI - Linux"
+  gather_facts:                   false
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
@@ -30,9 +30,9 @@
 
   post_tasks:
 
-- hosts:              "{{ global_primar_windows_host }}"
-  name:               "ONTAP-revert-35 - iSCSI - Windows"
-  gather_facts:       false
+- hosts:                          "{{ global_primary_windows_host }}"
+  name:                           "ONTAP-revert-35 - iSCSI - Windows"
+  gather_facts:                   false
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
