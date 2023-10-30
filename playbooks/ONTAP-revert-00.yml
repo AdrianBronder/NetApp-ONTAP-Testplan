@@ -34,6 +34,69 @@
     - netapp.ontap
 
   tasks:
+    - name: Get all LUN mappings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/san/lun-maps"
+        use_python_keys:            true
+        <<: *input
+      register: lun_map_info
+
+    - name: Remove all LUN mappings from clusters
+      netapp.ontap.na_ontap_lun_map:
+        state:                      absent
+        vserver:                    "{{ item.svm.name }}"
+        initiator_group_name:       "{{ item.igroup.name }}"
+        path:                       "{{ item.lun.name }}"
+        <<: *input
+      when:
+        - lun_map_info.ontap_info.protocols_san_lun_maps.num_records|int > 0
+        - item.svm.name is defined
+      loop:
+        "{{ lun_map_info.ontap_info.protocols_san_lun_maps.records }}"
+
+    - name: Get all LUNs from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/luns"
+        fields:
+         - "svm"
+        use_python_keys:            true
+        <<: *input
+      register: lun_info
+
+    - name: Remove all LUNs from clusters
+      netapp.ontap.na_ontap_lun_map:
+        state:                      absent
+        vserver:                    "{{ item.svm.name }}"
+        path:                       "{{ item.lun.name }}"
+        <<: *input
+      when:
+        - lun_info.ontap_info.storage_luns.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ lun_info.ontap_info.storage_luns.records }}"
+
+    - name: Get all iGroups from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/luns"
+        use_python_keys:            true
+        <<: *input
+      register: igroup_info
+
+    - name: Remove all iGroups from clusters
+      netapp.ontap.na_ontap_lun_map:
+        state:                      absent
+        vserver:                    "{{ item.svm.name }}"
+        name:                       "{{ item.name }}"
+        <<: *input
+      when:
+        - igroup_info.ontap_info.protocols_san_igroups.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ igroup_info.ontap_info.protocols_san_igroups.records }}"
+
     - name: Get all non-root volumes from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:

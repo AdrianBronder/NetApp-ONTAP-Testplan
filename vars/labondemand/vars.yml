@@ -72,7 +72,7 @@ ontap_35_win_igroup_name:         "ontap_35_win_ig01"
 ontap_35_win_igroup_iqns:         "{{ hostvars[global_primary_windows_host].iscsi.initiator_name }}"
 ontap_35_lin_vol_name:            "ontap_35_lin_vol01"
 ontap_35_win_vol_name:            "ontap_35_win_vol01"
-ontap_35_lin_lun_name:            "ontap_35_lin_vol01"
+ontap_35_lin_lun_name:            "ontap_35_lin_lun01"
 ontap_35_win_lun_name:            "ontap_35_win_lun01"
 
 # ONTAP-41 - NFS FlexClone
