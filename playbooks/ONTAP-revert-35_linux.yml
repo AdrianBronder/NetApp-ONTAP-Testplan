@@ -30,20 +30,15 @@
     - name: List iSCSI targets
       community.general.open_iscsi:
         show_nodes:               true
+      register: iscsi_nodes
 
     - name: Remove iSCSI tragets
       community.general.open_iscsi:
+        show_nodes:               false
         discover:                 false
         login:                    false
         auto_portal_startup:      false
         auto_node_startup:        false
-        portal:                   "{{ item.ip.address }}"
-      loop_control:
-        label: "{{ item.name }}"
-      loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
-            selectattr('svm.name', 'defined') |
-            selectattr('svm.name', '==', global_primary_san_svm) |
-            selectattr('service_policy.name', 'search', 'block') |
-            list }}"
+        target:                   "{{ iscsi_nodes.nodes | unique }}"
+
   post_tasks:
