@@ -48,10 +48,6 @@
             list }}"
     
     - name: Remove iSCSI targets
-      ansible.builtin.command: "iscsiadm"
-      args:
-        -m: "node"
-        -o: "delete"
-        -T: "{{ iscsi_nodes.nodes | unique }}"
+      ansible.builtin.command: "iscsiadm -m node -o delete -T {{ iscsi_nodes.nodes | unique }}"
 
   post_tasks:
