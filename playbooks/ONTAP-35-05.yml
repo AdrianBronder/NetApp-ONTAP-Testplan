@@ -36,4 +36,14 @@
     - debug:
         msg: "{{ iscsi_targets }}"
 
+    - name: Run PowerShell script with parameters
+        ansible.windows.win_powershell:
+          script: |
+            Get-IscsiTarget
+        register: ps_iscsi_targets
+
+    - debug:
+        msg: "{{ ps_iscsi_targets }}"
+
+
   post_tasks:
