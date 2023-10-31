@@ -1,0 +1,49 @@
+################################################################################
+#
+# Title:        ONTAP-revert-35 - LINUX TEMP
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-10-30
+# Description:  Revert all steps performed in test frame 35
+#               - iSCSI
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                          "{{ global_primary_linux_host }}"
+  name:                           "ONTAP-revert-35 - iSCSI - Linux"
+  gather_facts:                   false
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+
+  pre_tasks:
+
+  tasks:
+    - name: List iSCSI targets
+      community.general.open_iscsi:
+        show_nodes:               true
+
+    - name: Remove iSCSI tragets
+      community.general.open_iscsi:
+        discover:                 false
+        login:                    false
+        auto_portal_startup:      false
+        auto_node_startup:        false
+        portal:                   "{{ item.ip.address }}"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+  post_tasks:
