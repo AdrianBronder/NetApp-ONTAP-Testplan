@@ -25,27 +25,59 @@
     - ansible.posix
 
   tasks:
-  - name: Unmount exports
-    ansible.posix.mount:
-      state:                      "absent"
-      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      # opts:                       "rw,sync,hard,vers=3"
-      fstype:                     "nfs"
-    loop:
-      - "{{ ontap_31_vol_qtree_names + 
-          ontap_31_fg_qtree_names }}"
-      - "{{ ontap_41_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+    - name: List iSCSI targets
+      community.general.open_iscsi:
+        show_nodes:               true
+      register: iscsi_nodes
 
-  - name: Remove mount directories
-    ansible.builtin.file:
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      state:                      "absent"
-      mode:                       "0755"
-    loop:
-      - "{{ ontap_31_vol_qtree_names + 
-          ontap_31_fg_qtree_names }}"
-      - "{{ ontap_41_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}"
+    - name: Remove iSCSI sessions and logout
+      community.general.open_iscsi:
+        show_nodes:               false
+        discover:                 false
+        login:                    false
+        auto_portal_startup:      false
+        auto_node_startup:        false
+        portal:                   "{{ item.ip.address }}"
+      loop_control:
+        label: "{{ item.ip.address }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+      when:
+        - iscsi_nodes.nodes | length > 0
+
+    - name: Remove iSCSI targets
+      ansible.builtin.command:
+        cmd: "iscsiadm -m node -o delete -T {{ item }}"
+      loop:
+        "{{ iscsi_nodes.nodes | unique }}"
+      when:
+        - iscsi_nodes.nodes | length > 0
+
+    - name: Unmount exports
+      ansible.posix.mount:
+        state:                    "absent"
+        src:                      "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
+        path:                     "{{ linux_default_mount_dir }}/{{ item }}"
+        # opts:                     "rw,sync,hard,vers=3"
+        fstype:                   "nfs"
+      loop:
+        - "{{ ontap_31_vol_qtree_names + 
+            ontap_31_fg_qtree_names }}"
+        - "{{ ontap_41_vol_name }}"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+  
+    - name: Remove mount directories
+      ansible.builtin.file:
+        path:                     "{{ linux_default_mount_dir }}/{{ item }}"
+        state:                    "absent"
+        mode:                     "0755"
+      loop:
+        - "{{ ontap_31_vol_qtree_names + 
+            ontap_31_fg_qtree_names }}"
+        - "{{ ontap_41_vol_name }}"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        - "{{ ontap_41_clone_dir_name }}"
