@@ -5,7 +5,7 @@
 # Initial 
 # Create Date:  2023-10-30
 # Description:  iSCSI
-#               - LUNs & Mappings
+#               - Discover, Login & Mount (Linux)
 # 
 ################################################################################
 
