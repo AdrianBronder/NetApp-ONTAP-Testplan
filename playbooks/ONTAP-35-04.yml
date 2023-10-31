@@ -29,7 +29,7 @@
   pre_tasks:
 
   tasks:
-    - name: 
+    - name: Discover iSCSI targets on SVM and login
       community.general.open_iscsi:
         show_nodes:               true
         discover:                 true
