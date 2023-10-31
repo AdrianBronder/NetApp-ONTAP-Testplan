@@ -121,6 +121,11 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 echo ""
 echo ""
+echo "--> Creating default multi-path config on centos"
+sudo touch /etc/multipath.conf
+
+echo ""
+echo ""
 echo "--> Creating Users and groups in AD (dc1)"
 ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
 

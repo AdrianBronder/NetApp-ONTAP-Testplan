@@ -1,0 +1,44 @@
+################################################################################
+#
+# Title:        ONTAP-35-04 - Discover & Connect
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-10-30
+# Description:  iSCSI
+#               - LUNs & Mappings
+# 
+################################################################################
+
+- hosts:                          "{{ global_primary_linux_host }}"
+  name:                           "ONTAP-35-04 - Discover & Connect"
+  gather_facts:                   false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: 
+      community.general.open_iscsi:
+        show_nodes:               true
+        discover:                 true
+        login:                    true
+        auto_portal_startup:      true
+        portal:                   "{{ (hostvars[global_primary_test_cluster].network_ip_interfaces |
+                                      selectattr('svm.name', 'defined') |
+                                      selectattr('svm.name', '==', global_primary_san_svm) |
+                                      selectattr('service_policy.name', 'search', 'block') |
+                                      list)[-1].ip.address }}"
+
+  post_tasks:
