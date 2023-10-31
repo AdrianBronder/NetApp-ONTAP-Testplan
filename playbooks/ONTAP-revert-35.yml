@@ -27,6 +27,18 @@
   pre_tasks:
 
   tasks:
+    - name: Unmount LUN
+      ansible.posix.mount:
+        state:                      "absent"
+#        src:                        "/dev/dm-2"
+        path:                       "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
+  
+    - name: Remove mount directories
+      ansible.builtin.file:
+        path:                       "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
+        state:                      "absent"
+#        mode:                       "0755"
+
     - name: List iSCSI targets
       community.general.open_iscsi:
         show_nodes:               true
