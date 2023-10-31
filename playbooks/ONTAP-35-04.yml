@@ -35,10 +35,15 @@
         discover:                 true
         login:                    true
         auto_portal_startup:      true
-        portal:                   "{{ (hostvars[global_primary_test_cluster].network_ip_interfaces |
-                                      selectattr('svm.name', 'defined') |
-                                      selectattr('svm.name', '==', global_primary_san_svm) |
-                                      selectattr('service_policy.name', 'search', 'block') |
-                                      list)[-1].ip.address }}"
+        auto_node_startup:        true
+        portal:                   "{{ item.ip.address }}"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
 
   post_tasks:
