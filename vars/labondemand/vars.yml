@@ -42,7 +42,7 @@ ontap_31_fg_qtree_names:
   - "ontap_31_fg_qt03"
   - "ontap_31_fg_qt04"
   - "ontap_31_fg_qt05"
-linux_31_default_mount_dir:       "/mnt"
+linux_31_default_mount_dir:       "/mnt/31"
 
 # ONTAP-32 - CIFS
 ontap_32_vol_name:                "ontap_32_cifs_vol01"
@@ -74,6 +74,7 @@ ontap_35_lin_vol_name:            "ontap_35_lin_vol01"
 ontap_35_win_vol_name:            "ontap_35_win_vol01"
 ontap_35_lin_lun_name:            "ontap_35_lin_lun01"
 ontap_35_win_lun_name:            "ontap_35_win_lun01"
+linux_35_default_mount_dir:       "/mnt/35"
 
 # ONTAP-41 - NFS FlexClone
 ontap_41_policy_name:             "ontap_41_policy"
@@ -81,4 +82,4 @@ ontap_41_vol_name:                "ontap_41_nfs_vol01"
 ontap_41_snapshot_name:           "software_source"
 ontap_41_clone_dir_name:          "clonedir"
 ontap_41_clone_vol_name:          "{{ ontap_41_snapshot_name }}"
-linux_41_default_mount_dir:       "/mnt"
+linux_41_default_mount_dir:       "/mnt/41"

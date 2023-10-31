@@ -45,5 +45,29 @@
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
             list }}"
+    
+    - name: Build Filesystem on new LUN
+      community.general.filesystem:
+        fstype:                   "ext4"
+        dev:                      "/dev/dm-2"
+  
+    - name: Create mount directories
+      ansible.builtin.file:
+        path:                     "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
+        state:                    "directory"
+        mode:                     "0755"
+  
+    - name: Mount NFS export on Linux host
+      ansible.posix.mount:
+        state:                    "mounted"
+        src:                      "/dev/dm-2"
+        path:                     "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
+#        opts:                     "rw,sync,hard,vers=3"
+        fstype:                   "ext4"
+  
+    - name: Create test file on each export
+      community.general.filesize:
+        path: "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}/testfile"
+        size: 500MB
 
   post_tasks:
