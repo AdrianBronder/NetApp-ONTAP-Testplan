@@ -39,6 +39,19 @@
         login:                    false
         auto_portal_startup:      false
         auto_node_startup:        false
-        target:                   "{{ iscsi_nodes.nodes | unique }}"
+        portal:                   "{{ item.ip.address }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+    
+    - name: Remove iSCSI targets
+      ansible.builtin.command: "iscsiadm"
+      args:
+        -m: "node"
+        -o: "delete"
+        -T: "{{ iscsi_nodes.nodes | unique }}"
 
   post_tasks:
