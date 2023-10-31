@@ -25,6 +25,7 @@
     - ../vars/labondemand/vault.yml
   collections:
     - community.general
+    - ansible.posix
 
   pre_tasks:
 
@@ -51,21 +52,22 @@
         fstype:                   "ext4"
         dev:                      "/dev/dm-2"
   
-    - name: Create mount directories
+    - name: Create mount directory
       ansible.builtin.file:
         path:                     "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
         state:                    "directory"
         mode:                     "0755"
   
-    - name: Mount NFS export on Linux host
+    - name: Mount LUN
       ansible.posix.mount:
         state:                    "mounted"
         src:                      "/dev/dm-2"
         path:                     "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
 #        opts:                     "rw,sync,hard,vers=3"
         fstype:                   "ext4"
+        opts:                     "discard"
   
-    - name: Create test file on each export
+    - name: Create test file on LUN
       community.general.filesize:
         path: "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}/testfile"
         size: 500MB
