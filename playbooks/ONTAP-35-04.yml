@@ -38,7 +38,7 @@
         auto_node_startup:        true
         portal:                   "{{ item.ip.address }}"
       loop_control:
-        label: "{{ item.name }}"
+        label: "{{ item.ip.address }}"
       loop:
         "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
