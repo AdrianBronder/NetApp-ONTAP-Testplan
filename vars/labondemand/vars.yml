@@ -61,7 +61,7 @@ ontap_32_fg_qtree_names:
   - "ontap_32_fg_qt05"
 ontap_32_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
 ontap_32_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
-windows_32_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\ontap_shares"
+windows_32_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\32"
 ontap_32_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
