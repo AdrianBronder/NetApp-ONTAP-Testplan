@@ -30,7 +30,9 @@
     - name: Unmount LUN
       ansible.posix.mount:
         state:                      "absent"
-        path:                       "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
+        path:                       "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
+      loop:
+        "{{ ontap_35_lin_luns }}"
   
     - name: Remove mount directories
       ansible.builtin.file:
@@ -105,44 +107,35 @@
     - netapp.ontap
 
   tasks:
-    - name: Unmap Linux LUN
+    - name: Unmap LUNs
       netapp.ontap.na_ontap_lun_map:
-        state:                      absent
-        vserver:                    "{{ global_primary_san_svm }}"
-        initiator_group_name:       "{{ ontap_35_lin_igroup_name }}"
-        path:                       "/vol/{{ ontap_35_lin_vol_name }}/{{ ontap_35_lin_lun_name }}"
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        initiator_group_name:     "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[3] else
+                                      ontap_35_win_igroup_name if 'win' in (item | split('/'))[3] else
+                                      default(omit) }}"
+        path:                     "{{ item }}"
         <<: *input
-
-    - name: Unmap Windows LUN
-      netapp.ontap.na_ontap_lun_map:
-        state:                      absent
-        vserver:                    "{{ global_primary_san_svm }}"
-        initiator_group_name:       "{{ ontap_35_win_igroup_name }}"
-        path:                       "/vol/{{ ontap_35_win_vol_name }}/{{ ontap_35_win_lun_name }}"
-        <<: *input
+      loop:
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
 
     - name: Remove LUNs
-      block:
-        - name: Remove Linux LUN
-          netapp.ontap.na_ontap_lun:
-            state:                  absent
-            vserver:                "{{ global_primary_san_svm }}"
-            name:                   "{{ ontap_35_lin_lun_name }}"
-            flexvol_name:           "{{ ontap_35_lin_vol_name }}"
-            <<: *input
-        - name: Remove Windows LUN
-          netapp.ontap.na_ontap_lun:
-            state:                  absent
-            vserver:                "{{ global_primary_san_svm }}"
-            name:                   "{{ ontap_35_win_lun_name }}"
-            flexvol_name:           "{{ ontap_35_win_vol_name }}"
-            <<: *input
+      netapp.ontap.na_ontap_lun:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ (item | split('/'))[3] }}"
+        flexvol_name:             "{{ (item | split('/'))[2] }}"
+        <<: *input
+      loop:
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
     
     - name: Remove iGroups
       netapp.ontap.na_ontap_igroup:
-        state:                      absent
-        vserver:                    "{{ global_primary_san_svm }}"
-        name:                       "{{ item }}"
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ item }}"
         <<: *input
       loop:
         - "{{ ontap_35_lin_igroup_name }}"
@@ -150,11 +143,10 @@
 
     - name: Remove volumes
       netapp.ontap.na_ontap_volume:
-        state:                      absent
-        vserver:                    "{{ global_primary_san_svm }}"
-        name:                       "{{ item }}"
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ (item | split('/'))[2] }}"
         <<: *input
       loop:
-        - "{{ ontap_35_lin_vol_name }}"
-        - "{{ ontap_35_win_vol_name }}"
-      
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
