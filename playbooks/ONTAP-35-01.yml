@@ -39,7 +39,7 @@
       netapp.ontap.na_ontap_igroup:
         state:                    present
         vserver:                  "{{ global_primary_san_svm }}"
-        name:                     "{{ ontap_35_lin_igroup_name }}"
+        name:                     "{{ item }}"
         initiator_group_type:     "iscsi"
         os_type:                  "{{ 'linux' if 'lin' in item else
                                       'windows' if 'win' in item else
