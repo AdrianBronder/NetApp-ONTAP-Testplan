@@ -7,10 +7,12 @@
 # Description:  iSCSI
 #               - Discover, Login & Mount (Linux)
 # 
+# https://kb.netapp.com/onprem/ontap/da/SAN/How_to_match_Linux_disk_WWID_to_LUN_serial_number
+# 
 ################################################################################
 
-- hosts:                          "{{ global_primary_linux_host }}"
-  name:                           "ONTAP-35-04 - Discover, Login & Mount (Linux)"
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-35-04 - Discover, Login & Mount (Linux) - ONTAP"
   gather_facts:                   false
   vars:
     input: &input
@@ -24,12 +26,41 @@
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
   collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Get all LUNs from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/luns"
+        fields:
+         - "svm"
+         - "location"
+         - "serial_number"
+        use_python_keys:          true
+        <<: *input
+      register: lun_info
+
+  post_tasks:
+
+- hosts:                          "{{ global_primary_linux_host }}"
+  name:                           "ONTAP-35-04 - Discover, Login & Mount (Linux) - Linux"
+  gather_facts:                   false
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
     - community.general
     - ansible.posix
 
   pre_tasks:
 
   tasks:
+    - debug:
+        msg: "{{ hostvars[global_primary_test_cluster].lun_info }}"
+
     - name: Discover iSCSI targets on SVM and login
       community.general.open_iscsi:
         show_nodes:               true
@@ -52,7 +83,7 @@
         fstype:                   "ext4"
         dev:                      "/dev/dm-2"
   
-    - name: Create mount directory
+    - name: Create mount directory  
       ansible.builtin.file:
         path:                     "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
         state:                    "directory"
