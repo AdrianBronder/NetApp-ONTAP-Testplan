@@ -73,7 +73,13 @@ ontap_35_win_igroup_iqns:         "{{ hostvars[global_primary_windows_host].iscs
 ontap_35_lin_vol_name:            "ontap_35_lin_vol01"
 ontap_35_win_vol_name:            "ontap_35_win_vol01"
 ontap_35_lin_lun_name:            "ontap_35_lin_lun01"
+ontap_35_lin_luns:
+  - "/vol/ontap_35_lin_vol01/ontap_35_lin_lun01"
+  - "/vol/ontap_35_lin_vol02/ontap_35_lin_lun02"
+  - "/vol/ontap_35_lin_vol03/ontap_35_lin_lun03"
 ontap_35_win_lun_name:            "ontap_35_win_lun01"
+ontap_35_win_luns:
+  - "/vol/ontap_35_win_vol01/ontap_35_win_lun01"
 linux_35_default_mount_dir:       "/mnt/35"
 
 # ONTAP-41 - NFS FlexClone

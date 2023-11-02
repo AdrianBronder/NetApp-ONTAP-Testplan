@@ -38,7 +38,7 @@
     - name: Create volumes
       netapp.ontap.na_ontap_volume:
         state:                    present
-        name:                     "{{ item }}"
+        name:                     "{{ (item | split('/'))[1] }}"
         aggregate_name:           "{{ hostvars[global_primary_test_cluster].storage_aggregates[1].name }}"
         size:                     "{{ ontap_default_vol_size_gb }}"
         size_unit:                gb
@@ -47,7 +47,7 @@
         vserver:                  "{{ global_primary_san_svm }}"
         <<: *input
       loop:
-        - "{{ ontap_35_lin_vol_name }}"
-        - "{{ ontap_35_win_vol_name }}"
+        "{{ ontap_35_lin_luns }} +
+        {{ ontap_35_win_luns }}"
   
   post_tasks:

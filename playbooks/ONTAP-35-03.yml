@@ -35,46 +35,35 @@
   pre_tasks:
 
   tasks:
-    - name: Create LUN for Linux host
+    - name: Create LUNs
       netapp.ontap.na_ontap_lun:
         state:                    present
         vserver:                  "{{ global_primary_san_svm }}"
-        name:                     "{{ ontap_35_lin_lun_name }}"
-        flexvol_name:             "{{ ontap_35_lin_vol_name }}"
+        name:                     "{{ (item | split('/'))[2] }}"
+        flexvol_name:             "{{ (item | split('/'))[1] }}"
         size:                     "{{ ontap_default_lun_size_gb }}"
         size_unit:                "gb"
-        os_type:                  "linux"
+        os_type:                  "{{ 'linux' if 'lin' in (item | split('/'))[2]) else
+                                      'windows' if 'win' in (item | split('/'))[2]) else
+                                       default(omit) }}"
         space_reserve:            true
         space_allocation:         true
         <<: *input
+      loop:
+        "{{ ontap_35_lin_luns }} +
+         {{ ontap_35_win_luns }}"
 
-    - name: Create LUN for Windows host
-      netapp.ontap.na_ontap_lun:
-        state:                    present
-        vserver:                  "{{ global_primary_san_svm }}"
-        name:                     "{{ ontap_35_win_lun_name }}"
-        flexvol_name:             "{{ ontap_35_win_vol_name }}"
-        size:                     "{{ ontap_default_lun_size_gb }}"
-        size_unit:                "gb"
-        os_type:                  "windows"
-        space_reserve:            true
-        space_allocation:         true
-        <<: *input
-
-    - name: Map LUN to Linux iGroup
+    - name: Map LUNs to iGroups
       netapp.ontap.na_ontap_lun_map:
         state:                    present
         vserver:                  "{{ global_primary_san_svm }}"
-        initiator_group_name:     "{{ ontap_35_lin_igroup_name }}"
-        path:                     "/vol/{{ ontap_35_lin_vol_name }}/{{ ontap_35_lin_lun_name }}"
+        initiator_group_name:     "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[2]) else
+                                      ontap_35_win_igroup_name if 'win' in (item | split('/'))[2]) else
+                                       default(omit) }}"
+        path:                     "{{ item }}"
         <<: *input
-
-    - name: Map LUN to Windows iGroup
-      netapp.ontap.na_ontap_lun_map:
-        state:                    present
-        vserver:                  "{{ global_primary_san_svm }}"
-        initiator_group_name:     "{{ ontap_35_win_igroup_name }}"
-        path:                     "/vol/{{ ontap_35_win_vol_name }}/{{ ontap_35_win_lun_name }}"
-        <<: *input
+      loop:
+        "{{ ontap_35_lin_luns }} +
+         {{ ontap_35_win_luns }}"
 
   post_tasks:

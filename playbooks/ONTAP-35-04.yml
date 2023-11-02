@@ -85,32 +85,35 @@
         dev:                      "/dev/mapper/{{ ntap_iscsi_vendor_id }}\
                                    {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
                                       selectattr('name', 'defined') |
-                                      selectattr('name', '==', '/vol/'+ontap_35_lin_vol_name+'/'+ontap_35_lin_lun_name) |
+                                      selectattr('name', '==', item ) |
                                       first ).serial_hex }}"
+        loop:
+          "{{ ontap_35_lin_luns }}"
 
   
     - name: Create mount directory  
       ansible.builtin.file:
-        path:                     "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
+        path:                     "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
         state:                    "directory"
         mode:                     "0755"
+      loop:
+        "{{ ontap_35_lin_luns }}"
   
     - name: Mount LUN
       ansible.posix.mount:
         state:                    "mounted"
-        src:                      "/dev/mapper/{{ ntap_iscsi_vendor_id }}\
+        src:                      "{{ ntap_iscsi_vendor_id }}\
                                    {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
                                       selectattr('name', 'defined') |
-                                      selectattr('name', '==', '/vol/'+ontap_35_lin_vol_name+'/'+ontap_35_lin_lun_name) |
+                                      selectattr('name', '==', item ) |
                                       first ).serial_hex }}"
-        path:                     "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}"
-#        opts:                     "rw,sync,hard,vers=3"
+        path:                     "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                   "ext4"
         opts:                     "discard"
   
     - name: Create test file on LUN
       community.general.filesize:
-        path: "{{ linux_35_default_mount_dir }}/{{ ontap_35_lin_lun_name }}/testfile"
-        size: 500MB
+        path: "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"
+        size: 50MB
 
   post_tasks:
