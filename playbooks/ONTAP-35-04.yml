@@ -102,7 +102,7 @@
     - name: Mount LUN
       ansible.posix.mount:
         state:                    "mounted"
-        src:                      "{{ ntap_iscsi_vendor_id }}\
+        src:                      "/dev/mapper/{{ ntap_iscsi_vendor_id }}\
                                    {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
                                       selectattr('name', 'defined') |
                                       selectattr('name', '==', item ) |
@@ -119,5 +119,5 @@
         size: 50MB
       loop:
         "{{ ontap_35_lin_luns }}"
-        
+
   post_tasks:
