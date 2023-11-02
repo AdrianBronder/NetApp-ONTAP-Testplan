@@ -43,8 +43,10 @@
         initiator_group_type:     "iscsi"
         os_type:                  "{{ 'linux' if 'lin' in item else
                                       'windows' if 'win' in item else
-                                       default(omit) }}"
-        initiator_names:          "{{ ontap_35_lin_igroup_iqns }}"
+                                      default(omit) }}"
+        initiator_names:          "{{ ontap_35_lin_igroup_iqns if 'lin' in item else
+                                      ontap_35_win_igroup_iqns if 'win' in item else
+                                      default(omit) }}"
         <<: *input
       loop:
         - "{{ ontap_35_lin_igroup_name }}"

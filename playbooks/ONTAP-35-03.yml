@@ -45,7 +45,7 @@
         size_unit:                "gb"
         os_type:                  "{{ 'linux' if 'lin' in (item | split('/'))[3]) else
                                       'windows' if 'win' in (item | split('/'))[3]) else
-                                       default(omit) }}"
+                                      default(omit) }}"
         space_reserve:            true
         space_allocation:         true
         <<: *input
@@ -59,7 +59,7 @@
         vserver:                  "{{ global_primary_san_svm }}"
         initiator_group_name:     "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[3]) else
                                       ontap_35_win_igroup_name if 'win' in (item | split('/'))[3]) else
-                                       default(omit) }}"
+                                      default(omit) }}"
         path:                     "{{ item }}"
         <<: *input
       loop:
