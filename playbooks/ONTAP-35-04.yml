@@ -110,10 +110,14 @@
         path:                     "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                   "ext4"
         opts:                     "discard"
+      loop:
+        "{{ ontap_35_lin_luns }}"
   
     - name: Create test file on LUN
       community.general.filesize:
         path: "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"
         size: 50MB
-
+      loop:
+        "{{ ontap_35_lin_luns }}"
+        
   post_tasks:
