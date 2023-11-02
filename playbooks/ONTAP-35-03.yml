@@ -43,8 +43,8 @@
         flexvol_name:             "{{ (item | split('/'))[2] }}"
         size:                     "{{ ontap_default_lun_size_gb }}"
         size_unit:                "gb"
-        os_type:                  "{{ 'linux' if 'lin' in (item | split('/'))[3]) else
-                                      'windows' if 'win' in (item | split('/'))[3]) else
+        os_type:                  "{{ 'linux' if 'lin' in (item | split('/'))[3] else
+                                      'windows' if 'win' in (item | split('/'))[3] else
                                       default(omit) }}"
         space_reserve:            true
         space_allocation:         true
