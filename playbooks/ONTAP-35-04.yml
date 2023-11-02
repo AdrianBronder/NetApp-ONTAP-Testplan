@@ -88,7 +88,7 @@
         dev:                      "/dev/{{ ntap_iscsi_vendor_id }}
                                    {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
                                       selectattr('name', 'defined') |
-                                      selectattr('name', '==', '/vol/'+ontap_35_lin_vol_name+'/'+ontap_35_lin_lun01)).serial_hex }}"
+                                      selectattr('name', '==', '/vol/'+ontap_35_lin_vol_name+'/'+ontap_35_lin_lun_name)).serial_hex }}"
   
     - name: Create mount directory  
       ansible.builtin.file:
