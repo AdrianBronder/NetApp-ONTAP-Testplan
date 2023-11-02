@@ -62,9 +62,6 @@
   pre_tasks:
 
   tasks:
-    - debug:
-        msg: "{{ hostvars[global_primary_test_cluster].lun_info }}"
-
     - name: Discover iSCSI targets on SVM and login
       community.general.open_iscsi:
         show_nodes:               true
