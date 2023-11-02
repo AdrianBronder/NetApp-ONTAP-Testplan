@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-35-02 - Volumes"
+  name:                           "ONTAP-35-03 - LUNs & Mappings"
   gather_facts:                   false
   vars:
     input: &input
@@ -57,7 +57,7 @@
       netapp.ontap.na_ontap_lun_map:
         state:                    present
         vserver:                  "{{ global_primary_san_svm }}"
-        initiator_group_name:     "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[3] elses
+        initiator_group_name:     "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[3] else
                                       ontap_35_win_igroup_name if 'win' in (item | split('/'))[3] else
                                       default(omit) }}"
         path:                     "{{ item }}"
