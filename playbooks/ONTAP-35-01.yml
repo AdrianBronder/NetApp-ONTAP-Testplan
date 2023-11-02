@@ -35,24 +35,19 @@
   pre_tasks:
 
   tasks:
-    - name: Create a iGroup for Linux host
+    - name: Create a iGroups
       netapp.ontap.na_ontap_igroup:
         state:                    present
         vserver:                  "{{ global_primary_san_svm }}"
         name:                     "{{ ontap_35_lin_igroup_name }}"
         initiator_group_type:     "iscsi"
-        os_type:                  "linux"
+        os_type:                  "{{ 'linux' if 'lin' in item else
+                                      'windows' if 'win' in item else
+                                       default(omit) }}"
         initiator_names:          "{{ ontap_35_lin_igroup_iqns }}"
         <<: *input
+      loop:
+        - "{{ ontap_35_lin_igroup_name }}"
+        - "{{ ontap_35_win_igroup_name }}"
 
-    - name: Create a iGroup for Windows host
-      netapp.ontap.na_ontap_igroup:
-        state:                    present
-        vserver:                  "{{ global_primary_san_svm }}"
-        name:                     "{{ ontap_35_win_igroup_name }}"
-        initiator_group_type:     "iscsi"
-        os_type:                  "windows"
-        initiator_names:          "{{ ontap_35_win_igroup_iqns }}"
-        <<: *input
-  
   post_tasks:

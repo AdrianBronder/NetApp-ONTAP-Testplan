@@ -47,7 +47,7 @@
         vserver:                  "{{ global_primary_san_svm }}"
         <<: *input
       loop:
-        "{{ ontap_35_lin_luns }} +
-        {{ ontap_35_win_luns }}"
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
   
   post_tasks:

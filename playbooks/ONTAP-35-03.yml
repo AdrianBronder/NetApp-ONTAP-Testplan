@@ -50,8 +50,8 @@
         space_allocation:         true
         <<: *input
       loop:
-        "{{ ontap_35_lin_luns }} +
-         {{ ontap_35_win_luns }}"
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
 
     - name: Map LUNs to iGroups
       netapp.ontap.na_ontap_lun_map:
@@ -63,7 +63,7 @@
         path:                     "{{ item }}"
         <<: *input
       loop:
-        "{{ ontap_35_lin_luns }} +
-         {{ ontap_35_win_luns }}"
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
 
   post_tasks:

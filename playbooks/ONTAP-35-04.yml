@@ -87,8 +87,8 @@
                                       selectattr('name', 'defined') |
                                       selectattr('name', '==', item ) |
                                       first ).serial_hex }}"
-        loop:
-          "{{ ontap_35_lin_luns }}"
+      loop:
+        "{{ ontap_35_lin_luns }}"
 
   
     - name: Create mount directory  
