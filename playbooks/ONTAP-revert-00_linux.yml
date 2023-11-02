@@ -93,3 +93,12 @@
         - "{{ ontap_41_vol_name }}"
         - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         - "{{ ontap_41_clone_dir_name }}"
+
+    - name: Remove default parent mount directory
+      ansible.builtin.file:
+        path:                       "{{ item }}"
+        state:                      "absent"
+        mode:                       "0755"
+      loop:
+        - "{{ linux_31_default_mount_dir }}"
+        - "{{ linux_41_default_mount_dir }}"

@@ -54,6 +54,12 @@
         "{{ ontap_31_vol_qtree_names + 
             ontap_31_fg_qtree_names }}"
 
+    - name: Remove default parent mount directory
+      ansible.builtin.file:
+        path:                       "{{ linux_31_default_mount_dir }}"
+        state:                      "absent"
+        mode:                       "0755"
+
 - hosts:              "{{ global_primary_test_cluster }}"
   name:               "ONTAP-revert-31 - NFS - ONTAP"
   gather_facts:       false
