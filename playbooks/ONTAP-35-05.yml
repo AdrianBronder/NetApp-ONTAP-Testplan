@@ -25,7 +25,7 @@
   pre_tasks:
 
   tasks:
-    - name: Run PowerShell script with parameters
+    - name: Add iSCSI portal
       ansible.windows.win_powershell:
         script: |
           New-IscsiTargetPortal -TargetPortalAddress {{ item.ip.address }}
@@ -38,26 +38,30 @@
             selectattr('service_policy.name', 'search', 'block') |
             list }}"
 
-    - name: Run PowerShell script with parameters
+    - name: Get iSCSI targets
       ansible.windows.win_powershell:
         script: |
           Get-IscsiTarget
       register: ps_iscsi_targets
 
-    - debug:
-        msg: "{{ ps_iscsi_targets }}"
-
-    - name: Run PowerShell script with parameters
+    - name: Connect iSCSI targets
       ansible.windows.win_powershell:
-        script: |
-          Connect-IscsiTarget -NodeAddress iqn.1992-08.com.netapp:sn.04f8e1e6772911eea2b5005056b76a95:vs.22 -InitiatorPortalAddress 192.168.0.5 -TargetPortalAddress {{ item.ip.address }} -IsMultipathEnabled $true -IsPersistent $true
+        script:
+          "Connect-IscsiTarget \
+           -NodeAddress {{ (ps_iscsi_targets.output | \
+                            selectattr('NodeAddress', 'search', 'netapp') | \
+                            first).NodeAddress }} \
+           -InitiatorPortalAddress {{ item.1.ipv4.address }} \
+           -TargetPortalAddress {{ item.0.ip.address }} \
+           -IsMultipathEnabled $true -IsPersistent $true"
       loop_control:
-        label: "{{ item.ip.address }}"
+        label: "Connect {{ item.1.ipv4.address }} to {{ item.0.ip.address }}"
       loop:
         "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
-            list }}"
+            list |
+            product(ansible_interfaces) | list }}"
 
   post_tasks:

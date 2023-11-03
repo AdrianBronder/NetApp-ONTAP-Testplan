@@ -76,6 +76,8 @@ ontap_35_lin_luns:
   - "/vol/ontap_35_lin_vol03/ontap_35_lin_lun03"
 ontap_35_win_luns:
   - "/vol/ontap_35_win_vol01/ontap_35_win_lun01"
+  - "/vol/ontap_35_win_vol02/ontap_35_win_lun02"
+  - "/vol/ontap_35_win_vol03/ontap_35_win_lun03"
 linux_35_default_mount_dir:       "/mnt/35"
 
 # ONTAP-41 - NFS FlexClone
