@@ -99,7 +99,7 @@
            -NodeAddress {{ (ps_iscsi_targets.output | \
                             selectattr('NodeAddress', 'search', 'netapp') | \
                             first).NodeAddress }} \
-           -Confirm $true"
+           -Confirm:$false"
 
     - name: Remove iSCSI portals
       ansible.windows.win_powershell:
