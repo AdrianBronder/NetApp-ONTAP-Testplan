@@ -25,10 +25,11 @@
   pre_tasks:
 
   tasks:
-    - name: Add iSCSI portal
+    - name: Add iSCSI portals
       ansible.windows.win_powershell:
-        script: |
-          New-IscsiTargetPortal -TargetPortalAddress {{ item.ip.address }}
+        script:
+          "New-IscsiTargetPortal \
+           -TargetPortalAddress {{ item.ip.address }}"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
@@ -38,10 +39,10 @@
             selectattr('service_policy.name', 'search', 'block') |
             list }}"
 
-    - name: Get iSCSI targets
+    - name: Read iSCSI targets
       ansible.windows.win_powershell:
-        script: |
-          Get-IscsiTarget
+        script:
+          "Get-IscsiTarget"
       register: ps_iscsi_targets
 
     - name: Connect iSCSI targets
