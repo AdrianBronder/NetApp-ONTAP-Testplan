@@ -105,7 +105,8 @@
       ansible.windows.win_powershell:
         script:
           "Remove-IscsiTargetPortal \
-           -TargetPortalAddress {{ item.ip.address }}"
+           -TargetPortalAddress {{ item.ip.address }} \
+           -Confirm:$false"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:

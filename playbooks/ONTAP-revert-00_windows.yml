@@ -28,6 +28,36 @@
   pre_tasks:
 
   tasks:
+    - name: Read iSCSI targets
+      ansible.windows.win_powershell:
+        script: 
+          "Get-IscsiTarget"
+      register: ps_iscsi_targets
+
+    - name: Disconnect iSCSI targets
+      ansible.windows.win_powershell:
+        script:
+          "Disconnect-IscsiTarget \
+           -NodeAddress {{ (ps_iscsi_targets.output | \
+                            selectattr('NodeAddress', 'search', 'netapp') | \
+                            first).NodeAddress }} \
+           -Confirm:$false"
+
+    - name: Remove iSCSI portals
+      ansible.windows.win_powershell:
+        script:
+          "Remove-IscsiTargetPortal \
+           -TargetPortalAddress {{ item.ip.address }} \
+           -Confirm:$false"
+      loop_control:
+        label: "{{ item.ip.address }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+
     - name: 
       block:
         - name: Remove mapped shares
