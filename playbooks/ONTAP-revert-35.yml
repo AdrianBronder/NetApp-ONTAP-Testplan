@@ -96,7 +96,6 @@
       ansible.windows.win_powershell:
         script:
           "Disconnect-IscsiTarget \
-           -NodeAddress \
            -NodeAddress {{ (ps_iscsi_targets.output | \
                             selectattr('NodeAddress', 'search', 'netapp') | \
                             first).NodeAddress }}"
