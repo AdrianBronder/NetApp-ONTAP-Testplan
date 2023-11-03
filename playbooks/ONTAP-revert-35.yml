@@ -75,7 +75,7 @@
 
 - hosts:                          "{{ global_primary_windows_host }}"
   name:                           "ONTAP-revert-35 - iSCSI - Windows"
-  gather_facts:                   false
+  gather_facts:                   true
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
@@ -88,8 +88,8 @@
   tasks:
     - name: Read iSCSI targets
       ansible.windows.win_powershell:
-        script: |
-          Get-IscsiTarget
+        script: 
+          "Get-IscsiTarget"
       register: ps_iscsi_targets
 
     - name: Disconnect iSCSI targets
