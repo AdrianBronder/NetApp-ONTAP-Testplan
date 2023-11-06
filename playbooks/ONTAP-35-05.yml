@@ -102,7 +102,7 @@
             product(ansible_interfaces) | list }}"
 
     - name: Collect disk facts
-      community.windows.win_disk_facts
+      community.windows.win_disk_facts:
       register: win_disk_facts
 
     - name: Initialize disks
