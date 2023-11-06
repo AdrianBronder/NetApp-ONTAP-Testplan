@@ -114,15 +114,16 @@
                                                                           selectattr('name', '==', item ) |
                                                                           first ).serial_number) |
                                        first ).number }}"
+        online:                   true
+        force:                    true
       loop:
         "{{ ontap_35_win_luns }}"
-    
+
     - name: Partition disks
       community.windows.win_partition:
         partition_size:           -1
-        partition_number:         1
+        partition_number:         2
         gpt_type:                 "basic_data"
-        mbr_type:                 "extended"
         disk_number:              "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                        selectattr('serial_number', 'defined') |
                                        selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
@@ -132,10 +133,28 @@
                                        first ).number }}"
       loop:
         "{{ ontap_35_win_luns }}"
-  
-    - name: 
+
+    - debug:
+        msg: "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                  selectattr('serial_number', 'defined') |
+                  selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                                                     selectattr('name', 'defined') |
+                                                     selectattr('name', '==', item ) |
+                                                     first ).serial_number) |
+                  first ).partitions[1].volumes[0].path }}"
+      loop:
+        "{{ ontap_35_win_luns }}"
+
+    - name: Format disk
       community.windows.win_format:
-        file_system:              "NTFS"
+        file_system:              "ntfs"
+        path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                       selectattr('serial_number', 'defined') |
+                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                                                                          selectattr('name', 'defined') |
+                                                                          selectattr('name', '==', item ) |
+                                                                          first ).serial_number) |
+                                       first ).partitions[1].volumes[0].path }}"
         new_label:                "{{ item | split('/') | last }}"
       loop:
         "{{ ontap_35_win_luns }}"
