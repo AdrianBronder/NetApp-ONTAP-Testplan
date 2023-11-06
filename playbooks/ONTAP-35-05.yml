@@ -107,7 +107,7 @@
 
     - name: Initialize disks
       community.windows.win_initialize_disk:
-        disk_number:              "{{ (win_disk_facts |
+        disk_number:              "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                       selectattr('serial_number', 'defined') |
                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
                                                                         selectattr('name', 'defined') |
