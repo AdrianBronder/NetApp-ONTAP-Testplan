@@ -134,18 +134,11 @@
       loop:
         "{{ ontap_35_win_luns }}"
 
-    - debug:
-        msg: "{{ (win_disk_facts.ansible_facts.ansible_disks |
-                  selectattr('serial_number', 'defined') |
-                  selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                                     selectattr('name', 'defined') |
-                                                     selectattr('name', '==', item ) |
-                                                     first ).serial_number) |
-                  first ).partitions[1].volumes[0].path }}"
-      loop:
-        "{{ ontap_35_win_luns }}"
+    - name: Re-Collect disk facts (with new partitions)
+      community.windows.win_disk_facts:
+      register: win_disk_facts
 
-    - name: Format disk
+    - name: Format disks
       community.windows.win_format:
         file_system:              "ntfs"
         path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
@@ -156,12 +149,35 @@
                                                                           first ).serial_number) |
                                        first ).partitions[1].volumes[0].path }}"
         new_label:                "{{ item | split('/') | last }}"
+        force:                    true
       loop:
         "{{ ontap_35_win_luns }}"
 
-    - name: Create mount directory
+    - name: Create root mount directory
       ansible.windows.win_file:
         path:                     "{{ windows_35_default_mount_dir }}"
         state:                    directory
 
+    - name: Create mount directories for LUNs
+      ansible.windows.win_file:
+        path:                     "{{ windows_35_default_mount_dir }}\\{{ item }}"
+        state:                    directory
+      loop:
+        "{{ ontap_35_win_luns }}"
+
+    - name: Add access paths to LUNs
+      ansible.windows.win_powershell:
+        script:
+          "Add-PartitionAccessPath \
+           -DiskNumber {{ (win_disk_facts.ansible_facts.ansible_disks |
+                                       selectattr('serial_number', 'defined') |
+                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                                                                          selectattr('name', 'defined') |
+                                                                          selectattr('name', '==', item ) |
+                                                                          first ).serial_number) |
+                                       first ).number }} \
+           -PartitionNumber 2 \
+           -AccessPath {{windows_35_default_mount_dir}}\\\\{{ item | split('/') | last }}"
+      loop:
+        "{{ ontap_35_win_luns }}"
   post_tasks:
