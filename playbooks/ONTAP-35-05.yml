@@ -12,8 +12,44 @@
 #
 ################################################################################
 
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-35-05 - Discover, Login & Mount (Windows) - ONTAP"
+  gather_facts:                   false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Get LUNs from "{{ global_primary_san_svm }}"
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/luns"
+        fields:
+          - "svm"
+          - "location"
+          - "serial_number"
+        parameters:
+          svm.name:               "{{ global_primary_san_svm }}"
+        use_python_keys:          true
+        <<: *input
+      register: lun_info
+
+  post_tasks:
+
 - hosts:              "{{ global_primary_windows_host }}"
-  name:               "ONTAP-35-05 - Discover, Login & Mount (Windows)"
+  name:               "ONTAP-35-05 - Discover, Login & Mount (Windows) - Windows"
   gather_facts:       true
   vars_files:
     - ../vars/labondemand/vars.yml
@@ -65,4 +101,20 @@
             list |
             product(ansible_interfaces) | list }}"
 
+    - name: Collect disk facts
+      community.windows.win_initialize_disk:
+        disk_number: 1
+      register: win_disk_facts
+
+    - name: Initialize disks
+      community.windows.win_initialize_disk:
+        disk_number:              "{{ (win_disk_facts |
+                                      selectattr('serial_number', 'defined') |
+                                      selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                                                                        selectattr('name', 'defined') |
+                                                                        selectattr('name', '==', item ) |
+                                                                        first ).serial)).number }}"
+      loop:
+        "{{ ontap_35_win_luns }}"
+        
   post_tasks:
