@@ -79,6 +79,7 @@ ontap_35_win_luns:
   - "/vol/ontap_35_win_vol02/ontap_35_win_lun02"
   - "/vol/ontap_35_win_vol03/ontap_35_win_lun03"
 linux_35_default_mount_dir:       "/mnt/35"
+windows_35_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\35"
 
 # ONTAP-41 - NFS FlexClone
 ontap_41_policy_name:             "ontap_41_policy"

@@ -119,8 +119,10 @@
     
     - name: Format disks
       community.windows.win_partition:
-        partition_size: -1
-        partition_number: 1
+        partition_size:           -1
+        partition_number:         1
+        gpt_type:                 "basic_data"
+        mbr_type:                 "extended"
         disk_number:              "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                        selectattr('serial_number', 'defined') |
                                        selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
@@ -131,4 +133,9 @@
       loop:
         "{{ ontap_35_win_luns }}"
         
+    - name: Create mount directory
+      ansible.windows.win_file:
+        path:                     "{{ windows_35_default_mount_dir }}"
+        state:                    directory
+
   post_tasks:
