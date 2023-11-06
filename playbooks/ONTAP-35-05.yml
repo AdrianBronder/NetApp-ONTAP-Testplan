@@ -117,7 +117,7 @@
       loop:
         "{{ ontap_35_win_luns }}"
     
-    - name: Format disks
+    - name: Partition disks
       community.windows.win_partition:
         partition_size:           -1
         partition_number:         1
@@ -132,7 +132,14 @@
                                        first ).number }}"
       loop:
         "{{ ontap_35_win_luns }}"
-        
+  
+    - name: 
+      community.windows.win_format:
+        file_system:              "NTFS"
+        new_label:                "{{ item | split('/') | last }}"
+      loop:
+        "{{ ontap_35_win_luns }}"
+
     - name: Create mount directory
       ansible.windows.win_file:
         path:                     "{{ windows_35_default_mount_dir }}"
