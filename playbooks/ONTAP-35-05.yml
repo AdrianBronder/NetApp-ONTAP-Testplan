@@ -160,7 +160,7 @@
 
     - name: Create mount directories for LUNs
       ansible.windows.win_file:
-        path:                     "{{ windows_35_default_mount_dir }}\\{{ item }}"
+        path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}"
         state:                    directory
       loop:
         "{{ ontap_35_win_luns }}"
