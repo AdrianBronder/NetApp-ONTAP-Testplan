@@ -73,7 +73,7 @@
       ansible.posix.mount:
         state:                    "absent"
         src:                      "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-        path:                     "{{ linux_default_mount_dir }}/{{ item }}"
+        path:                     "{{ linux_31_default_mount_dir }}/{{ item }}"
         # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
       loop:
