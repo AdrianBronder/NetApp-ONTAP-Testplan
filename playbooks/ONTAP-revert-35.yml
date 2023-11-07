@@ -116,7 +116,7 @@
             selectattr('service_policy.name', 'search', 'block') |
             list }}"
 
-    - name: Remove mount directory
+    - name: Remove root mount directory
       ansible.windows.win_file:
         path:                     "{{ windows_35_default_mount_dir }}"
         state:                    absent

@@ -162,7 +162,7 @@
       loop:
         "{{ ontap_35_win_luns }}"
 
-    - name: Change ACLs to allow access to LUNs
+    - name: Change ACLs on device path
       ansible.windows.win_acl:
         state:                    present
         user:                     "Everyone"
@@ -194,7 +194,7 @@
       loop:
         "{{ ontap_35_win_luns }}"
 
-    - name: Change ACLs to allow access to new mount points
+    - name: Change ACLs on mount paths
       ansible.windows.win_acl:
         state:                    present
         user:                     "Everyone"
@@ -210,7 +210,7 @@
       loop:
         "{{ ontap_35_win_luns }}"
 
-    - name: Create test file on each share
+    - name: Create test file on each LUN
       ansible.windows.win_file:
         path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}\\{{ item | split('/') | last }}_testfile"
         state:                    touch
