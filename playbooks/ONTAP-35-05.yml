@@ -165,6 +165,21 @@
       loop:
         "{{ ontap_35_win_luns }}"
 
+    - name: Change ACLs to allow access to LUNs
+      ansible.windows.win_acl:
+        state:                    present
+        user:                     "Everyone"
+        rights:                   "Modify,ReadAndExecute,ListDirectory,Read,Write"
+        path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                       selectattr('serial_number', 'defined') |
+                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                                                                          selectattr('name', 'defined') |
+                                                                          selectattr('name', '==', item ) |
+                                                                          first ).serial_number) |
+                                       first ).partitions[1].access_paths[-1] }}"
+      loop:
+        "{{ ontap_35_win_luns }}"
+
     - name: Add access paths to LUNs
       ansible.windows.win_powershell:
         script:
