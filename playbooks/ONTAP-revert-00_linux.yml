@@ -77,10 +77,9 @@
         # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
       loop:
-        - "{{ ontap_31_vol_qtree_names + 
-            ontap_31_fg_qtree_names }}"
-        - "{{ ontap_41_vol_name }}"
-        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        "{{ ontap_31_vol_qtree_names + 
+            ontap_31_fg_qtree_names +
+            ontap_41_vol_name }}"
   
     - name: Remove mount directories
       ansible.builtin.file:
@@ -88,11 +87,9 @@
         state:                    "absent"
         mode:                     "0755"
       loop:
-        - "{{ ontap_31_vol_qtree_names + 
-            ontap_31_fg_qtree_names }}"
-        - "{{ ontap_41_vol_name }}"
-        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-        - "{{ ontap_41_clone_dir_name }}"
+        "{{ ontap_31_vol_qtree_names + 
+            ontap_31_fg_qtree_names +
+            ontap_41_vol_name }}"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
@@ -100,5 +97,5 @@
         state:                      "absent"
         mode:                       "0755"
       loop:
-        - "{{ linux_31_default_mount_dir }}"
-        - "{{ linux_41_default_mount_dir }}"
+        "{{ linux_31_default_mount_dir +
+            linux_41_default_mount_dir }}"
