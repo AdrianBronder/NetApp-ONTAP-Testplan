@@ -1,19 +1,16 @@
 ################################################################################
 #
-# Title:        ONTAP-35-05 - Discover, Login & Mount (Windows)
+# Title:        ONTAP-35-05 - Mount & Write (Windows)
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-10-31
 # Description:  iSCSI
-#               - Discover, Login & Mount (Windows)
-#
-# https://www.itprotoday.com/cloud-computing/q-how-can-i-use-command-line-configure-iscsi-connections
-# https://www.windowspro.de/wolfgang-sommergut/iscsi-verbindungen-powershell-verwalten
+#               - Mount & Write (Windows)
 #
 ################################################################################
 
 - hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-35-05 - Discover, Login & Mount (Windows) - ONTAP"
+  name:                           "ONTAP-35-05 - Mount & Write (Windows) - ONTAP"
   gather_facts:                   false
   vars:
     input: &input
@@ -170,6 +167,7 @@
         state:                    present
         user:                     "Everyone"
         rights:                   "Modify,ReadAndExecute,ListDirectory,Read,Write"
+        type:                     "allow"
         path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                        selectattr('serial_number', 'defined') |
                                        selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
@@ -195,4 +193,12 @@
            -AccessPath {{windows_35_default_mount_dir}}\\\\{{ item | split('/') | last }}"
       loop:
         "{{ ontap_35_win_luns }}"
+
+    - name: Create test file on each share
+      ansible.windows.win_file:
+        path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}\\{{ item }}_testfile"
+        state:                    touch
+      loop:
+        "{{ ontap_35_win_luns }}"
+
   post_tasks:
