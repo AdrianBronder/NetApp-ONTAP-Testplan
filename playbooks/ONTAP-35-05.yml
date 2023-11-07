@@ -194,13 +194,6 @@
       loop:
         "{{ ontap_35_win_luns }}"
 
-    - name: Create test file on each share
-      ansible.windows.win_file:
-        path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}\\{{ item }}_testfile"
-        state:                    touch
-      loop:
-        "{{ ontap_35_win_luns }}"
-
     - name: Change ACLs to allow access to new mount points
       ansible.windows.win_acl:
         state:                    present
@@ -214,6 +207,13 @@
                                                                           selectattr('name', '==', item ) |
                                                                           first ).serial_number) |
                                        first ).partitions[1].access_paths[0] }}"
+      loop:
+        "{{ ontap_35_win_luns }}"
+
+    - name: Create test file on each share
+      ansible.windows.win_file:
+        path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}\\{{ item | split('/') | last }}_testfile"
+        state:                    touch
       loop:
         "{{ ontap_35_win_luns }}"
 
