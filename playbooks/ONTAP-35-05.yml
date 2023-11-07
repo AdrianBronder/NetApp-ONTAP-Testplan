@@ -174,7 +174,7 @@
                                                                           selectattr('name', 'defined') |
                                                                           selectattr('name', '==', item ) |
                                                                           first ).serial_number) |
-                                       first ).partitions[1].access_paths[-1] }}"
+                                       first ).partitions[1].access_paths[0] }}"
       loop:
         "{{ ontap_35_win_luns }}"
 
@@ -198,6 +198,22 @@
       ansible.windows.win_file:
         path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}\\{{ item }}_testfile"
         state:                    touch
+      loop:
+        "{{ ontap_35_win_luns }}"
+
+    - name: Change ACLs to allow access to new mount points
+      ansible.windows.win_acl:
+        state:                    present
+        user:                     "Everyone"
+        rights:                   "Modify,ReadAndExecute,ListDirectory,Read,Write"
+        type:                     "allow"
+        path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                       selectattr('serial_number', 'defined') |
+                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                                                                          selectattr('name', 'defined') |
+                                                                          selectattr('name', '==', item ) |
+                                                                          first ).serial_number) |
+                                       first ).partitions[1].access_paths[0] }}"
       loop:
         "{{ ontap_35_win_luns }}"
 
