@@ -114,6 +114,18 @@
                               selectattr('name', 'defined') |
                               selectattr('name', '==', item ) |
                               first ).serial_hex }}"
+      when:
+        - (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+           selectattr('name', 'defined') |
+           selectattr('name', '==', item ) |
+           first ).serial_hex is defined
+      loop_control:
+        label: "{{ item }} --> \
+                {{ ontap_iscsi_vendor_id }}\
+                {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                    selectattr('name', 'defined') |
+                    selectattr('name', '==', item ) |
+                    first ).serial_hex is defined"
       loop:
         "{{ ontap_35_lin_luns }}"
 
