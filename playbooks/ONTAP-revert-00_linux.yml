@@ -19,7 +19,7 @@
   name:                           "ONTAP-revert-00 - Return to Day0 - Linux - ONTAP (read)"
   gather_facts:                   false
   vars:
-    input: &input
+    input_read: &input_read
       hostname:                   "{{ ansible_host }}"
       username:                   "{{ ontap_admin_user }}"
       password:                   "{{ ontap_admin_password }}"
@@ -46,7 +46,7 @@
         parameters:
           svm.name:               "{{ global_primary_san_svm }}"
         use_python_keys:          true
-        <<: *input
+        <<: *input_read
       register: lun_info
 
   post_tasks:
