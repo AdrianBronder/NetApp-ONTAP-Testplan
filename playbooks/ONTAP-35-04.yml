@@ -48,8 +48,6 @@
 - hosts:                          "{{ global_primary_linux_host }}"
   name:                           "ONTAP-35-04 - Mount & Write (Linux) - Linux"
   gather_facts:                   false
-  vars:
-    ntap_iscsi_vendor_id:         "3600a0980"
   vars_files:
     - ../vars/labondemand/vars.yml
     - ../vars/labondemand/vault.yml
@@ -80,7 +78,7 @@
     - name: Build Filesystem on new LUN
       community.general.filesystem:
         fstype:                   "ext4"
-        dev:                      "/dev/mapper/{{ ntap_iscsi_vendor_id }}\
+        dev:                      "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
                                    {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
                                       selectattr('name', 'defined') |
                                       selectattr('name', '==', item ) |
@@ -100,7 +98,7 @@
     - name: Mount LUN
       ansible.posix.mount:
         state:                    "mounted"
-        src:                      "/dev/mapper/{{ ntap_iscsi_vendor_id }}\
+        src:                      "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
                                    {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
                                       selectattr('name', 'defined') |
                                       selectattr('name', '==', item ) |

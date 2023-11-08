@@ -15,6 +15,42 @@
 #
 ################################################################################
 
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-revert-35 - iSCSI - ONTAP (read)"
+  gather_facts:                   false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Get LUNs from "{{ global_primary_san_svm }}"
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/luns"
+        fields:
+          - "svm"
+          - "location"
+          - "serial_number"
+        parameters:
+          svm.name:               "{{ global_primary_san_svm }}"
+        use_python_keys:          true
+        <<: *input
+      register: lun_info
+
+  post_tasks:
+
 - hosts:                          "{{ global_primary_linux_host }}"
   name:                           "ONTAP-revert-35 - iSCSI - Linux"
   gather_facts:                   false
@@ -70,6 +106,16 @@
         "{{ iscsi_nodes.nodes | unique }}"
       when:
         - iscsi_nodes.nodes | length > 0
+
+    - name: Flush multipath devices
+      ansible.builtin.command:
+        cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
+                           {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                              selectattr('name', 'defined') |
+                              selectattr('name', '==', item ) |
+                              first ).serial_hex }}"
+      loop:
+        "{{ ontap_35_lin_luns }}"
 
   post_tasks:
 

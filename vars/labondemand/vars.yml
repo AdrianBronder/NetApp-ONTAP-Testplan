@@ -12,6 +12,7 @@ ontap_default_fg_size_gb:         102400
 ontap_default_fg_size_increment_gb: 1024
 ontap_default_fg_multiplier:      8
 ontap_default_lun_size_gb:        5
+ontap_iscsi_vendor_id:            "3600a0980"
 linux_default_mount_dir:          "/mnt"
 
 # ONTAP-12 - Cluster User Management
