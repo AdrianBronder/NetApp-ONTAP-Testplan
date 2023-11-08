@@ -46,45 +46,45 @@
   #     - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
   #     - "{{ ontap_41_clone_dir_name }}"
 
-  - name: Unmount exports on Linux Client
-    ansible.posix.mount:
-      state:                      "absent"
-      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      # opts:                       "rw,sync,hard,vers=3"
-      fstype:                     "nfs"
-    loop:
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
-      - "{{ ontap_41_clone_dir_name }}"
-      - "{{ ontap_41_vol_name }}"
-
-  - name: Remove mount directories from Linux Client
-    ansible.builtin.file:
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      state:                      "absent"
-      mode:                       "0755"
-    loop:
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
-      - "{{ ontap_41_clone_dir_name }}"
-      - "{{ ontap_41_vol_name }}"
+    - name: Unmount exports on Linux Client
+      ansible.posix.mount:
+        state:                      "absent"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
+        path:                       "{{ linux_default_mount_dir }}/{{ item }}"
+        # opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+      loop:
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
+        - "{{ ontap_41_clone_dir_name }}"
+        - "{{ ontap_41_vol_name }}"
+  
+    - name: Remove mount directories from Linux Client
+      ansible.builtin.file:
+        path:                       "{{ linux_default_mount_dir }}/{{ item }}"
+        state:                      "absent"
+        mode:                       "0755"
+      loop:
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_01"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_02"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_03"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_04"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_05"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_06"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_07"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_08"
+        - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_09"
+        - "{{ ontap_41_clone_dir_name }}"
+        - "{{ ontap_41_vol_name }}"
 
 
 - hosts:              "{{ global_primary_test_cluster }}"
@@ -116,45 +116,45 @@
   #     junction_path:              "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
   #     <<: *input
 
-  - name: Remove volumes
-    netapp.ontap.na_ontap_volume:
-      state:                      absent
-      name:                       "{{ item }}"
-      vserver:                    "{{ global_primary_nas_svm }}"
-      <<: *input
-    loop:
-      - "{{ ontap_41_clone_vol_name }}"
-      - "{{ ontap_41_clone_vol_name }}_01"
-      - "{{ ontap_41_clone_vol_name }}_02"
-      - "{{ ontap_41_clone_vol_name }}_03"
-      - "{{ ontap_41_clone_vol_name }}_04"
-      - "{{ ontap_41_clone_vol_name }}_05"
-      - "{{ ontap_41_clone_vol_name }}_06"
-      - "{{ ontap_41_clone_vol_name }}_07"
-      - "{{ ontap_41_clone_vol_name }}_08"
-      - "{{ ontap_41_clone_vol_name }}_09"
-      - "{{ ontap_41_clone_dir_name }}"
-      - "{{ ontap_41_vol_name }}"
-      
-
-  - name: Remove read-write export policy
-    netapp.ontap.na_ontap_export_policy:
-      state:                      absent
-      name:                       "{{ ontap_41_policy_name }}"
-      vserver:                    "{{ global_primary_nas_svm }}"
-      <<: *input
-
-  - name: Apply default export policy to root volume
-    netapp.ontap.na_ontap_volume:
-      state:                      present
-      name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
-      vserver:                    "{{ global_primary_nas_svm }}"
-      export_policy:              "default"
-      <<: *input
-
-  - name: Remove read-only export policy
-    netapp.ontap.na_ontap_export_policy:
-      state:                      absent
-      name:                       "ro_{{ global_primary_nas_svm }}"
-      vserver:                    "{{ global_primary_nas_svm }}"
-      <<: *input
+    - name: Remove volumes
+      netapp.ontap.na_ontap_volume:
+        state:                      absent
+        name:                       "{{ item }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        <<: *input
+      loop:
+        - "{{ ontap_41_clone_vol_name }}"
+        - "{{ ontap_41_clone_vol_name }}_01"
+        - "{{ ontap_41_clone_vol_name }}_02"
+        - "{{ ontap_41_clone_vol_name }}_03"
+        - "{{ ontap_41_clone_vol_name }}_04"
+        - "{{ ontap_41_clone_vol_name }}_05"
+        - "{{ ontap_41_clone_vol_name }}_06"
+        - "{{ ontap_41_clone_vol_name }}_07"
+        - "{{ ontap_41_clone_vol_name }}_08"
+        - "{{ ontap_41_clone_vol_name }}_09"
+        - "{{ ontap_41_clone_dir_name }}"
+        - "{{ ontap_41_vol_name }}"
+        
+  
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      absent
+        name:                       "{{ ontap_41_policy_name }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        <<: *input
+  
+    - name: Apply default export policy to root volume
+      netapp.ontap.na_ontap_volume:
+        state:                      present
+        name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        export_policy:              "default"
+        <<: *input
+  
+    - name: Remove read-only export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      absent
+        name:                       "ro_{{ global_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        <<: *input

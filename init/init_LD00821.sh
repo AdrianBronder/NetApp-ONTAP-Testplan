@@ -48,7 +48,7 @@ rm -rf ~/.local/*
 echo ""
 echo ""
 echo "--> Installing additional packages"
-sudo yum install -y wget gcc libffi-devel epel-release zlib-devel jq libxml2 git krb5-devel sshpass --skip-broken
+sudo yum install -y wget gcc libffi-devel epel-release zlib-devel jq libxml2 git krb5-devel sshpass ncurses-devel nvme-cli --skip-broken
 sudo yum erase -y openssl
 
 echo ""
@@ -121,6 +121,11 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 echo ""
 echo ""
+echo "--> Creating default multi-path config on centos"
+sudo touch /etc/multipath.conf
+
+echo ""
+echo ""
 echo "--> Creating Users and groups in AD (dc1)"
 ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
 
@@ -128,3 +133,19 @@ echo ""
 echo ""
 echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
 ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-revert-00.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+
+echo ""
+echo ""
+echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-revert-00.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+
+echo ""
+echo ""
+echo "--> Install new Linux kernel, change kernel default, add NVMe_TCP module to load after reboot and reboot"
+sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+sudo yum -y install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+sudo yum -y --enablerepo=elrepo-kernel install kernel-lt
+sudo sed -i 's/GRUB_DEFAULT=saved/GRUB_DEFAULT=0/g' /etc/default/grub
+sudo grub2-mkconfig -o /boot/grub2/grub.cfg
+sudo echo "nvme_tcp" > /etc/modules-load.d/nvme_tcp.conf
+sudo reboot

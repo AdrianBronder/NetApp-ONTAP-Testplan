@@ -127,7 +127,7 @@ svm_svms:
     ndmp:
       allowed:                    false
     nvme:
-      allowed:                    false
+      allowed:                    true
     language:                     "utf8mb4"
     comment:                      "This is the second SVM for SAN testing"
 
@@ -179,6 +179,16 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is created for the primary SAN SVM"
     enabled:                      true
 
+protocols_san_iscsi_services:
+  - svm:
+      name:                       "{{ svm_svms[2].name }}"
+    enabled:                      true
+
+protocols_nvme_services:
+  - svm:
+      name:                       "{{ svm_svms[2].name }}"
+    enabled:                      true
+
 network_ip_interfaces:
   - name:                         "{{ svm_svms[0].name }}"
     scope:                        "svm"
@@ -227,7 +237,71 @@ network_ip_interfaces:
         name:                     "e0c"
       auto_revert:                true
     service_policy:
-      name:                       "default-data-files"
+      name:                       "default-management"
+  - name:                         "{{ svm_svms[2].name }}_iscsi01"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[2].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.215"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                false
+    service_policy:
+      name:                       "default-data-blocks"
+  - name:                         "{{ svm_svms[2].name }}_iscsi02"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[2].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.216"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[1].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                false
+    service_policy:
+      name:                       "default-data-blocks"
+  - name:                         "{{ svm_svms[2].name }}_nvme01"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[2].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.217"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                false
+    service_policy:
+      name:                       "default-data-nvme-tcp"
+  - name:                         "{{ svm_svms[2].name }}_nvme02"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[2].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.218"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[1].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                false
+    service_policy:
+      name:                       "default-data-nvme-tcp"
   - name:                         "{{ cluster_nodes[0].name }}_ic01"
     scope:                        "cluster"
     ip:

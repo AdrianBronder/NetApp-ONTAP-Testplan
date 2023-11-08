@@ -15,6 +15,42 @@
 #
 ################################################################################
 
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-revert-00 - Return to Day0 - Linux - ONTAP (read)"
+  gather_facts:                   false
+  vars:
+    input_read: &input_read
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Get LUNs from "{{ global_primary_san_svm }}"
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/luns"
+        fields:
+          - "svm"
+          - "location"
+          - "serial_number"
+        parameters:
+          svm.name:               "{{ global_primary_san_svm }}"
+        use_python_keys:          true
+        <<: *input_read
+      register: lun_info
+
+  post_tasks:
+
 - hosts:              "linux"
   name:               "ONTAP-revert-00 - Return to Day0 - Linux"
   gather_facts:       false
@@ -25,27 +61,99 @@
     - ansible.posix
 
   tasks:
-  - name: Unmount exports
-    ansible.posix.mount:
-      state:                      "absent"
-      src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      # opts:                       "rw,sync,hard,vers=3"
-      fstype:                     "nfs"
-    loop:
-      - "{{ ontap_31_vol_qtree_names + 
-          ontap_31_fg_qtree_names }}"
-      - "{{ ontap_41_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+    - name: Unmount LUNs
+      ansible.posix.mount:
+        state:                      "absent"
+        path:                       "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
+      loop:
+        "{{ ontap_35_lin_luns }}"
 
-  - name: Remove mount directories
-    ansible.builtin.file:
-      path:                       "{{ linux_default_mount_dir }}/{{ item }}"
-      state:                      "absent"
-      mode:                       "0755"
-    loop:
-      - "{{ ontap_31_vol_qtree_names + 
-          ontap_31_fg_qtree_names }}"
-      - "{{ ontap_41_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-      - "{{ ontap_41_clone_dir_name }}"
+    - name: Remove default LUN mount directory
+      ansible.builtin.file:
+        path:                       "{{ linux_35_default_mount_dir }}"
+        state:                      "absent"
+
+    - name: List iSCSI targets
+      community.general.open_iscsi:
+        show_nodes:               true
+      register: iscsi_nodes
+
+    - name: Remove iSCSI sessions and logout
+      community.general.open_iscsi:
+        show_nodes:               false
+        discover:                 false
+        login:                    false
+        auto_portal_startup:      false
+        auto_node_startup:        false
+        portal:                   "{{ item.ip.address }}"
+      loop_control:
+        label: "{{ item.ip.address }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+      when:
+        - iscsi_nodes.nodes | length > 0
+
+    - name: Remove iSCSI targets
+      ansible.builtin.command:
+        cmd: "iscsiadm -m node -o delete -T {{ item }}"
+      loop:
+        "{{ iscsi_nodes.nodes | unique }}"
+      when:
+        - iscsi_nodes.nodes | length > 0
+
+    - name: Flush multipath devices
+      ansible.builtin.command:
+        cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
+                           {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                              selectattr('name', 'defined') |
+                              selectattr('name', '==', item ) |
+                              first ).serial_hex }}"
+      when:
+        - (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+           selectattr('name', 'defined') |
+           selectattr('name', '==', item ) |
+           first ).serial_hex is defined
+      loop_control:
+        label: "{{ item }} --> \
+                {{ ontap_iscsi_vendor_id }}\
+                {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                    selectattr('name', 'defined') |
+                    selectattr('name', '==', item ) |
+                    first ).serial_hex }}"
+      loop:
+        "{{ ontap_35_lin_luns }}"
+
+    - name: Unmount exports
+      ansible.posix.mount:
+        state:                    "absent"
+        src:                      "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
+        path:                     "{{ linux_31_default_mount_dir }}/{{ item }}"
+        # opts:                     "rw,sync,hard,vers=3"
+        fstype:                   "nfs"
+      loop:
+        "{{ ontap_31_vol_qtree_names + 
+            ontap_31_fg_qtree_names +
+            [ontap_41_vol_name] }}"
+  
+    - name: Remove mount directories
+      ansible.builtin.file:
+        path:                     "{{ linux_default_mount_dir }}/{{ item }}"
+        state:                    "absent"
+        mode:                     "0755"
+      loop:
+        "{{ ontap_31_vol_qtree_names + 
+            ontap_31_fg_qtree_names +
+            [ontap_41_vol_name] }}"
+
+    - name: Remove default parent mount directory
+      ansible.builtin.file:
+        path:                       "{{ item }}"
+        state:                      "absent"
+        mode:                       "0755"
+      loop:
+        - "{{ linux_31_default_mount_dir }}"
+        - "{{ linux_41_default_mount_dir }}"
