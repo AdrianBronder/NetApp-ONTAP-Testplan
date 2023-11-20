@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-37-01 - Subsystem
+# Title:        ONTAP-37-01 - Volumes
 # Author:       NetApp Inc. (badrian)
 # Initial 
-# Create Date:  2023-10-22
+# Create Date:  2023-11-22
 # Description:  NVMe/TCP
-#               - Subsystem
+#               - Volumes
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -15,25 +15,8 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_linux_host }}"
-  name:                           "ONTAP-37-01 - Subsystem - Linux"
-  gather_facts:                   true
-  vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
-  collections:
-    - community.general
-    - ansible.posix
-
-  pre_tasks:
-
-  tasks:
-
-  post_tasks:
-  
-
 - hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-37-01 - Subsystem - ONTAP"
+  name:                           "ONTAP-37-01 - Volumes"
   gather_facts:                   false
   vars:
     input: &input
@@ -52,13 +35,19 @@
   pre_tasks:
 
   tasks:
-    - name: Create a Subsystem
-      netapp.ontap.na_ontap_nvme_subsystem:
+    - name: Create volumes
+      netapp.ontap.na_ontap_volume:
         state:                    present
+        name:                     "{{ (item | split('/'))[2] }}"
+        aggregate_name:           "{{ hostvars[global_primary_test_cluster].storage_aggregates[1].name }}"
+        size:                     "{{ ontap_default_vol_size_gb }}"
+        size_unit:                gb
+        space_guarantee:          none
+        tiering_policy:           auto
         vserver:                  "{{ global_primary_san_svm }}"
-        name:                     "{{ ontap_37_lin_subsystem_name }}"
-        os_type:                  "linux"
-        hosts :                   "{{ hostvars[global_primary_linux_host].ansible_hostnqn }}"
         <<: *input
-
+      loop:
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
+  
   post_tasks:
