@@ -1,0 +1,59 @@
+################################################################################
+#
+# Title:        ONTAP-37-03 - Subsystems & Mappings
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-10-30
+# Description:  NVMe/TCP
+#               - Subsystems & Mappings
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-37-03 - Subsystems & Mappings"
+  gather_facts:                   false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../vars/labondemand/vars.yml
+    - ../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Create LUNs
+      netapp.ontap.na_ontap_nvme_namespace:
+        state:                    present
+        vserver:                  "{{ global_primary_san_svm }}"
+        path:                     "{{ item }}"
+        size:                     "{{ ontap_default_lun_size_gb }}"
+        size_unit:                "gb"
+        os_type:                  "linux"
+        <<: *input
+      loop:
+        "{{ ontap_37_lin_namespaces }}"
+
+    - name: Map Namespaces to Subsystem
+      netapp.ontap.na_ontap_nvme_subsystem:
+        state:                    present
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ ontap_37_lin_subsystem_name }}"
+        os_type:                  "linux"
+        paths:                    "{{ ontap_37_lin_namespaces }}"
+        <<: *input
+
+  post_tasks:

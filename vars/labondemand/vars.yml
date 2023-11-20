@@ -12,6 +12,7 @@ ontap_default_fg_size_gb:         102400
 ontap_default_fg_size_increment_gb: 1024
 ontap_default_fg_multiplier:      8
 ontap_default_lun_size_gb:        5
+ontap_default_ns_size_gb:         5
 ontap_iscsi_vendor_id:            "3600a0980"
 linux_default_mount_dir:          "/mnt"
 
@@ -81,6 +82,14 @@ ontap_35_win_luns:
   - "/vol/ontap_35_win_vol03/ontap_35_win_lun03"
 linux_35_default_mount_dir:       "/mnt/35"
 windows_35_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\35"
+
+# ONTAP-37 - NVMe/TCP
+ontap_37_lin_subsystem_name:      "ontap_37_lin_subs01"
+ontap_37_lin_namespaces:
+  - "/vol/ontap_37_lin_vol01/ontap_37_lin_ns01"
+  - "/vol/ontap_37_lin_vol02/ontap_37_lin_ns02"
+  - "/vol/ontap_37_lin_vol03/ontap_37_lin_ns03"
+linux_37_default_mount_dir:       "/mnt/37"
 
 # ONTAP-41 - NFS FlexClone
 ontap_41_policy_name:             "ontap_41_policy"
