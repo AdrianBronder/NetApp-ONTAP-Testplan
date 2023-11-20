@@ -42,7 +42,7 @@
         path:                     "{{ item }}"
         size:                     "{{ ontap_default_lun_size_gb }}"
         size_unit:                "gb"
-        os_type:                  "linux"
+        ostype:                   "linux"
         <<: *input
       loop:
         "{{ ontap_37_lin_namespaces }}"
