@@ -48,7 +48,7 @@
 
     - name: Disconnect NVMe namespaces
       ansible.builtin.command:
-        cmd: "nvme disconnect --device={{ (linux_ontap_ns.ONTAPdevices |
+        cmd: "nvme disconnect --device {{ (linux_ontap_ns.ONTAPdevices |
                                            selectattr('Namespace_Path', 'defined') |
                                            selectattr('Namespace_Path', '==', item ) |
                                            first ).Device }}"
