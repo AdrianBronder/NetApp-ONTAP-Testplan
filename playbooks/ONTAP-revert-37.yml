@@ -41,21 +41,17 @@
 
     - name: Read connected namespaces
       ansible.utils.cli_parse:
-        command: "nvme netapp ontapdevices -o json"
+        command: "nvme list-subsys -o json"
         parser:
           name: ansible.utils.json
-        set_fact: linux_ontap_ns
+        set_fact: linux_ontap_subs
 
     - name: Disconnect NVMe namespaces
       ansible.builtin.command:
-        cmd: "nvme disconnect --device={{ (linux_ontap_ns.ONTAPdevices |
-                                           selectattr('Namespace_Path', 'defined') |
-                                           selectattr('Namespace_Path', '==', item ) |
-                                           first ).Device }}"
-      loop_control:
-        label: "{{ item.ip.address }}"
-      loop:
-        "{{ ontap_37_lin_namespaces }}"
+        cmd: "nvme disconnect --nqn={{ (linux_ontap_subs.Subsystems |
+                                        selectattr('NQN', 'defined') |
+                                        selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
+                                        first ).NQN }}"
 
   post_tasks:
 
