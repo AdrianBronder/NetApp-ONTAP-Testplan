@@ -48,7 +48,7 @@
     - name: Build filesystem on namespaces
       community.general.filesystem:
         fstype:                   "ext4"
-        dev:                      "{{ (linux_ontap_ns.ONTAPdevices |
+        dev:                      "{{ (linux_ontap_ns.stdout.ONTAPdevices |
                                        selectattr('Namespace_Path', 'defined') |
                                        selectattr('Namespace_Path', '==', item ) |
                                        first ).Device }}"
@@ -66,7 +66,7 @@
     - name: Mount namespaces
       ansible.posix.mount:
         state:                    "mounted"
-        src:                      "{{ (linux_ontap_ns.ONTAPdevices |
+        src:                      "{{ (linux_ontap_ns.stdout.ONTAPdevices |
                                        selectattr('Namespace_Path', 'defined') |
                                        selectattr('Namespace_Path', '==', item ) |
                                        first ).Device }}"
