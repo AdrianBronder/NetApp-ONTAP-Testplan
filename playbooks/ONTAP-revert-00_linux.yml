@@ -163,6 +163,7 @@
                               selectattr('name', '==', item ) |
                               first ).serial_hex }}"
       when:
+        - hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.num_records|int > 0
         - (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
            selectattr('name', 'defined') |
            selectattr('name', '==', item ) |
