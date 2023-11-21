@@ -85,6 +85,7 @@
         vserver:                  "{{ global_primary_san_svm }}"
         subsystem:                "{{ ontap_37_lin_subsystem_name }}"
         skip_mapped_check:        true
+        skip_host_check:          true
         <<: *input
 
     - name: Remove namespaces
