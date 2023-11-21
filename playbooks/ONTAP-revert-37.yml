@@ -39,17 +39,23 @@
         path:                       "{{ linux_37_default_mount_dir }}"
         state:                      "absent"
 
+    - name: Read connected namespaces
+      ansible.utils.cli_parse:
+        command: "nvme netapp ontapdevices -o json"
+        parser:
+          name: ansible.utils.json
+        set_fact: linux_ontap_ns
+
     - name: Disconnect NVMe namespaces
       ansible.builtin.command:
-        cmd: "nvme disconnect-all -t tcp -a {{ item.ip.address }}"
+        cmd: "nvme disconnect --device={{ (linux_ontap_ns.ONTAPdevices |
+                                           selectattr('Namespace_Path', 'defined') |
+                                           selectattr('Namespace_Path', '==', item ) |
+                                           first ).Device }}"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
-            selectattr('svm.name', 'defined') |
-            selectattr('svm.name', '==', global_primary_san_svm) |
-            selectattr('service_policy.name', 'search', 'nvme-tcp') |
-            list }}"
+        "{{ ontap_37_lin_namespaces }}"
 
   post_tasks:
 
