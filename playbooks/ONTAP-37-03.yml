@@ -33,7 +33,7 @@
   
 
 - hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-37-01 - Subsystem - ONTAP"
+  name:                           "ONTAP-37-03 - Subsystem - ONTAP"
   gather_facts:                   false
   vars:
     input: &input
