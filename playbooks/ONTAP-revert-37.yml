@@ -79,6 +79,14 @@
     - netapp.ontap
 
   tasks:
+    - name: Remove subsystem
+      netapp.ontap.na_ontap_nvme_subsystem:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        subsystem:                "{{ ontap_37_lin_subsystem_name }}"
+        skip_mapped_check:        true
+        <<: *input
+
     - name: Remove namespaces
       netapp.ontap.na_ontap_nvme_namespace:
         state:                    absent
@@ -87,13 +95,6 @@
         <<: *input
       loop:
         "{{ ontap_37_lin_namespaces }}"
-  
-    - name: Remove subsystems
-      netapp.ontap.na_ontap_nvme_subsystem:
-        state:                    absent
-        vserver:                  "{{ global_primary_san_svm }}"
-        subsystem:                "{{ ontap_37_lin_subsystem_name }}"
-        <<: *input
 
     - name: Remove volumes
       netapp.ontap.na_ontap_volume:
