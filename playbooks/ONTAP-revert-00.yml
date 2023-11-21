@@ -69,8 +69,8 @@
     - name: Remove all namespaces from clusters
       netapp.ontap.na_ontap_nvme_namespace:
         state:                    absent
-        vserver:                  "{{ global_primary_san_svm }}"
-        path:                     "{{ item }}"
+        vserver:                  "{{ item.svm.name }}"
+        path:                     "{{ item.name }}"
         <<: *input
       when:
         - nvme_ns_info.ontap_info.storage_namespaces.num_records|int > 0
