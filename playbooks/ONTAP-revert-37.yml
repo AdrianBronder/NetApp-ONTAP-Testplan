@@ -54,7 +54,7 @@
   post_tasks:
 
   - hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-revert-35 - iSCSI - ONTAP"
+  name:                           "ONTAP-revert-37 - NVMe/TCP - ONTAP"
   gather_facts:                   false
   vars:
     input: &input
