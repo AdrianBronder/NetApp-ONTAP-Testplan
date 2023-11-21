@@ -49,6 +49,24 @@
         <<: *input_read
       register: lun_info
 
+    - name: Get NVMe subsystems from "{{ global_primary_san_svm }}"
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/nvme/subsystems"
+        use_python_keys:          true
+        <<: *input
+      register: nvme_subsys_info
+
+    - name: Get all NVMe namespaces from "{{ global_primary_san_svm }}"
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/namespaces"
+        fields:
+          - "svm"
+        use_python_keys:            true
+        <<: *input
+      register: nvme_ns_info
+
   post_tasks:
 
 - hosts:              "linux"
@@ -61,6 +79,38 @@
     - ansible.posix
 
   tasks:
+    - name: Unmount Namespaces
+      ansible.posix.mount:
+        state:                      "absent"
+        path:                       "{{ linux_37_default_mount_dir }}/{{ item | split('/') | last }}"
+      loop:
+        "{{ ontap_37_lin_namespaces }}"
+
+    - name: Remove default Namespace mount directory
+      ansible.builtin.file:
+        path:                       "{{ linux_37_default_mount_dir }}"
+        state:                      "absent"
+
+    - name: Read connected namespaces
+      ansible.utils.cli_parse:
+        command: "nvme list-subsys -o json"
+        parser:
+          name: ansible.utils.json
+        set_fact: linux_ontap_subs
+
+    - name: Disconnect NVMe namespaces
+      ansible.builtin.command:
+        cmd: "nvme disconnect --nqn={{ (linux_ontap_subs.Subsystems |
+                                        selectattr('NQN', 'defined') |
+                                        selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
+                                        first ).NQN }}"
+      when:
+        - linux_ontap_subs.Subsystems is defined
+        - linux_ontap_subs.Subsystems |
+          selectattr('NQN', 'defined') |
+          selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
+          length > 0 
+
     - name: Unmount LUNs
       ansible.posix.mount:
         state:                      "absent"

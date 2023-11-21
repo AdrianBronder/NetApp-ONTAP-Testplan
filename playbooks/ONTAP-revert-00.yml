@@ -34,6 +34,50 @@
     - netapp.ontap
 
   tasks:
+    - name: Get all NVMe subsystems from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/nvme/subsystems"
+        use_python_keys:            true
+        <<: *input
+      register: nvme_subsys_info
+
+    - name: Remove all subsystems from clusters
+      netapp.ontap.na_ontap_nvme_subsystem:
+        state:                    absent
+        vserver:                  "{{ item.svm.name }}"
+        subsystem:                "{{ item.name }}"
+        skip_mapped_check:        true
+        skip_host_check:          true
+        <<: *input
+      when:
+        - nvme_subsys_info.ontap_info.protocols_nvme_subsystems.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ nvme_subsys_info.ontap_info.protocols_nvme_subsystems.records }}"
+
+    - name: Get all NVMe namespaces from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/namespaces"
+        fields:
+          - "svm"
+        use_python_keys:            true
+        <<: *input
+      register: nvme_ns_info
+
+    - name: Remove all namespaces from clusters
+      netapp.ontap.na_ontap_nvme_namespace:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        path:                     "{{ item }}"
+        <<: *input
+      when:
+        - nvme_ns_info.ontap_info.storage_namespaces.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ nvme_ns_info.ontap_info.storage_namespaces.records }}"
+
     - name: Get all LUN mappings from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
