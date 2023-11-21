@@ -54,7 +54,7 @@
         gather_subset:
           - "protocols/nvme/subsystems"
         use_python_keys:          true
-        <<: *input
+        <<: *input_read
       register: nvme_subsys_info
 
     - name: Get all NVMe namespaces from "{{ global_primary_san_svm }}"
@@ -64,7 +64,7 @@
         fields:
           - "svm"
         use_python_keys:            true
-        <<: *input
+        <<: *input_read
       register: nvme_ns_info
 
   post_tasks:
