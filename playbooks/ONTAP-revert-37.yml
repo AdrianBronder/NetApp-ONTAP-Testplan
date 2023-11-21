@@ -52,6 +52,11 @@
                                         selectattr('NQN', 'defined') |
                                         selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
                                         first ).NQN }}"
+      when:
+        - linux_ontap_subs.Subsystems |
+          selectattr('NQN', 'defined') |
+          selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
+          lenght > 0 
 
   post_tasks:
 
