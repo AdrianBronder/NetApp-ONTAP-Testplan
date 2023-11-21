@@ -75,6 +75,7 @@
                                        selectattr('Namespace_Path', 'defined') |
                                        selectattr('Namespace_Path', '==', item ) |
                                        first ).Device }}"
+        path:                     "{{ linux_37_default_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                   "ext4"
         opts:                     "discard"
       loop:
