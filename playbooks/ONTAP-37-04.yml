@@ -41,17 +41,22 @@
             list }}"
 
     - name: Read connected namespaces
-      ansible.builtin.command:
-        cmd: "nvme netapp ontapdevices -o json"
-      register: linux_ontap_ns
+      ansible.utils.cli_parse:
+        command: "nvme netapp ontapdevices -o json"
+        parser:
+          name: ansible.utils.json
+        set_fact: linux_ontap_ns
 
     - name: Build filesystem on namespaces
       community.general.filesystem:
         fstype:                   "ext4"
-        dev:                      "{{ ((linux_ontap_ns.stdout | to_json ).ONTAPdevices |
+        dev:                      "{{ (linux_ontap_ns.ONTAPdevices |
                                        selectattr('Namespace_Path', 'defined') |
                                        selectattr('Namespace_Path', '==', item ) |
                                        first ).Device }}"
+      loop:
+        "{{ ontap_37_lin_namespaces }}"
+
       loop:
         "{{ ontap_37_lin_namespaces }}"
 
@@ -66,7 +71,7 @@
     - name: Mount namespaces
       ansible.posix.mount:
         state:                    "mounted"
-        src:                      "{{ ((linux_ontap_ns.stdout | to_json ).ONTAPdevices |
+        src:                      "{{ (linux_ontap_ns.ONTAPdevices |
                                        selectattr('Namespace_Path', 'defined') |
                                        selectattr('Namespace_Path', '==', item ) |
                                        first ).Device }}"
