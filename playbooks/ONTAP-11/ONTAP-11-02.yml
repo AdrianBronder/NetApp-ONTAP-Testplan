@@ -203,5 +203,3 @@
   - name: Show all domain tunnel svms
     ansible.builtin.debug:
       msg: "{{ ontap.ontap_info.security_authentication_cluster_ad_proxy }}"
-
-  post_tasks:
