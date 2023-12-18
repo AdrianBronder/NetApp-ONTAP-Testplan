@@ -19,8 +19,8 @@
   name:               "ONTAP-revert-41 - NFS FlexClone - Linux"
   gather_facts:       false
   vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
   collections:
     - ansible.posix
 
@@ -99,8 +99,8 @@
       validate_certs: false
       use_rest:       "always"
   vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
   collections:
     - netapp.ontap
 

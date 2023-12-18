@@ -13,8 +13,8 @@
   name:               ONTAP-31-05 - Mount & Write (FlexGroups)
   gather_facts:       false
   vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
   collections:
     - ansible.posix
     - community.general

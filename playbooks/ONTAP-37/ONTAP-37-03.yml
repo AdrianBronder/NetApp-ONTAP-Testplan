@@ -19,8 +19,8 @@
   name:                           "ONTAP-37-03 - Subsystem - Linux"
   gather_facts:                   true
   vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
   collections:
     - community.general
     - ansible.posix
@@ -44,8 +44,8 @@
       validate_certs:             false
       use_rest:                   "always"
   vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
   collections:
     - netapp.ontap
 

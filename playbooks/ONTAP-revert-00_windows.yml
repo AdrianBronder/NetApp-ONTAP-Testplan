@@ -19,8 +19,8 @@
   name:               "ONTAP-revert-00 - Return to Day0 - Windows"
   gather_facts:       false
   vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
   collections:
     - ansible.windows
     - community.windows

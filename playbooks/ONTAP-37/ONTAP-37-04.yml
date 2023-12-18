@@ -19,8 +19,8 @@
   name:                           "ONTAP-37-04 - Mount & Write (Linux)"
   gather_facts:                   true
   vars_files:
-    - ../vars/labondemand/vars.yml
-    - ../vars/labondemand/vault.yml
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
   collections:
     - community.general
     - ansible.posix
@@ -54,9 +54,6 @@
                                        selectattr('Namespace_Path', 'defined') |
                                        selectattr('Namespace_Path', '==', item ) |
                                        first ).Device }}"
-      loop:
-        "{{ ontap_37_lin_namespaces }}"
-
       loop:
         "{{ ontap_37_lin_namespaces }}"
 
