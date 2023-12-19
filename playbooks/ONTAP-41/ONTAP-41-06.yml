@@ -4,7 +4,7 @@
 # Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-08
-# Description:  NFS Flexclone
+# Description:  Cloning (NFS)
 #               - Mount & Write (FlexClone Volume)
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
@@ -34,7 +34,7 @@
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
         state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:\
                                      /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         path:                       "{{ linux_41_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
 #        opts:                       "rw,sync,hard,vers=3"
@@ -49,7 +49,7 @@
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
         state:                      "mounted"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:\
                                      /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         path:                       "{{ linux_41_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
         # opts:                       "rw,sync,hard,vers=3"

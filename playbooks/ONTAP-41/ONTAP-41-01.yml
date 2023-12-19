@@ -4,7 +4,7 @@
 # Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-08
-# Description:  NFS Flexclone
+# Description:  Cloning (NFS)
 #               - Export Policies & Rules
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
