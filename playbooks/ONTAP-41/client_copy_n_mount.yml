@@ -36,7 +36,7 @@
 
 - name: "Index: {{ item }} - Step: 2 Create mount directories - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
   ansible.builtin.file:
-    path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+    path:                       "{{ linux_41_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
     state:                      "directory"
     mode:                       "0755"
   
@@ -45,12 +45,12 @@
     state:                      "mounted"
     src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
                                   /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
-    path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+    path:                       "{{ linux_41_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
     fstype:                     "nfs"
 
 - name: "Index: {{ item }} - Step: 4 Create test file on each export - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
   community.general.filesize:
-    path: "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}/moreops_{{ pipe_timestamp }}"
+    path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}/moreops_{{ pipe_timestamp }}"
     size: "{{ filesize | default('500MB') }}"
 
 # - name: "Index: {{ item }} - 4 Create test file on each export - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"

@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-41-04 - Client Write (origin volume)
+# Title:        ONTAP-41-04 - Client Write (Origin Volume)
 # Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-08
 # Description:  NFS Flexclone
-#               - Client Write (origin volume)
+#               - Client Write (Origin Volume)
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-41-04 - Client Write (origin volume)"
+  name:               "ONTAP-41-04 - Client Write (Origin Volume)"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -33,7 +33,7 @@
   tasks:
     - name: Create test file on NFS export
       community.general.filesize:
-        path: "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_extraop_{{ pipe_timestamp }}"
+        path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_extraop_{{ pipe_timestamp }}"
         size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

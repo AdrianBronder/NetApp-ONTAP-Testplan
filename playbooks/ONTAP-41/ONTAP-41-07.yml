@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-41-07- Client Write (flexclone volume)
+# Title:        ONTAP-41-07- Client Write (Clone)
 # Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-08
 # Description:  NFS Flexclone
-#               - Client Write (flexclone volume)
+#               - Client Write (Clone)
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-41-07 - Client Write (Flexclone Volume)"
+  name:               "ONTAP-41-07 - Client Write (Clone)"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -33,7 +33,7 @@
   tasks:
     - name: Create test file on each export
       community.general.filesize:
-        path: "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/extraop_{{ pipe_timestamp }}"
+        path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/extraop_{{ pipe_timestamp }}"
         size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

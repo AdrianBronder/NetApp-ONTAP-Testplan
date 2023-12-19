@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-41-03 - Mount & Write (Volume)
+# Title:        ONTAP-41-03 - Mount & Write (Origin Volume)
 # Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-08
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-41-03 - Mount & Write (Volume)"
+  name:               "ONTAP-41-03 - Mount & Write (Origin Volume)"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -35,14 +35,14 @@
       ansible.posix.mount:
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_41_vol_name }}/{{ ontap_41_vol_name }}"
+                                     {{ ontap_41_vol_name }}"
         path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
   
     - name: Create mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}"
+        path:                       "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}"
         state:                      "directory"
         mode:                       "0755"
   
@@ -51,13 +51,13 @@
         state:                      "mounted"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
                                      {{ ontap_41_vol_name }}"
-        path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}"
+        path:                       "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}"
         # opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
   
     - name: Create test file on NFS export
       community.general.filesize:
-        path: "{{ linux_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_original_{{ pipe_timestamp }}"
+        path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_vol_name }}/{{ ontap_41_snapshot_name }}_original_{{ pipe_timestamp }}"
         size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

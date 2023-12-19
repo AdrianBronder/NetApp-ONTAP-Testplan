@@ -70,7 +70,7 @@
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
   
-    - name: Create read-write export policy rules for SVM root volume
+    - name: Create read-write export policy rules for data volumes
       na_ontap_export_policy_rule:
         state:                      present
         name:                       "{{ ontap_41_policy_name }}"

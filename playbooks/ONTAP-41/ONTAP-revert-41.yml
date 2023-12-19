@@ -50,7 +50,7 @@
       ansible.posix.mount:
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-        path:                       "{{ linux_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_41_default_mount_dir }}/{{ item }}"
         # opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
       loop:
@@ -69,7 +69,7 @@
   
     - name: Remove mount directories from Linux Client
       ansible.builtin.file:
-        path:                       "{{ linux_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_41_default_mount_dir }}/{{ item }}"
         state:                      "absent"
         mode:                       "0755"
       loop:
