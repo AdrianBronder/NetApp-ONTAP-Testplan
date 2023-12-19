@@ -27,32 +27,32 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
    ```
 4. Execute test steps, e.g. general connection test playbook "ONTAP-01-04.yml"
    ```
-   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-01-04.yml
+   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-01/ONTAP-01-04.yml
    ```
 
 
 # Further Execution Examples
 - Execute a single test step (e.g. ONTAP-02-02 - Physical Network):
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10-02.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-02.yml
   ```
 - Executing an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10-*.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-*.yml
   ```
 - Revert configuration changed and objects created during a test frame:
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-31.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-31/ONTAP-revert-31.yml
   ```
 - Executing ALL tests with a single command (and track the execution time)
   ```
-  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-[0-9]*.yml
+  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-*/ONTAP-[0-9]*.yml
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-00_linux.yml
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-00_windows.yml
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-revert-00.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/ONTAP-revert-00_linux.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/ONTAP-revert-00_windows.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/ONTAP-revert-00.yml
   ```
 
 
@@ -105,17 +105,6 @@ The playbooks can be executed in any other non-production environments for demos
 
 
 # Changelog
-
-## v1.1
-Additions:
-* NFS Flexclone Test Case workflow - ONTAP-41-xx
-* Added ONTAP-revert-41 to accomadate clones
-* Test Plan Test Case List for ready reference
-* Added ONTAP-41-08 - Creates & Mounts 10 cloned instances
-
-Changes:
-* Minor task name updates
-* Updated ONTAP-revert-00_linux to support ONTAP-41 tasks
 
 ## v1.0
 Initial Release
