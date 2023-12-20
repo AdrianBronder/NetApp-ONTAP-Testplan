@@ -186,12 +186,3 @@
         path:                     "{{ linux_default_mount_dir }}"
         state:                    "absent"
         mode:                     "0755"
-
-    - name: Remove default parent mount directory
-      ansible.builtin.file:
-        path:                       "{{ item }}"
-        state:                      "absent"
-        mode:                       "0755"
-      loop:
-        - "{{ linux_31_mount_dir }}"
-        - "{{ linux_41_mount_dir }}"
