@@ -82,13 +82,13 @@
     - name: Unmount Namespaces
       ansible.posix.mount:
         state:                      "absent"
-        path:                       "{{ linux_37_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                       "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
       loop:
         "{{ ontap_37_lin_namespaces }}"
 
     - name: Remove default Namespace mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_37_default_mount_dir }}"
+        path:                       "{{ linux_37_mount_dir }}"
         state:                      "absent"
 
     - name: Read connected namespaces
@@ -114,13 +114,13 @@
     - name: Unmount LUNs
       ansible.posix.mount:
         state:                      "absent"
-        path:                       "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                       "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
       loop:
         "{{ ontap_35_lin_luns }}"
 
     - name: Remove default LUN mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_35_default_mount_dir }}"
+        path:                       "{{ linux_35_mount_dir }}"
         state:                      "absent"
 
     - name: List iSCSI targets
@@ -177,7 +177,7 @@
       ansible.posix.mount:
         state:                    "absent"
         src:                      "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-        path:                     "{{ linux_31_default_mount_dir }}/{{ item }}"
+        path:                     "{{ linux_31_mount_dir }}/{{ item }}"
         # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
       loop:
@@ -191,7 +191,7 @@
         state:                    "absent"
         mode:                     "0755"
       loop:
-        "{{ ansible_mounts | selectattr(global_primary_nas_svm, 'in', 'device' )}}"
+        "{{ ansible_mounts | selectattr('device', 'search', global_primary_nas_svm)}}"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
@@ -199,5 +199,5 @@
         state:                      "absent"
         mode:                       "0755"
       loop:
-        - "{{ linux_31_default_mount_dir }}"
-        - "{{ linux_41_default_mount_dir }}"
+        - "{{ linux_31_mount_dir }}"
+        - "{{ linux_41_mount_dir }}"
