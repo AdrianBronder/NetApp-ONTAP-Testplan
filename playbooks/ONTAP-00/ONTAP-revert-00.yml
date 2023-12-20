@@ -148,12 +148,28 @@
           - "storage/volumes"
         fields:
           - "svm"
+          - "clone"
         parameters:
           is_svm_root:            false
         use_python_keys:          true
         <<: *input
       register: vol_info
-  
+
+    - name: Delete all volume clones from clusters
+      netapp.ontap.na_ontap_volume:
+        state:                    absent
+        name:                     "{{ item.name }}"
+        vserver:                  "{{ item.svm.name }}" 
+        wait_for_completion:      true
+        <<: *input
+      when:
+        - vol_info.ontap_info.storage_volumes.num_records|int > 0
+        - item.name is defined
+        - item.clone is defined
+        - item.clone.is_flexclone
+      loop:
+        "{{ vol_info.ontap_info.storage_volumes.records }}"
+
     - name: Delete all volumes from clusters
       netapp.ontap.na_ontap_volume:
         state:                    absent
