@@ -71,7 +71,7 @@
 
 - hosts:              "linux"
   name:               "ONTAP-revert-00 - Return to Day0 - Linux"
-  gather_facts:       false
+  gather_facts:       true
   vars_files:
     - ../../vars/labondemand/vars.yml
     - ../../vars/labondemand/vault.yml
@@ -187,13 +187,11 @@
   
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                     "{{ linux_default_mount_dir }}/{{ item }}"
+        path:                     "{{ linux_default_mount_dir }}/{{ item.mount }}"
         state:                    "absent"
         mode:                     "0755"
       loop:
-        "{{ ontap_31_vol_qtree_names + 
-            ontap_31_fg_qtree_names +
-            [ontap_41_vol_name] }}"
+        "{{ ansible_mounts | selectattr(global_primary_nas_svm, 'in', 'device' )}}"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
