@@ -179,17 +179,13 @@
         # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
       loop:
-        "{{ ontap_31_vol_qtree_names + 
-            ontap_31_fg_qtree_names +
-            [ontap_41_vol_name] }}"
+        "{{ ansible_mounts | selectattr('device', 'search', global_primary_nas_svm)}}"
   
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                     "{{ linux_default_mount_dir }}/{{ item.mount }}"
+        path:                     "{{ linux_default_mount_dir }}
         state:                    "absent"
         mode:                     "0755"
-      loop:
-        "{{ ansible_mounts | selectattr('device', 'search', global_primary_nas_svm)}}"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
