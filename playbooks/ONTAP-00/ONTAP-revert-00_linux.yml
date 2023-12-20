@@ -175,7 +175,7 @@
       ansible.posix.mount:
         state:                    "absent"
         src:                      "{{ item.device }}"
-        path:                     "{{ item.device }}"
+        path:                     "{{ item.mount }}"
         # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
       loop:
