@@ -38,12 +38,18 @@
 | 35-03 | iSCSI	                            | LUNs & Mappings                       |
 | 35-04 | iSCSI	                            | Mount & Write (Linux)                 |
 | 35-05 | iSCSI	                            | Mount & Write (Windows)               |
-| 41-01 | NFS Flexclone	                    | Export Policies & Rules               |
-| 41-02 | NFS Flexclone	                    | Volumes & Qtrees                      |
-| 41-03 | NFS Flexclone	                    | Mount & Write (Volumes)               |
-| 41-04 | NFS Flexclone	                    | Volume Clone                          |
-| 41-05 | NFS Flexclone	                    | Client Mount of Volume Clone          |
-| 41-06 | NFS Flexclone	                    | Client Write                          |
+| 37-01 | NVMe/TCP	                        | Volumes                               |
+| 37-02 | NVMe/TCP	                        | Namespaces                            |
+| 37-03 | NVMe/TCP	                        | Subsystem                             |
+| 37-04 | NVMe/TCP	                        | Mount & Write (Linux)                 |
+| 41-01 | Cloning (NFS)	                    | Export Policies & Rules               |
+| 41-02 | Cloning (NFS)	                    | Origin Volume                         |
+| 41-03 | Cloning (NFS)	                    | Mount & Write (Origin Volume)         |
+| 41-04 | Cloning (NFS)	                    | Client Write (Origin Volume)          |
+| 41-05 | Cloning (NFS)	                    | Clone Volume                          |
+| 41-06 | Cloning (NFS)	                    | Mount & Write (Clone)                 |
+| 41-07 | Cloning (NFS)	                    | Client Write (Clone)                  |
+| 41-08 | Cloning (NFS)	                    | Clone & Write (Loop)                  |
 |  ---  |                                   |                                       |
 | Revert-00_linux   | Revert all systems to initial state - Linux                 | |
 | Revert-00_windows | Revert all systems to initial state - Windows               | |
@@ -51,4 +57,5 @@
 | Revert-31         | Revert all steps performed in test frame 31 - NFS           | |
 | Revert-32         | Revert all steps performed in test frame 32 - CIFS          | |
 | Revert-35         | Revert all steps performed in test frame 35 - iSCSI         | |
+| Revert-37         | Revert all steps performed in test frame 37 - NVMe/TCP      | |
 | Revert-41         | Revert all steps performed in test frame 41 - NFS FlexClone | |
