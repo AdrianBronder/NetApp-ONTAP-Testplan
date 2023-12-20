@@ -183,7 +183,7 @@
   
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                     "{{ linux_default_mount_dir }}
+        path:                     "{{ linux_default_mount_dir }}"
         state:                    "absent"
         mode:                     "0755"
 
