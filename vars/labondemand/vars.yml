@@ -14,7 +14,8 @@ ontap_default_fg_multiplier:      8
 ontap_default_lun_size_gb:        5
 ontap_default_ns_size_gb:         5
 ontap_iscsi_vendor_id:            "3600a0980"
-linux_default_mount_dir:          "/mnt"
+linux_default_mount_dir:          "/mnt/ontap_test"
+windows_default_mount_dir:        "C:\\Users\\Administrator.DEMO\\Desktop\\ontap_test"
 
 # ONTAP-12 - Cluster User Management
 ontap_12_local_ro:                "na_local_ro"
@@ -44,7 +45,7 @@ ontap_31_fg_qtree_names:
   - "ontap_31_fg_qt03"
   - "ontap_31_fg_qt04"
   - "ontap_31_fg_qt05"
-linux_31_default_mount_dir:       "/mnt/31"
+linux_31_mount_dir:               "{{ linux_default_mount_dir }}/31"
 
 # ONTAP-32 - CIFS
 ontap_32_vol_name:                "ontap_32_cifs_vol01"
@@ -63,7 +64,7 @@ ontap_32_fg_qtree_names:
   - "ontap_32_fg_qt05"
 ontap_32_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
 ontap_32_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
-windows_32_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\32"
+windows_32_mount_dir:             "{{ windows_default_mount_dir }}\\32"
 ontap_32_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
@@ -80,8 +81,8 @@ ontap_35_win_luns:
   - "/vol/ontap_35_win_vol01/ontap_35_win_lun01"
   - "/vol/ontap_35_win_vol02/ontap_35_win_lun02"
   - "/vol/ontap_35_win_vol03/ontap_35_win_lun03"
-linux_35_default_mount_dir:       "/mnt/35"
-windows_35_default_mount_dir:     "C:\\Users\\Administrator.DEMO\\Desktop\\35"
+linux_35_mount_dir:               "{{ linux_default_mount_dir }}/35"
+windows_35_mount_dir:             "{{ windows_default_mount_dir }}\\35"
 
 # ONTAP-37 - NVMe/TCP
 ontap_37_lin_subsystem_name:      "ontap_37_lin_subs01"
@@ -89,7 +90,7 @@ ontap_37_lin_namespaces:
   - "/vol/ontap_37_lin_vol01/ontap_37_lin_ns01"
   - "/vol/ontap_37_lin_vol02/ontap_37_lin_ns02"
   - "/vol/ontap_37_lin_vol03/ontap_37_lin_ns03"
-linux_37_default_mount_dir:       "/mnt/37"
+linux_37_mount_dir:               "/mnt/37"
 
 # ONTAP-41 - NFS FlexClone
 ontap_41_policy_name:             "ontap_41_policy"
@@ -97,4 +98,4 @@ ontap_41_vol_name:                "ontap_41_nfs_vol01"
 ontap_41_snapshot_name:           "software_source"
 ontap_41_clone_dir_name:          "clonedir"
 ontap_41_clone_vol_name:          "{{ ontap_41_snapshot_name }}"
-linux_41_default_mount_dir:       "/mnt/41"
+linux_41_mount_dir:               "{{ linux_default_mount_dir }}/41"

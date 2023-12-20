@@ -152,12 +152,12 @@
 
     - name: Create root mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_35_default_mount_dir }}"
+        path:                     "{{ windows_35_mount_dir }}"
         state:                    directory
 
     - name: Create mount directories for LUNs
       ansible.windows.win_file:
-        path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}"
+        path:                     "{{ windows_35_mount_dir }}\\{{ item | split('/') | last }}"
         state:                    directory
       loop:
         "{{ ontap_35_win_luns }}"
@@ -190,7 +190,7 @@
                                                                           first ).serial_number) |
                                        first ).number }} \
            -PartitionNumber 2 \
-           -AccessPath {{windows_35_default_mount_dir}}\\\\{{ item | split('/') | last }}"
+           -AccessPath {{windows_35_mount_dir}}\\\\{{ item | split('/') | last }}"
       loop:
         "{{ ontap_35_win_luns }}"
 
@@ -212,7 +212,7 @@
 
     - name: Create test file on each LUN
       ansible.windows.win_file:
-        path:                     "{{ windows_35_default_mount_dir }}\\{{ item | split('/') | last }}\\{{ item | split('/') | last }}_testfile"
+        path:                     "{{ windows_35_mount_dir }}\\{{ item | split('/') | last }}\\{{ item | split('/') | last }}_testfile"
         state:                    touch
       loop:
         "{{ ontap_35_win_luns }}"

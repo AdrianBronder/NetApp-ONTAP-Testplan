@@ -30,7 +30,7 @@
   tasks:
     - name: Create mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_32_default_mount_dir }}"
+        path:                     "{{ windows_32_mount_dir }}"
         state:                    directory
 
     - name: 
@@ -47,7 +47,7 @@
           community.windows.win_shortcut:
             state:                present
             src:                  "\\\\{{ global_primary_nas_svm }}\\{{ item }}"
-            dest:                 "{{ windows_32_default_mount_dir }}\\{{ item }}.lnk"
+            dest:                 "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
           loop:
             "{{ ontap_32_fg_qtree_names }}"
 

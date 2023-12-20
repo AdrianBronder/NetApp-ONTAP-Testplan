@@ -59,7 +59,7 @@
 
     - name: Create mount directory  
       ansible.builtin.file:
-        path:                     "{{ linux_37_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                     "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
         state:                    "directory"
         mode:                     "0755"
       loop:
@@ -72,7 +72,7 @@
                                        selectattr('Namespace_Path', 'defined') |
                                        selectattr('Namespace_Path', '==', item ) |
                                        first ).Device }}"
-        path:                     "{{ linux_37_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                     "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                   "ext4"
         opts:                     "discard"
       loop:
@@ -80,7 +80,7 @@
   
     - name: Create test file on Namespace
       community.general.filesize:
-        path: "{{ linux_37_default_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"
+        path: "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"
         size: 50MB
       loop:
         "{{ ontap_37_lin_namespaces }}"

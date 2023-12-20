@@ -30,13 +30,13 @@
     - name: Unmount Namespaces
       ansible.posix.mount:
         state:                      "absent"
-        path:                       "{{ linux_37_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                       "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
       loop:
         "{{ ontap_37_lin_namespaces }}"
   
     - name: Remove default Namespace mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_37_default_mount_dir }}"
+        path:                       "{{ linux_37_mount_dir }}"
         state:                      "absent"
 
     - name: Read connected namespaces

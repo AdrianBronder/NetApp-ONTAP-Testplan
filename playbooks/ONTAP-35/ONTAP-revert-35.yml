@@ -66,13 +66,13 @@
     - name: Unmount LUNs
       ansible.posix.mount:
         state:                      "absent"
-        path:                       "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                       "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
       loop:
         "{{ ontap_35_lin_luns }}"
   
     - name: Remove default LUN mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_35_default_mount_dir }}"
+        path:                       "{{ linux_35_mount_dir }}"
         state:                      "absent"
 
     - name: List iSCSI targets
@@ -178,7 +178,7 @@
 
     - name: Remove root mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_35_default_mount_dir }}"
+        path:                     "{{ windows_35_mount_dir }}"
         state:                    absent
 
   post_tasks:

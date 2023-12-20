@@ -33,7 +33,7 @@
   tasks:
     - name: Create test file on each export
       community.general.filesize:
-        path: "{{ linux_41_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/extraop_{{ pipe_timestamp }}"
+        path: "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/extraop_{{ pipe_timestamp }}"
         size: "{{ filesize | default('500MB') }}"
   
   post_tasks:

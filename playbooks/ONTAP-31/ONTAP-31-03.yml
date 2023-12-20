@@ -33,7 +33,7 @@
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
                                      {{ ontap_31_vol_name }}/{{ item }}"
-        path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
       loop:
@@ -41,7 +41,7 @@
   
     - name: Create mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
         state:                      "directory"
         mode:                       "0755"
       loop:
@@ -52,7 +52,7 @@
         state:                      "mounted"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
                                      {{ ontap_31_vol_name }}/{{ item }}"
-        path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
       loop:
@@ -60,7 +60,7 @@
   
     - name: Create test file on each export
       community.general.filesize:
-        path: "{{ linux_31_default_mount_dir }}/{{ item }}/{{ item }}_testfile"
+        path: "{{ linux_31_mount_dir }}/{{ item }}/{{ item }}_testfile"
         size: 50MB
       loop:
         "{{ ontap_31_vol_qtree_names }}"

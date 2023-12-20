@@ -29,7 +29,7 @@
       ansible.posix.mount:
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_31_vol_name }}/{{ item }}"
-        path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
       loop:
@@ -39,7 +39,7 @@
       ansible.posix.mount:
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_31_fg_qtree_names }}/{{ item }}"
-        path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
       loop:
@@ -47,7 +47,7 @@
   
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_31_default_mount_dir }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
         state:                      "absent"
         mode:                       "0755"
       loop:
@@ -56,7 +56,7 @@
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_31_default_mount_dir }}"
+        path:                       "{{ linux_31_mount_dir }}"
         state:                      "absent"
         mode:                       "0755"
 

@@ -89,7 +89,7 @@
   
     - name: Create mount directory  
       ansible.builtin.file:
-        path:                     "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                     "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
         state:                    "directory"
         mode:                     "0755"
       loop:
@@ -103,7 +103,7 @@
                                       selectattr('name', 'defined') |
                                       selectattr('name', '==', item ) |
                                       first ).serial_hex }}"
-        path:                     "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}"
+        path:                     "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                   "ext4"
         opts:                     "discard"
       loop:
@@ -111,7 +111,7 @@
   
     - name: Create test file on LUN
       community.general.filesize:
-        path: "{{ linux_35_default_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"
+        path: "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"
         size: 50MB
       loop:
         "{{ ontap_35_lin_luns }}"
