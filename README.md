@@ -50,9 +50,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/ONTAP-revert-00_linux.yml
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/ONTAP-revert-00_windows.yml
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/ONTAP-revert-00.yml
+  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
   ```
 
 

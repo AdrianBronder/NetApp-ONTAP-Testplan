@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-    - name: Get LUNs from "{{ global_primary_san_svm }}"
+    - name: Get LUNs from "{{ global_primary_test_cluster }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "storage/luns"
@@ -43,13 +43,11 @@
           - "svm"
           - "location"
           - "serial_number"
-        parameters:
-          svm.name:               "{{ global_primary_san_svm }}"
         use_python_keys:          true
         <<: *input_read
       register: lun_info
 
-    - name: Get NVMe subsystems from "{{ global_primary_san_svm }}"
+    - name: Get NVMe subsystems from "{{ global_primary_test_cluster }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "protocols/nvme/subsystems"
@@ -57,7 +55,7 @@
         <<: *input_read
       register: nvme_subsys_info
 
-    - name: Get all NVMe namespaces from "{{ global_primary_san_svm }}"
+    - name: Get all NVMe namespaces from "{{ global_primary_test_cluster }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "storage/namespaces"
