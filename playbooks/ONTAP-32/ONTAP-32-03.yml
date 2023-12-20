@@ -1,0 +1,67 @@
+################################################################################
+#
+# Title:        ONTAP-32-03 - Mount & Write (Volume)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-23
+# Description:  CIFS
+#               - Mount & Write (Volume)
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "win_hosts"
+  name:               "ONTAP-32-03 - Mount & Write (Volume)"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Create mount directory
+      ansible.windows.win_file:
+        path:                     "{{ windows_32_mount_dir }}"
+        state:                    directory
+
+    - name: 
+      block:
+        - name: Save network credentials
+          community.windows.win_credential:
+            state:                present
+            name:                 "{{ global_primary_nas_svm }}"
+            type:                 "domain_password"
+            username:             "{{ ontap_32_ad_admin_user }}"
+            secret:               "{{ ontap_32_ad_admin_user_pw }}"
+        
+        - name: Map shares
+          community.windows.win_shortcut:
+            state:                present
+            src:                  "\\\\{{ global_primary_nas_svm }}\\{{ item }}"
+            dest:                 "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
+          loop:
+            "{{ ontap_32_vol_qtree_names }}"
+
+        - name: Create test file on each share
+          ansible.windows.win_file:
+            path:                     "\\\\{{ global_primary_nas_svm }}\\{{ item }}\\{{ item }}_testfile"
+            state:                    touch
+          loop:
+            "{{ ontap_32_vol_qtree_names }}"
+      vars:
+        # become is required to save and retrieve the credentials in the tasks
+        ansible_become:           "yes"
+        ansible_become_method:    "runas"
+        ansible_become_user:      "{{ ansible_user }}"
+        ansible_become_pass:      "{{ ansible_password }}"
+
+  post_tasks:

@@ -1,0 +1,107 @@
+################################################################################
+#
+# Title:        ONTAP-revert-37 - NVMe/TCP
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-11-22
+# Description:  Revert all steps performed in test frame 37
+#               - NVMe/TCP
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                          "{{ global_primary_linux_host }}"
+  name:                           "ONTAP-revert-37 - NVMe/TCP - Linux"
+  gather_facts:                   false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+
+  pre_tasks:
+
+  tasks:
+    - name: Unmount Namespaces
+      ansible.posix.mount:
+        state:                      "absent"
+        path:                       "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
+      loop:
+        "{{ ontap_37_lin_namespaces }}"
+  
+    - name: Remove default Namespace mount directory
+      ansible.builtin.file:
+        path:                       "{{ linux_37_mount_dir }}"
+        state:                      "absent"
+
+    - name: Read connected namespaces
+      ansible.utils.cli_parse:
+        command: "nvme list-subsys -o json"
+        parser:
+          name: ansible.utils.json
+        set_fact: linux_ontap_subs
+
+    - name: Disconnect NVMe namespaces
+      ansible.builtin.command:
+        cmd: "nvme disconnect --nqn={{ (linux_ontap_subs.Subsystems |
+                                        selectattr('NQN', 'defined') |
+                                        selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
+                                        first ).NQN }}"
+      when:
+        - linux_ontap_subs.Subsystems is defined
+        - linux_ontap_subs.Subsystems |
+          selectattr('NQN', 'defined') |
+          selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
+          length > 0 
+
+  post_tasks:
+
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-revert-37 - NVMe/TCP - ONTAP"
+  gather_facts:                   false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+    - name: Remove subsystem
+      netapp.ontap.na_ontap_nvme_subsystem:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        subsystem:                "{{ ontap_37_lin_subsystem_name }}"
+        skip_mapped_check:        true
+        skip_host_check:          true
+        <<: *input
+
+    - name: Remove namespaces
+      netapp.ontap.na_ontap_nvme_namespace:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        path:                     "{{ item }}"
+        <<: *input
+      loop:
+        "{{ ontap_37_lin_namespaces }}"
+
+    - name: Remove volumes
+      netapp.ontap.na_ontap_volume:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ (item | split('/'))[2] }}"
+        <<: *input
+      loop:
+        "{{ ontap_37_lin_namespaces }}"

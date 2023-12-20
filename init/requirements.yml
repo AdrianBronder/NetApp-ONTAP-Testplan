@@ -1,6 +1,8 @@
 collections:
   - name:     "netapp.ontap"
     version:  "22.7.0"
+  - name:     "ansible.utils"
+    version:  "2.11.0"
   - name:     "ansible.posix"
     version:  "1.5.4"
   - name:     "ansible.windows"

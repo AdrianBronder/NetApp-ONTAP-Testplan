@@ -1,0 +1,54 @@
+################################################################################
+#
+# Title:        Client Copy and Mount Tasks
+# Author:       NetApp Inc. (ken)
+# Initial 
+# Create Date:  2023-10-10
+# Description:  Cloning (NFS)
+#               - Make Many Volumes & Mount
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- name: Get and Set Ansible date_time fact
+  set_fact:
+    pipe_timestamp: "{{ lookup('pipe', 'date +%Y%m%dT%H%M%S') }}"
+
+- name: "Index: {{ item }} - Step: 1 Create Volume clone (Flexclone) - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+  netapp.ontap.na_ontap_volume_clone:
+    state:                      present
+    vserver:                    "{{ global_primary_nas_svm }}"
+    parent_volume:              "{{ ontap_41_vol_name }}"
+    name:                       "{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+    parent_snapshot:            "{{ ontap_41_snapshot_name }}"
+    junction_path:              "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+    hostname:                   "{{ ansible_host }}"
+    username:                   "{{ ontap_admin_user }}"
+    password:                   "{{ ontap_admin_password }}"
+    https:                      true
+    validate_certs:             false
+    use_rest:                   "always"
+
+- name: "Index: {{ item }} - Step: 2 Create mount directories - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+  ansible.builtin.file:
+    path:                       "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+    state:                      "directory"
+    mode:                       "0755"
+  
+- name: "Index: {{ item }} - Step: 3 Mount NFS export on Linux host - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+  ansible.posix.mount:
+    state:                      "mounted"
+    src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:\
+                                  /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+    path:                       "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+    fstype:                     "nfs"
+
+- name: "Index: {{ item }} - Step: 4 Create test file on each export - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
+  community.general.filesize:
+    path: "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}/moreops_{{ pipe_timestamp }}"
+    size: "{{ filesize | default('500MB') }}"

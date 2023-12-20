@@ -1,0 +1,246 @@
+################################################################################
+#
+# Title:        ONTAP-revert-35 - iSCSI
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-10-30
+# Description:  Revert all steps performed in test frame 35
+#               - iSCSI
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-revert-35 - iSCSI - ONTAP (read)"
+  gather_facts:                   false
+  vars:
+    input_read: &input_read
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Get LUNs from "{{ global_primary_san_svm }}"
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/luns"
+        fields:
+          - "svm"
+          - "location"
+          - "serial_number"
+        parameters:
+          svm.name:               "{{ global_primary_san_svm }}"
+        use_python_keys:          true
+        <<: *input_read
+      register: lun_info
+
+  post_tasks:
+
+- hosts:                          "{{ global_primary_linux_host }}"
+  name:                           "ONTAP-revert-35 - iSCSI - Linux"
+  gather_facts:                   false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+
+  pre_tasks:
+
+  tasks:
+    - name: Unmount LUNs
+      ansible.posix.mount:
+        state:                      "absent"
+        path:                       "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
+      loop:
+        "{{ ontap_35_lin_luns }}"
+  
+    - name: Remove default LUN mount directory
+      ansible.builtin.file:
+        path:                       "{{ linux_35_mount_dir }}"
+        state:                      "absent"
+
+    - name: List iSCSI targets
+      community.general.open_iscsi:
+        show_nodes:               true
+      register: iscsi_nodes
+
+    - name: Remove iSCSI sessions and logout
+      community.general.open_iscsi:
+        show_nodes:               false
+        discover:                 false
+        login:                    false
+        auto_portal_startup:      false
+        auto_node_startup:        false
+        portal:                   "{{ item.ip.address }}"
+      loop_control:
+        label: "{{ item.ip.address }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+      when:
+        - iscsi_nodes.nodes | length > 0
+
+    - name: Remove iSCSI targets
+      ansible.builtin.command:
+        cmd: "iscsiadm -m node -o delete -T {{ item }}"
+      loop:
+        "{{ iscsi_nodes.nodes | unique }}"
+      when:
+        - iscsi_nodes.nodes | length > 0
+
+    - name: Flush multipath devices
+      ansible.builtin.command:
+        cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
+                           {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                              selectattr('name', 'defined') |
+                              selectattr('name', '==', item ) |
+                              first ).serial_hex }}"
+      when:
+        - (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+           selectattr('name', 'defined') |
+           selectattr('name', '==', item ) |
+           first ).serial_hex is defined
+      loop_control:
+        label: "{{ item }} --> \
+                {{ ontap_iscsi_vendor_id }}\
+                {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                    selectattr('name', 'defined') |
+                    selectattr('name', '==', item ) |
+                    first ).serial_hex }}"
+      loop:
+        "{{ ontap_35_lin_luns }}"
+
+  post_tasks:
+
+- hosts:                          "{{ global_primary_windows_host }}"
+  name:                           "ONTAP-revert-35 - iSCSI - Windows"
+  gather_facts:                   true
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Read iSCSI targets
+      ansible.windows.win_powershell:
+        script: 
+          "Get-IscsiTarget"
+      register: ps_iscsi_targets
+
+    - name: Disconnect iSCSI targets
+      ansible.windows.win_powershell:
+        script:
+          "Disconnect-IscsiTarget \
+           -NodeAddress {{ (ps_iscsi_targets.output | \
+                            selectattr('NodeAddress', 'search', 'netapp') | \
+                            first).NodeAddress }} \
+           -Confirm:$false"
+      when:
+        - ps_iscsi_targets.output | length > 0
+        
+    - name: Remove iSCSI portals
+      ansible.windows.win_powershell:
+        script:
+          "Remove-IscsiTargetPortal \
+           -TargetPortalAddress {{ item.ip.address }} \
+           -Confirm:$false"
+      loop_control:
+        label: "{{ item.ip.address }}"
+      loop:
+        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+
+    - name: Remove root mount directory
+      ansible.windows.win_file:
+        path:                     "{{ windows_35_mount_dir }}"
+        state:                    absent
+
+  post_tasks:
+
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-revert-35 - iSCSI - ONTAP"
+  gather_facts:                   false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+    - name: Unmap LUNs
+      netapp.ontap.na_ontap_lun_map:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        initiator_group_name:     "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[3] else
+                                      ontap_35_win_igroup_name if 'win' in (item | split('/'))[3] else
+                                      default(omit) }}"
+        path:                     "{{ item }}"
+        <<: *input
+      loop:
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
+
+    - name: Remove LUNs
+      netapp.ontap.na_ontap_lun:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ (item | split('/'))[3] }}"
+        flexvol_name:             "{{ (item | split('/'))[2] }}"
+        <<: *input
+      loop:
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
+    
+    - name: Remove iGroups
+      netapp.ontap.na_ontap_igroup:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ item }}"
+        <<: *input
+      loop:
+        - "{{ ontap_35_lin_igroup_name }}"
+        - "{{ ontap_35_win_igroup_name }}"
+
+    - name: Remove volumes
+      netapp.ontap.na_ontap_volume:
+        state:                    absent
+        vserver:                  "{{ global_primary_san_svm }}"
+        name:                     "{{ (item | split('/'))[2] }}"
+        <<: *input
+      loop:
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"

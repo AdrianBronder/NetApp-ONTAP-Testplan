@@ -1,0 +1,68 @@
+################################################################################
+#
+# Title:        ONTAP-31-04 - FlexGroups & Qtrees
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-24
+# Description:  NFS
+#               - FlexGroup & Qtrees
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-31-04 - FlexGroup & Qtrees"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Create FlexGroup
+      netapp.ontap.na_ontap_volume:
+        state:                      present
+        name:                       "{{ ontap_31_fg_name }}"
+        size:                       "{{ ontap_default_fg_size_gb }}"
+        volume_security_style:      "unix"
+        aggr_list:                  "{{ storage_aggregates | map(attribute='name') | flatten }}"
+        aggr_list_multiplier:       "{{ ontap_default_fg_multiplier }}"
+        size_unit:                  gb
+        space_guarantee:            "none"
+        tiering_policy:             "auto"
+        export_policy:              "{{ ontap_31_policy_name }}"
+        junction_path:              "/{{ ontap_31_fg_name }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        wait_for_completion:        True
+        <<: *input
+  
+    - name: Create qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                      present
+        name:                       "{{ item }}"
+        flexvol_name:               "{{ ontap_31_fg_name }}"
+        export_policy:              "{{ ontap_31_policy_name }}"
+        security_style:             "unix"
+        unix_permissions:           0777
+        vserver:                    "{{ global_primary_nas_svm }}"
+        <<: *input
+      loop:
+        "{{ ontap_31_fg_qtree_names }}"
+  
+  post_tasks:

@@ -1,0 +1,85 @@
+################################################################################
+#
+# Title:        ONTAP-11-03 - Key Manager
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-17
+# Description:  Advanced Cluster Configuration
+#               - Key Manager
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "ontap"
+  name:               "ONTAP-11-03 - Key Manager"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+  - name: Configure onboard Key Manager
+    netapp.ontap.na_ontap_security_key_manager:
+      state:                      present
+      onboard:
+        passphrase:               "{{ security_key_managers.onboard.passphrase }}"
+      <<: *input
+    when:
+      security_key_managers.onboard is defined
+
+  - name: Get all non-root aggregates
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:
+        - "storage/aggregates"
+      use_python_keys:            true
+      <<: *input
+    register: aggr_info
+
+  - name: Enable aggregate encryption on all aggregates
+    netapp.ontap.na_ontap_aggregate:
+      state:                      present
+      name:                       "{{ item.name }}"
+      encryption:                 true
+      <<: *input
+    loop:
+      "{{ aggr_info.ontap_info.storage_aggregates.records }}"
+    loop_control:
+      label: "{{ item.name }}"
+    when:
+      - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
+      - item.name is defined
+
+  post_tasks:
+  - name: Get key manager configuration and backup
+    netapp.ontap.na_ontap_rest_info:
+      gather_subset:              "security/key-managers"
+      fields:
+        - "*"
+      use_python_keys:            true
+      <<: *input
+    register:
+      ontap_key_manager
+
+  - name: Display key manager configuration and backup
+    ansible.builtin.debug:
+      msg:
+        - "{{ ontap_key_manager.ontap_info.security_key_managers.records }}"
+    when:
+      - ontap_key_manager.ontap_info.security_key_managers.num_records|int > 0

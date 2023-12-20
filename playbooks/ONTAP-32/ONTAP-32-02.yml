@@ -1,0 +1,85 @@
+################################################################################
+#
+# Title:        ONTAP-32-02 - Shares & ACLs (Volume)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-24
+# Description:  CIFS
+#               - Shares & ACLs (Volume)
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                          "{{ global_primary_test_cluster }}"
+  name:                           "ONTAP-32-02 - Shares & ACLs (Volume)"
+  gather_facts:                   false
+  vars:
+    input: &input
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Create shares
+      netapp.ontap.na_ontap_cifs:
+        state:                      present
+        name:                       "{{ item }}"
+        path:                       "/{{ ontap_32_vol_name }}/{{ item }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        browsable:                  true
+        oplocks:                    true
+        show_snapshot:              true
+        comment:                    "Test share created as part of test frame ONTAP-22"
+        <<: *input
+      loop:
+        "{{ ontap_32_vol_qtree_names }}"
+
+    - name: Remove "Full Control" for "Everyone"
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                      absent
+        share_name:                 "{{ item }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        user_or_group:              "Everyone"
+        permission:                 "full_control"
+        <<: *input
+      loop:
+        "{{ ontap_32_vol_qtree_names }}"
+
+    - name: Create ACL on test share (admins - Full Control)
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                      present
+        share_name:                 "{{ item }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        user_or_group:              "{{ ontap_32_ad_admin_group }}"
+        permission:                 "full_control"
+        <<: *input
+      loop:
+        "{{ ontap_32_vol_qtree_names }}"
+
+    - name: Create ACL on test share (read-only users - Read)
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                      present
+        share_name:                 "{{ item }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        user_or_group:              "{{ ontap_32_ad_ro_group }}"
+        permission:                 "read"
+        <<: *input
+      loop:
+        "{{ ontap_32_vol_qtree_names }}"
+  
+  post_tasks:

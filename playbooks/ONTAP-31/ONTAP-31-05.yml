@@ -1,0 +1,62 @@
+################################################################################
+#
+# Title:        ONTAP-31-05 - Mount & Write (FlexGroups)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-25
+# Description:  NFS
+#               - Mount & Write (FlexGroups)
+# 
+################################################################################
+
+- hosts:              "linux"
+  name:               ONTAP-31-05 - Mount & Write (FlexGroups)
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Ensure stale mounts are removed before proceding (in case a mount exists)
+      ansible.posix.mount:
+        state:                      "absent"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                     {{ ontap_31_fg_name }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
+#        opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+      loop:
+        "{{ ontap_31_fg_qtree_names }}"
+  
+    - name: Create mount directories
+      ansible.builtin.file:
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
+        state:                      "directory"
+        mode:                       "0755"
+      loop:
+        "{{ ontap_31_fg_qtree_names }}"
+  
+    - name: Mount NFS export on Linux host
+      ansible.posix.mount:
+        state:                      "mounted"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                     {{ ontap_31_fg_name }}/{{ item }}"
+        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
+        opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+      loop:
+        "{{ ontap_31_fg_qtree_names }}"
+  
+    - name: Create test file on each export
+      community.general.filesize:
+        path: "{{ linux_31_mount_dir }}/{{ item }}/{{ item }}_testfile"
+        size: 50MB
+      loop:
+        "{{ ontap_31_fg_qtree_names }}"
+
+  post_tasks:

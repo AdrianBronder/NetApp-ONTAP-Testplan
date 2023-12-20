@@ -1,0 +1,58 @@
+################################################################################
+#
+# Title:        ONTAP-01-04 - Ansible 
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2023-08-17
+# Description:  Cluster Basic Connection Checks
+#               - Ansible
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:              "ontap"
+  name:               "ONTAP-01-04 - Ansible"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+  - name: Print hosts and inventory source
+    ansible.builtin.debug:
+      msg: "{{ ansible_host }} from {{ inventory_dir }}"
+
+  - name: Get ONTAP version info
+    na_ontap_rest_info:
+      gather_subset:
+        - "cluster/software"
+      fields:
+        - "nodes.name"
+        - "nodes.version"
+      use_python_keys:            true
+      <<: *input
+    register: netapp
+
+  - name: Print ONTAP version info
+    ansible.builtin.debug:
+      msg:
+        - "{{ netapp }}"
+
+  post_tasks:
