@@ -174,8 +174,8 @@
     - name: Unmount exports
       ansible.posix.mount:
         state:                    "absent"
-        src:                      "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ item }}"
-        path:                     "{{ linux_31_mount_dir }}/{{ item }}"
+        src:                      "{{ item.device }}"
+        path:                     "{{ item.device }}"
         # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
       loop:
