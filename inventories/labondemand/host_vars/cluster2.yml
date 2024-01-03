@@ -222,6 +222,8 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"
+    ipspace:
+      name:                       "ip_peering"
   - name:                         "{{ cluster_nodes[1].name }}_ic01"
     scope:                        "cluster"
     ip:
@@ -236,3 +238,5 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"
+    ipspace:
+      name:                       "ip_peering"

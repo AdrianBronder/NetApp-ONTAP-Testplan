@@ -85,6 +85,7 @@
       netapp.ontap.na_ontap_interface:
         state:                      present
         interface_name:             "{{ item.name }}"
+        ipspace:                    "{{ item.ipspace.name }}"
         home_node:                  "{{ item.location.home_node.name }}"
         home_port:                  "{{ item.location.home_port.name }}"
         address:                    "{{ item.ip.address }}"
