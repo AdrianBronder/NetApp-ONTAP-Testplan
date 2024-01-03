@@ -223,7 +223,7 @@ network_ip_interfaces:
     service_policy:
       name:                       "default-intercluster"
     ipspace:
-      name:                       "ip_peering"
+      name:                       "Default"
   - name:                         "{{ cluster_nodes[1].name }}_ic01"
     scope:                        "cluster"
     ip:
@@ -239,4 +239,4 @@ network_ip_interfaces:
     service_policy:
       name:                       "default-intercluster"
     ipspace:
-      name:                       "ip_peering"
+      name:                       "Default"
