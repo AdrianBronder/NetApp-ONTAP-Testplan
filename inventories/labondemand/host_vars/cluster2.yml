@@ -240,3 +240,21 @@ network_ip_interfaces:
       name:                       "default-intercluster"
     ipspace:
       name:                       "Default"
+
+cluster_peers:
+  - name:                        "cluster1"
+    authentication:
+      generate_passphrase:        false
+      passphrase:                 "string"
+    encryption:
+      proposed:                   "tls_psk"
+    ipspace: 
+      name:                       "Default"
+    local_network:
+      interfaces:
+        - ip_address:             "192.168.0.123"
+        - ip_address:             "192.168.0.124"
+    remote:
+      ip_addresses:
+        - "192.168.0.121"
+        - "192.168.0.122"
