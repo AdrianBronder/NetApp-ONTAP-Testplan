@@ -370,17 +370,12 @@ cluster_peers:
       passphrase:                 "{{ vault_custer_peers.phassphrase }}"
     encryption:
       proposed:                   "tls_psk"
-    ip_address:                   "192.168.0.121"
     ipspace: 
       name:                       "Default"
     local_network:
       interfaces:
         - ip_address:             "192.168.0.121"
         - ip_address:             "192.168.0.122"
-      netmask:                    "255.255.255.0"
-    peer_applications:
-      - "snapmirror"
-      - "flexcache"
     remote:
       ip_addresses:
         - "192.168.0.123"
