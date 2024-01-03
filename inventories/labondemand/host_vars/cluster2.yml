@@ -242,7 +242,7 @@ network_ip_interfaces:
       name:                       "Default"
 
 cluster_peers:
-  - name:                        "cluster1"
+  - name:                         "cluster1"
     authentication:
       generate_passphrase:        false
       passphrase:                 "{{ vault_custer_peers.phassphrase }}"

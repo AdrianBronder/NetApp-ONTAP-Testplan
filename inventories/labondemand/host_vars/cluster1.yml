@@ -364,7 +364,7 @@ network_ip_interfaces:
       name:                       "Default"
 
 cluster_peers:
-  - name:                        "cluster2"
+  - name:                         "cluster2"
     authentication:
       generate_passphrase:        false
       passphrase:                 "{{ vault_custer_peers.phassphrase }}"
