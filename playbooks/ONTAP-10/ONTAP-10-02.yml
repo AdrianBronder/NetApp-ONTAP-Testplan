@@ -35,44 +35,46 @@
   pre_tasks:
 
   tasks:
-  - name: Create broadcast domains on storage cluster
-    netapp.ontap.na_ontap_broadcast_domain:
-      state:                      present
-      name:                       "{{ item.name }}"
-      mtu:                        "{{ item.mtu }}"
-      ipspace:                    "{{ item.ipspace.name }}"
-      <<: *input
-    loop:
-      "{{ network_ethernet_broadcast_domains }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - item.name is defined
-
-  - name: Create interface groups on storage cluster
-    netapp.ontap.na_ontap_net_ifgrp:
-      state:                      present
-      node:                       "{{ item.node.name }}"
-      broadcast_domain:           "{{ item.broadcast_domain.name }}"
-      ipspace:                    "{{ item.broadcast_domain.ipspace.name }}"
-      ports:                      "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
-      distribution_function:      "{{ item.lag.distribution_policy }}"
-      mode:                       "{{ item.lag.mode }}"
-      <<: *input
-    loop:
-      "{{ network_ethernet_ports }}"
-    loop_control:
-      label: "{{ item.node.name }}:{{ item.name }}"
-    when:
-      - item.name is defined
-
-  - name: Configure default network route on storage cluster
-    netapp.ontap.na_ontap_net_routes:
-      state:                      present
-      vserver:                    
-      destination:                "0.0.0.0/0"
-      gateway:                    "{{ all_default_gateway }}"
-      <<: *input
-
+    - name: Create default broadcast domains on storage cluster
+      netapp.ontap.na_ontap_broadcast_domain:
+        state:                      present
+        name:                       "{{ item.name }}"
+        mtu:                        "{{ item.mtu }}"
+        ipspace:                    "{{ item.ipspace.name }}"
+        <<: *input
+      loop:
+        "{{ network_ethernet_broadcast_domains }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.broadcast_domain.ipspace.name == "Default"
+  
+    - name: Create default interface groups on storage cluster
+      netapp.ontap.na_ontap_net_ifgrp:
+        state:                      present
+        node:                       "{{ item.node.name }}"
+        broadcast_domain:           "{{ item.broadcast_domain.name }}"
+        ipspace:                    "{{ item.broadcast_domain.ipspace.name }}"
+        ports:                      "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
+        distribution_function:      "{{ item.lag.distribution_policy }}"
+        mode:                       "{{ item.lag.mode }}"
+        <<: *input
+      loop:
+        "{{ network_ethernet_ports }}"
+      loop_control:
+        label: "{{ item.node.name }}:{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.broadcast_domain.ipspace.name is defined
+        - item.broadcast_domain.ipspace.name == "Default"
+  
+    - name: Configure default network route on storage cluster
+      netapp.ontap.na_ontap_net_routes:
+        state:                      present
+        vserver:                    
+        destination:                "0.0.0.0/0"
+        gateway:                    "{{ all_default_gateway }}"
+        <<: *input
 
   post_tasks:

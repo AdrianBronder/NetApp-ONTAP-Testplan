@@ -5,7 +5,7 @@
 # Initial 
 # Create Date:  2023-08-22
 # Description:  Basic SVM Setup
-#               - SVM network interfaces (LIFs)
+#               - SVM Logical Network
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -35,44 +35,44 @@
   pre_tasks:
 
   tasks:
-  - name: Create network interfaces on test SVMs
-    netapp.ontap.na_ontap_interface:
-      state:                      present
-      vserver:                    "{{ item.svm.name }}"
-      interface_name:             "{{ item.name }}"
-      home_node:                  "{{ item.location.home_node.name }}"
-      home_port:                  "{{ item.location.home_port.name }}"
-      address:                    "{{ item.ip.address }}"
-      netmask:                    "{{ item.ip.netmask }}"
-      service_policy:             "{{ item.service_policy.name | default(omit) }}"
-      is_auto_revert:             "{{ item.location.auto_revert | default(omit) }}"
-      <<: *input
-    loop:
-      "{{ network_ip_interfaces }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - network_ip_interfaces | length > 0
-      - item.svm.name is defined
-      - item.scope == "svm"
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name 
+    - name: Create network interfaces on test SVMs
+      netapp.ontap.na_ontap_interface:
+        state:                      present
+        vserver:                    "{{ item.svm.name }}"
+        interface_name:             "{{ item.name }}"
+        home_node:                  "{{ item.location.home_node.name }}"
+        home_port:                  "{{ item.location.home_port.name }}"
+        address:                    "{{ item.ip.address }}"
+        netmask:                    "{{ item.ip.netmask }}"
+        service_policy:             "{{ item.service_policy.name | default(omit) }}"
+        is_auto_revert:             "{{ item.location.auto_revert | default(omit) }}"
+        <<: *input
+      loop:
+        "{{ network_ip_interfaces }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - network_ip_interfaces | length > 0
+        - item.svm.name is defined
+        - item.scope == "svm"
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name 
 
-  - name: Configure default route on test SVMs
-    netapp.ontap.na_ontap_net_routes:
-      state:                      present
-      vserver:                    "{{ item.name }}"
-      destination:                "0.0.0.0/0"
-      gateway:                    "{{ all_default_gateway }}"
-      <<: *input
-    loop:
-      "{{ svm_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - svm_svms | length > 0
-      - item.name is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.name
+    - name: Configure default route on test SVMs
+      netapp.ontap.na_ontap_net_routes:
+        state:                      present
+        vserver:                    "{{ item.name }}"
+        destination:                "0.0.0.0/0"
+        gateway:                    "{{ all_default_gateway }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
 
   post_tasks:

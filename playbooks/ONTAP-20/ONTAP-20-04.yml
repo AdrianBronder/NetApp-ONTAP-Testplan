@@ -35,121 +35,121 @@
   pre_tasks:
 
   tasks:
-  - name: Configure NFS service on SVMs
-    netapp.ontap.na_ontap_nfs:
-      state:                      present
-      vserver:                    "{{ item.svm.name }}"
-      service_state:              "{{ 'started' if item.enabled else 'stopped'}}"
-      nfsv3:                      "{{ 'enabled' if item.protocol.v3_enabled else 'disabled'}}"
-      nfsv4:                      "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
-      nfsv41:                     "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
-      showmount:                  "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
-      <<: *input
-    loop:
-      "{{ protocols_nfs_services }}"
-    loop_control:
-      label: "{{ item.svm.name }}"
-    when:
-      - protocols_nfs_services | length > 0
-      - item.svm.name is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-
-  - name: Patch additional SVM NFS parameters - v3-64bit-identifiers
-    netapp.ontap.na_ontap_rest_cli:
-      command:                    'vserver/nfs'
-      verb:                       'PATCH'
-      params: 
-        vserver:                  "{{ item.svm.name }}"
-      body:
-        v3-64bit-identifiers:     "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
-      <<: *input
-    loop:
-      "{{ protocols_nfs_services }}"
-    loop_control:
-      label: "{{ item.svm.name }}"
-    when:
-      - protocols_nfs_services | length > 0
-      - item.svm.name is defined
-      - item.protocol.v3_64bit_identifiers_enabled is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-
-  - name: Patch additional SVM NFS parameters - v4-64bit-identifiers
-    netapp.ontap.na_ontap_rest_cli:
-      command:                    'vserver/nfs'
-      verb:                       'PATCH'
-      params: 
-        vserver:                  "{{ item.svm.name }}"
-      body:
-        v4-64bit-identifiers:     "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
-      <<: *input
-    loop:
-      "{{ protocols_nfs_services }}"
-    loop_control:
-      label: "{{ item.svm.name }}"
-    when:
-      - protocols_nfs_services | length > 0
-      - item.svm.name is defined
-      - item.protocol.v4_64bit_identifiers_enabled is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+    - name: Configure NFS service on SVMs
+      netapp.ontap.na_ontap_nfs:
+        state:                      present
+        vserver:                    "{{ item.svm.name }}"
+        service_state:              "{{ 'started' if item.enabled else 'stopped'}}"
+        nfsv3:                      "{{ 'enabled' if item.protocol.v3_enabled else 'disabled'}}"
+        nfsv4:                      "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
+        nfsv41:                     "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
+        showmount:                  "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
+        <<: *input
+      loop:
+        "{{ protocols_nfs_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
+      when:
+        - protocols_nfs_services | length > 0
+        - item.svm.name is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
-  - name: Create active directory preferred domain controllers
-    netapp.ontap.na_ontap_active_directory_domain_controllers:
-      state:                      present
-      vserver:                    "{{ item.0.key }}"
-      fqdn:                       "{{ item.1.fqdn }}"
-      server_ip:                  "{{ item.1.ip }}"
-      <<: *input
-    loop:
-      "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
-    loop_control:
-      label: "{{ item.0.key }}"
-    when:
-      - protocols_active_directory | list | length > 0
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.0.key
-
-  - name: Create CIFS server on SVMs
-    netapp.ontap.na_ontap_cifs_server:
-      state:                      present
-      name:                       "{{ item.name }}"
-      vserver:                    "{{ item.svm.name }}"
-      service_state:              "started"
-      domain:                     "{{ item.ad_domain.fqdn }}"
-      ou:                         "{{ item.ad_domain.organizational_unit }}"
-      admin_user_name:            "{{ all_ad_join_user }}"
-      admin_password:             "{{ all_ad_join_password }}"
-      <<: *input
-    loop:
-      "{{ protocols_cifs_services }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - protocols_cifs_services | length > 0
-      - item.name is defined 
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-
-  - name: Patch additional SVM CIFS parameters - comment
-    netapp.ontap.na_ontap_rest_cli:
-      command:                    'vserver/cifs'
-      verb:                       'PATCH'
-      params: 
-        vserver:                  "{{ item.svm.name }}"
-      body:
-        comment:                  "{{ item.comment }}"
-      <<: *input
-    loop:
-      "{{ protocols_cifs_services }}"
-    loop_control:
-      label: "{{ item.svm.name }}"
-    when:
-      - protocols_cifs_services | length > 0
-      - item.svm.name is defined
-      - item.comment is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+    - name: Patch additional SVM NFS parameters - v3-64bit-identifiers
+      netapp.ontap.na_ontap_rest_cli:
+        command:                    'vserver/nfs'
+        verb:                       'PATCH'
+        params: 
+          vserver:                  "{{ item.svm.name }}"
+        body:
+          v3-64bit-identifiers:     "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
+        <<: *input
+      loop:
+        "{{ protocols_nfs_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
+      when:
+        - protocols_nfs_services | length > 0
+        - item.svm.name is defined
+        - item.protocol.v3_64bit_identifiers_enabled is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+  
+    - name: Patch additional SVM NFS parameters - v4-64bit-identifiers
+      netapp.ontap.na_ontap_rest_cli:
+        command:                    'vserver/nfs'
+        verb:                       'PATCH'
+        params: 
+          vserver:                  "{{ item.svm.name }}"
+        body:
+          v4-64bit-identifiers:     "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
+        <<: *input
+      loop:
+        "{{ protocols_nfs_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
+      when:
+        - protocols_nfs_services | length > 0
+        - item.svm.name is defined
+        - item.protocol.v4_64bit_identifiers_enabled is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+    
+    - name: Create active directory preferred domain controllers
+      netapp.ontap.na_ontap_active_directory_domain_controllers:
+        state:                      present
+        vserver:                    "{{ item.0.key }}"
+        fqdn:                       "{{ item.1.fqdn }}"
+        server_ip:                  "{{ item.1.ip }}"
+        <<: *input
+      loop:
+        "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
+      loop_control:
+        label: "{{ item.0.key }}"
+      when:
+        - protocols_active_directory | list | length > 0
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.0.key
+  
+    - name: Create CIFS server on SVMs
+      netapp.ontap.na_ontap_cifs_server:
+        state:                      present
+        name:                       "{{ item.name }}"
+        vserver:                    "{{ item.svm.name }}"
+        service_state:              "started"
+        domain:                     "{{ item.ad_domain.fqdn }}"
+        ou:                         "{{ item.ad_domain.organizational_unit }}"
+        admin_user_name:            "{{ all_ad_join_user }}"
+        admin_password:             "{{ all_ad_join_password }}"
+        <<: *input
+      loop:
+        "{{ protocols_cifs_services }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - protocols_cifs_services | length > 0
+        - item.name is defined 
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+  
+    - name: Patch additional SVM CIFS parameters - comment
+      netapp.ontap.na_ontap_rest_cli:
+        command:                    'vserver/cifs'
+        verb:                       'PATCH'
+        params: 
+          vserver:                  "{{ item.svm.name }}"
+        body:
+          comment:                  "{{ item.comment }}"
+        <<: *input
+      loop:
+        "{{ protocols_cifs_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
+      when:
+        - protocols_cifs_services | length > 0
+        - item.svm.name is defined
+        - item.comment is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
   post_tasks:

@@ -35,21 +35,21 @@
   pre_tasks:
 
   tasks:
-  - name: Configure DNS on test SVMs
-    netapp.ontap.na_ontap_dns:
-      state:                      present
-      vserver:                    "{{ item.name }}"
-      domains:                    "{{ item.dns.domains }}"
-      nameservers:                "{{ item.dns.servers }}"
-      <<: *input
-    loop:
-      "{{ svm_svms }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - svm_svms | length > 0
-      - item.name is defined
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.name
+    - name: Configure DNS on test SVMs
+      netapp.ontap.na_ontap_dns:
+        state:                      present
+        vserver:                    "{{ item.name }}"
+        domains:                    "{{ item.dns.domains }}"
+        nameservers:                "{{ item.dns.servers }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
 
   post_tasks:

@@ -35,24 +35,24 @@
   pre_tasks:
 
   tasks:
-  - name: Create local users with read-only privileges
-    netapp.ontap.na_ontap_user:
-      state:                      present
-      name:                       "{{ item.name }}"
-      application_dicts:          "{{ item.applications }}"
-      set_password:               "{{ vault_security_accounts[item.name].password }}"
-      role_name:                  "{{ item.role.name }}"
-      <<: *input
-    loop:
-      "{{ security_accounts }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - security_accounts | length > 0
-      - item.name is defined
-      - item.scope == "cluster"
-      - item.role.name == "readonly"
-      - ('password') in item.applications | map(attribute='authentication_methods') | flatten
-      - not ('domain') in item.applications | map(attribute='authentication_methods') | flatten
+    - name: Create local users with read-only privileges
+      netapp.ontap.na_ontap_user:
+        state:                      present
+        name:                       "{{ item.name }}"
+        application_dicts:          "{{ item.applications }}"
+        set_password:               "{{ vault_security_accounts[item.name].password }}"
+        role_name:                  "{{ item.role.name }}"
+        <<: *input
+      loop:
+        "{{ security_accounts }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - security_accounts | length > 0
+        - item.name is defined
+        - item.scope == "cluster"
+        - item.role.name == "readonly"
+        - ('password') in item.applications | map(attribute='authentication_methods') | flatten
+        - not ('domain') in item.applications | map(attribute='authentication_methods') | flatten
 
   post_tasks:
