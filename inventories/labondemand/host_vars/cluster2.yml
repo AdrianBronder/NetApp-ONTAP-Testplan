@@ -245,7 +245,7 @@ cluster_peers:
   - name:                        "cluster1"
     authentication:
       generate_passphrase:        false
-      passphrase:                 "string"
+      passphrase:                 "{{ vault_custer_peers.phassphrase }}"
     encryption:
       proposed:                   "tls_psk"
     ipspace: 

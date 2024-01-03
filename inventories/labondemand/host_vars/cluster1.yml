@@ -367,7 +367,7 @@ cluster_peers:
   - name:                        "cluster2"
     authentication:
       generate_passphrase:        false
-      passphrase:                 "string"
+      passphrase:                 "{{ vault_custer_peers.phassphrase }}"
     encryption:
       proposed:                   "tls_psk"
     ip_address:                   "192.168.0.121"
