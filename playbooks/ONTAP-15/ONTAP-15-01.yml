@@ -84,7 +84,6 @@
     - name: Create network interfaces on test SVMs
       netapp.ontap.na_ontap_interface:
         state:                      present
-        vserver:                    "{{ item.svm.name }}"
         interface_name:             "{{ item.name }}"
         home_node:                  "{{ item.location.home_node.name }}"
         home_port:                  "{{ item.location.home_port.name }}"
