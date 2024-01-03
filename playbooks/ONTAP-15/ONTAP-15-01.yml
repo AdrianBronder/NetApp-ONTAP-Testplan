@@ -60,7 +60,7 @@
         label: "{{ item.name }}"
       when:
         - item.name is defined
-        - item.broadcast_domain.ipspace.name != "Default"
+        - item.ipspace.name != "Default"
 
     - name: Create peering interface groups on storage cluster
       netapp.ontap.na_ontap_net_ifgrp:
