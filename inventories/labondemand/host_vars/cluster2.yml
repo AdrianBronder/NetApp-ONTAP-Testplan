@@ -218,7 +218,7 @@ network_ip_interfaces:
       home_node:
         name:                     "{{ cluster_nodes[0].name }}"
       home_port:
-        name:                     "a0b"
+        name:                     "e0c"
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"
@@ -234,7 +234,7 @@ network_ip_interfaces:
       home_node:
         name:                     "{{ cluster_nodes[1].name }}"
       home_port:
-        name:                     "a0b"
+        name:                     "e0c"
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"

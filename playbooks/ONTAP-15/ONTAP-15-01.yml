@@ -81,7 +81,7 @@
         - item.broadcast_domain.ipspace.name is defined
         - item.broadcast_domain.ipspace.name != "Default"
 
-    - name: Create network interfaces on test SVMs
+    - name: Create peering interfaces
       netapp.ontap.na_ontap_interface:
         state:                      present
         interface_name:             "{{ item.name }}"
@@ -100,5 +100,6 @@
       when:
         - network_ip_interfaces | length > 0
         - item.scope == "cluster"
+        - item.service_policy.name == "default-intercluster"
 
   post_tasks:
