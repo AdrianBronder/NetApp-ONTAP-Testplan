@@ -48,6 +48,34 @@ network_ethernet_ports:
       ipspace:
         name:                     "Default"
     type:                         "lag"
+  - name:                         "a0b"
+    node:
+      name:                       "{{ cluster_nodes[0].name }}"
+    type:                         "lag"
+    lag:
+      member_ports:
+        - name:                   "e0d"
+        - name:                   "e0e"
+      distribution_policy:        "port"
+      mode:                       "singlemode"
+    broadcast_domain:
+      name:                       "bc_peering"
+      ipspace:
+        name:                     "ip_peering"
+  - name:                         "a0b"
+    node:
+      name:                       "{{ cluster_nodes[1].name }}"
+    lag:
+      member_ports:
+        - name:                   "e0d"
+        - name:                   "e0e"
+      distribution_policy:        "port"
+      mode:                       "singlemode"
+    broadcast_domain:
+      name:                       "bc_peering"
+      ipspace:
+        name:                     "ip_peering"
+    type:                         "lag"
 
 storage_aggregates:
   - name:                         "{{ cluster_nodes[0].name | replace('-','_') }}_aggr01"
@@ -190,7 +218,7 @@ network_ip_interfaces:
       home_node:
         name:                     "{{ cluster_nodes[0].name }}"
       home_port:
-        name:                     "e0c"
+        name:                     "a0b"
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"
@@ -204,7 +232,7 @@ network_ip_interfaces:
       home_node:
         name:                     "{{ cluster_nodes[1].name }}"
       home_port:
-        name:                     "e0c"
+        name:                     "a0b"
       auto_revert:                true
     service_policy:
       name:                       "default-intercluster"
