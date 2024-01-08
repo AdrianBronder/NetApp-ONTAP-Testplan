@@ -33,7 +33,17 @@
     - netapp.ontap
 
   tasks:
-    - name: Remove SVM Peering
+    - name: Remove SVM Peerings
       netapp.ontap.na_ontap_vserver_peer:
-
-      
+        state:                         present
+        vserver:                       "{{ item }}"
+        peer_vserver:                  "{{ global_primary_backup_svm }}"
+        peer_cluster:                  "{{ global_secondary_test_cluster }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ global_secondary_test_cluster }}"
+        <<: *input
+      loop:
+        - "{{ global_primary_nas_svm }}"
+        - "{{ global_primary_san_svm }}"
