@@ -16,7 +16,7 @@
 ################################################################################
 
 - name: Execute Pre-steps - Cluster Peering
-  ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-*.yml
+  ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
 
 - name: Execute Pre-steps - SVM Creation
-  ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-*.yml
+  ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-01.yml
