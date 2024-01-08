@@ -128,13 +128,13 @@ svm_svms:
     cifs:
       allowed:                    true
     iscsi:
-      allowed:                    false
+      allowed:                    true
     fcp:
-      allowed:                    false
+      allowed:                    true
     ndmp:
       allowed:                    false
     nvme:
-      allowed:                    false
+      allowed:                    true
     language:                     "utf8mb4"
     comment:                      "This is the primary backup SVM for testing"
 
@@ -173,6 +173,16 @@ protocols_cifs_services:
       organizational_unit:        "{{ all_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is the default NAS backup \
                                    location"
+    enabled:                      true
+
+protocols_san_iscsi_services:
+  - svm:
+      name:                       "{{ svm_svms[1].name }}"
+    enabled:                      true
+
+protocols_nvme_services:
+  - svm:
+      name:                       "{{ svm_svms[1].name }}"
     enabled:                      true
 
 network_ip_interfaces:
