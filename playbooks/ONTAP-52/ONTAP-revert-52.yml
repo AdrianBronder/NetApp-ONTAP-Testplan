@@ -35,7 +35,7 @@
   tasks:
     - name: Remove SVM Peerings
       netapp.ontap.na_ontap_vserver_peer:
-        state:                         present
+        state:                         absent
         vserver:                       "{{ item }}"
         peer_vserver:                  "{{ global_primary_backup_svm }}"
         peer_cluster:                  "{{ global_secondary_test_cluster }}"
