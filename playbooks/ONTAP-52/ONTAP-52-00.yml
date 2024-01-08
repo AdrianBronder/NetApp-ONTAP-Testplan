@@ -15,8 +15,34 @@
 # 
 ################################################################################
 
-- name: Execute Pre-steps - Cluster Peering
-  ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-02.yml
 
-- name: Execute Pre-steps - SVM Creation
-  ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-31-00.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-31-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-31-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-31-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-31-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-31-05.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-32-00.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-32-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-32-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-32-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-32-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-32-05.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-32-06.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-35-00.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-35-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-35-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-35-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-35-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-35-05.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-37-00.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-37-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-37-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-37-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-37-04.yml
+
