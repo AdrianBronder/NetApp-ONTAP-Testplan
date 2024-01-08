@@ -1,0 +1,39 @@
+################################################################################
+#
+# Title:        ONTAP-revert-52 - Backup with SnapMirror
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-08
+# Description:  Revert all steps performed in test frame 52
+#               - Backup with SnapMirror
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-revert-52 - Backup with SnapMirror"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+    - name: Remove SVM Peering
+      netapp.ontap.na_ontap_vserver_peer:
+
+      
