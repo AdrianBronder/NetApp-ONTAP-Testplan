@@ -55,11 +55,11 @@
           path:                        "{{ item.destination.path }}"
         <<: *input
       loop:
-        "{{ snapmirror_info.ontap_info.storage_volumes.records }}"
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
       loop_control:
         label: "{{ item.destination.path }}"
       when:
-        - snapmirror_info.ontap_info.storage_volumes.records | length > 0
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
         - item.destination.path is defined
         - item.source.cluster.name is defined
 
