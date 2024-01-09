@@ -38,6 +38,8 @@
         state:                         absent
         source_cluster_name:           "{{ global_primary_test_cluster }}"
         dest_cluster_name:             "{{ global_secondary_test_cluster }}"
+        peer_options:
+          hostname: "{{ global_primary_test_cluster }}"
         <<: *input
   
     - name: Remove peering interfaces
