@@ -70,8 +70,8 @@
       ansible.builtin.async_status:
           jid: "{{ item.ansible_job_id }}"
       register: __jobs_exec_dp
-      retries: 20
-      delay: 2
+      retries: 50
+      delay: 6
       until: __jobs_exec_dp.finished
       loop: "{{ __exec_dp.results }}"
       loop_control:
@@ -80,7 +80,7 @@
         - __exec_dp.results | length > 0
         - item.ansible_job_id is defined
 
-    - name: Remove SVM Peerings
+    - name: Remove SVM peerings
       netapp.ontap.na_ontap_vserver_peer:
         state:                         absent
         vserver:                       "{{ global_primary_backup_svm }}"
@@ -94,5 +94,19 @@
       loop:
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"
+
+    - name: Remove destination volumes
+      netapp.ontap.na_ontap_volume:
+        state:                      absent
+        name:                       "{{ item.destination.path | split(':') | last }}"
+        vserver:                    "{{ item.destination.svm.name }}"
+        <<: *input
+      loop:
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
+      loop_control:
+        label: "{{ item.destination.path }}"
+      when:
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
+        - item.destination.path is defined
 
   post_tasks:
