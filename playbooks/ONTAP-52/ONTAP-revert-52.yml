@@ -95,11 +95,15 @@
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"
 
+    - name: debug
+      ansible.builtin.debug:
+        msg: "{{ snapmirror_info }}"
+
     - name: Remove destination volumes
       netapp.ontap.na_ontap_volume:
-        state:                      absent
-        name:                       "{{ item.destination.path | split(':') | last }}"
-        vserver:                    "{{ item.destination.svm.name }}"
+        state:                         absent
+        name:                          "{{ item.destination.path | split(':') | last }}"
+        vserver:                       "{{ item.destination.svm.name }}"
         <<: *input
       loop:
         "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
