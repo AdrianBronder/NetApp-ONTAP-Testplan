@@ -51,6 +51,7 @@
         state:                         absent
         source_endpoint:
           cluster:                     "{{ item.source.cluster.name }}"
+          path:                        "{{ item.source.path }}"
         destination_endpoint:
           path:                        "{{ item.destination.path }}"
         <<: *input
@@ -61,7 +62,6 @@
       when:
         - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
         - item.destination.path is defined
-        - item.source.cluster.name is defined
 
     - name: Remove SVM Peerings
       netapp.ontap.na_ontap_vserver_peer:
