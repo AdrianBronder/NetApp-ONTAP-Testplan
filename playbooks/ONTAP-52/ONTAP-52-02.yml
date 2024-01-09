@@ -80,7 +80,8 @@
           cluster:                     "{{ global_secondary_test_cluster }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         create_destination:
-          enabled: true
+          enabled:                     true
+        update:                        false
         <<: *input_02
       loop:
         "{{ hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records }}"
@@ -103,8 +104,7 @@
       until: __jobs_exec_dp.finished
       loop: "{{ __exec_dp.results }}"
       loop_control:
-        label:
-          - "{{ item.item.name }}"
+        label: "{{ item.item.name }}"
       when:
         - __exec_dp.results | length > 0
         - item.ansible_job_id is defined
