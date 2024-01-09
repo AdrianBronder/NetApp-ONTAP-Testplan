@@ -35,10 +35,10 @@
   pre_tasks:
 
   tasks:
-    - name: Create SVM Peering for NAS SVM
+    - name: Create SVM Peerings
       netapp.ontap.na_ontap_vserver_peer:
         state:                         present
-        vserver:                       "{{ global_primary_nas_svm }}"
+        vserver:                       "{{ item }}"
         peer_vserver:                  "{{ global_primary_backup_svm }}"
         peer_cluster:                  "{{ global_secondary_test_cluster }}"
         applications:
@@ -46,17 +46,8 @@
         peer_options:
           hostname: "{{ global_secondary_test_cluster }}"
         <<: *input
-
-    - name: Create SVM Peering for SAN SVM
-      netapp.ontap.na_ontap_vserver_peer:
-        state:                         present
-        vserver:                       "{{ global_primary_san_svm }}"
-        peer_vserver:                  "{{ global_primary_backup_svm }}"
-        peer_cluster:                  "{{ global_secondary_test_cluster }}"
-        applications:
-          - "snapmirror"
-        peer_options:
-          hostname: "{{ global_secondary_test_cluster }}"
-        <<: *input
+      loop:
+        - "{{ global_primary_nas_svm }}"
+        - "{{ global_primary_san_svm }}"
 
   post_tasks:
