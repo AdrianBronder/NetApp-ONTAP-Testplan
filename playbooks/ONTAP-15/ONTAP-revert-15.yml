@@ -33,6 +33,13 @@
     - netapp.ontap
 
   tasks:
+    - name: Remove cluster peerings
+      netapp.ontap.na_ontap_cluster_peer:
+        state:                         absent
+        source_cluster_name:           "{{ global_primary_test_cluster }}"
+        dest_cluster_name:             "{{ global_secondary_test_cluster }}"
+        <<: *input
+  
     - name: Remove peering interfaces
       netapp.ontap.na_ontap_interface:
         state:                      absent
