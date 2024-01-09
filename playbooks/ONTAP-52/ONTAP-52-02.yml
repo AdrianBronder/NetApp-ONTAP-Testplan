@@ -43,9 +43,8 @@
           - "svm"
         parameters:
           is_svm_root:                 false
-          svm:
-            name:                      "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
-          use_python_keys:             true
+          svm.name:                    "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
+        use_python_keys:               true
         <<: *input
       register: vol_info
   
