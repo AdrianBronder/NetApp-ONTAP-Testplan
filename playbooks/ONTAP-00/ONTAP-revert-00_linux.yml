@@ -45,7 +45,7 @@
         parameters:
           svm.name:               "{{ global_primary_san_svm }}"
         use_python_keys:          true
-        <<: *input
+        <<: *input_read
       register: iscsi_info
 
     - name: Get LUNs from "{{ global_primary_test_cluster }}"
