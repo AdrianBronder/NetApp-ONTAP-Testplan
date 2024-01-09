@@ -33,17 +33,13 @@
     - netapp.ontap
 
   tasks:
-    - name: Debug
-      ansible.builtin.debug:
-        msg: "{{ global_primary_test_cluster if (global_primary_test_cluster == ansible_host) else global_secondary_test_cluster }}"
-
     - name: Remove cluster peerings
       netapp.ontap.na_ontap_cluster_peer:
         state:                         absent
-        source_cluster_name:           "{{ global_primary_test_cluster if (global_primary_test_cluster == ansible_host) else global_secondary_test_cluster }}"
-        dest_cluster_name:             "{{ global_secondary_test_cluster if (global_primary_test_cluster == ansible_host) else global_primary_test_cluster}}"
+        source_cluster_name:           "{{ global_primary_test_cluster if global_primary_test_cluster == cluster.name else global_secondary_test_cluster }}"
+        dest_cluster_name:             "{{ global_secondary_test_cluster if global_primary_test_cluster == cluster.namet else global_primary_test_cluster}}"
         peer_options:
-          hostname: "{{ global_primary_test_cluster if (global_primary_test_cluster == ansible_host) else global_secondary_test_cluster }}"
+          hostname: "{{ global_primary_test_cluster if global_primary_test_cluster == cluster.name else global_secondary_test_cluster }}"
         <<: *input
   
     - name: Remove peering interfaces
