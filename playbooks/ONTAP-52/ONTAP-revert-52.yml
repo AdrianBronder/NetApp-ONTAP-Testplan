@@ -77,8 +77,5 @@
         - snapmirror_info.ontap_info.storage_volumes.records | length > 0
         - item.destination.path is defined
         - item.source.cluster.name is defined
-      register: __exec_dp
-      async: 60
-      poll: 0
 
   post_tasks:
