@@ -84,7 +84,6 @@
         gather_subset:
           - "svm/peers"
         fields:
-          - "source"
           - "destination"
         use_python_keys:               true
         <<: *input
