@@ -75,7 +75,7 @@
       until: __jobs_exec_dp.finished
       loop: "{{ __exec_dp.results }}"
       loop_control:
-        label: "{{ item.item.name }}"
+        label: "{{ item.item.destination.path }}"
       when:
         - __exec_dp.results | length > 0
         - item.ansible_job_id is defined
