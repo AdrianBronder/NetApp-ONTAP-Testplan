@@ -92,23 +92,6 @@
         - hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
-      register: __exec_dp
-      async: 60
-      poll: 0
-
-    - name: Wait for all protection jobs to complete
-      ansible.builtin.async_status:
-          jid: "{{ item.ansible_job_id }}"
-      register: __jobs_exec_dp
-      retries: 100
-      delay: 3
-      until: __jobs_exec_dp.finished
-      loop: "{{ __exec_dp.results }}"
-      loop_control:
-        label: "{{ item.item.svm.name + ':' + item.item.name }}"
-      when:
-        - __exec_dp.results | length > 0
-        - item.ansible_job_id is defined
 
     - name: Initialize all in parallel
       netapp.ontap.na_ontap_snapmirror:
