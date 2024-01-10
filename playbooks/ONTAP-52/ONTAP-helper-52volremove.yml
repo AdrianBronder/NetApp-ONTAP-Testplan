@@ -41,6 +41,7 @@
           - "*"
         parameters:
           svm.name:                    "{{ global_primary_backup_svm }}"
+          is_svm_root:            false
         use_python_keys:               true
         <<: *input
       register: vol_info
