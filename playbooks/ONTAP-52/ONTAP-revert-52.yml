@@ -95,10 +95,6 @@
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"
 
-    - name: debug
-      ansible.builtin.debug:
-        msg: "{{ snapmirror_info }}"
-
     - name: Remove destination volumes
       netapp.ontap.na_ontap_volume:
         state:                         absent

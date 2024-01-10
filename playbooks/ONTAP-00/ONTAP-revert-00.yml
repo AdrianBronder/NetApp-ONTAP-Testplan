@@ -327,10 +327,10 @@
     - name: Remove cluster peerings
       netapp.ontap.na_ontap_cluster_peer:
         state:                         absent
-        source_cluster_name:           "{{ ansible_host }}"
+        source_cluster_name:           "{{ cluster.name }}"
         dest_cluster_name:             "{{ item.name }}"
         peer_options:
-          hostname: "{{ item.name }}"
+          hostname: "{{ hostvars[item.name].ansible_host }}"
         <<: *input
       when:
         - cluster_peer_info.ontap_info.cluster_peers.num_records|int > 0

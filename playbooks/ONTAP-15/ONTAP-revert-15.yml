@@ -39,7 +39,7 @@
         source_cluster_name:           "{{ global_primary_test_cluster if global_primary_test_cluster == cluster.name else global_secondary_test_cluster }}"
         dest_cluster_name:             "{{ global_secondary_test_cluster if global_primary_test_cluster == cluster.name else global_primary_test_cluster}}"
         peer_options:
-          hostname: "{{ global_primary_test_cluster if global_primary_test_cluster == cluster.name else global_secondary_test_cluster }}"
+          hostname: "{{ hostvars[global_primary_test_cluster].ansible_host if global_primary_test_cluster == cluster.name else hostvars[global_secondary_test_cluster].ansible_host }}"
         <<: *input
   
     - name: Remove peering interfaces
