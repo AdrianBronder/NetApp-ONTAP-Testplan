@@ -44,7 +44,7 @@
         browsable:                  true
         oplocks:                    true
         show_snapshot:              true
-        comment:                    "Test share created as part of test frame ONTAP-22"
+        comment:                    "Test share created as part of test frame ONTAP-32"
         <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
