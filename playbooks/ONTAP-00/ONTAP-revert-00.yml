@@ -84,7 +84,8 @@
         gather_subset:
           - "svm/peers"
         fields:
-          - "destination"
+          - "svm"
+          - "peer"
         use_python_keys:               true
         <<: *input
       register: svm_peer_info
@@ -92,13 +93,13 @@
     - name: Remove SVM peerings
       netapp.ontap.na_ontap_vserver_peer:
         state:                         absent
-        vserver:                       "{{ global_primary_backup_svm }}"
-        peer_vserver:                  "{{ item }}"
-        peer_cluster:                  "{{ global_primary_test_cluster }}"
+        vserver:                       "{{ item.svm.name }}"
+        peer_vserver:                  "{{ item.peer.svm.name }}"
+        peer_cluster:                  "{{ item.peer.cluster.name }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ global_primary_test_cluster }}"
+          hostname: "{{ hostvars[item.peer.cluster.name].ansible_host }}"
         <<: *input
       when:
         - svm_peer_info.ontap_info.svm_peers.num_records|int > 0
@@ -327,7 +328,7 @@
       netapp.ontap.na_ontap_cluster_peer:
         state:                         absent
         source_cluster_name:           "{{ cluster.name }}"
-        dest_cluster_name:             "{{ item.name }}"
+        dest_cluster_name:             "{{ item.remote.name }}"
         peer_options:
           hostname: "{{ hostvars[item.name].ansible_host }}"
         <<: *input
