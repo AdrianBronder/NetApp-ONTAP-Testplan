@@ -15,8 +15,75 @@
 #
 ################################################################################
 
+- hosts:              "win_hosts"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - Windows"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: 
+      block:
+        - name: Remove mapped share
+          community.windows.win_shortcut:
+            state:                absent
+            dest:                 "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name }}.lnk"
+
+        - name: Remove network credentials
+          community.windows.win_credential:
+            state:                absent
+            name:                 "{{ global_primary_nas_svm }}"
+            type:                 "domain_password"
+      vars:
+        # become is required to save and retrieve the credentials in the tasks
+        ansible_become:           "yes"
+        ansible_become_method:    "runas"
+        ansible_become_user:      "{{ ansible_user }}"
+        ansible_become_pass:      "{{ ansible_password }}"
+
+    - name: Remove mount directory
+      ansible.windows.win_file:
+        path:                     "{{ windows_52_mount_dir }}"
+        state:                    absent
+
+- hosts:              "linux"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - Linux"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+
+  tasks:
+    - name: Unmount export on volume
+      ansible.posix.mount:
+        state:                      "absent"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
+        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+#        opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+  
+    - name: Remove mount directories
+      ansible.builtin.file:
+        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+        state:                      "absent"
+        mode:                       "0755"
+
+    - name: Remove default parent mount directory
+      ansible.builtin.file:
+        path:                       "{{ linux_52_mount_dir }}"
+        state:                      "absent"
+        mode:                       "0755"
+
 - hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-revert-52 - Backup with SnapMirror"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP"
   gather_facts:       false
   vars:
     input: &input

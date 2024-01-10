@@ -1,0 +1,134 @@
+################################################################################
+#
+# Title:        ONTAP-52-11 - Bulk Protect Volumes
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-08
+# Description:  Backup (SnapMirror)
+#               - Bulk Protect Volumes
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-52-11 - Bulk Protect Volumes - Source"
+  gather_facts:       false
+  vars:
+    input_01: &input_01
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Get all volumes to be protected
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/volumes"
+        fields:
+          - "svm"
+        parameters:
+          is_svm_root:                 false
+          svm.name:                    "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
+        use_python_keys:               true
+        <<: *input_01
+      register: vol_info
+  
+  post_tasks:
+
+- hosts:              "{{ global_secondary_test_cluster }}"
+  name:               "ONTAP-52-02 - Protect Volumes - Destination"
+  gather_facts:       false
+  vars:
+    input_02: &input_02
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Setup volume protection
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ global_primary_test_cluster }}"
+          path:                        "{{ item.svm.name + ':' + item.name }}"
+        destination_endpoint:
+          cluster:                     "{{ global_secondary_test_cluster }}"
+          path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
+        create_destination:
+          enabled:                     true
+        update:                        false
+        initialize:                    false
+        <<: *input_02
+      loop:
+        "{{ hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records }}"
+      loop_control:
+        label: "{{ item.svm.name + ':' + item.name }}"
+      when:
+        - hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
+        - item.name is defined
+        - item.svm.name is defined
+
+    - name: Initialize all in parallel
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ global_primary_test_cluster }}"
+          path:                        "{{ item.svm.name + ':' + item.name }}"
+        destination_endpoint:
+          cluster:                     "{{ global_secondary_test_cluster }}"
+          path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
+        update:                        false
+        initialize:                    true
+        <<: *input_02
+      loop:
+        "{{ hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records }}"
+      loop_control:
+        label: "{{ item.svm.name + ':' + item.name }}"
+      when:
+        - hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
+        - item.name is defined
+        - item.svm.name is defined
+      register: __exec_initdp
+      async: 60
+      poll: 0
+
+    - name: Wait for all initialization jobs to complete
+      ansible.builtin.async_status:
+          jid: "{{ item.ansible_job_id }}"
+      register: __jobs_exec_initdp
+      retries: 100
+      delay: 3
+      until: __jobs_exec_initdp.finished
+      loop: "{{ __exec_initdp.results }}"
+      loop_control:
+        label: "{{ item.item.svm.name + ':' + item.item.name }}"
+      when:
+        - __exec_initdp.results | length > 0
+        - item.ansible_job_id is defined
+
+  post_tasks:
