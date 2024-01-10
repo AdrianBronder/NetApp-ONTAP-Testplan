@@ -48,7 +48,7 @@
     - name: Remove destination volumes
       netapp.ontap.na_ontap_volume:
         state:                         absent
-        name:                          "{{ item }}"
+        name:                          "{{ item.name }}"
         vserver:                       "{{ item.svm.name }}"
         <<: *input
       loop:
