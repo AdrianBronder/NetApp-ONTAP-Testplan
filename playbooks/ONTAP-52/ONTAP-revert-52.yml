@@ -64,7 +64,7 @@
         - item.destination.path is defined
       register: __exec_dp
       async: 60
-      poll: 0
+      poll: 1
 
     - name: Wait for all deletion jobs to complete
       ansible.builtin.async_status:
