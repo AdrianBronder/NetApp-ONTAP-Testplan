@@ -63,8 +63,8 @@
         - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
         - item.destination.path is defined
       register: __exec_dp
-      async: 60
-      poll: 1
+      async: 120
+      poll: 0
 
     - name: Wait for all deletion jobs to complete
       ansible.builtin.async_status:
