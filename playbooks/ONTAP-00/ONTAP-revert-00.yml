@@ -34,6 +34,79 @@
     - netapp.ontap
 
   tasks:
+    - name: Get all SnapMirror relations to be deleted
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "snapmirror/relationships"
+        fields:
+          - "source"
+          - "destination"
+        use_python_keys:               true
+        <<: *input
+      register: snapmirror_info
+  
+    - name: Remove all volume protections in parallel
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         absent
+        source_endpoint:
+          cluster:                     "{{ item.source.cluster.name }}"
+          path:                        "{{ item.source.path }}"
+        destination_endpoint:
+          path:                        "{{ item.destination.path }}"
+        <<: *input
+      loop:
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
+      loop_control:
+        label: "{{ item.destination.path }}"
+      when:
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
+        - item.destination.path is defined
+      register: __exec_dp
+      async: 60
+      poll: 0
+
+    - name: Wait for all deletion jobs to complete
+      ansible.builtin.async_status:
+          jid: "{{ item.ansible_job_id }}"
+      register: __jobs_exec_dp
+      retries: 20
+      delay: 2
+      until: __jobs_exec_dp.finished
+      loop: "{{ __exec_dp.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      when:
+        - __exec_dp.results | length > 0
+        - item.ansible_job_id is defined
+
+    - name: Get all SVM peerings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "svm/peers"
+        fields:
+          - "source"
+          - "destination"
+        use_python_keys:               true
+        <<: *input
+      register: svm_peer_info
+
+    - name: Remove SVM peerings
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "{{ global_primary_backup_svm }}"
+        peer_vserver:                  "{{ item }}"
+        peer_cluster:                  "{{ global_primary_test_cluster }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ global_primary_test_cluster }}"
+        <<: *input
+      when:
+        - svm_peer_info.ontap_info.svm_peers.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ svm_peer_info.ontap_info.svm_peers.records }}"
+
     - name: Get all NVMe subsystems from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
@@ -240,6 +313,31 @@
         - item.name is defined
         - item.scope == "svm"
   
+    - name: Get all cluster peerings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "cluster/peers"
+        fields:
+          - "name"
+          - "remote"
+        use_python_keys:               true
+        <<: *input
+      register: cluster_peer_info
+
+    - name: Remove cluster peerings
+      netapp.ontap.na_ontap_cluster_peer:
+        state:                         absent
+        source_cluster_name:           "{{ ansible_host }}"
+        dest_cluster_name:             "{{ item.name }}"
+        peer_options:
+          hostname: "{{ item.name }}"
+        <<: *input
+      when:
+        - cluster_peer_info.ontap_info.cluster_peers.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ cluster_peer_info.ontap_info.cluster_peers.records }}"
+
     - name: Get all intercluster interfaces from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
