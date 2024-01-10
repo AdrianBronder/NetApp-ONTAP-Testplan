@@ -69,8 +69,8 @@
 
   pre_tasks:
 
-  tasks:  
-    - name: Protect all volumes in parallel
+  tasks:
+    - name: Setup volume protection
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
@@ -82,6 +82,28 @@
         create_destination:
           enabled:                     true
         update:                        false
+        initialize:                    false
+        <<: *input_02
+      loop:
+        "{{ hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records }}"
+      loop_control:
+        label: "{{ item.svm.name + ':' + item.name }}"
+      when:
+        - hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
+        - item.name is defined
+        - item.svm.name is defined
+
+    - name: Initialize all in parallel
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ global_primary_test_cluster }}"
+          path:                        "{{ item.svm.name + ':' + item.name }}"
+        destination_endpoint:
+          cluster:                     "{{ global_secondary_test_cluster }}"
+          path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
+        update:                        false
+        initialize:                    true
         <<: *input_02
       loop:
         "{{ hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records }}"
