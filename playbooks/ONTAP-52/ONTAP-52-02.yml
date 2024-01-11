@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-    - name: Create custom Snapshot policy
+    - name: Create custom snapshot policy
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         present
         vserver:                       "{{ global_primary_nas_svm }}"

@@ -83,10 +83,10 @@
         mode:                       "0755"
 
 - hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Secondary"
   gather_facts:       false
   vars:
-    input: &input
+    input_01: &input_01
       hostname:       "{{ ansible_host }}"
       username:       "{{ ontap_admin_user }}"
       password:       "{{ ontap_admin_password }}"
@@ -110,7 +110,7 @@
         parameters:
           source.svm.name:             "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
         use_python_keys:               true
-        <<: *input
+        <<: *input_01
       register: snapmirror_info
   
     - name: Remove all volume protections in parallel
@@ -121,7 +121,7 @@
           path:                        "{{ item.source.path }}"
         destination_endpoint:
           path:                        "{{ item.destination.path }}"
-        <<: *input
+        <<: *input_01
       loop:
         "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
       loop_control:
@@ -157,17 +157,24 @@
           - "snapmirror"
         peer_options:
           hostname: "{{ global_primary_test_cluster }}"
-        <<: *input
+        <<: *input_01
       loop:
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"
 
-    - name: Remove destination volumes
+    - name: remove destination volume
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ ontap_52_vol_name }}_dst"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        <<: *input_01
+
+    - name: Remove destination volumes (bulk test)
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ item.destination.path | split(':') | last }}"
         vserver:                       "{{ item.destination.svm.name }}"
-        <<: *input
+        <<: *input_01
       loop:
         "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
       loop_control:
@@ -176,4 +183,43 @@
         - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
         - item.destination.path is defined
 
+    - name: Remove custom SnapMirror policies
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         absent
+        vserver:                       "{{ global_primary_backup_svm }}"
+        policy_name:                   "{{ ontap_52_snapm_policy_name }}"
+        <<: *input_01
+
   post_tasks:
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Primary"
+  gather_facts:       false
+  vars:
+    input_02: &input_02
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+    - name: Remove source volume
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ ontap_52_vol_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        <<: *input_02
+
+    - name: Remove custom snapshot policy
+      netapp.ontap.na_ontap_snapshot_policy:
+        state:                         absent
+        vserver:                       "{{ global_primary_nas_svm }}"
+        name:                          "{{ ontap_52_snap_policy_name }}"
+        <<: *input_02
