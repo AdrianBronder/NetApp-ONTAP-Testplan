@@ -126,7 +126,7 @@
         policy_name:                   "{{ item.name }}"
         <<: *input
       when:
-        - svm_peer_info.ontap_info.snapmirror_policies.num_records|int > 0
+        - snapm_policy_info.ontap_info.snapmirror_policies.num_records|int > 0
         - item.name is defined
         - item.svm.name is defined
       loop:
