@@ -40,7 +40,7 @@
         state:                         present
         source_endpoint:
           cluster:                     "{{ global_primary_test_cluster }}"
-          path:                        "{{ item.svm.name + ':' + ontap_52_vol_name }}"
+          path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         destination_endpoint:
           cluster:                     "{{ global_secondary_test_cluster }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
@@ -55,7 +55,7 @@
         state:                         present
         source_endpoint:
           cluster:                     "{{ global_primary_test_cluster }}"
-          path:                        "{{ global_primary_test_cluster + ':' + ontap_52_vol_name }}"
+          path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         destination_endpoint:
           cluster:                     "{{ global_secondary_test_cluster }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
