@@ -107,6 +107,31 @@
       loop:
         "{{ svm_peer_info.ontap_info.svm_peers.records }}"
 
+    - name: Get all SVM peerings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "snapmirror/policies"
+        fields:
+          - "svm"
+        parameters:
+          scope:                       "svm"
+        use_python_keys:               true
+        <<: *input
+      register: snapm_policy_info
+
+    - name: Remove custom SnapMirror policies
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         absent
+        vserver:                       "{{ item.svm.name }}"
+        policy_name:                   "{{ item.name }}"
+        <<: *input
+      when:
+        - svm_peer_info.ontap_info.snapmirror_policies.num_records|int > 0
+        - item.name is defined
+        - item.svm.name is defined
+      loop:
+        "{{ snapm_policy_info.ontap_info.snapmirror_policies.records }}"
+
     - name: Get all NVMe subsystems from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:

@@ -90,7 +90,7 @@ ontap_37_lin_namespaces:
   - "/vol/ontap_37_lin_vol01/ontap_37_lin_ns01"
   - "/vol/ontap_37_lin_vol02/ontap_37_lin_ns02"
   - "/vol/ontap_37_lin_vol03/ontap_37_lin_ns03"
-linux_37_mount_dir:               "/mnt/37"
+linux_37_mount_dir:               "{{ linux_default_mount_dir }}/37"
 
 # ONTAP-41 - NFS FlexClone
 ontap_41_policy_name:             "ontap_41_policy"
