@@ -101,8 +101,6 @@
         user_or_group:              "Everyone"
         permission:                 "full_control"
         <<: *input
-      loop:
-        "{{ ontap_32_vol_qtree_names }}"
 
     - name: Create ACL on test share (admins - read-only)
       netapp.ontap.na_ontap_cifs_acl:
