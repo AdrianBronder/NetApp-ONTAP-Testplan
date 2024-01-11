@@ -70,7 +70,7 @@
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
   
-    - name: Create read-write export policy rules for data volumes
+    - name: Create read-write export policy rules
       na_ontap_export_policy_rule:
         state:                      present
         name:                       "{{ ontap_52_policy_name }}"
@@ -116,7 +116,6 @@
         name:                       "{{ ontap_52_win_qtree_name }}"
         flexvol_name:               "{{ ontap_52_vol_name }}"
         security_style:             "ntfs"
-        unix_permissions:           0777
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
 
