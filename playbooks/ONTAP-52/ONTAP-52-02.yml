@@ -38,10 +38,10 @@
     - name: Create custom Snapshot policy
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         present
-        vserver:                       "{{ global_primary_backup_svm }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_52_snap_policy_name }}"
         schedule:                      "10min"
-        prefix:                        "10min"
+        prefix:                        "10min_"
         snapmirror_label:              "{{ ontap_52_snapm_sched_label }}"
         count:                         6
         enabled:                       True
