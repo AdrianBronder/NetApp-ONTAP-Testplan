@@ -60,6 +60,11 @@
         - "testfile_11"
         - "testfile_12"
         - "testfile_13"
+      vars:
+        ansible_become:           "yes"
+        ansible_become_method:    "runas"
+        ansible_become_user:      "{{ ansible_user }}"
+        ansible_become_pass:      "{{ ansible_password }}"
 
   post_tasks:
 
