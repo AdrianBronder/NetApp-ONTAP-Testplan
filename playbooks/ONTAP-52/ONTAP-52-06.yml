@@ -1,0 +1,130 @@
+################################################################################
+#
+# Title:        ONTAP-52-06 - Create Incremental Backup
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-08
+# Description:  Backup (SnapMirror)
+#               - Create Incremental Backup
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "linux"
+  name:               "ONTAP-52-06 - Create Incremental Backup - Linux"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Create additional test files
+      community.general.filesize:
+        path: "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}/{{ item }}"
+        size: 50MB
+      loop:
+        - "testfile_11"
+        - "testfile_12"
+        - "testfile_13"
+  
+  post_tasks:
+
+- hosts:              "win_hosts"
+  name:               "ONTAP-52-06 - Create Incremental Backup - Windows"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Create additional test files
+      ansible.windows.win_file:
+        path:                     "{{ windows_52_mount_dir }}\\{{ item }}"
+        state:                    touch
+      loop:
+        - "testfile_11"
+        - "testfile_12"
+        - "testfile_13"
+
+  post_tasks:
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-52-06 - Create Incremental Backup - ONTAP Primary"
+  gather_facts:       false
+  vars:
+    input_01: &input_01
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Create snapshot with SnapMirror label
+      netapp.ontap.na_ontap_snapshot:
+        state:                         present
+        snapshot:                      "{{ ontap_52_snapshot_name }}"
+        vserver:                       "{{ vserver name }}"
+        volume:                        "{{ global_primary_nas_svm }}"
+        snapmirror_label:              "{{ ontap_52_snapm_adhoc_label }}"
+        comment:                       "ONTAP Test 52"
+        <<: *input_01
+
+  post_tasks:
+
+- hosts:              "{{ global_secondary_test_cluster }}"
+  name:               "ONTAP-52-06 - Create Incremental Backup - ONTAP Secondary"
+  gather_facts:       false
+  vars:
+    input_02: &input_02
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Update SnapMirror relation
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ global_primary_test_cluster }}"
+          path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
+        destination_endpoint:
+          cluster:                     "{{ global_secondary_test_cluster }}"
+          path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
+        update:                        true
+        <<: *input_02
+
+  post_tasks:
