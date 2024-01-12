@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-11 - Bulk Protect Volumes - Source"
+  name:               "ONTAP-52-11 - Bulk Protect Volumes - ONTAP Primary"
   gather_facts:       false
   vars:
     input_01: &input_01
@@ -51,7 +51,7 @@
   post_tasks:
 
 - hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-52-02 - Protect Volumes - Destination"
+  name:               "ONTAP-52-02 - Protect Volumes - ONTAP Secondary"
   gather_facts:       false
   vars:
     input_02: &input_02

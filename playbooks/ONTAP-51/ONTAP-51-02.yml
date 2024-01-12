@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-52-03 - Prepare Filesystem (Source)
+# Title:        ONTAP-51-02 - Prepare Filesystem
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
-# Description:  Backup (SnapMirror)
-#               - Prepare Filesystem (Source)
+# Description:  Local Versioning (Snapshots)
+#               - Prepare Filesystem
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-03 - Prepare Filesystem (Source) - ONTAP"
+  name:               "ONTAP-51-02 - Prepare Filesystem - ONTAP"
   gather_facts:       false
   vars:
     input: &input
@@ -66,14 +66,14 @@
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
+        name:                       "{{ ontap_51_policy_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
   
     - name: Create read-write export policy rules
       na_ontap_export_policy_rule:
         state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
+        name:                       "{{ ontap_51_policy_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                    "any"
@@ -86,15 +86,15 @@
     - name: Create volume with custom snapshot policy
       netapp.ontap.na_ontap_volume:
         state:                      present
-        name:                       "{{ ontap_52_vol_name }}"
+        name:                       "{{ ontap_51_vol_name }}"
         aggregate_name:             "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
         size:                       "{{ ontap_default_vol_size_gb }}"
         size_unit:                  gb
         space_guarantee:            none
-        snapshot_policy:            "{{ ontap_52_snap_policy_name }}"
+        snapshot_policy:            "{{ ontap_51_snap_policy_name }}"
         tiering_policy:             auto
         export_policy:              "ro_{{ global_primary_nas_svm }}"
-        junction_path:              "/{{ ontap_52_vol_name }}"
+        junction_path:              "/{{ ontap_51_vol_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         volume_security_style:      "unix"
         <<: *input
@@ -102,9 +102,9 @@
     - name: Create UNIX qtree
       netapp.ontap.na_ontap_qtree:
         state:                      present
-        name:                       "{{ ontap_52_lin_qtree_name }}"
-        flexvol_name:               "{{ ontap_52_vol_name }}"
-        export_policy:              "{{ ontap_52_policy_name }}"
+        name:                       "{{ ontap_51_lin_qtree_name }}"
+        flexvol_name:               "{{ ontap_51_vol_name }}"
+        export_policy:              "{{ ontap_51_policy_name }}"
         security_style:             "unix"
         unix_permissions:           0777
         vserver:                    "{{ global_primary_nas_svm }}"
@@ -113,8 +113,8 @@
     - name: Create NTFS qtree
       netapp.ontap.na_ontap_qtree:
         state:                      present
-        name:                       "{{ ontap_52_win_qtree_name }}"
-        flexvol_name:               "{{ ontap_52_vol_name }}"
+        name:                       "{{ ontap_51_win_qtree_name }}"
+        flexvol_name:               "{{ ontap_51_vol_name }}"
         security_style:             "ntfs"
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
@@ -122,19 +122,19 @@
     - name: Create share
       netapp.ontap.na_ontap_cifs:
         state:                      present
-        name:                       "{{ ontap_52_win_qtree_name }}"
-        path:                       "/{{ ontap_52_vol_name }}/{{ ontap_52_win_qtree_name }}"
+        name:                       "{{ ontap_51_win_qtree_name }}"
+        path:                       "/{{ ontap_51_vol_name }}/{{ ontap_51_win_qtree_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         browsable:                  true
         oplocks:                    true
         show_snapshot:              true
-        comment:                    "Test share created as part of test frame ONTAP-52"
+        comment:                    "Test share created as part of test frame ONTAP-51"
         <<: *input
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
         state:                      absent
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
+        share_name:                 "{{ ontap_51_win_qtree_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         user_or_group:              "Everyone"
         permission:                 "full_control"
@@ -143,25 +143,25 @@
     - name: Create ACL on test share (admins - Full Control)
       netapp.ontap.na_ontap_cifs_acl:
         state:                      present
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
+        share_name:                 "{{ ontap_51_win_qtree_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "{{ ontap_52_ad_admin_group }}"
+        user_or_group:              "{{ ontap_51_ad_admin_group }}"
         permission:                 "full_control"
         <<: *input
 
     - name: Create ACL on test share (read-only users - Read)
       netapp.ontap.na_ontap_cifs_acl:
         state:                      present
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
+        share_name:                 "{{ ontap_51_win_qtree_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "{{ ontap_52_ad_ro_group }}"
+        user_or_group:              "{{ ontap_51_ad_ro_group }}"
         permission:                 "read"
         <<: *input
 
   post_tasks:
 
 - hosts:              "linux"
-  name:               "ONTAP-52-03 - Prepare Filesystem (Source) - Linux"
+  name:               "ONTAP-51-02 - Prepare Filesystem - Linux"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -177,14 +177,14 @@
       ansible.posix.mount:
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+                                     {{ ontap_51_vol_name }}/{{ ontap_51_lin_qtree_name }}"
+        path:                       "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
   
     - name: Create mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+        path:                       "{{ linux_52_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
         state:                      "directory"
         mode:                       "0755"
   
@@ -192,24 +192,27 @@
       ansible.posix.mount:
         state:                      "mounted"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+                                     {{ ontap_51_vol_name }}/{{ ontap_51_lin_qtree_name }}"
+        path:                       "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
   
     - name: Create test files
       community.general.filesize:
-        path: "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}/{{ item }}"
+        path: "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}/{{ item }}"
         size: 50MB
       loop:
         - "testfile_01"
         - "testfile_02"
         - "testfile_03"
+        - "testfile_04"
+        - "testfile_05"
+        - "testfile_06"
   
   post_tasks:
 
 - hosts:              "win_hosts"
-  name:               "ONTAP-52-03 - Prepare Filesystem (Source) - Windows"
+  name:               "ONTAP-51-02 - Prepare Filesystem - Windows"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -223,7 +226,7 @@
   tasks:
     - name: Create mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_52_mount_dir }}"
+        path:                     "{{ windows_51_mount_dir }}"
         state:                    directory
 
     - name: 
@@ -233,23 +236,26 @@
             state:                present
             name:                 "{{ global_primary_nas_svm }}"
             type:                 "domain_password"
-            username:             "{{ ontap_52_ad_admin_user }}"
-            secret:               "{{ ontap_52_ad_admin_user_pw }}"
+            username:             "{{ ontap_51_ad_admin_user }}"
+            secret:               "{{ ontap_51_ad_admin_user_pw }}"
         
         - name: Map share
           community.windows.win_shortcut:
             state:                present
-            src:                  "\\\\{{ global_primary_nas_svm }}\\{{ ontap_52_win_qtree_name }}"
-            dest:                 "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name }}.lnk"
+            src:                  "\\\\{{ global_primary_nas_svm }}\\{{ ontap_51_win_qtree_name }}"
+            dest:                 "{{ windows_51_mount_dir }}\\{{ ontap_51_win_qtree_name }}.lnk"
 
         - name: Create test files
           ansible.windows.win_file:
-            path:                     "\\\\{{ global_primary_nas_svm }}\\{{ ontap_52_win_qtree_name }}\\{{ item }}"
+            path:                     "\\\\{{ global_primary_nas_svm }}\\{{ ontap_51_win_qtree_name }}\\{{ item }}"
             state:                    touch
           loop:
             - "testfile_01"
             - "testfile_02"
             - "testfile_03"
+            - "testfile_04"
+            - "testfile_05"
+            - "testfile_06"
       vars:
         # become is required to save and retrieve the credentials in the tasks
         ansible_become:           "yes"

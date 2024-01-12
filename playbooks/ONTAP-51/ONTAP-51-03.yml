@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-52-09 - Restore Backup
+# Title:        ONTAP-51-03 - Create Snapshot
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
 # Description:  Backup (SnapMirror)
-#               - Restore from Backup
+#               - Create Snapshot
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-09 - Restore Backup"
+  name:               "ONTAP-52-03 - Create Snapshot"
   gather_facts:       false
   vars:
     input: &input
@@ -35,17 +35,13 @@
   pre_tasks:
 
   tasks:
-    - name: Restore from backup
-      netapp.ontap.na_ontap_snapmirror:
+    - name: Create snapshot
+      netapp.ontap.na_ontap_snapshot:
         state:                         present
-        relationship_type:             "restore"
-        destination_endpoint:
-          cluster:                     "{{ global_primary_test_cluster }}"
-          path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
-        source_endpoint:
-          cluster:                     "{{ global_secondary_test_cluster }}"
-          path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
-        source_snapshot:               "{{ ontap_52_snapshot_name }}"
+        snapshot:                      "{{ ontap_51_snapshot_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        volume:                        "{{ ontap_51_vol_name }}"
+        comment:                       "ONTAP Test 51"
         <<: *input
 
   post_tasks:

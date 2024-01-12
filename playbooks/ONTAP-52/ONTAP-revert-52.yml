@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-revert-52 - Backup with SnapMirror
+# Title:        ONTAP-revert-52 - Backup (SnapMirror)
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
 # Description:  Revert all steps performed in test frame 52
-#               - Backup with SnapMirror
+#               - Backup (SnapMirror)
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -87,7 +87,7 @@
 
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+        path:                       "{{ linux_52_mount_dir }}/{{ item }}"
         state:                      "absent"
         mode:                       "0755"
       loop:
@@ -217,9 +217,9 @@
 
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
-        vserver:                    "{{ global_primary_backup_svm }}"
+        state:                         present
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
         <<: *input_01
 
   post_tasks:
@@ -265,7 +265,7 @@
 
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input_02

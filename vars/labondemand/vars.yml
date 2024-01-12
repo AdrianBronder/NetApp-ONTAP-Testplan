@@ -100,6 +100,20 @@ ontap_41_clone_dir_name:          "clonedir"
 ontap_41_clone_vol_name:          "{{ ontap_41_snapshot_name }}"
 linux_41_mount_dir:               "{{ linux_default_mount_dir }}/41"
 
+# ONTAP-51 - Local Versioning (Snapshots)
+ontap_51_policy_name:             "ontap_51_policy"
+ontap_51_vol_name:                "ontap_51_vol01"
+ontap_51_win_qtree_name:          "ontap_51_win_qt01"
+ontap_51_lin_qtree_name:          "ontap_51_lin_qt01"
+ontap_51_snapshot_name:           "ontap_51_snapshot"
+ontap_51_snap_policy_name:        "ontap_51_snap_policy"
+linux_51_mount_dir:               "{{ linux_default_mount_dir }}/51"
+windows_51_mount_dir:             "{{ windows_default_mount_dir }}\\51"
+ontap_51_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_51_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+ontap_51_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_51_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+
 # ONTAP-52 - Backup (SnapMirror)
 ontap_52_policy_name:             "ontap_52_policy"
 ontap_52_vol_name:                "ontap_52_vol01"
