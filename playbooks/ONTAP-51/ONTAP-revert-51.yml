@@ -4,7 +4,7 @@
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
-# Description:  Revert all steps performed in test frame 52
+# Description:  Revert all steps performed in test frame 51
 #               - Local Versioning (Snapshots)
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html

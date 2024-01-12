@@ -184,7 +184,7 @@
   
     - name: Create mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
+        path:                       "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
         state:                      "directory"
         mode:                       "0755"
   

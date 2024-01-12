@@ -39,7 +39,7 @@
       netapp.ontap.na_ontap_volume:
         state:                      present
         name:                       "{{ ontap_51_vol_name }}"
-        restore_snapshot:           "{{ ontap_51_snapshot_name }}"
+        snapshot_restore:           "{{ ontap_51_snapshot_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
 

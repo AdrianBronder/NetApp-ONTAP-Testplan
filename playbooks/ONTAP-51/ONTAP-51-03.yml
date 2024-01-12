@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-03 - Create Snapshot"
+  name:               "ONTAP-51-03 - Create Snapshot"
   gather_facts:       false
   vars:
     input: &input
