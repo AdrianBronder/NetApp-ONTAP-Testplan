@@ -37,7 +37,16 @@
           loop:
             - "{{ ontap_52_win_qtree_name }}"
             - "{{ ontap_52_win_qtree_name }}_dst"
-
+        - name: Remove network credentials
+          community.windows.win_credential:
+            state:                absent
+            name:                 "{{ global_primary_nas_svm }}"
+            type:                 "domain_password"
+        - name: Remove network credentials
+          community.windows.win_credential:
+            state:                absent
+            name:                 "{{ global_primary_backup_svm }}"
+            type:                 "domain_password"
       vars:
         # become is required to save and retrieve the credentials in the tasks
         ansible_become:           "yes"
