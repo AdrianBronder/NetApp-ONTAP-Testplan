@@ -179,8 +179,15 @@
       loop:
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"
+    
+    - name: Remove CIFS share
+      netapp.ontap.na_ontap_cifs:
+        state:                         absent
+        name:                          "{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        <<: *input_01
 
-    - name: remove destination volume
+    - name: Remove destination volume
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ ontap_52_vol_name }}_dst"
@@ -235,6 +242,13 @@
     - netapp.ontap
 
   tasks:
+    - name: Remove CIFS share
+      netapp.ontap.na_ontap_cifs:
+        state:                         absent
+        name:                          "{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        <<: *input_02
+
     - name: Remove source volume
       netapp.ontap.na_ontap_volume:
         state:                         absent
