@@ -29,7 +29,7 @@
 
   tasks:
     - name: Create additional test files
-      community.general.file:
+      ansible.builtin.file:
         state: absent
         path: "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}/{{ item }}"
       loop:
