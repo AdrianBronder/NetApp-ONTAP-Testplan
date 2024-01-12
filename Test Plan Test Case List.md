@@ -50,12 +50,29 @@
 | 41-06 | Cloning (NFS)	                    | Mount & Write (Clone)                 |
 | 41-07 | Cloning (NFS)	                    | Client Write (Clone)                  |
 | 41-08 | Cloning (NFS)	                    | Clone & Write (Loop)                  |
+| 51-01 | Local Versioning (Snapshots)	    | Custom Policy                         |
+| 51-02 | Local Versioning (Snapshots)	    | Prepare Filesystem                    |
+| 51-03 | Local Versioning (Snapshots)	    | Create Snapshot                       |
+| 51-04 | Local Versioning (Snapshots)	    | Delete Files                          |
+| 51-05 | Local Versioning (Snapshots)	    | Restore Snapshot                      |
+| 52-01 | Backup (SnapMirror)               | SVM Peering                           |
+| 52-02 | Backup (SnapMirror)               | Custom Policies                       |
+| 52-03 | Backup (SnapMirror)               | Prepare Filesystem (Source)           |
+| 52-04 | Backup (SnapMirror)               | Create Backup Relation                |
+| 52-05 | Backup (SnapMirror)               | Access Backup (read-only)             |
+| 52-06 | Backup (SnapMirror)               | Create Additional Files               |
+| 52-07 | Backup (SnapMirror)               | Create Incremental Backup             |
+| 52-08 | Backup (SnapMirror)               | Delete Files                          |
+| 52-09 | Backup (SnapMirror)               | Restore Backup                        |
+| 52-11 | Backup (SnapMirror)               | Bulk Protect Volumes                  |
 |  ---  |                                   |                                       |
 | Revert-00_linux   | Revert all systems to initial state - Linux                 | |
 | Revert-00_windows | Revert all systems to initial state - Windows               | |
 | Revert-00         | Revert all systems to initial state - ONTAP                 | |
-| Revert-31         | Revert all steps performed in test frame 31 - NFS           | |
-| Revert-32         | Revert all steps performed in test frame 32 - CIFS          | |
-| Revert-35         | Revert all steps performed in test frame 35 - iSCSI         | |
-| Revert-37         | Revert all steps performed in test frame 37 - NVMe/TCP      | |
-| Revert-41         | Revert all steps performed in test frame 41 - NFS FlexClone | |
+| Revert-31         | Revert test frame 31 - NFS                                  | |
+| Revert-32         | Revert test frame 32 - CIFS                                 | |
+| Revert-35         | Revert test frame 35 - iSCSI                                | |
+| Revert-37         | Revert test frame 37 - NVMe/TCP                             | |
+| Revert-41         | Revert test frame 41 - NFS FlexClone                        | |
+| Revert-51         | Revert test frame 51 - Local Versioning (Snapshots)         | |
+| Revert-52         | Revert test frame 52 - Backup (SnapMirror)                  | |
