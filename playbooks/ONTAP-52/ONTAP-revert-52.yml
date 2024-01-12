@@ -190,6 +190,13 @@
         policy_name:                   "{{ ontap_52_snapm_policy_name }}"
         <<: *input_01
 
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "{{ ontap_52_policy_name }}"
+        vserver:                    "{{ global_primary_backup_svm }}"
+        <<: *input_01
+
   post_tasks:
 
 - hosts:              "{{ global_primary_test_cluster }}"
@@ -222,4 +229,11 @@
         state:                         absent
         vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_52_snap_policy_name }}"
+        <<: *input_02
+
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "{{ ontap_52_policy_name }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input_02

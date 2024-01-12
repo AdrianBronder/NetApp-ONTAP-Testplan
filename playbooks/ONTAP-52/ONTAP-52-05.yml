@@ -72,12 +72,32 @@
         junction_path:              "/{{ ontap_52_vol_name }}_dst"
         <<: *input
 
-    - name: Apply read-only export policy to UNIX qtree
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "{{ ontap_52_policy_name }}"
+        vserver:                    "{{ global_primary_backup_svm }}"
+        <<: *input
+
+    - name: Create read-write export policy rules
+      na_ontap_export_policy_rule:
+        state:                      present
+        name:                       "{{ ontap_52_policy_name }}"
+        vserver:                    "{{ global_primary_backup_svm }}"
+        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                    "any"
+        rw_rule:                    "any"
+        protocol:                   "nfs"
+        super_user_security:        "any"
+        allow_suid:                 true
+        <<: *input
+
+    - name: Apply read-write export policy to UNIX qtree
       netapp.ontap.na_ontap_qtree:
         state:                      present
         name:                       "{{ ontap_52_lin_qtree_name }}"
         flexvol_name:               "{{ ontap_52_vol_name }}_dst"
-        export_policy:              "ro_{{ global_primary_backup_svm }}"
+        export_policy:              "{{ ontap_52_policy_name }}"
         vserver:                    "{{ global_primary_backup_svm }}"
         <<: *input
 

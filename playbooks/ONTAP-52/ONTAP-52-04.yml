@@ -46,6 +46,7 @@
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         create_destination:
           enabled:                     true
+        policy:                        "{{ ontap_52_snapm_policy_name }}"
         update:                        false
         initialize:                    false
         <<: *input
