@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
+- hosts:              "{{ global_secondary_test_cluster }}"
   name:               "ONTAP-52-09 - Restore from Backup - ONTAP Secondary"
   gather_facts:       false
   vars:
