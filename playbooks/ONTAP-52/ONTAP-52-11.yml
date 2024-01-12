@@ -113,22 +113,5 @@
         - hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
-      register: __exec_initdp
-      async: 60
-      poll: 0
-
-    - name: Wait for all initialization jobs to complete
-      ansible.builtin.async_status:
-          jid: "{{ item.ansible_job_id }}"
-      register: __jobs_exec_initdp
-      retries: 100
-      delay: 3
-      until: __jobs_exec_initdp.finished
-      loop: "{{ __exec_initdp.results }}"
-      loop_control:
-        label: "{{ item.item.svm.name + ':' + item.item.name }}"
-      when:
-        - __exec_initdp.results | length > 0
-        - item.ansible_job_id is defined
 
   post_tasks:
