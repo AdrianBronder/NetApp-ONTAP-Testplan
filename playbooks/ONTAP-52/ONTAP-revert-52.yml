@@ -30,16 +30,14 @@
   tasks:
     - name: 
       block:
-        - name: Remove mapped share
+        - name: Remove mapped shares
           community.windows.win_shortcut:
             state:                absent
-            dest:                 "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name }}.lnk"
+            dest:                 "{{ windows_52_mount_dir }}\\{{ item }}.lnk"
+          loop:
+            - "{{ ontap_52_win_qtree_name }}"
+            - "{{ ontap_52_win_qtree_name }}_dst"
 
-        - name: Remove network credentials
-          community.windows.win_credential:
-            state:                absent
-            name:                 "{{ global_primary_nas_svm }}"
-            type:                 "domain_password"
       vars:
         # become is required to save and retrieve the credentials in the tasks
         ansible_become:           "yes"
@@ -62,19 +60,30 @@
     - ansible.posix
 
   tasks:
-    - name: Unmount export on volume
+    - name: Unmount export on source qtree
       ansible.posix.mount:
         state:                      "absent"
         src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
         path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
 #        opts:                       "rw,sync,hard,vers=3"
         fstype:                     "nfs"
-  
+
+    - name: Unmount export on destination qtree
+      ansible.posix.mount:
+        state:                      "absent"
+        src:                        "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
+        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
+#        opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+
     - name: Remove mount directories
       ansible.builtin.file:
         path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
         state:                      "absent"
         mode:                       "0755"
+      loop:
+        - "{{ ontap_52_lin_qtree_name }}"
+        - "{{ ontap_52_lin_qtree_name }}_dst"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
