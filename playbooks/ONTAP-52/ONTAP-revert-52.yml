@@ -5,7 +5,6 @@
 # Initial 
 # Create Date:  2024-01-08
 # Description:  Revert all steps performed in test frame 52
-#               - Backup (SnapMirror)
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
