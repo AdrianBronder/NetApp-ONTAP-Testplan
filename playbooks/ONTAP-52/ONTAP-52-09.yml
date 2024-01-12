@@ -35,22 +35,9 @@
   pre_tasks:
 
   tasks:
-    - name: Creeate restore relationship and restore files from backup
+    - name: Restore files from backup
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
-        relationship_type:             "restore"
-        destination_endpoint:
-          cluster:                     "{{ global_primary_test_cluster }}"
-          path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
-        source_endpoint:
-          cluster:                     "{{ global_secondary_test_cluster }}"
-          path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
-        source_snapshot:               "{{ ontap_52_snapshot_name }}"
-        <<: *input
-
-    - name: Remove restore relationship
-      netapp.ontap.na_ontap_snapmirror:
-        state:                         absent
         relationship_type:             "restore"
         destination_endpoint:
           cluster:                     "{{ global_primary_test_cluster }}"
