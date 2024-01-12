@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-52-03 - Custom Policies
+# Title:        ONTAP-52-02 - Custom Policies
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-03 - Custom Policies"
+  name:               "ONTAP-52-02 - Custom Policies"
   gather_facts:       false
   vars:
     input_01: &input_01
@@ -50,7 +50,7 @@
   post_tasks:
 
 - hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-52-03 - Custom Policies"
+  name:               "ONTAP-52-02 - Custom Policies"
   gather_facts:       false
   vars:
     input_02: &input_02

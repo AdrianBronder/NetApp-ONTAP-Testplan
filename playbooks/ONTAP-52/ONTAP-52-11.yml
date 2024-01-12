@@ -93,7 +93,7 @@
         - item.name is defined
         - item.svm.name is defined
 
-    - name: Initialize all in parallel
+    - name: Initialize all
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
