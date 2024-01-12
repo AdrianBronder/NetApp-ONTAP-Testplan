@@ -54,7 +54,7 @@
   tasks:
     - name: Create additional test files
       ansible.windows.win_file:
-        path:                     "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name}}\\{{ item }}"
+        path:                     "\\\\{{ global_primary_nas_svm }}\\{{ ontap_52_win_qtree_name}}\\{{ item }}"
         state:                    touch
       loop:
         - "testfile_11"
