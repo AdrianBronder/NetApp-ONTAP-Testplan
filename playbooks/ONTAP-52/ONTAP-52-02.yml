@@ -40,8 +40,8 @@
         state:                         present
         vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_52_snap_policy_name }}"
-        schedule:                      "10min"
-        prefix:                        "10min_"
+        schedule:                      "5min"
+        prefix:                        "5min_"
         snapmirror_label:              "{{ ontap_52_snapm_sched_label }}"
         count:                         6
         enabled:                       True
@@ -83,7 +83,7 @@
           - 36
         schedule:
           - ''
-          - "10min"
+          - "5min"
         prefix:
           - ''
           - "snapm_sched_"
