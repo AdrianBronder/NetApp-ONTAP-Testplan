@@ -87,8 +87,8 @@
       netapp.ontap.na_ontap_snapshot:
         state:                         present
         snapshot:                      "{{ ontap_52_snapshot_name }}"
-        vserver:                       "{{ vserver name }}"
-        volume:                        "{{ global_primary_nas_svm }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        volume:                        "{{ ontap_52_vol_name }}"
         snapmirror_label:              "{{ ontap_52_snapm_adhoc_label }}"
         comment:                       "ONTAP Test 52"
         <<: *input_01
