@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-52-06 - Create Additional Files
+# Title:        ONTAP-52-08 - Delete Files
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
 # Description:  Backup (SnapMirror)
-#               - Create Additional Files
+#               - Delete Files
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-52-06 - Create Additional Files - Linux"
+  name:               "ONTAP-52-08 - Delete Files - Linux"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -29,18 +29,18 @@
 
   tasks:
     - name: Create additional test files
-      community.general.filesize:
+      community.general.file:
+        state: absent
         path: "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}/{{ item }}"
-        size: 50MB
       loop:
-        - "testfile_11"
-        - "testfile_12"
-        - "testfile_13"
+        - "testfile_01"
+        - "testfile_02"
+        - "testfile_03"
   
   post_tasks:
 
 - hosts:              "win_hosts"
-  name:               "ONTAP-52-06 - Create Additional Files - Windows"
+  name:               "ONTAP-52-08 - Delete Files - Windows"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -55,11 +55,11 @@
     - name: Create additional test files
       ansible.windows.win_file:
         path:                     "\\\\{{ global_primary_nas_svm }}\\{{ ontap_52_win_qtree_name}}\\{{ item }}"
-        state:                    touch
+        state:                    absent
       loop:
-        - "testfile_11"
-        - "testfile_12"
-        - "testfile_13"
+        - "testfile_01"
+        - "testfile_02"
+        - "testfile_03"
       vars:
         ansible_become:           "yes"
         ansible_become_method:    "runas"
