@@ -39,10 +39,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         relationship_type:             "restore"
-        source_endpoint:
+        destination_endpoint:
           cluster:                     "{{ global_primary_test_cluster }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
-        destination_endpoint:
+        source_endpoint:
           cluster:                     "{{ global_secondary_test_cluster }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         source_snapshot:               "{{ ontap_52_snapshot_name }}"
