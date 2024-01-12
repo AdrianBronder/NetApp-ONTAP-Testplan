@@ -1,0 +1,53 @@
+################################################################################
+#
+# Title:        ONTAP-revert-20 - Storage Virtual Machines (SVMs)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-12
+# Description:  Revert all steps performed in test frame 20
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:              "ontap"
+  name:               "ONTAP-revert-20 - Storage Virtual Machines (SVMs)"
+  gather_facts:       false
+  vars:
+    input: &input
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+  - name: Remove CIFS server on SVMs
+      netapp.ontap.na_ontap_cifs_server:
+        state:                      absent
+        name:                       "{{ item.name }}"
+        vserver:                    "{{ item.svm.name }}"
+        domain:                     "{{ item.ad_domain.fqdn }}"
+        ou:                         "{{ item.ad_domain.organizational_unit }}"
+        admin_user_name:            "{{ all_ad_join_user }}"
+        admin_password:             "{{ all_ad_join_password }}"
+        <<: *input
+      loop:
+        "{{ protocols_cifs_services }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - protocols_cifs_services | length > 0
+        - item.name is defined 
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name

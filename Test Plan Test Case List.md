@@ -58,17 +58,28 @@
 | 52-01 | Backup (SnapMirror)               | SVM Peering                           |
 | 52-02 | Backup (SnapMirror)               | Custom Policies                       |
 | 52-03 | Backup (SnapMirror)               | Prepare Filesystem (Source)           |
-| 52-04 | Backup (SnapMirror)               | Create Backup Relation                |
+| 52-04 | Backup (SnapMirror)               | Protect Volume                        |
 | 52-05 | Backup (SnapMirror)               | Access Backup (read-only)             |
 | 52-06 | Backup (SnapMirror)               | Create Additional Files               |
 | 52-07 | Backup (SnapMirror)               | Create Incremental Backup             |
 | 52-08 | Backup (SnapMirror)               | Delete Files                          |
 | 52-09 | Backup (SnapMirror)               | Restore Backup                        |
 | 52-11 | Backup (SnapMirror)               | Bulk Protect Volumes                  |
-|  ---  |                                   |                                       |
+| ---   | ---                               | ---                                   |
+| Prepare-15         | Prepare test frame 15 - Cluster Peering                    | |
+| Prepare-20         | Prepare test frame 20 - Storage Virtual Machines (SVMs)    | |
+| Prepare-31         | Prepare test frame 31 - NFS                                | |
+| Prepare-32         | Prepare test frame 32 - CIFS                               | |
+| Prepare-35         | Prepare test frame 35 - iSCSI                              | |
+| Prepare-37         | Prepare test frame 37 - NVMe/TCP                           | |
+| Prepare-41         | Prepare test frame 41 - NFS FlexClone                      | |
+| Prepare-51         | Prepare test frame 51 - Local Versioning (Snapshots)       | |
+| Prepare-52         | Prepare test frame 52 - Backup (SnapMirror)                | |
+| ---   | ---                               | ---                                   |
 | Revert-00_linux   | Revert all systems to initial state - Linux                 | |
 | Revert-00_windows | Revert all systems to initial state - Windows               | |
 | Revert-00         | Revert all systems to initial state - ONTAP                 | |
+| Revert-20         | Revert test frame 20 - Storage Virtual Machines (SVMs)      | |
 | Revert-31         | Revert test frame 31 - NFS                                  | |
 | Revert-32         | Revert test frame 32 - CIFS                                 | |
 | Revert-35         | Revert test frame 35 - iSCSI                                | |
