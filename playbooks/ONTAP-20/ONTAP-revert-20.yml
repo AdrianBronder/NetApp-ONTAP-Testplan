@@ -32,22 +32,37 @@
     - netapp.ontap
 
   tasks:
-  - name: Remove CIFS server on SVMs
-    netapp.ontap.na_ontap_cifs_server:
-      state:                      absent
-      name:                       "{{ item.name }}"
-      vserver:                    "{{ item.svm.name }}"
-      domain:                     "{{ item.ad_domain.fqdn }}"
-      ou:                         "{{ item.ad_domain.organizational_unit }}"
-      admin_user_name:            "{{ all_ad_join_user }}"
-      admin_password:             "{{ all_ad_join_password }}"
-      <<: *input
-    loop:
-      "{{ protocols_cifs_services }}"
-    loop_control:
-      label: "{{ item.name }}"
-    when:
-      - protocols_cifs_services | length > 0
-      - item.name is defined 
-      - security_authentication_cluster_ad_proxy.svm.name is defined and
-        security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+    - name: Remove CIFS server on SVMs
+      netapp.ontap.na_ontap_cifs_server:
+        state:                         absent
+        name:                          "{{ item.name }}"
+        vserver:                       "{{ item.svm.name }}"
+        domain:                        "{{ item.ad_domain.fqdn }}"
+        ou:                            "{{ item.ad_domain.organizational_unit }}"
+        admin_user_name:               "{{ all_ad_join_user }}"
+        admin_password:                "{{ all_ad_join_password }}"
+        <<: *input
+      loop:
+        "{{ protocols_cifs_services }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - protocols_cifs_services | length > 0
+        - item.name is defined 
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+    - name: Remove SVMs
+      netapp.ontap.na_ontap_svm:
+        state:                         absent
+        name:                          "{{ item.name }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined 
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name

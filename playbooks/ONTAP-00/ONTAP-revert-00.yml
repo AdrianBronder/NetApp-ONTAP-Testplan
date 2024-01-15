@@ -402,7 +402,7 @@
         <<: *input
       register: svm_info
   
-    - name: Delete all SVMs
+    - name: Remove all SVMs
       netapp.ontap.na_ontap_svm:
         state:                    absent
         name:                     "{{ item.name }}"
