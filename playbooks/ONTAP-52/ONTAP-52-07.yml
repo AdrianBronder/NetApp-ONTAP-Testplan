@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-52-07 - Create Incremental Backup
+# Title:        ONTAP-52-07 - Incremental Backup
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
 # Description:  Backup (SnapMirror)
-#               - Create Incremental Backup
+#               - Incremental Backup
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-07 - Create Incremental Backup - ONTAP Primary"
+  name:               "ONTAP-52-07 - Incremental Backup - ONTAP Primary"
   gather_facts:       false
   vars:
     input_01: &input_01
@@ -48,7 +48,7 @@
   post_tasks:
 
 - hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-52-07 - Create Incremental Backup - ONTAP Secondary"
+  name:               "ONTAP-52-07 - Incremental Backup - ONTAP Secondary"
   gather_facts:       false
   vars:
     input_02: &input_02

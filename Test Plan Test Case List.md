@@ -52,7 +52,7 @@
 | 41-08 | Cloning (NFS)	                    | Clone & Write (Loop)                  |
 | 51-01 | Local Versioning (Snapshots)	    | Custom Policy                         |
 | 51-02 | Local Versioning (Snapshots)	    | Prepare Filesystem                    |
-| 51-03 | Local Versioning (Snapshots)	    | Create Snapshot                       |
+| 51-03 | Local Versioning (Snapshots)	    | Snapshot                              |
 | 51-04 | Local Versioning (Snapshots)	    | Delete Files                          |
 | 51-05 | Local Versioning (Snapshots)	    | Restore Snapshot                      |
 | 52-01 | Backup (SnapMirror)               | SVM Peering                           |
@@ -60,8 +60,8 @@
 | 52-03 | Backup (SnapMirror)               | Prepare Filesystem (Source)           |
 | 52-04 | Backup (SnapMirror)               | Protect Volume                        |
 | 52-05 | Backup (SnapMirror)               | Access Backup (read-only)             |
-| 52-06 | Backup (SnapMirror)               | Create Additional Files               |
-| 52-07 | Backup (SnapMirror)               | Create Incremental Backup             |
+| 52-06 | Backup (SnapMirror)               | Additional Files                      |
+| 52-07 | Backup (SnapMirror)               | Incremental Backup                    |
 | 52-08 | Backup (SnapMirror)               | Delete Files                          |
 | 52-09 | Backup (SnapMirror)               | Restore Backup                        |
 | 52-11 | Backup (SnapMirror)               | Bulk Protect Volumes                  |

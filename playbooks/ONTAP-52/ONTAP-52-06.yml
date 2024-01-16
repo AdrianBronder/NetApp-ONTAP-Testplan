@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-52-06 - Create Additional Files
+# Title:        ONTAP-52-06 - Additional Files
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
 # Description:  Backup (SnapMirror)
-#               - Create Additional Files
+#               - Additional Files
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-52-06 - Create Additional Files - Linux"
+  name:               "ONTAP-52-06 - Additional Files - Linux"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -40,7 +40,7 @@
   post_tasks:
 
 - hosts:              "win_hosts"
-  name:               "ONTAP-52-06 - Create Additional Files - Windows"
+  name:               "ONTAP-52-06 - Additional Files - Windows"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml

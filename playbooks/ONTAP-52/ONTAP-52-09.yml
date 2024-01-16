@@ -5,7 +5,7 @@
 # Initial 
 # Create Date:  2024-01-08
 # Description:  Backup (SnapMirror)
-#               - Restore from Backup
+#               - Restore Backup
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap

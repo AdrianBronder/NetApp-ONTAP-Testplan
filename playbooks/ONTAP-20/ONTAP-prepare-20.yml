@@ -20,12 +20,12 @@
 - ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-10-04.yml
 - ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-10-05.yml
 
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-11-01.yml
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-11-02.yml
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-11-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-03.yml
 
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-12-01.yml
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-12-02.yml
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-12-04.yml
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-12-05.yml
-- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-12-10.yml
+- ansible.builtin.import_playbook: ../ONTAP-12/ONTAP-12-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-12/ONTAP-12-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-12/ONTAP-12-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-12/ONTAP-12-05.yml
+- ansible.builtin.import_playbook: ../ONTAP-12/ONTAP-12-10.yml
