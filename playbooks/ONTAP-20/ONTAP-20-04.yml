@@ -94,7 +94,50 @@
         - item.protocol.v4_64bit_identifiers_enabled is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-    
+
+    - name: Create read-only export policy for NFS
+      netapp.ontap.na_ontap_export_policy:
+        state:                      present
+        name:                       "ro_{{ item.svm.name }}"
+        vserver:                    "{{ item.svm.name }}"
+        <<: *input
+      when:
+        - protocols_nfs_services | length > 0
+        - item.svm.name is defined 
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+  
+    - name: Create read-only export policy rules for SVM root volume for NFS
+      na_ontap_export_policy_rule:
+        state:                      present
+        name:                       "ro_{{ global_primary_nas_svm }}"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                    "any"
+        rw_rule:                    "none"
+        protocol:                   "nfs"
+        super_user_security:        "none"
+        allow_suid:                 false
+        <<: *input
+      when:
+        - protocols_nfs_services | length > 0
+        - item.svm.name is defined 
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+    - name: Apply read-only export policy to SVM's root volume for NFS
+      netapp.ontap.na_ontap_volume:
+        state:                      present
+        name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
+        vserver:                    "{{ global_primary_nas_svm }}"
+        export_policy:              "ro_{{ global_primary_nas_svm }}"
+        <<: *input
+      when:
+        - protocols_nfs_services | length > 0
+        - item.svm.name is defined 
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
     - name: Create active directory preferred domain controllers
       netapp.ontap.na_ontap_active_directory_domain_controllers:
         state:                      present
