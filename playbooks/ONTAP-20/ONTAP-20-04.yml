@@ -101,6 +101,10 @@
         name:                       "ro_{{ item.svm.name }}"
         vserver:                    "{{ item.svm.name }}"
         <<: *input
+      loop:
+        "{{ protocols_nfs_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined 
@@ -119,6 +123,10 @@
         super_user_security:        "none"
         allow_suid:                 false
         <<: *input
+      loop:
+        "{{ protocols_nfs_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined 
@@ -132,6 +140,10 @@
         vserver:                    "{{ global_primary_nas_svm }}"
         export_policy:              "ro_{{ global_primary_nas_svm }}"
         <<: *input
+      loop:
+        "{{ protocols_nfs_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined 
