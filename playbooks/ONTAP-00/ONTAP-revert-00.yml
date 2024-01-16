@@ -362,6 +362,7 @@
         - item.name is defined
       loop:
         "{{ cluster_peer_info.ontap_info.cluster_peers.records }}"
+      ignore_errors: true # required, if peering is deleted simultaniously on both sides
 
     - name: Get all intercluster interfaces from clusters
       netapp.ontap.na_ontap_rest_info:
