@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-51-05 - Restore Snapshot
+# Title:        ONTAP-51-06 - Restore Snapshot
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-08
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-51-05 - Restore Snapshot"
+  name:               "ONTAP-51-06 - Restore Snapshot"
   gather_facts:       false
   vars:
     input: &input
