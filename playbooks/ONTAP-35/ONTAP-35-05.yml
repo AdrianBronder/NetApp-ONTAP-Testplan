@@ -87,7 +87,7 @@
                             first).NodeAddress }} \
            -InitiatorPortalAddress {{ item.1.ipv4.address }} \
            -TargetPortalAddress {{ item.0.ip.address }} \
-           -IsMultipathEnabled $true -IsPersistent $true"
+           -IsMultipathEnabled $true" # -IsPersistent $true"
       loop_control:
         label: "Connect {{ item.1.ipv4.address }} to {{ item.0.ip.address }}"
       loop:

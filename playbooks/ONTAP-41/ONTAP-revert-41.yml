@@ -142,18 +142,3 @@
         name:                       "{{ ontap_41_policy_name }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
-  
-    - name: Apply default export policy to root volume
-      netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        export_policy:              "default"
-        <<: *input
-  
-    - name: Remove read-only export policy
-      netapp.ontap.na_ontap_export_policy:
-        state:                      absent
-        name:                       "ro_{{ global_primary_nas_svm }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        <<: *input
