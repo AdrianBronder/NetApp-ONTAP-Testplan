@@ -114,8 +114,8 @@
     - name: Create read-only export policy rules for SVM root volume for NFS
       na_ontap_export_policy_rule:
         state:                      present
-        name:                       "ro_{{ global_primary_nas_svm }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        name:                       "ro_{{ item.svm.name }}"
+        vserver:                    "{{ item.svm.name }}"
         client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                    "any"
         rw_rule:                    "none"
@@ -136,9 +136,9 @@
     - name: Apply read-only export policy to SVM's root volume for NFS
       netapp.ontap.na_ontap_volume:
         state:                      present
-        name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        export_policy:              "ro_{{ global_primary_nas_svm }}"
+        name:                       "{{ item.svm.name.replace('-','_') }}_root"
+        vserver:                    "{{ item.svm.name }}"
+        export_policy:              "ro_{{ item.svm.name }}"
         <<: *input
       loop:
         "{{ protocols_nfs_services }}"
