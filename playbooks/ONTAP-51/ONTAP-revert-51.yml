@@ -123,7 +123,7 @@
 
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                         present
+        state:                         absent
         name:                          "{{ ontap_51_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input_02
