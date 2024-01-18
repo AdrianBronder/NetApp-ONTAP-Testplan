@@ -81,12 +81,6 @@
         keep:
           - 5
           - 36
-        schedule:
-          - ''
-          - "5min"
-        prefix:
-          - ''
-          - "snapm_sched_"
         <<: *input_02
 
   post_tasks:

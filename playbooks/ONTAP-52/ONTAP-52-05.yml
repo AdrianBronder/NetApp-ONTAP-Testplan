@@ -35,34 +35,6 @@
   pre_tasks:
 
   tasks:
-    - name: Create read-only export policy
-      netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "ro_{{ global_primary_backup_svm }}"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        <<: *input
-  
-    - name: Create read-only export policy rules for SVM root volume
-      na_ontap_export_policy_rule:
-        state:                      present
-        name:                       "ro_{{ global_primary_backup_svm }}"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                    "any"
-        rw_rule:                    "none"
-        protocol:                   "nfs"
-        super_user_security:        "none"
-        allow_suid:                 false
-        <<: *input
-  
-    - name: Apply read-only export policy to SVM's root volume
-      netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ global_primary_backup_svm.replace('-','_') }}_root"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        export_policy:              "ro_{{ global_primary_backup_svm }}"
-        <<: *input
-
     - name: Apply read-only export policy to backup volume & mount it to SVM's namespace
       netapp.ontap.na_ontap_volume:
         state:                      present
@@ -86,7 +58,7 @@
         vserver:                    "{{ global_primary_backup_svm }}"
         client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                    "any"
-        rw_rule:                    "any"
+        rw_rule:                    "none"
         protocol:                   "nfs"
         super_user_security:        "any"
         allow_suid:                 true
@@ -104,7 +76,7 @@
     - name: Create share
       netapp.ontap.na_ontap_cifs:
         state:                      present
-        name:                       "{{ ontap_52_win_qtree_name }}"
+        name:                       "{{ ontap_52_win_qtree_name }}_dst"
         path:                       "/{{ ontap_52_vol_name }}_dst/{{ ontap_52_win_qtree_name }}"
         vserver:                    "{{ global_primary_backup_svm }}"
         browsable:                  true
@@ -148,27 +120,28 @@
   tasks:
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
   
     - name: Create mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
-        state:                      "directory"
-        mode:                       "0755"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
+        state:                         "directory"
+        mode:                          "0755"
   
-    - name: Mount NFS export on Linux host
+    - name: Mount NFS export on Linux host (read-only)
       ansible.posix.mount:
-        state:                      "mounted"
-        src:                        "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "mounted"
+        src:                           "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
+        opts:                          "ro"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
   
   post_tasks:
 
@@ -187,24 +160,24 @@
   tasks:
     - name: Create mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_52_mount_dir }}"
-        state:                    directory
+        path:                          "{{ windows_52_mount_dir }}"
+        state:                         directory
 
     - name: 
       block:
         - name: Save network credentials
           community.windows.win_credential:
-            state:                present
-            name:                 "{{ global_primary_backup_svm }}"
-            type:                 "domain_password"
-            username:             "{{ ontap_52_ad_admin_user }}"
-            secret:               "{{ ontap_52_ad_admin_user_pw }}"
+            state:                     present
+            name:                      "{{ global_primary_backup_svm }}"
+            type:                      "domain_password"
+            username:                  "{{ ontap_52_ad_admin_user }}"
+            secret:                    "{{ ontap_52_ad_admin_user_pw }}"
         
         - name: Map share
           community.windows.win_shortcut:
-            state:                present
-            src:                  "\\\\{{ global_primary_backup_svm }}\\{{ ontap_52_win_qtree_name }}"
-            dest:                 "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name }}_dst.lnk"
+            state:                     present
+            src:                       "\\\\{{ global_primary_backup_svm }}\\{{ ontap_52_win_qtree_name }}"
+            dest:                      "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name }}_dst.lnk"
       vars:
         # become is required to save and retrieve the credentials in the tasks
         ansible_become:           "yes"

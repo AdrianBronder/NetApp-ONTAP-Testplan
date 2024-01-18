@@ -182,7 +182,7 @@
     - name: Remove CIFS share
       netapp.ontap.na_ontap_cifs:
         state:                         absent
-        name:                          "{{ ontap_52_win_qtree_name }}"
+        name:                          "{{ ontap_52_win_qtree_name }}_dst"
         vserver:                       "{{ global_primary_backup_svm }}"
         <<: *input_01
 

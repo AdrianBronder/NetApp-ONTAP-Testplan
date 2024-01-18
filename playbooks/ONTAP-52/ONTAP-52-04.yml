@@ -47,6 +47,7 @@
         create_destination:
           enabled:                     true
         policy:                        "{{ ontap_52_snapm_policy_name }}"
+        schedule:                      "5min"
         update:                        false
         initialize:                    false
         <<: *input

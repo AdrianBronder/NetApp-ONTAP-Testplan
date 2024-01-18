@@ -33,9 +33,9 @@
         path: "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}/{{ item }}"
         size: 50MB
       loop:
-        - "testfile_11"
-        - "testfile_12"
-        - "testfile_13"
+        - "testfile11"
+        - "testfile12"
+        - "testfile13"
   
   post_tasks:
 
@@ -57,9 +57,9 @@
         path:                     "\\\\{{ global_primary_nas_svm }}\\{{ ontap_52_win_qtree_name}}\\{{ item }}"
         state:                    touch
       loop:
-        - "testfile_11"
-        - "testfile_12"
-        - "testfile_13"
+        - "testfile11"
+        - "testfile12"
+        - "testfile13"
       vars:
         ansible_become:           "yes"
         ansible_become_method:    "runas"
