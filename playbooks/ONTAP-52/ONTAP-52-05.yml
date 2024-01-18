@@ -88,7 +88,7 @@
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
         state:                      absent
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
+        share_name:                 "{{ ontap_52_win_qtree_name }}_dst"
         vserver:                    "{{ global_primary_backup_svm }}"
         user_or_group:              "Everyone"
         permission:                 "full_control"
@@ -97,7 +97,7 @@
     - name: Create ACL on test share (admins - read-only)
       netapp.ontap.na_ontap_cifs_acl:
         state:                      present
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
+        share_name:                 "{{ ontap_52_win_qtree_name }}_dst"
         vserver:                    "{{ global_primary_backup_svm }}"
         user_or_group:              "{{ ontap_52_ad_admin_group }}"
         permission:                 "read"
