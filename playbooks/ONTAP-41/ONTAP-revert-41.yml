@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-revert-41 - NFS FlexClone
+# Title:        ONTAP-revert-41 - Cloning (NFS)
 # Author:       NetApp Inc. (ken)
 # Initial 
 # Create Date:  2023-10-10
@@ -15,7 +15,7 @@
 ################################################################################
 
 - hosts:              "linux"
-  name:               "ONTAP-revert-41 - NFS FlexClone - Linux"
+  name:               "ONTAP-revert-41 - Cloning (NFS) - Linux"
   gather_facts:       false
   vars_files:
     - ../../vars/labondemand/vars.yml
@@ -87,7 +87,7 @@
 
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-revert-41 - NFS - ONTAP"
+  name:               "ONTAP-revert-41 - Cloning (NFS) - ONTAP"
   gather_facts:       false
   vars:
     input: &input
