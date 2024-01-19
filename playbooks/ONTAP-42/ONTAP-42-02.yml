@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-42-01 - QoS Policy
+# Title:        ONTAP-42-02 - Export Policies & Rules
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-19
 # Description:  Quality of Service
-#               - QoS Policy
+#               - Export Policies & Rules
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-42-02 - QoS Policy"
+  name:               "ONTAP-42-02 - Volumes"
   gather_facts:       false
   vars:
     input: &input
@@ -34,17 +34,36 @@
 
   pre_tasks:
 
-  tasks:
-    - name: Create QoS policy
-      netapp.ontap.na_ontap_qos_policy_group:
+  tasks:    
+    - name: Create non-QoS volume
+      netapp.ontap.na_ontap_volume:
         state:                         present
-        name:                          "{{ ontap_42_qos_policy_name }}"
+        name:                          "{{ ontap_42_vol_name }}"
+        aggregate_name:                "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
+        size:                          "{{ ontap_default_vol_size_gb }}"
+        size_unit:                     gb
+        space_guarantee:               none
+        tiering_policy:                auto
+        export_policy:                 "{{ ontap_42_policy_name }}"
+        junction_path:                 "/{{ ontap_42_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        fixed_qos_options:
-          max_throughput_iops: 1000
-          max_throughput_mbps: 10
-          min_throughput_iops: 100
-          min_throughput_mbps: 1
-          capacity_shared: True
+        volume_security_style:         "unix"
         <<: *input
+
+    - name: Create QoS volume
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ ontap_42_qos_vol_name }}"
+        aggregate_name:                "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
+        size:                          "{{ ontap_default_vol_size_gb }}"
+        size_unit:                     gb
+        space_guarantee:               none
+        tiering_policy:                auto
+        export_policy:                 "{{ ontap_42_policy_name }}"
+        junction_path:                 "/{{ ontap_42_qos_vol_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        volume_security_style:         "unix"
+        qos_policy_group:              "{{ ontap_42_qos_policy_name }}"
+        <<: *input
+
   post_tasks:
