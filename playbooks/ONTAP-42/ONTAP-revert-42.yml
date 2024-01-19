@@ -71,7 +71,7 @@
   tasks:
     - name: Remove CIFS share
       netapp.ontap.na_ontap_cifs:
-        state:                         present
+        state:                         absent
         name:                          "{{ item }}{{ ontap_42_cifs_suffix }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
