@@ -36,7 +36,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
   ```
   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-02.yml
   ```
-- Executing an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
+- Execute an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-*.yml
   ```
@@ -44,9 +44,9 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
   ```
   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-31/ONTAP-revert-31.yml
   ```
-- Executing ALL tests with a single command (and track the execution time)
+- Execute ALL tests with a single command (and track the execution time)
   ```
-  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-*/ONTAP-[0-9]*.yml
+  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
