@@ -81,14 +81,15 @@
         peer_cluster:                  "{{ item.peer.cluster.name }}"
         applications:
           - "snapmirror"
-        peer_options:
-          hostname: "{{ hostvars[item.peer.cluster.name].ansible_host }}"
+#        peer_options:
+#          hostname: "{{ hostvars[item.peer.cluster.name].ansible_host }}"
         <<: *input
       when:
         - svm_peer_info.ontap_info.svm_peers.num_records|int > 0
         - item.name is defined
       loop:
         "{{ svm_peer_info.ontap_info.svm_peers.records }}"
+#      ignore_errors: true
 
     - name: Get all SVM peerings from clusters
       netapp.ontap.na_ontap_rest_info:
@@ -337,15 +338,15 @@
         state:                         absent
         source_cluster_name:           "{{ cluster.name }}"
         dest_cluster_name:             "{{ item.remote.name }}"
-        peer_options:
-          hostname: "{{ hostvars[item.name].ansible_host }}"
+#        peer_options:
+#          hostname: "{{ hostvars[item.name].ansible_host }}"
         <<: *input
       when:
         - cluster_peer_info.ontap_info.cluster_peers.num_records|int > 0
         - item.name is defined
       loop:
         "{{ cluster_peer_info.ontap_info.cluster_peers.records }}"
-      ignore_errors: true # required, if peering is deleted simultaniously on both sides
+#      ignore_errors: true # required, if peering is deleted simultaniously on both sides
 
     - name: Get all intercluster interfaces from clusters
       netapp.ontap.na_ontap_rest_info:
