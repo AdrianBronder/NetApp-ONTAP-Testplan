@@ -5,7 +5,6 @@
 # Initial 
 # Create Date:  2023-11-22
 # Description:  Revert all steps performed in test frame 37
-#               - NVMe/TCP
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap

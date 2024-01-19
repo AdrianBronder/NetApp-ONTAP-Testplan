@@ -1,0 +1,49 @@
+################################################################################
+#
+# Title:        ONTAP-prepare-52 - Backup (SnapMirror)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-08
+# Description:  Execute all pre-steps for running test frame 51
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-02.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-prepare-20.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-04.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-31/ONTAP-31-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-31/ONTAP-31-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-31/ONTAP-31-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-31/ONTAP-31-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-31/ONTAP-31-05.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-32/ONTAP-32-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-32/ONTAP-32-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-32/ONTAP-32-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-32/ONTAP-32-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-32/ONTAP-32-05.yml
+- ansible.builtin.import_playbook: ../ONTAP-32/ONTAP-32-06.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-35/ONTAP-35-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-35/ONTAP-35-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-35/ONTAP-35-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-35/ONTAP-35-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-35/ONTAP-35-05.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-37/ONTAP-37-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-37/ONTAP-37-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-37/ONTAP-37-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-37/ONTAP-37-04.yml
+

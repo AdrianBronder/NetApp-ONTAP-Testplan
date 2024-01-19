@@ -38,17 +38,57 @@
 | 35-03 | iSCSI	                            | LUNs & Mappings                       |
 | 35-04 | iSCSI	                            | Mount & Write (Linux)                 |
 | 35-05 | iSCSI	                            | Mount & Write (Windows)               |
-| 41-01 | NFS Flexclone	                    | Export Policies & Rules               |
-| 41-02 | NFS Flexclone	                    | Volumes & Qtrees                      |
-| 41-03 | NFS Flexclone	                    | Mount & Write (Volumes)               |
-| 41-04 | NFS Flexclone	                    | Volume Clone                          |
-| 41-05 | NFS Flexclone	                    | Client Mount of Volume Clone          |
-| 41-06 | NFS Flexclone	                    | Client Write                          |
-|  ---  |                                   |                                       |
+| 37-01 | NVMe/TCP	                        | Volumes                               |
+| 37-02 | NVMe/TCP	                        | Namespaces                            |
+| 37-03 | NVMe/TCP	                        | Subsystem                             |
+| 37-04 | NVMe/TCP	                        | Mount & Write (Linux)                 |
+| 41-01 | Cloning (NFS)	                    | Export Policies & Rules               |
+| 41-02 | Cloning (NFS)	                    | Origin Volume                         |
+| 41-03 | Cloning (NFS)	                    | Mount & Write (Origin Volume)         |
+| 41-04 | Cloning (NFS)	                    | Client Write (Origin Volume)          |
+| 41-05 | Cloning (NFS)	                    | Clone Volume                          |
+| 41-06 | Cloning (NFS)	                    | Mount & Write (Clone)                 |
+| 41-07 | Cloning (NFS)	                    | Client Write (Clone)                  |
+| 41-08 | Cloning (NFS)	                    | Clone & Write (Loop)                  |
+| 42-01 | Quality of Service                | Export Policies & Rules               |
+| 42-02 | Quality of Service	            | QoS Policy                            |
+| 42-03 | Quality of Service                | Prepare Filesystem                    |
+| 42-04 | Quality of Service	            | Client Write                          |
+| 51-01 | Local Versioning (Snapshots)	    | Custom Policy                         |
+| 51-02 | Local Versioning (Snapshots)	    | Prepare Filesystem                    |
+| 51-03 | Local Versioning (Snapshots)	    | Snapshot                              |
+| 51-04 | Local Versioning (Snapshots)	    | Delete Files                          |
+| 51-06 | Local Versioning (Snapshots)	    | Restore Snapshot                      |
+| 52-01 | Backup (SnapMirror)               | SVM Peering                           |
+| 52-02 | Backup (SnapMirror)               | Custom Policies                       |
+| 52-03 | Backup (SnapMirror)               | Prepare Filesystem (Source)           |
+| 52-04 | Backup (SnapMirror)               | Protect Volume                        |
+| 52-05 | Backup (SnapMirror)               | Access Backup (read-only)             |
+| 52-06 | Backup (SnapMirror)               | Additional Files                      |
+| 52-07 | Backup (SnapMirror)               | Incremental Backup                    |
+| 52-08 | Backup (SnapMirror)               | Delete Files                          |
+| 52-09 | Backup (SnapMirror)               | Restore Backup                        |
+| 52-11 | Backup (SnapMirror)               | Bulk Protect Volumes                  |
+| ---   | ---                               | ---                                   |
+| Prepare-15         | Prepare test frame 15 - Cluster Peering                    | |
+| Prepare-20         | Prepare test frame 20 - Storage Virtual Machines (SVMs)    | |
+| Prepare-31         | Prepare test frame 31 - NFS                                | |
+| Prepare-32         | Prepare test frame 32 - CIFS                               | |
+| Prepare-35         | Prepare test frame 35 - iSCSI                              | |
+| Prepare-37         | Prepare test frame 37 - NVMe/TCP                           | |
+| Prepare-41         | Prepare test frame 41 - NFS FlexClone                      | |
+| Prepare-51         | Prepare test frame 51 - Local Versioning (Snapshots)       | |
+| Prepare-52         | Prepare test frame 52 - Backup (SnapMirror)                | |
+| ---   | ---                               | ---                                   |
 | Revert-00_linux   | Revert all systems to initial state - Linux                 | |
 | Revert-00_windows | Revert all systems to initial state - Windows               | |
 | Revert-00         | Revert all systems to initial state - ONTAP                 | |
-| Revert-31         | Revert all steps performed in test frame 31 - NFS           | |
-| Revert-32         | Revert all steps performed in test frame 32 - CIFS          | |
-| Revert-35         | Revert all steps performed in test frame 35 - iSCSI         | |
-| Revert-41         | Revert all steps performed in test frame 41 - NFS FlexClone | |
+| Revert-20         | Revert test frame 20 - Storage Virtual Machines (SVMs)      | |
+| Revert-31         | Revert test frame 31 - NFS                                  | |
+| Revert-32         | Revert test frame 32 - CIFS                                 | |
+| Revert-35         | Revert test frame 35 - iSCSI                                | |
+| Revert-37         | Revert test frame 37 - NVMe/TCP                             | |
+| Revert-41         | Revert test frame 41 - Cloning (NFS)                        | |
+| Revert-41         | Revert test frame 41 - Quality of Service                   | |
+| Revert-51         | Revert test frame 51 - Local Versioning (Snapshots)         | |
+| Revert-52         | Revert test frame 52 - Backup (SnapMirror)                  | |

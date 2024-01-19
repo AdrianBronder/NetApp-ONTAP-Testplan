@@ -1,0 +1,61 @@
+################################################################################
+#
+# Title:        ONTAP-42-04 - Client Write
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-19
+# Description:  Quality of Service
+#               - Client Write
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "linux"
+  name:               "ONTAP-42-04 - Client Write"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Create test files on non-QoS volume
+      ansible.builtin.command:
+        argv:
+          - dd
+          - if=/dev/urandom
+          - of={{ linux_42_mount_dir }}/{{ ontap_42_vol_name }}{{ ontap_42_nfs_suffix }}/testfile
+          - bs=1024KB
+          - count=100
+      register: nonqos_write
+
+    - name: Create test files on QoS volume
+      ansible.builtin.command:
+        argv:
+          - dd
+          - if=/dev/urandom
+          - of={{ linux_42_mount_dir }}/{{ ontap_42_qos_vol_name }}{{ ontap_42_nfs_suffix }}/testfile
+          - bs=1024KB
+          - count=100
+      register: qos_write
+
+    - name: Results - without QoS
+      ansible.builtin.debug:
+        msg:
+          - "--> {{ nonqos_write.stderr_lines | last }}"
+
+    - name: Results - with QoS
+      ansible.builtin.debug:
+        msg:
+          - "--> {{ qos_write.stderr_lines | last }}"
+  
+  post_tasks:

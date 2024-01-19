@@ -35,10 +35,10 @@
   pre_tasks:
 
   tasks:
-  - name: Send Test AutoSupport (Call Home)
-    netapp.ontap.na_ontap_autosupport_invoke:
-      autosupport_message:        "Invoked test autosupport as part of standard test plan"
-      type:                       "test"
-      <<: *input
+    - name: Send Test AutoSupport (Call Home)
+      netapp.ontap.na_ontap_autosupport_invoke:
+        autosupport_message:        "Invoked test autosupport as part of standard test plan"
+        type:                       "test"
+        <<: *input
 
   post_tasks:

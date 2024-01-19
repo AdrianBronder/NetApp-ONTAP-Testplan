@@ -1,0 +1,270 @@
+################################################################################
+#
+# Title:        ONTAP-revert-52 - Backup (SnapMirror)
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-08
+# Description:  Revert all steps performed in test frame 52
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:              "win_hosts"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - Windows"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: 
+      block:
+        - name: Remove mapped shares
+          community.windows.win_shortcut:
+            state:                absent
+            dest:                 "{{ windows_52_mount_dir }}\\{{ item }}.lnk"
+          loop:
+            - "{{ ontap_52_win_qtree_name }}"
+            - "{{ ontap_52_win_qtree_name }}_dst"
+        - name: Remove network credentials
+          community.windows.win_credential:
+            state:                absent
+            name:                 "{{ global_primary_nas_svm }}"
+            type:                 "domain_password"
+        - name: Remove network credentials
+          community.windows.win_credential:
+            state:                absent
+            name:                 "{{ global_primary_backup_svm }}"
+            type:                 "domain_password"
+      vars:
+        # become is required to save and retrieve the credentials in the tasks
+        ansible_become:           "yes"
+        ansible_become_method:    "runas"
+        ansible_become_user:      "{{ ansible_user }}"
+        ansible_become_pass:      "{{ ansible_password }}"
+
+    - name: Remove mount directory
+      ansible.windows.win_file:
+        path:                     "{{ windows_52_mount_dir }}"
+        state:                    absent
+
+- hosts:              "linux"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - Linux"
+  gather_facts:       false
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - ansible.posix
+
+  tasks:
+    - name: Unmount export on source qtree
+      ansible.posix.mount:
+        state:                      "absent"
+        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
+        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+#        opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+
+    - name: Unmount export on destination qtree
+      ansible.posix.mount:
+        state:                      "absent"
+        src:                        "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
+        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
+#        opts:                       "rw,sync,hard,vers=3"
+        fstype:                     "nfs"
+
+    - name: Remove mount directories
+      ansible.builtin.file:
+        path:                       "{{ linux_52_mount_dir }}/{{ item }}"
+        state:                      "absent"
+        mode:                       "0755"
+      loop:
+        - "{{ ontap_52_lin_qtree_name }}"
+        - "{{ ontap_52_lin_qtree_name }}_dst"
+
+    - name: Remove default parent mount directory
+      ansible.builtin.file:
+        path:                       "{{ linux_52_mount_dir }}"
+        state:                      "absent"
+        mode:                       "0755"
+
+- hosts:              "{{ global_secondary_test_cluster }}"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Secondary"
+  gather_facts:       false
+  vars:
+    input_01: &input_01
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+    - name: Get all SnapMirror relations to be deleted
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "snapmirror/relationships"
+        fields:
+          - "source"
+          - "destination"
+        parameters:
+          source.svm.name:             "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
+        use_python_keys:               true
+        <<: *input_01
+      register: snapmirror_info
+  
+    - name: Remove all volume protections in parallel
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         absent
+        source_endpoint:
+          cluster:                     "{{ item.source.cluster.name }}"
+          path:                        "{{ item.source.path }}"
+        destination_endpoint:
+          path:                        "{{ item.destination.path }}"
+        <<: *input_01
+      loop:
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
+      loop_control:
+        label: "{{ item.destination.path }}"
+      when:
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
+        - item.destination.path is defined
+      register: __exec_dp
+      async: 120
+      poll: 0
+
+    - name: Wait for all deletion jobs to complete
+      ansible.builtin.async_status:
+          jid: "{{ item.ansible_job_id }}"
+      register: __jobs_exec_dp
+      retries: 50
+      delay: 6
+      until: __jobs_exec_dp.finished
+      loop: "{{ __exec_dp.results }}"
+      loop_control:
+        label: "{{ item.item.destination.path }}"
+      when:
+        - __exec_dp.results | length > 0
+        - item.ansible_job_id is defined
+
+    - name: Remove SVM peerings
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "{{ global_primary_backup_svm }}"
+        peer_vserver:                  "{{ item }}"
+        peer_cluster:                  "{{ global_primary_test_cluster }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ global_primary_test_cluster }}"
+        <<: *input_01
+      loop:
+        - "{{ global_primary_nas_svm }}"
+        - "{{ global_primary_san_svm }}"
+    
+    - name: Remove CIFS share
+      netapp.ontap.na_ontap_cifs:
+        state:                         absent
+        name:                          "{{ ontap_52_win_qtree_name }}_dst"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        <<: *input_01
+
+    - name: Remove destination volume
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ ontap_52_vol_name }}_dst"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        <<: *input_01
+
+    - name: Remove destination volumes (bulk test)
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ item.destination.path | split(':') | last }}"
+        vserver:                       "{{ item.destination.svm.name }}"
+        <<: *input_01
+      loop:
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
+      loop_control:
+        label: "{{ item.destination.path }}"
+      when:
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
+        - item.destination.path is defined
+
+    - name: Remove custom SnapMirror policies
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         absent
+        vserver:                       "{{ global_primary_backup_svm }}"
+        policy_name:                   "{{ ontap_52_snapm_policy_name }}"
+        <<: *input_01
+
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         absent
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        <<: *input_01
+
+  post_tasks:
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Primary"
+  gather_facts:       false
+  vars:
+    input_02: &input_02
+      hostname:       "{{ ansible_host }}"
+      username:       "{{ ontap_admin_user }}"
+      password:       "{{ ontap_admin_password }}"
+      https:          true
+      validate_certs: false
+      use_rest:       "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  tasks:
+    - name: Remove CIFS share
+      netapp.ontap.na_ontap_cifs:
+        state:                         absent
+        name:                          "{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        <<: *input_02
+
+    - name: Remove source volume
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ ontap_52_vol_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        <<: *input_02
+
+    - name: Remove custom snapshot policy
+      netapp.ontap.na_ontap_snapshot_policy:
+        state:                         absent
+        vserver:                       "{{ global_primary_nas_svm }}"
+        name:                          "{{ ontap_52_snap_policy_name }}"
+        <<: *input_02
+
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         absent
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        <<: *input_02

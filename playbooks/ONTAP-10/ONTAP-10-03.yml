@@ -35,26 +35,26 @@
   pre_tasks:
 
   tasks:
-  - name: Create DNS config on storage cluster
-    netapp.ontap.na_ontap_dns:
-      state:                      present
-      vserver:                    "{{ inventory_hostname }}"
-      domains:                    "{{ all_dns_domains }}"
-      nameservers:                "{{ all_dns_nameservers }}"
-      use_rest:                   "never"
-      <<: *input
-
-  - name: Create NTP server on storage cluster
-    netapp.ontap.na_ontap_ntp:
-      state:                      present
-      server_name:                "{{ item }}"
-      version:                    "auto"
-      <<: *input
-    loop:
-      "{{ all_ntp_serveres }}"
-    retries: 5
-    delay: 3
-    register: result
-    until: not result.failed
+    - name: Create DNS config on storage cluster
+      netapp.ontap.na_ontap_dns:
+        state:                      present
+        vserver:                    "{{ inventory_hostname }}"
+        domains:                    "{{ all_dns_domains }}"
+        nameservers:                "{{ all_dns_nameservers }}"
+        use_rest:                   "never"
+        <<: *input
+  
+    - name: Create NTP server on storage cluster
+      netapp.ontap.na_ontap_ntp:
+        state:                      present
+        server_name:                "{{ item }}"
+        version:                    "auto"
+        <<: *input
+      loop:
+        "{{ all_ntp_serveres }}"
+      retries: 5
+      delay: 3
+      register: result
+      until: not result.failed
 
   post_tasks:

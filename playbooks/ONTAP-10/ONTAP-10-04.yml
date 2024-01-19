@@ -35,19 +35,19 @@
   pre_tasks:
 
   tasks:
-  - name: Create data aggregates on storage cluster 
-    netapp.ontap.na_ontap_aggregate:
-      state:                      present
-      name:                       "{{ item.name }}"
-      nodes:                      "{{ item.node.name }}"
-      disk_count:                 "{{ item.block_storage.primary.disk_count }}"
-      snaplock_type:              "{{ item.snaplock_type }}"
-      <<: *input 
-    loop:
-      "{{ storage_aggregates }}"
-    loop_control:
-      label: "{{ item.node.name }}:{{ item.name }}"
-    when:
-      - item.name is defined
+    - name: Create data aggregates on storage cluster 
+      netapp.ontap.na_ontap_aggregate:
+        state:                      present
+        name:                       "{{ item.name }}"
+        nodes:                      "{{ item.node.name }}"
+        disk_count:                 "{{ item.block_storage.primary.disk_count }}"
+        snaplock_type:              "{{ item.snaplock_type }}"
+        <<: *input 
+      loop:
+        "{{ storage_aggregates }}"
+      loop_control:
+        label: "{{ item.node.name }}:{{ item.name }}"
+      when:
+        - item.name is defined
 
   post_tasks:

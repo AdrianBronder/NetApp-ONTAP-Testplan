@@ -35,6 +35,19 @@
   pre_tasks:
 
   tasks:
+    - name: Get iSCSI target info from "{{ global_primary_san_svm }}" 
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/san/iscsi/services"
+        fields:
+          - "svm"
+          - "target"
+        parameters:
+          svm.name:               "{{ global_primary_san_svm }}"
+        use_python_keys:          true
+        <<: *input_read
+      register: iscsi_info
+
     - name: Get LUNs from "{{ global_primary_test_cluster }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
@@ -134,6 +147,8 @@
         auto_portal_startup:      false
         auto_node_startup:        false
         portal:                   "{{ item.ip.address }}"
+        target:                   "{{ (hostvars[global_primary_test_cluster].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
+                                       first ).target.name }}"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
@@ -179,7 +194,7 @@
         # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
       loop:
-        "{{ ansible_mounts | selectattr('device', 'search', global_primary_nas_svm)}}"
+        "{{ ansible_mounts | selectattr('device', 'search', 'ntap-svm*')}}"
   
     - name: Remove mount directories
       ansible.builtin.file:

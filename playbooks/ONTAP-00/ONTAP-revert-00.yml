@@ -34,6 +34,88 @@
     - netapp.ontap
 
   tasks:
+    - name: Get all SnapMirror relations to be deleted
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "snapmirror/relationships"
+        fields:
+          - "source"
+          - "destination"
+        use_python_keys:               true
+        <<: *input
+      register: snapmirror_info
+  
+    - name: Remove all volume protections
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         absent
+        source_endpoint:
+          cluster:                     "{{ item.source.cluster.name }}"
+          path:                        "{{ item.source.path }}"
+        destination_endpoint:
+          path:                        "{{ item.destination.path }}"
+        <<: *input
+      loop:
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
+      loop_control:
+        label: "{{ item.destination.path }}"
+      when:
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
+        - item.destination.path is defined
+
+    - name: Get all SVM peerings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "svm/peers"
+        fields:
+          - "svm"
+          - "peer"
+        use_python_keys:               true
+        <<: *input
+      register: svm_peer_info
+
+    - name: Remove SVM peerings
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "{{ item.svm.name }}"
+        peer_vserver:                  "{{ item.peer.svm.name }}"
+        peer_cluster:                  "{{ item.peer.cluster.name }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ hostvars[item.peer.cluster.name].ansible_host }}"
+        <<: *input
+      when:
+        - svm_peer_info.ontap_info.svm_peers.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ svm_peer_info.ontap_info.svm_peers.records }}"
+      ignore_errors: true # required, if peering is deleted simultaniously on both sides
+
+    - name: Get all SVM peerings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "snapmirror/policies"
+        fields:
+          - "svm"
+        parameters:
+          scope:                       "svm"
+        use_python_keys:               true
+        <<: *input
+      register: snapm_policy_info
+
+    - name: Remove custom SnapMirror policies
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         absent
+        vserver:                       "{{ item.svm.name }}"
+        policy_name:                   "{{ item.name }}"
+        <<: *input
+      when:
+        - snapm_policy_info.ontap_info.snapmirror_policies.num_records|int > 0
+        - item.name is defined
+        - item.svm.name is defined
+      loop:
+        "{{ snapm_policy_info.ontap_info.snapmirror_policies.records }}"
+
     - name: Get all NVMe subsystems from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
@@ -240,6 +322,32 @@
         - item.name is defined
         - item.scope == "svm"
   
+    - name: Get all cluster peerings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "cluster/peers"
+        fields:
+          - "name"
+          - "remote"
+        use_python_keys:               true
+        <<: *input
+      register: cluster_peer_info
+
+    - name: Remove cluster peerings
+      netapp.ontap.na_ontap_cluster_peer:
+        state:                         absent
+        source_cluster_name:           "{{ cluster.name }}"
+        dest_cluster_name:             "{{ item.remote.name }}"
+        peer_options:
+          hostname: "{{ hostvars[item.name].ansible_host }}"
+        <<: *input
+      when:
+        - cluster_peer_info.ontap_info.cluster_peers.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ cluster_peer_info.ontap_info.cluster_peers.records }}"
+      ignore_errors: true # required, if peering is deleted simultaniously on both sides
+
     - name: Get all intercluster interfaces from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
@@ -279,7 +387,7 @@
         <<: *input
       register: svm_info
   
-    - name: Delete all SVMs
+    - name: Remove all SVMs
       netapp.ontap.na_ontap_svm:
         state:                    absent
         name:                     "{{ item.name }}"

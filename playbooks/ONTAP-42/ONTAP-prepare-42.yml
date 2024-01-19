@@ -1,0 +1,21 @@
+################################################################################
+#
+# Title:        ONTAP-prepare-42 - Quality of Service
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-19
+# Description:  Execute all pre-steps for running test frame 42
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-prepare-20.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-04.yml

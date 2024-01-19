@@ -1,0 +1,86 @@
+################################################################################
+#
+# Title:        ONTAP-52-02 - Custom Policies
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-01-08
+# Description:  Backup (SnapMirror)
+#               - Custom Policies
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:              "{{ global_primary_test_cluster }}"
+  name:               "ONTAP-52-02 - Custom Policies"
+  gather_facts:       false
+  vars:
+    input_01: &input_01
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Create custom snapshot policy
+      netapp.ontap.na_ontap_snapshot_policy:
+        state:                         present
+        vserver:                       "{{ global_primary_nas_svm }}"
+        name:                          "{{ ontap_52_snap_policy_name }}"
+        schedule:                      "5min"
+        prefix:                        "5min_"
+        snapmirror_label:              "{{ ontap_52_snapm_sched_label }}"
+        count:                         6
+        enabled:                       True
+        <<: *input_01
+
+  post_tasks:
+
+- hosts:              "{{ global_secondary_test_cluster }}"
+  name:               "ONTAP-52-02 - Custom Policies"
+  gather_facts:       false
+  vars:
+    input_02: &input_02
+      hostname:                   "{{ ansible_host }}"
+      username:                   "{{ ontap_admin_user }}"
+      password:                   "{{ ontap_admin_password }}"
+      https:                      true
+      validate_certs:             false
+      use_rest:                   "always"
+  vars_files:
+    - ../../vars/labondemand/vars.yml
+    - ../../vars/labondemand/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Create custom SnapMirror policy
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         present
+        vserver:                       "{{ global_primary_backup_svm }}"
+        policy_name:                   "{{ ontap_52_snapm_policy_name }}"
+        policy_type:                   "mirror_vault"
+        snapmirror_label:
+          - "{{ ontap_52_snapm_adhoc_label }}"
+          - "{{ ontap_52_snapm_sched_label }}"
+        keep:
+          - 5
+          - 36
+        <<: *input_02
+
+  post_tasks:

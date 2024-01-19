@@ -35,16 +35,16 @@
   pre_tasks:
 
   tasks:
-  - name: Install licenses on storage cluster
-    netapp.ontap.na_ontap_license:
-      state:                      present
-      license_codes:              "{{ item.node.name }}"
-      <<: *input
-    loop:
-      "{{ cluster_licensing_licenses }}"
-    loop_control:
-      label: "{{ item }}"
-    when:
-      - cluster_licensing_licenses | length > 0
+    - name: Install licenses on storage cluster
+      netapp.ontap.na_ontap_license:
+        state:                      present
+        license_codes:              "{{ item.node.name }}"
+        <<: *input
+      loop:
+        "{{ cluster_licensing_licenses }}"
+      loop_control:
+        label: "{{ item }}"
+      when:
+        - cluster_licensing_licenses | length > 0
 
   post_tasks:

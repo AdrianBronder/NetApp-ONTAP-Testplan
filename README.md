@@ -8,8 +8,8 @@
 
 
 # Introduction
-This repository contains Ansible artifacts (inventories, vars, playbooks...) for executing test and demos against ONTAP automatically.
-They can be used out of the box in Lab on Demand or tuned to any other environment
+This repository contains Ansible artifacts (inventories, vars, playbooks...) for executing tests and demos against ONTAP automatically.
+They can be used out of the box in Lab on Demand or - by adjusting varaibles - in any other environment.
 
 
 # Quick Start with Lab on Demand
@@ -36,7 +36,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
   ```
   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-02.yml
   ```
-- Executing an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
+- Execute an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-*.yml
   ```
@@ -44,9 +44,9 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
   ```
   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-31/ONTAP-revert-31.yml
   ```
-- Executing ALL tests with a single command (and track the execution time)
+- Execute ALL tests with a single command (and track the execution time)
   ```
-  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-*/ONTAP-[0-9]*.yml
+  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
@@ -104,5 +104,12 @@ The playbooks can be executed in any other non-production environments for demos
 
 # Changelog
 
+## v1.1
+- Adding ONTAP-42 - Quality of Service
+- Adding ONTAP-51 - Local Versioning (Snapshots)
+- Adding ONTAP-52 - Backup (SnapMirror)
+- Adding "prepare" playbooks to run all pre-requesits for a particular test frame
+- Moving RO policy creation for NFS to “ONTAP-20 – Basic SVM Setup”
+
 ## v1.0
-Initial Release
+- Initial Release

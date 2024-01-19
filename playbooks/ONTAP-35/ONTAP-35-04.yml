@@ -29,6 +29,19 @@
   pre_tasks:
 
   tasks:
+    - name: Get iSCSI target info from "{{ global_primary_san_svm }}" 
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/san/iscsi/services"
+        fields:
+          - "svm"
+          - "target"
+        parameters:
+          svm.name:               "{{ global_primary_san_svm }}"
+        use_python_keys:          true
+        <<: *input
+      register: iscsi_info
+    
     - name: Get LUNs from "{{ global_primary_san_svm }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
@@ -47,7 +60,7 @@
 
 - hosts:                          "{{ global_primary_linux_host }}"
   name:                           "ONTAP-35-04 - Mount & Write (Linux) - Linux"
-  gather_facts:                   false
+  gather_facts:                   true
   vars_files:
     - ../../vars/labondemand/vars.yml
     - ../../vars/labondemand/vault.yml
@@ -66,6 +79,8 @@
         auto_portal_startup:      true
         auto_node_startup:        true
         portal:                   "{{ item.ip.address }}"
+        target:                   "{{ (hostvars[global_primary_test_cluster].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
+                                       first ).target.name }}"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
@@ -86,7 +101,6 @@
       loop:
         "{{ ontap_35_lin_luns }}"
 
-  
     - name: Create mount directory  
       ansible.builtin.file:
         path:                     "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
@@ -94,7 +108,7 @@
         mode:                     "0755"
       loop:
         "{{ ontap_35_lin_luns }}"
-  
+
     - name: Mount LUN
       ansible.posix.mount:
         state:                    "mounted"
@@ -108,7 +122,7 @@
         opts:                     "discard"
       loop:
         "{{ ontap_35_lin_luns }}"
-  
+
     - name: Create test file on LUN
       community.general.filesize:
         path: "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"

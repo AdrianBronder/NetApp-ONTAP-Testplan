@@ -5,7 +5,6 @@
 # Initial 
 # Create Date:  2023-08-17
 # Description:  Revert all steps performed in test frame 31
-#               - NFS
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -96,20 +95,5 @@
       netapp.ontap.na_ontap_export_policy:
         state:                      absent
         name:                       "{{ ontap_31_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        <<: *input
-  
-    - name: Apply default export policy to root volume
-      netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        export_policy:              "default"
-        <<: *input
-  
-    - name: Remove read-only export policy
-      netapp.ontap.na_ontap_export_policy:
-        state:                      absent
-        name:                       "ro_{{ global_primary_nas_svm }}"
         vserver:                    "{{ global_primary_nas_svm }}"
         <<: *input
