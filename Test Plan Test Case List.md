@@ -50,6 +50,10 @@
 | 41-06 | Cloning (NFS)	                    | Mount & Write (Clone)                 |
 | 41-07 | Cloning (NFS)	                    | Client Write (Clone)                  |
 | 41-08 | Cloning (NFS)	                    | Clone & Write (Loop)                  |
+| 42-01 | Quality of Service                | Export Policies & Rules               |
+| 42-02 | Quality of Service	            | QoS Policy                            |
+| 42-03 | Quality of Service                | Prepare Filesystem                    |
+| 42-04 | Quality of Service	            | Client Write                          |
 | 51-01 | Local Versioning (Snapshots)	    | Custom Policy                         |
 | 51-02 | Local Versioning (Snapshots)	    | Prepare Filesystem                    |
 | 51-03 | Local Versioning (Snapshots)	    | Snapshot                              |
@@ -84,6 +88,7 @@
 | Revert-32         | Revert test frame 32 - CIFS                                 | |
 | Revert-35         | Revert test frame 35 - iSCSI                                | |
 | Revert-37         | Revert test frame 37 - NVMe/TCP                             | |
-| Revert-41         | Revert test frame 41 - NFS FlexClone                        | |
+| Revert-41         | Revert test frame 41 - Cloning (NFS)                        | |
+| Revert-41         | Revert test frame 41 - Quality of Service                   | |
 | Revert-51         | Revert test frame 51 - Local Versioning (Snapshots)         | |
 | Revert-52         | Revert test frame 52 - Backup (SnapMirror)                  | |

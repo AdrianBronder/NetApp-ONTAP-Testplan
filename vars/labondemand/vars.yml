@@ -92,13 +92,27 @@ ontap_37_lin_namespaces:
   - "/vol/ontap_37_lin_vol03/ontap_37_lin_ns03"
 linux_37_mount_dir:               "{{ linux_default_mount_dir }}/37"
 
-# ONTAP-41 - NFS FlexClone
+# ONTAP-41 - Cloning (NFS)
 ontap_41_policy_name:             "ontap_41_policy"
 ontap_41_vol_name:                "ontap_41_nfs_vol01"
 ontap_41_snapshot_name:           "software_source"
 ontap_41_clone_dir_name:          "clonedir"
 ontap_41_clone_vol_name:          "{{ ontap_41_snapshot_name }}"
 linux_41_mount_dir:               "{{ linux_default_mount_dir }}/41"
+
+# ONTAP-42 - Quality of Service
+ontap_42_policy_name:             "ontap_42_policy"
+ontap_42_qos_policy_name:         "ontap_42_qos_policy"
+ontap_42_vol_name:                "ontap_42_noqos_vol01"
+ontap_42_nfs_suffix:              "_nfs_qt01"
+ontap_42_cifs_suffix:             "_cifs_qt01"
+ontap_42_qos_vol_name:            "ontap_42_qos_vol01"
+linux_42_mount_dir:               "{{ linux_default_mount_dir }}/42"
+windows_42_mount_dir:             "{{ windows_default_mount_dir }}\\42"
+ontap_42_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_42_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+ontap_42_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_42_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
 # ONTAP-51 - Local Versioning (Snapshots)
 ontap_51_policy_name:             "ontap_51_policy"

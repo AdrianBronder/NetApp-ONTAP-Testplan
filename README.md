@@ -105,6 +105,7 @@ The playbooks can be executed in any other non-production environments for demos
 # Changelog
 
 ## v1.1
+- Adding ONTAP-42 - Quality of Service
 - Adding ONTAP-51 - Local Versioning (Snapshots)
 - Adding ONTAP-52 - Backup (SnapMirror)
 - Adding "prepare" playbooks to run all pre-requesits for a particular test frame
