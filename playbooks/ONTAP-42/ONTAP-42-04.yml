@@ -48,11 +48,16 @@
           - count=100
       register: qos_write
 
-    - debug:
+    - name: Results - without QoS
+      ansible.builtin.debug:
         msg:
-          - "#### RESULTS - NO QOS ####\
-            {{ nonqos_write }}"
-          - "#### RESULTS - WITH QOS ####\
-            {{ qos_write }}"
+          - "--> {{ nonqos_write.stderr_lines | last }}"
+          - "{{ nonqos_write }}"
+
+    - name: Results - with QoS
+      ansible.builtin.debug:
+        msg:
+          - "--> {{ qos_write.stderr_lines | last }}"
+          - "{{ qos_write }}"
   
   post_tasks:
