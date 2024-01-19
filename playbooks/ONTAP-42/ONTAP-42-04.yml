@@ -29,10 +29,10 @@
 
   tasks:
     - name: Create test files on non-QoS volume
-      ansible.builtin.command: dd if=/dev/urandom of=/mn{{ linux_42_mount_dir }}/{{ ontap_42_vol_name }}{{ ontap_42_nfs_suffix }}/testfile bs=1024KB count=100
+      ansible.builtin.command: dd if=/dev/urandom of={{ linux_42_mount_dir }}/{{ ontap_42_vol_name }}{{ ontap_42_nfs_suffix }}/testfile bs=1024KB count=100
 
     - name: Create test files on QoS volume
-      ansible.builtin.command: dd if=/dev/urandom of=/mn{{ linux_42_mount_dir }}/{{ ontap_42_qos_vol_name }}{{ ontap_42_nfs_suffix }}/testfile bs=1024KB count=100
+      ansible.builtin.command: dd if=/dev/urandom of={{ linux_42_mount_dir }}/{{ ontap_42_qos_vol_name }}{{ ontap_42_nfs_suffix }}/testfile bs=1024KB count=100
       register: qos_write
 
 #    - name: Create test files on non-QoS volume
