@@ -53,7 +53,7 @@
     - name: Create QoS volume
       netapp.ontap.na_ontap_volume:
         state:                         present
-        name:                          "{{ ontap_42_vol_name }}"
+        name:                          "{{ ontap_42_qos_vol_name }}"
         aggregate_name:                "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
         size:                          "{{ ontap_default_vol_size_gb }}"
         size_unit:                     gb
