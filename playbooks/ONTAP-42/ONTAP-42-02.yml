@@ -25,7 +25,7 @@
       password:                   "{{ ontap_admin_password }}"
       https:                      true
       validate_certs:             false
-#      use_rest:                   "always"
+      use_rest:                   "always"
   vars_files:
     - ../../vars/labondemand/vars.yml
     - ../../vars/labondemand/vault.yml
@@ -40,8 +40,11 @@
         state:                         present
         name:                          "{{ ontap_42_qos_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        max_throughput:                "10MB/s,1000iops"
-        min_throughput:                "1MB/s,100iops"
+        fixed_qos_options:
+          max_throughput_iops: 1000
+          max_throughput_mbps: 10
+          min_throughput_iops: 100
+          min_throughput_mbps: 1
+          capacity_shared: True
         <<: *input
-
   post_tasks:
