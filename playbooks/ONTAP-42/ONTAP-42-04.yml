@@ -42,7 +42,7 @@
 
     - debug:
         msg:
-          - "nonqos_write"
-          - "qos_write"
+          - "{{ nonqos_write }}"
+          - "{{ qos_write }}"
   
   post_tasks:
