@@ -109,6 +109,7 @@ The playbooks can be executed in any other non-production environments for demos
 - Adding ONTAP-51 - Local Versioning (Snapshots)
 - Adding ONTAP-52 - Backup (SnapMirror)
 - Adding "prepare" playbooks to run all pre-requesits for a particular test frame
+- Moving RO policy creation for NFS to “ONTAP-20 – Basic SVM Setup”
 
 ## v1.0
 - Initial Release

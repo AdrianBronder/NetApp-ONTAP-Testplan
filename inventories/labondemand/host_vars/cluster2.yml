@@ -151,6 +151,10 @@ protocols_nfs_services:
     showmount_enabled:            true
 
 protocols_active_directory:
+  cluster1_ad:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
   ntap-svm03-backup:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
