@@ -86,7 +86,7 @@
   name:               "ONTAP-revert-51 - Local Versioning (Snapshots) - ONTAP"
   gather_facts:       false
   vars:
-    input_02: &input_02
+    input: &input
       hostname:       "{{ ansible_host }}"
       username:       "{{ ontap_admin_user }}"
       password:       "{{ ontap_admin_password }}"
@@ -105,25 +105,25 @@
         state:                         absent
         name:                          "{{ ontap_51_win_qtree_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input_02
+        <<: *input
 
     - name: Remove source volume
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ ontap_51_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input_02
+        <<: *input
 
     - name: Remove custom snapshot policy
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         absent
         vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_51_snap_policy_name }}"
-        <<: *input_02
+        <<: *input
 
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         absent
         name:                          "{{ ontap_51_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input_02
+        <<: *input
