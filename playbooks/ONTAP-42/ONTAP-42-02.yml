@@ -38,8 +38,8 @@
     - name: Create QoS policy
       netapp.ontap.na_ontap_qos_policy_group:
         state:                         present
-        name:                          "{{ global_primary_nas_svm }}"
-        vserver:                       "{{ ontap_42_qos_policy_name }}"
+        name:                          "{{ ontap_42_qos_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         max_throughput:                "10MB/s,1000iops"
         min_throughput:                "1MB/s,100iops"
         <<: *input
