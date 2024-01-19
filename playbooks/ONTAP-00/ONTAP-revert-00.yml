@@ -45,7 +45,7 @@
         <<: *input
       register: snapmirror_info
   
-    - name: Remove all volume protections in parallel
+    - name: Remove all volume protections
       netapp.ontap.na_ontap_snapmirror:
         state:                         absent
         source_endpoint:
@@ -61,23 +61,6 @@
       when:
         - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
         - item.destination.path is defined
-      register: __exec_dp
-      async: 120
-      poll: 0
-
-    - name: Wait for all deletion jobs to complete
-      ansible.builtin.async_status:
-          jid: "{{ item.ansible_job_id }}"
-      register: __jobs_exec_dp
-      retries: 50
-      delay: 6
-      until: __jobs_exec_dp.finished
-      loop: "{{ __exec_dp.results }}"
-      loop_control:
-        label: "{{ item.item.name }}"
-      when:
-        - __exec_dp.results | length > 0
-        - item.ansible_job_id is defined
 
     - name: Get all SVM peerings from clusters
       netapp.ontap.na_ontap_rest_info:
