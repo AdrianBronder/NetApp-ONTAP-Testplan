@@ -52,12 +52,10 @@
       ansible.builtin.debug:
         msg:
           - "--> {{ nonqos_write.stderr_lines | last }}"
-          - "{{ nonqos_write }}"
 
     - name: Results - with QoS
       ansible.builtin.debug:
         msg:
           - "--> {{ qos_write.stderr_lines | last }}"
-          - "{{ qos_write }}"
   
   post_tasks:
