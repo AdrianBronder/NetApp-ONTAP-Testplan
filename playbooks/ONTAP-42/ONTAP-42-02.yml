@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-42-02 - Export Policies & Rules
+# Title:        ONTAP-42-02 - Volumes
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-01-19
 # Description:  Quality of Service
-#               - Export Policies & Rules
+#               - Volumes
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
