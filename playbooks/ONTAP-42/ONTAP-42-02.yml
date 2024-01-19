@@ -44,7 +44,7 @@
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
-        export_policy:                 "{{ ontap_42_policy_name }}"
+        export_policy:                 "ro_{{ global_primary_nas_svm }}"
         junction_path:                 "/{{ ontap_42_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "unix"
@@ -59,7 +59,7 @@
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
-        export_policy:                 "{{ ontap_42_policy_name }}"
+        export_policy:                 "ro_{{ global_primary_nas_svm }}"
         junction_path:                 "/{{ ontap_42_qos_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "unix"
