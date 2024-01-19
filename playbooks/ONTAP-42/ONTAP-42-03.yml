@@ -60,7 +60,7 @@
         space_guarantee:               none
         tiering_policy:                auto
         export_policy:                 "{{ ontap_42_policy_name }}"
-        junction_path:                 "/{{ ontap_42_vol_name }}"
+        junction_path:                 "/{{ ontap_42_qos_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "unix"
         qos_policy_group:              "{{ ontap_42_qos_policy_name }}"
