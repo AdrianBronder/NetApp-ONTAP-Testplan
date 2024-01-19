@@ -27,22 +27,29 @@
 
   pre_tasks:
 
-  tasks:  
+  tasks:
     - name: Create test files on non-QoS volume
-      community.general.filesize:
-        path: "{{ linux_42_mount_dir }}/{{ ontap_42_vol_name }}{{ ontap_42_nfs_suffix }}/testfile01"
-        size: 100MB
-      register: nonqos_write
+      ansible.builtin.command: dd if=/dev/urandom of=/mn{{ linux_42_mount_dir }}/{{ ontap_42_vol_name }}{{ ontap_42_nfs_suffix }}/testfile bs=1024KB count=100
 
     - name: Create test files on QoS volume
-      community.general.filesize:
-        path: "{{ linux_42_mount_dir }}/{{ ontap_42_qos_vol_name }}{{ ontap_42_nfs_suffix }}/testfile01"
-        size: 100MB
+      ansible.builtin.command: dd if=/dev/urandom of=/mn{{ linux_42_mount_dir }}/{{ ontap_42_qos_vol_name }}{{ ontap_42_nfs_suffix }}/testfile bs=1024KB count=100
       register: qos_write
+
+#    - name: Create test files on non-QoS volume
+#      community.general.filesize:
+#        path: "{{ linux_42_mount_dir }}/{{ ontap_42_vol_name }}{{ ontap_42_nfs_suffix }}/testfile01"
+#        size: 100MB
+#      register: nonqos_write
+
+#    - name: Create test files on QoS volume
+#      community.general.filesize:
+#        path: "{{ linux_42_mount_dir }}/{{ ontap_42_qos_vol_name }}{{ ontap_42_nfs_suffix }}/testfile01"
+#        size: 100MB
+#      register: qos_write
 
     - debug:
         msg:
-          - "{{ nonqos_write }}"
+#          - "{{ nonqos_write }}"
           - "{{ qos_write }}"
   
   post_tasks:
