@@ -14,8 +14,9 @@ They can be used out of the box in Lab on Demand or - by adjusting varaibles - i
 
 # Quick Start with Lab on Demand
 For NetApp internal and partner use - ready to go in less than 15 minutes
-1. Please use the virtual hands-on lab (log in with your NetApp support account):
-   - https://labondemand.netapp.com/node/497
+1. Please use one the early adopter virtual hands-on lab (log in with your NetApp support account):
+   - https://labondemand.netapp.com/lab/eapontap9131 (ONTAP 9.13.1)
+   - https://labondemand.netapp.com/lab/eapontap9141 (ONTAP 9.14.1)
 2. Log into the Linux host ("centos1.demo.netapp.com") and clone this repository:
    ```
    git clone https://github.com/AdrianBronder/NetApp-ONTAP-Testplan.git
@@ -23,7 +24,9 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
 3. Initialize the environment by running the lab init script:
    ```
    cd ./NetApp-ONTAP-Testplan
-   ./init/init_LD00821.sh
+   # based on ONTAP (lab) version: ./init/init_eapontap<ontapversion>.sh
+   # e.g.
+   ./init/init_eapontap9141.sh
    ```
 4. Execute test steps, e.g. general connection test playbook "ONTAP-01-04.yml"
    ```

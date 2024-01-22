@@ -2,10 +2,10 @@
 
 ################################################################################
 #
-# Title:        init_LD00821.sh
+# Title:        init_eapontap9131.sh
 # Author:       Adrian Bronder
 # Initial Date: 2023-08-16
-# Description:  Prepare linux host "centos1" in LoD lab LD00821
+# Description:  Prepare linux host "centos1" in LoD lab 497
 #               --> "Early Adopter Lab for ONTAP 9.13.1"
 #
 # URLs:         https://labondemand.netapp.com/node/497
