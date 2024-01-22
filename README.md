@@ -19,6 +19,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
    - https://labondemand.netapp.com/lab/eapontap9141 (ONTAP 9.14.1)
 2. Log into the Linux host ("centos1.demo.netapp.com") and clone this repository:
    ```
+   yum install git
    git clone https://github.com/AdrianBronder/NetApp-ONTAP-Testplan.git
    ```
 3. Initialize the environment by running the lab init script:
