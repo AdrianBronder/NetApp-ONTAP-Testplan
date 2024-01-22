@@ -48,8 +48,8 @@ rm -rf ~/.local/*
 echo ""
 echo ""
 echo "--> Installing additional packages"
-sudo yum install -y wget gcc perl libffi-devel epel-release zlib-devel jq libxml2 git krb5-devel sshpass ncurses-devel nvme-cli --skip-broken
 sudo yum erase -y openssl
+sudo yum install -y wget gcc perl libffi-devel epel-release zlib-devel jq libxml2 git krb5-devel sshpass ncurses-devel nvme-cli --skip-broken
 
 echo ""
 echo ""
