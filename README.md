@@ -24,6 +24,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
    
    ```
 3. Initialize the environment by running the lab init script:
+   Caution: The script might end with a reboot of the Linux system. Simply reconnect to execute further steps.
    ```
    cd ./NetApp-ONTAP-Testplan
    # based on ONTAP (lab) version: ./init/init_eapontap<ontapversion>.sh

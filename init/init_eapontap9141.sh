@@ -18,89 +18,46 @@ echo ""
 echo ""
 echo "--> Setting variables & paths"
 source ~/.bashrc
-OPENSSLVERS="1.1.1u"
-PYTHON3VERS="3.9.17"
+#OPENSSLVERS="1.1.1u" #"1.1.1u"
+#PYTHON3VERS="3.9.18"
 ANSIBLEVERS="2.15.2"
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-DOWNLOADPATH="/tmp/downloads"
-OPENSSLPATH="/usr/local/openssl"
-echo "OpenSSL version to be installed: $OPENSSLVERS"
-echo "Python3 version to be installed: $PYTHON3VERS"
+#DOWNLOADPATH="/tmp/downloads"
+#OPENSSLPATH="/usr/local/openssl"
+#echo "OpenSSL version to be installed: $OPENSSLVERS"
+#echo "Python3 version to be installed: $PYTHON3VERS"
 echo "Ansible version to be installed: $ANSIBLEVERS"
 echo "Path to this script:  $SCRIPTPATH"
-echo "Download path:        $DOWNLOADPATH"
-echo "OpenSSL path:         $OPENSSLPATH" 
+#echo "Download path:        $DOWNLOADPATH"
+#echo "OpenSSL path:         $OPENSSLPATH" 
 
 echo ""
 echo ""
-echo "--> Updating Centos system"
-sudo yum -y update
-
-echo ""
-echo ""
-echo "--> Remove Python3"
-sudo yum remove -y python3
-sudo rm -f /usr/bin/python3
-sudo rm -f /usr/bin/pip3
-sudo rm -rf /usr/local/lib
-rm -rf ~/.local/*
+echo "--> Updating RHEL system"
+dnf -y update
 
 echo ""
 echo ""
 echo "--> Installing additional packages"
-sudo yum install -y wget gcc perl libffi-devel epel-release zlib-devel jq libxml2 git krb5-devel sshpass ncurses-devel nvme-cli --skip-broken
-sudo yum erase -y openssl
-sudo yum install -y perl --skip-broken
+dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11-kerberos krb5-workstation krb5-devel python3.11-pip python3.11-devel --skip-broken
 
 echo ""
 echo ""
-echo "--> Install OpenSSL"
-sudo mkdir $DOWNLOADPATH
-sudo wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
-sudo tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
-cd $DOWNLOADPATH/openssl-$OPENSSLVERS
-echo "Configuring OpenSSL..."
-sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH > /dev/null
-sudo make > /dev/null
-echo "Installing OpenSSL..."
-sudo make install > /dev/null
-sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
-sudo ldconfig
-rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz
-echo "export PATH=$PATH:$OPENSSLPATH/bin" >> ~/.bashrc
-source ~/.bashrc
-cd $SCRIPTPATH
-
-echo ""
-echo ""
-echo "--> Install Python3"
-sudo mkdir $DOWNLOADPATH
-sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
-sudo tar xfo $DOWNLOADPATH/Python-$PYTHON3VERS.tgz -C $DOWNLOADPATH
-cd $DOWNLOADPATH/Python-$PYTHON3VERS
-echo "Configuring Python3..."
-sudo ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
-echo "Installing Python3..."
-sudo make altinstall > /dev/null
-sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3
-sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
-sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
-sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
-rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
-echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
-source ~/.bashrc
-cd $SCRIPTPATH
+echo "--> Setting alternative Python to 3.11 as default"
+update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+update-alternatives --set python3
 
 echo ""
 echo ""
 echo "--> Upgrading pip"
-sudo python3 -m pip install --upgrade pip
+python3 -m pip install --upgrade pip
 
 echo ""
 echo ""
-echo "--> Installing additional Python libs"
-sudo python3 -m pip install --upgrade requests six netapp_lib selinux
-sudo python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
+echo "--> Installing additional Python packages"
+python3 -m pip install --upgrade requests six netapp_lib selinux
+python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 
 echo ""
 echo ""
@@ -123,14 +80,14 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 echo ""
 echo ""
 echo "--> Creating default multi-path config on centos"
-sudo touch /etc/multipath.conf
+touch /etc/multipath.conf
 
 echo ""
 echo ""
 echo "--> Creating Users and groups in AD (dc1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml
 
 echo ""
 echo ""
 echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-00/ONTAP-revert-00.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-00/ONTAP-revert-00.yml

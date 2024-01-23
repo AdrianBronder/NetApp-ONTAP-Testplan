@@ -19,7 +19,7 @@ echo ""
 echo "--> Setting variables & paths"
 source ~/.bashrc
 OPENSSLVERS="1.1.1u"
-PYTHON3VERS="3.9.17"
+PYTHON3VERS="3.9.18"
 ANSIBLEVERS="2.15.2"
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 DOWNLOADPATH="/tmp/downloads"
@@ -48,7 +48,7 @@ rm -rf ~/.local/*
 echo ""
 echo ""
 echo "--> Installing additional packages"
-sudo yum install -y wget gcc libffi-devel epel-release zlib-devel jq libxml2 git krb5-devel sshpass ncurses-devel nvme-cli --skip-broken
+sudo yum install -y wget gcc libffi-devel epel-release zlib-devel python3-devel jq libxml2 git krb5-devel krb5-workstation sshpass ncurses-devel nvme-cli --skip-broken
 sudo yum erase -y openssl
 
 echo ""
