@@ -39,7 +39,7 @@ dnf -y update
 echo ""
 echo ""
 echo "--> Installing additional packages"
-dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11-kerberos krb5-workstation krb5-devel python3.11-pip python3.11-devel --skip-broken
+dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11-kerberos krb5-workstation krb5-devel python3.11-pip python3.11-devel nfs-utils --skip-broken
 
 echo ""
 echo ""
@@ -79,8 +79,10 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 echo ""
 echo ""
-echo "--> Creating default multi-path config on centos"
+echo "--> Enable multipath on RHEL1"
 touch /etc/multipath.conf
+modprobe -v dm-multipath
+systemctl restart multipathd
 
 echo ""
 echo ""

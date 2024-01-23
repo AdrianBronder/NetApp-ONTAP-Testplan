@@ -27,8 +27,8 @@
       validate_certs:             false
       use_rest:                   "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir }}/vars.yml
+    - ../../vars/{{ inventory_dir }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -138,8 +138,8 @@
   name:               "ONTAP-42-04 - Client Write"
   gather_facts:       false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir }}/vars.yml
+    - ../../vars/{{ inventory_dir }}/vault.yml
   collections:
     - ansible.posix
     - community.general
