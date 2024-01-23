@@ -13,8 +13,8 @@
   name:               ONTAP-31-05 - Mount & Write (FlexGroups)
   gather_facts:       false
   vars_files:
-    - ../../vars/{{ inventory_dir }}/vars.yml
-    - ../../vars/{{ inventory_dir }}/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
     - community.general

@@ -31,8 +31,8 @@
       validate_certs:             false
       use_rest:                   "always"
   vars_files:
-    - ../../vars/{{ inventory_dir }}/vars.yml
-    - ../../vars/{{ inventory_dir }}/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 

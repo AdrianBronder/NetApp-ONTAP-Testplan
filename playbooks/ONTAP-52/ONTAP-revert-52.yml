@@ -18,8 +18,8 @@
   name:               "ONTAP-revert-52 - Backup (SnapMirror) - Windows"
   gather_facts:       false
   vars_files:
-    - ../../vars/{{ inventory_dir }}/vars.yml
-    - ../../vars/{{ inventory_dir }}/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.windows
     - community.windows
@@ -62,8 +62,8 @@
   name:               "ONTAP-revert-52 - Backup (SnapMirror) - Linux"
   gather_facts:       false
   vars_files:
-    - ../../vars/{{ inventory_dir }}/vars.yml
-    - ../../vars/{{ inventory_dir }}/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
 
@@ -111,8 +111,8 @@
       validate_certs: false
       use_rest:       "always"
   vars_files:
-    - ../../vars/{{ inventory_dir }}/vars.yml
-    - ../../vars/{{ inventory_dir }}/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -235,8 +235,8 @@
       validate_certs: false
       use_rest:       "always"
   vars_files:
-    - ../../vars/{{ inventory_dir }}/vars.yml
-    - ../../vars/{{ inventory_dir }}/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
