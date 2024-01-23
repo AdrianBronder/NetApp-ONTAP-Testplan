@@ -46,7 +46,7 @@ echo ""
 echo "--> Setting alternative Python to 3.11 as default"
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
 update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
-update-alternatives --set python3
+update-alternatives --set python3 /usr/bin/python3.11
 
 echo ""
 echo ""
