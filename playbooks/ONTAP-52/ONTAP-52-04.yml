@@ -39,10 +39,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[primary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['primary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[secondary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         create_destination:
           enabled:                     true
@@ -56,10 +56,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[primary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['primary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[secondary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         update:                        false
         initialize:                    true

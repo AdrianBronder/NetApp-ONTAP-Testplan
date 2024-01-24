@@ -74,10 +74,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[primary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['primary_storage_cluster'].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[secondary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         create_destination:
           enabled:                     true
@@ -85,11 +85,11 @@
         initialize:                    false
         <<: *input_02
       loop:
-        "{{ hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records }}"
+        "{{ hostvars['primary_storage_cluster'].vol_info.ontap_info.storage_volumes.records }}"
       loop_control:
         label: "{{ item.svm.name + ':' + item.name }}"
       when:
-        - hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
+        - hostvars['primary_storage_cluster'].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
 
@@ -97,20 +97,20 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[primary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['primary_storage_cluster'].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[secondary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         update:                        false
         initialize:                    true
         <<: *input_02
       loop:
-        "{{ hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records }}"
+        "{{ hostvars['primary_storage_cluster'].vol_info.ontap_info.storage_volumes.records }}"
       loop_control:
         label: "{{ item.svm.name + ':' + item.name }}"
       when:
-        - hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
+        - hostvars['primary_storage_cluster'].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
 

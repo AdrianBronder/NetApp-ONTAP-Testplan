@@ -40,10 +40,10 @@
         state:                         present
         relationship_type:             "restore"
         destination_endpoint:
-          cluster:                     "{{ hostvars[primary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['primary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         source_endpoint:
-          cluster:                     "{{ hostvars[secondary_storage_cluster].cluster.name }}"
+          cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         source_snapshot:               "{{ ontap_52_snapshot_name }}"
         <<: *input

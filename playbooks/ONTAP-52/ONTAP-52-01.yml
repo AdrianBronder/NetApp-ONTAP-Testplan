@@ -40,11 +40,11 @@
         state:                         present
         vserver:                       "{{ item }}"
         peer_vserver:                  "{{ global_primary_backup_svm }}"
-        peer_cluster:                  "{{ hostvars[secondary_storage_cluster].cluster.name }}"
+        peer_cluster:                  "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ hostvars[secondary_storage_cluster].ansible_host }}"
+          hostname: "{{ hostvars['secondary_storage_cluster'].ansible_host }}"
         <<: *input
       loop:
         - "{{ global_primary_nas_svm }}"

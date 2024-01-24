@@ -39,7 +39,7 @@
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ (item | split('/'))[2] }}"
-        aggregate_name:                "{{ hostvars[primary_storage_cluster].storage_aggregates[1].name }}"
+        aggregate_name:                "{{ hostvars['primary_storage_cluster'].storage_aggregates[1].name }}"
         size:                          "{{ ontap_default_vol_size_gb }}"
         size_unit:                     gb
         space_guarantee:               none

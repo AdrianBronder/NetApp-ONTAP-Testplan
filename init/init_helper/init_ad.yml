@@ -51,8 +51,8 @@
       when:
         - item.scope == "svm"
       loop:
-        "{{ hostvars['cluster1'].network_ip_interfaces | list + 
-            hostvars['cluster2'].network_ip_interfaces | list }}"
+        "{{ hostvars['primary_storage_cluster'].network_ip_interfaces | list + 
+            hostvars['secondary_storage_cluster'].network_ip_interfaces | list }}"
       loop_control:
         label: "{{ item.name }}"
   
