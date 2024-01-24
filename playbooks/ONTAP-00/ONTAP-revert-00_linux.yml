@@ -15,7 +15,7 @@
 #
 ################################################################################
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "{{ gropus['primary_storage_clusters'][0] }}"
   name:                                "ONTAP-revert-00 - Return to Day0 - Linux - ONTAP (read)"
   gather_facts:                        false
   vars:
@@ -147,12 +147,12 @@
         auto_portal_startup:      false
         auto_node_startup:        false
         portal:                   "{{ item.ip.address }}"
-        target:                   "{{ (hostvars['primary_storage_cluster'].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
+        target:                   "{{ (hostvars[gropus['primary_storage_clusters'][0]].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
                                        first ).target.name }}"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars['primary_storage_cluster'].network_ip_interfaces |
+        "{{ gropus['primary_storage_clusters'][0].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -171,13 +171,13 @@
     - name: Flush multipath devices
       ansible.builtin.command:
         cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
-                           {{ (hostvars['primary_storage_cluster'].lun_info.ontap_info.storage_luns.records |
+                           {{ (hostvars[gropus['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                               selectattr('name', 'defined') |
                               selectattr('name', '==', item ) |
                               first ).serial_hex }}"
       when:
-        - hostvars['primary_storage_cluster'].lun_info.ontap_info.storage_luns.num_records|int > 0
-        - (hostvars['primary_storage_cluster'].lun_info.ontap_info.storage_luns.records |
+        - hostvars[gropus['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.num_records|int > 0
+        - (hostvars[gropus['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
            selectattr('name', 'defined') |
            selectattr('name', '==', item ) |
            first ).serial_hex is defined
