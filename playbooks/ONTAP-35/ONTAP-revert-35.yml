@@ -90,7 +90,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars['primary_storage_cluster'].network_ip_interfaces |
+        "{{ hostvars[gropus['primary_storage_clusters'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -109,19 +109,19 @@
     - name: Flush multipath devices
       ansible.builtin.command:
         cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
-                           {{ (hostvars['primary_storage_cluster'].lun_info.ontap_info.storage_luns.records |
+                           {{ (hostvars[gropus['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                               selectattr('name', 'defined') |
                               selectattr('name', '==', item ) |
                               first ).serial_hex }}"
       when:
-        - (hostvars['primary_storage_cluster'].lun_info.ontap_info.storage_luns.records |
+        - (hostvars[gropus['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
            selectattr('name', 'defined') |
            selectattr('name', '==', item ) |
            first ).serial_hex is defined
       loop_control:
         label: "{{ item }} --> \
                 {{ ontap_iscsi_vendor_id }}\
-                {{ (hostvars['primary_storage_cluster'].lun_info.ontap_info.storage_luns.records |
+                {{ (hostvars[gropus['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                     selectattr('name', 'defined') |
                     selectattr('name', '==', item ) |
                     first ).serial_hex }}"
@@ -169,7 +169,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars['primary_storage_cluster'].network_ip_interfaces |
+        "{{ hostvars[gropus['primary_storage_clusters'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |

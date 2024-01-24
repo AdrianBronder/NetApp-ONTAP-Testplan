@@ -40,7 +40,7 @@
         state:                         present
         relationship_type:             "restore"
         destination_endpoint:
-          cluster:                     "{{ hostvars['primary_storage_cluster'].cluster.name }}"
+          cluster:                     "{{ hostvars[gropus['primary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         source_endpoint:
           cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
