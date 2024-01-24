@@ -101,7 +101,7 @@
         state:                         "absent"
         mode:                          "0755"
 
-- hosts:                               "secondary_storage_cluster"
+- hosts:                               "secondary_storage_clusters"
   name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Secondary"
   gather_facts:                        false
   vars:
@@ -225,7 +225,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Primary"
   gather_facts:                        false
   vars:

@@ -54,7 +54,7 @@
         path:                          "{{ windows_32_mount_dir }}"
         state:                         absent
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-32 - CIFS - ONTAP"
   gather_facts:                        false
   vars:

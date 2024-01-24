@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-52-03 - Prepare Filesystem (Source) - ONTAP"
   gather_facts:                        false
   vars:

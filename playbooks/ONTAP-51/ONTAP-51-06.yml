@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-51-06 - Restore Snapshot"
   gather_facts:                        false
   vars:

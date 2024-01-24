@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-35 - iSCSI - ONTAP (read)"
   gather_facts:                        false
   vars:
@@ -50,7 +50,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_linux_host"
+- hosts:                               "linux_hosts"
   name:                                "ONTAP-revert-35 - iSCSI - Linux"
   gather_facts:                        false
   vars_files:
@@ -130,7 +130,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_windows_host"
+- hosts:                               "windows_hosts"
   name:                                "ONTAP-revert-35 - iSCSI - Windows"
   gather_facts:                        true
   vars_files:
@@ -182,7 +182,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-35 - iSCSI - ONTAP"
   gather_facts:                        false
   vars:

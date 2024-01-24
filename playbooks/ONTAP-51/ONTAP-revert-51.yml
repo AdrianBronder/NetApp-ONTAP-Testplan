@@ -82,7 +82,7 @@
         state:                         "absent"
         mode:                          "0755"
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-51 - Local Versioning (Snapshots) - ONTAP"
   gather_facts:                        false
   vars:

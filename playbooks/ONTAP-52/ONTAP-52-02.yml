@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-52-02 - Custom Policies"
   gather_facts:                        false
   vars:
@@ -49,7 +49,7 @@
 
   post_tasks:
 
-- hosts:                               "secondary_storage_cluster"
+- hosts:                               "secondary_storage_clusters"
   name:                                "ONTAP-52-02 - Custom Policies"
   gather_facts:                        false
   vars:

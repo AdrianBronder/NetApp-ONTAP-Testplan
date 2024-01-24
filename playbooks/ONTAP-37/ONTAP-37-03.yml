@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_linux_host"
+- hosts:                               "linux"
   name:                                "ONTAP-37-03 - Subsystem - Linux"
   gather_facts:                        true
   vars_files:
@@ -32,7 +32,7 @@
   post_tasks:
   
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-37-03 - Subsystem - ONTAP"
   gather_facts:                        false
   vars:

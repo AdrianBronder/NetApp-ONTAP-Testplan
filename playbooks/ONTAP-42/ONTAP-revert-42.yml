@@ -51,7 +51,7 @@
         state:                         "absent"
         mode:                          "0755"
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-42 - Quality of Service - ONTAP"
   gather_facts:                        false
   vars:

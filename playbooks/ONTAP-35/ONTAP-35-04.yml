@@ -9,7 +9,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_cluster"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-35-04 - Mount & Write (Linux) - ONTAP"
   gather_facts:                        false
   vars:
@@ -58,7 +58,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_linux_host"
+- hosts:                               "linux_hosts"
   name:                                "ONTAP-35-04 - Mount & Write (Linux) - Linux"
   gather_facts:                        true
   vars_files:
