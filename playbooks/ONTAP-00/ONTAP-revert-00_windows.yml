@@ -15,7 +15,7 @@
 #
 ################################################################################
 
-- hosts:                               "win_hosts"
+- hosts:                               "windows_hosts"
   name:                                "ONTAP-revert-00 - Return to Day0 - Windows"
   gather_facts:                        false
   vars_files:

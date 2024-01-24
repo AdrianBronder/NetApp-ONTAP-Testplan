@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:                               "win_hosts"
+- hosts:                               "windows_hosts"
   name:                                "ONTAP-revert-52 - Backup (SnapMirror) - Windows"
   gather_facts:                        false
   vars_files:

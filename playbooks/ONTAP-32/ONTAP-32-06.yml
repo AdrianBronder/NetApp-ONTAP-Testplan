@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "win_hosts"
+- hosts:                               "windows_hosts"
   name:                                "ONTAP-32-06 - Mount & Write (FlexGroup)"
   gather_facts:                        false
   vars_files:

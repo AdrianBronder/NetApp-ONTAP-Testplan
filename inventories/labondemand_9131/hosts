@@ -7,7 +7,7 @@ cluster2 ansible_host=cluster2.demo.netapp.com
 [linux]
 centos1 ansible_host=centos1.demo.netapp.com
 
-[win_hosts]
+[windows_hosts]
 jumphost win_hostname=jumphost.demo.netapp.com
 
 [win_domain_controllers]
@@ -18,5 +18,5 @@ primary_storage_clusters
 secondary_storage_clusters
 
 [windows:children]
-win_hosts
+windows_hosts
 win_domain_controllers

@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:                               "win_hosts"
+- hosts:                               "windows_hosts"
   name:                                "ONTAP-revert-51 - Local Versioning (Snapshots) - Windows"
   gather_facts:                        false
   vars_files:

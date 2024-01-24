@@ -210,7 +210,7 @@
   
   post_tasks:
 
-- hosts:                               "win_hosts"
+- hosts:                               "windows_hosts"
   name:                                "ONTAP-52-03 - Prepare Filesystem (Source) - Windows"
   gather_facts:                        false
   vars_files:

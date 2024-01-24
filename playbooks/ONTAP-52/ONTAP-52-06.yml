@@ -41,7 +41,7 @@
   
   post_tasks:
 
-- hosts:                               "win_hosts"
+- hosts:                               "windows_hosts"
   name:                                "ONTAP-52-06 - Additional Files - Windows"
   gather_facts:                        false
   vars_files:
