@@ -127,12 +127,12 @@ sudo touch /etc/multipath.conf
 echo ""
 echo ""
 echo "--> Creating Users and groups in AD (dc1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9131 $SCRIPTPATH/init_helper/init_ad.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
 
 echo ""
 echo ""
 echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/../playbooks/ONTAP-00/ONTAP-revert-00.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9131 $SCRIPTPATH/../playbooks/ONTAP-00/ONTAP-revert-00.yml --vault-password-file $SCRIPTPATH/init_helper/vaultfile.txt
 
 echo ""
 echo ""
