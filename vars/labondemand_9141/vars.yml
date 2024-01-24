@@ -1,8 +1,4 @@
 # General Defaults
-global_primary_test_cluster:      "cluster1"
-global_secondary_test_cluster:    "cluster2"
-global_primary_linux_host:        "rhel1"
-global_primary_windows_host:      "jumphost"
 global_primary_nas_svm:           "ntap-svm01-nas"
 global_primary_san_svm:           "ntap-svm02-san"
 global_primary_backup_svm:        "ntap-svm03-backup"
