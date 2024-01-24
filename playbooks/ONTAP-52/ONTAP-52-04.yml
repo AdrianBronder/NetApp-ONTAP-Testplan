@@ -39,7 +39,7 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[gropus['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         destination_endpoint:
           cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
@@ -56,7 +56,7 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[gropus['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         destination_endpoint:
           cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"

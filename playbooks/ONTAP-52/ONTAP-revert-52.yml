@@ -171,11 +171,11 @@
         state:                         absent
         vserver:                       "{{ global_primary_backup_svm }}"
         peer_vserver:                  "{{ item }}"
-        peer_cluster:                  "{{ hostvars[gropus['primary_storage_clusters'][0]].ansible_host | split('.') | first }}"
+        peer_cluster:                  "{{ hostvars[groups['primary_storage_clusters'][0]].ansible_host | split('.') | first }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ hostvars[gropus['primary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
         <<: *input_01
       loop:
         - "{{ global_primary_nas_svm }}"

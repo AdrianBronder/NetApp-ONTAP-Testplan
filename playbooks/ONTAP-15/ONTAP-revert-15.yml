@@ -35,16 +35,16 @@
     - name: Remove cluster peerings
       netapp.ontap.na_ontap_cluster_peer:
         state:                         absent
-        source_cluster_name:           "{{ hostvars[gropus['primary_storage_clusters'][0]].cluster.name
-                                           if hostvars[gropus['primary_storage_clusters'][0]].cluster.name == cluster.name
+        source_cluster_name:           "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name
+                                           if hostvars[groups['primary_storage_clusters'][0]].cluster.name == cluster.name
                                            else hostvars['secondary_storage_cluster'].cluster.name }}"
         dest_cluster_name:             "{{ hostvars['secondary_storage_cluster'].cluster.name
-                                           if hostvars[gropus['primary_storage_clusters'][0]].cluster.name == cluster.name
-                                           else hostvars[gropus['primary_storage_clusters'][0]].cluster.name }}"
+                                           if hostvars[groups['primary_storage_clusters'][0]].cluster.name == cluster.name
+                                           else hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
         peer_options:
           hostname:                    "{{ hostvars['secondary_storage_cluster'].ansible_host
-                                           if hostvars[gropus['primary_storage_clusters'][0]].cluster.name == cluster.name
-                                           else hostvars[gropus['primary_storage_clusters'][0]].ansible_host }}"
+                                           if hostvars[groups['primary_storage_clusters'][0]].cluster.name == cluster.name
+                                           else hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
         <<: *input
       ignore_errors: true
   

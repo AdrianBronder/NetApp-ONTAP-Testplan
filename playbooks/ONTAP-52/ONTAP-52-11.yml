@@ -74,7 +74,7 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[gropus['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
           cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
@@ -85,11 +85,11 @@
         initialize:                    false
         <<: *input_02
       loop:
-        "{{ hostvars[gropus['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
+        "{{ hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
       loop_control:
         label: "{{ item.svm.name + ':' + item.name }}"
       when:
-        - hostvars[gropus['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records | length > 0
+        - hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
 
@@ -97,7 +97,7 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[gropus['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
           cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
@@ -106,11 +106,11 @@
         initialize:                    true
         <<: *input_02
       loop:
-        "{{ hostvars[gropus['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
+        "{{ hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
       loop_control:
         label: "{{ item.svm.name + ':' + item.name }}"
       when:
-        - hostvars[gropus['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records | length > 0
+        - hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
 
