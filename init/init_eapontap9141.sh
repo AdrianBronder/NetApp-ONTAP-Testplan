@@ -86,6 +86,11 @@ systemctl restart multipathd
 
 echo ""
 echo ""
+echo "--> Enable NVMe/TCP on RHEL1"
+modprobe nvme_tcp
+
+echo ""
+echo ""
 echo "--> Creating Users and groups in AD (dc1)"
 ansible-playbook -i $SCRIPTPATH/../inventories/labondemand $SCRIPTPATH/init_helper/init_ad.yml
 
