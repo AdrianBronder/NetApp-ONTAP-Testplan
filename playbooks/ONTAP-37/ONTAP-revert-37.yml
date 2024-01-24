@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:                               "linux_hosts""
+- hosts:                               "linux_hosts"
   name:                                "ONTAP-revert-37 - NVMe/TCP - Linux"
   gather_facts:                        false
   vars_files:
