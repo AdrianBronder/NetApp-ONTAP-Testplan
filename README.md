@@ -42,7 +42,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
 
 
 # Further Execution Examples
-(keep in mind: based on ONTAP (lab) version: ./inventories/labondemand_<ontapversion>)
+(keep in mind: based on ONTAP (lab) version: ./inventories/labondemand_< ontapversion >)
 - Execute a single test step (e.g. ONTAP-02-02 - Physical Network):
   ```
   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-02.yml
