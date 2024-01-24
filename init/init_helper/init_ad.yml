@@ -33,10 +33,10 @@
     - microsoft.ad
 
   tasks:
-    - name: Create DNS record for centos1
+    - name: Create DNS record for linux system
       community.windows.win_dns_record:
         state:                         "present"
-        name:                          "centos1"
+        name:                          "{{ groups['linux_hosts'][0] }}"
         type:                          "A"
         value:                         "192.168.0.61"
         zone:                          "{{ all_default_dns_domain }}"
@@ -52,7 +52,7 @@
         - item.scope == "svm"
       loop:
         "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces | list + 
-            hostvars['secondary_storage_cluster'].network_ip_interfaces | list }}"
+            hostvars[groups['secondary_storage_clusters'][0]].network_ip_interfaces | list }}"
       loop_control:
         label: "{{ item.name }}"
   
