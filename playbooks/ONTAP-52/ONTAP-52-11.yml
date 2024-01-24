@@ -77,7 +77,7 @@
           cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         create_destination:
           enabled:                     true
@@ -100,7 +100,7 @@
           cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars['secondary_storage_cluster'].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         update:                        false
         initialize:                    true
