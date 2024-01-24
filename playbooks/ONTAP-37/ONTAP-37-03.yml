@@ -58,7 +58,7 @@
         vserver:                       "{{ global_primary_san_svm }}"
         subsystem:                     "{{ ontap_37_lin_subsystem_name }}"
         ostype:                        "linux"
-        hosts:                         "{{ hostvars['primary_linux_host'].ansible_hostnqn }}"
+        hosts:                         "{{ hostvars[groups['linux_hosts'][0]].ansible_hostnqn }}"
         paths:                         "{{ ontap_37_lin_namespaces }}"
         <<: *input
 
