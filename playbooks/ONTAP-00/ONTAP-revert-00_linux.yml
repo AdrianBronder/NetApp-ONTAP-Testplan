@@ -80,9 +80,9 @@
 
   post_tasks:
 
-- hosts:              "linux"
-  name:               "ONTAP-revert-00 - Return to Day0 - Linux"
-  gather_facts:       true
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-00 - Return to Day0 - Linux"
+  gather_facts:                        true
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -185,6 +185,7 @@
         label: "{{ item }}"
       loop:
         "{{ ontap_35_lin_luns }}"
+      ignore_errors: true
 
     - name: Unmount exports
       ansible.posix.mount:
