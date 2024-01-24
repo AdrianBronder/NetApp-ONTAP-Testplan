@@ -47,7 +47,7 @@
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ ontap_41_clone_dir_name }}"
-        aggregate_name:                "{{ hostvars['primary_storage_cluster'].storage_aggregates[0].name }}"
+        aggregate_name:                "{{ storage_aggregates[0].name }}"
         export_policy:                 "ro_{{ global_primary_nas_svm }}"
         junction_path:                 "/{{ ontap_41_clone_dir_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
