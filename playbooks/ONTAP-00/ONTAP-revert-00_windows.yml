@@ -15,9 +15,9 @@
 #
 ################################################################################
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-revert-00 - Return to Day0 - Windows"
-  gather_facts:       false
+- hosts:                               "win_hosts"
+  name:                                "ONTAP-revert-00 - Return to Day0 - Windows"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -54,7 +54,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+        "{{ hostvars[primary_storage_cluster].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -62,32 +62,32 @@
 
     - name: Remove root mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_35_mount_dir }}"
-        state:                    absent
+        path:                          "{{ windows_35_mount_dir }}"
+        state:                         absent
 
     - name: 
       block:
         - name: Remove mapped shares
           community.windows.win_shortcut:
-            state:                absent
-            dest:                 "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
+            state:                     absent
+            dest:                      "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
           loop:
             "{{ ontap_32_vol_qtree_names +
                 ontap_32_fg_qtree_names }}"
 
         - name: Remove network credentials
           community.windows.win_credential:
-            state:                absent
-            name:                 "{{ global_primary_nas_svm }}"
-            type:                 "domain_password"
+            state:                     absent
+            name:                      "{{ global_primary_nas_svm }}"
+            type:                      "domain_password"
       vars:
         # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
     - name: Remove mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_default_mount_dir }}"
-        state:                    absent
+        path:                          "{{ windows_default_mount_dir }}"
+        state:                         absent

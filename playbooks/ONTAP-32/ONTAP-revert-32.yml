@@ -14,9 +14,9 @@
 #
 ################################################################################
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-revert-32 - CIFS - Windows"
-  gather_facts:       false
+- hosts:                               "win_hosts"
+  name:                                "ONTAP-revert-32 - CIFS - Windows"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -31,40 +31,40 @@
       block:
         - name: Remove mapped shares
           community.windows.win_shortcut:
-            state:                absent
-            dest:                 "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
+            state:                     absent
+            dest:                      "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
           loop:
             "{{ ontap_32_vol_qtree_names +
                 ontap_32_fg_qtree_names }}"
 
         - name: Remove network credentials
           community.windows.win_credential:
-            state:                absent
-            name:                 "{{ global_primary_nas_svm }}"
-            type:                 "domain_password"
+            state:                     absent
+            name:                      "{{ global_primary_nas_svm }}"
+            type:                      "domain_password"
       vars:
         # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
     - name: Remove mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_32_mount_dir }}"
-        state:                    absent
+        path:                          "{{ windows_32_mount_dir }}"
+        state:                         absent
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-revert-32 - CIFS - ONTAP"
-  gather_facts:       false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-revert-32 - CIFS - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -74,9 +74,9 @@
   tasks:
     - name: Remove shares
       netapp.ontap.na_ontap_cifs:
-        state:                      absent
-        name:                       "{{ item }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         absent
+        name:                          "{{ item }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names +
@@ -84,14 +84,14 @@
   
     - name: Remove volume
       netapp.ontap.na_ontap_volume:
-        state:                      absent
-        name:                       "{{ ontap_32_vol_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         absent
+        name:                          "{{ ontap_32_vol_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
   
     - name: Remove FlexGroup
       netapp.ontap.na_ontap_volume:
-        state:                      absent
-        name:                       "{{ ontap_32_fg_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         absent
+        name:                          "{{ ontap_32_fg_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input

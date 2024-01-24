@@ -9,17 +9,17 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-35-04 - Mount & Write (Linux) - ONTAP"
-  gather_facts:                   false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-35-04 - Mount & Write (Linux) - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,8 +37,8 @@
           - "svm"
           - "target"
         parameters:
-          svm.name:               "{{ global_primary_san_svm }}"
-        use_python_keys:          true
+          svm.name:                    "{{ global_primary_san_svm }}"
+        use_python_keys:               true
         <<: *input
       register: iscsi_info
     
@@ -51,16 +51,16 @@
           - "location"
           - "serial_number"
         parameters:
-          svm.name:               "{{ global_primary_san_svm }}"
-        use_python_keys:          true
+          svm.name:                    "{{ global_primary_san_svm }}"
+        use_python_keys:               true
         <<: *input
       register: lun_info
 
   post_tasks:
 
-- hosts:                          "{{ global_primary_linux_host }}"
-  name:                           "ONTAP-35-04 - Mount & Write (Linux) - Linux"
-  gather_facts:                   true
+- hosts:                               "primary_linux_host"
+  name:                                "ONTAP-35-04 - Mount & Write (Linux) - Linux"
+  gather_facts:                        true
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -73,18 +73,18 @@
   tasks:
     - name: Discover iSCSI targets on SVM and login
       community.general.open_iscsi:
-        show_nodes:               true
-        discover:                 true
-        login:                    true
-        auto_portal_startup:      true
-        auto_node_startup:        true
-        portal:                   "{{ item.ip.address }}"
-        target:                   "{{ (hostvars[global_primary_test_cluster].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
-                                       first ).target.name }}"
+        show_nodes:                    true
+        discover:                      true
+        login:                         true
+        auto_portal_startup:           true
+        auto_node_startup:             true
+        portal:                        "{{ item.ip.address }}"
+        target:                        "{{ (hostvars[primary_storage_cluster].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
+                                            first ).target.name }}"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+        "{{ hostvars[primary_storage_cluster].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -92,34 +92,34 @@
 
     - name: Build Filesystem on new LUN
       community.general.filesystem:
-        fstype:                   "ext4"
-        dev:                      "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
-                                   {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                      selectattr('name', 'defined') |
-                                      selectattr('name', '==', item ) |
-                                      first ).serial_hex }}"
+        fstype:                        "ext4"
+        dev:                           "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
+                                        {{ (hostvars[primary_storage_cluster].lun_info.ontap_info.storage_luns.records |
+                                           selectattr('name', 'defined') |
+                                           selectattr('name', '==', item ) |
+                                           first ).serial_hex }}"
       loop:
         "{{ ontap_35_lin_luns }}"
 
     - name: Create mount directory  
       ansible.builtin.file:
-        path:                     "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
-        state:                    "directory"
-        mode:                     "0755"
+        path:                          "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
+        state:                         "directory"
+        mode:                          "0755"
       loop:
         "{{ ontap_35_lin_luns }}"
 
     - name: Mount LUN
       ansible.posix.mount:
-        state:                    "mounted"
-        src:                      "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
-                                   {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                      selectattr('name', 'defined') |
-                                      selectattr('name', '==', item ) |
-                                      first ).serial_hex }}"
-        path:                     "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
-        fstype:                   "ext4"
-        opts:                     "discard"
+        state:                         "mounted"
+        src:                           "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
+                                        {{ (hostvars[primary_storage_cluster].lun_info.ontap_info.storage_luns.records |
+                                           selectattr('name', 'defined') |
+                                           selectattr('name', '==', item ) |
+                                           first ).serial_hex }}"
+        path:                          "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
+        fstype:                        "ext4"
+        opts:                          "discard"
       loop:
         "{{ ontap_35_lin_luns }}"
 

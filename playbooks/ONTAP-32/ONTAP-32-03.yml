@@ -15,9 +15,9 @@
 # 
 ################################################################################
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-32-03 - Mount & Write (Volume)"
-  gather_facts:       false
+- hosts:                               "win_hosts"
+  name:                                "ONTAP-32-03 - Mount & Write (Volume)"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -30,38 +30,38 @@
   tasks:
     - name: Create mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_32_mount_dir }}"
-        state:                    directory
+        path:                          "{{ windows_32_mount_dir }}"
+        state:                         directory
 
     - name: 
       block:
         - name: Save network credentials
           community.windows.win_credential:
-            state:                present
-            name:                 "{{ global_primary_nas_svm }}"
-            type:                 "domain_password"
-            username:             "{{ ontap_32_ad_admin_user }}"
-            secret:               "{{ ontap_32_ad_admin_user_pw }}"
+            state:                     present
+            name:                      "{{ global_primary_nas_svm }}"
+            type:                      "domain_password"
+            username:                  "{{ ontap_32_ad_admin_user }}"
+            secret:                    "{{ ontap_32_ad_admin_user_pw }}"
         
         - name: Map shares
           community.windows.win_shortcut:
-            state:                present
-            src:                  "\\\\{{ global_primary_nas_svm }}\\{{ item }}"
-            dest:                 "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
+            state:                     present
+            src:                       "\\\\{{ global_primary_nas_svm }}\\{{ item }}"
+            dest:                      "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
           loop:
             "{{ ontap_32_vol_qtree_names }}"
 
         - name: Create test file on each share
           ansible.windows.win_file:
-            path:                     "\\\\{{ global_primary_nas_svm }}\\{{ item }}\\{{ item }}_testfile"
-            state:                    touch
+            path:                      "\\\\{{ global_primary_nas_svm }}\\{{ item }}\\{{ item }}_testfile"
+            state:                     touch
           loop:
             "{{ ontap_32_vol_qtree_names }}"
       vars:
         # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
   post_tasks:

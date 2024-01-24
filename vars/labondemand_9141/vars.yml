@@ -70,9 +70,9 @@ ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
 # ONTAP-35 - iSCSI
 ontap_35_lin_igroup_name:         "ontap_35_lin_ig01"
-ontap_35_lin_igroup_iqns:         "{{ hostvars[global_primary_linux_host].iscsi.initiator_name }}"
+ontap_35_lin_igroup_iqns:         "{{ hostvars[primary_linux_host].iscsi.initiator_name }}"
 ontap_35_win_igroup_name:         "ontap_35_win_ig01"
-ontap_35_win_igroup_iqns:         "{{ hostvars[global_primary_windows_host].iscsi.initiator_name }}"
+ontap_35_win_igroup_iqns:         "{{ hostvars[primary_windows_host].iscsi.initiator_name }}"
 ontap_35_lin_luns:
   - "/vol/ontap_35_lin_vol01/ontap_35_lin_lun01"
   - "/vol/ontap_35_lin_vol02/ontap_35_lin_lun02"

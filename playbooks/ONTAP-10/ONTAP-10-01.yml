@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-10-01 - Licenses"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-10-01 - Licenses"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,8 +37,8 @@
   tasks:
     - name: Install licenses on storage cluster
       netapp.ontap.na_ontap_license:
-        state:                      present
-        license_codes:              "{{ item.node.name }}"
+        state:                         present
+        license_codes:                 "{{ item.node.name }}"
         <<: *input
       loop:
         "{{ cluster_licensing_licenses }}"

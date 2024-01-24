@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-35-02 - Volumes"
-  gather_facts:                   false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-35-02 - Volumes"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,14 +37,14 @@
   tasks:
     - name: Create volumes
       netapp.ontap.na_ontap_volume:
-        state:                    present
-        name:                     "{{ (item | split('/'))[2] }}"
-        aggregate_name:           "{{ hostvars[global_primary_test_cluster].storage_aggregates[1].name }}"
-        size:                     "{{ ontap_default_vol_size_gb }}"
-        size_unit:                gb
-        space_guarantee:          none
-        tiering_policy:           auto
-        vserver:                  "{{ global_primary_san_svm }}"
+        state:                         present
+        name:                          "{{ (item | split('/'))[2] }}"
+        aggregate_name:                "{{ hostvars[primary_storage_cluster].storage_aggregates[1].name }}"
+        size:                          "{{ ontap_default_vol_size_gb }}"
+        size_unit:                     gb
+        space_guarantee:               none
+        tiering_policy:                auto
+        vserver:                       "{{ global_primary_san_svm }}"
         <<: *input
       loop:
         "{{ ontap_35_lin_luns +

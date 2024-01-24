@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-20-04 - SVM Data Protocol Setup"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-20-04 - SVM Data Protocol Setup"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,13 +37,13 @@
   tasks:
     - name: Configure NFS service on SVMs
       netapp.ontap.na_ontap_nfs:
-        state:                      present
-        vserver:                    "{{ item.svm.name }}"
-        service_state:              "{{ 'started' if item.enabled else 'stopped'}}"
-        nfsv3:                      "{{ 'enabled' if item.protocol.v3_enabled else 'disabled'}}"
-        nfsv4:                      "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
-        nfsv41:                     "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
-        showmount:                  "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
+        state:                         present
+        vserver:                       "{{ item.svm.name }}"
+        service_state:                 "{{ 'started' if item.enabled else 'stopped'}}"
+        nfsv3:                         "{{ 'enabled' if item.protocol.v3_enabled else 'disabled'}}"
+        nfsv4:                         "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
+        nfsv41:                        "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
+        showmount:                     "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
         <<: *input
       loop:
         "{{ protocols_nfs_services }}"
@@ -57,12 +57,12 @@
   
     - name: Patch additional SVM NFS parameters - v3-64bit-identifiers
       netapp.ontap.na_ontap_rest_cli:
-        command:                    'vserver/nfs'
-        verb:                       'PATCH'
+        command:                       'vserver/nfs'
+        verb:                          'PATCH'
         params: 
-          vserver:                  "{{ item.svm.name }}"
+          vserver:                     "{{ item.svm.name }}"
         body:
-          v3-64bit-identifiers:     "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
+          v3-64bit-identifiers:        "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
         <<: *input
       loop:
         "{{ protocols_nfs_services }}"
@@ -77,12 +77,12 @@
   
     - name: Patch additional SVM NFS parameters - v4-64bit-identifiers
       netapp.ontap.na_ontap_rest_cli:
-        command:                    'vserver/nfs'
-        verb:                       'PATCH'
+        command:                       'vserver/nfs'
+        verb:                          'PATCH'
         params: 
-          vserver:                  "{{ item.svm.name }}"
+          vserver:                     "{{ item.svm.name }}"
         body:
-          v4-64bit-identifiers:     "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
+          v4-64bit-identifiers:        "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
         <<: *input
       loop:
         "{{ protocols_nfs_services }}"
@@ -97,9 +97,9 @@
 
     - name: Create read-only export policy for NFS
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "ro_{{ item.svm.name }}"
-        vserver:                    "{{ item.svm.name }}"
+        state:                         present
+        name:                          "ro_{{ item.svm.name }}"
+        vserver:                       "{{ item.svm.name }}"
         <<: *input
       loop:
         "{{ protocols_nfs_services }}"
@@ -113,15 +113,15 @@
   
     - name: Create read-only export policy rules for SVM root volume for NFS
       na_ontap_export_policy_rule:
-        state:                      present
-        name:                       "ro_{{ item.svm.name }}"
-        vserver:                    "{{ item.svm.name }}"
-        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                    "any"
-        rw_rule:                    "none"
-        protocol:                   "nfs"
-        super_user_security:        "none"
-        allow_suid:                 false
+        state:                         present
+        name:                          "ro_{{ item.svm.name }}"
+        vserver:                       "{{ item.svm.name }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "none"
+        protocol:                      "nfs"
+        super_user_security:           "none"
+        allow_suid:                    false
         <<: *input
       loop:
         "{{ protocols_nfs_services }}"
@@ -135,10 +135,10 @@
 
     - name: Apply read-only export policy to SVM's root volume for NFS
       netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ item.svm.name.replace('-','_') }}_root"
-        vserver:                    "{{ item.svm.name }}"
-        export_policy:              "ro_{{ item.svm.name }}"
+        state:                         present
+        name:                          "{{ item.svm.name.replace('-','_') }}_root"
+        vserver:                       "{{ item.svm.name }}"
+        export_policy:                 "ro_{{ item.svm.name }}"
         <<: *input
       loop:
         "{{ protocols_nfs_services }}"
@@ -152,10 +152,10 @@
 
     - name: Create active directory preferred domain controllers
       netapp.ontap.na_ontap_active_directory_domain_controllers:
-        state:                      present
-        vserver:                    "{{ item.0.key }}"
-        fqdn:                       "{{ item.1.fqdn }}"
-        server_ip:                  "{{ item.1.ip }}"
+        state:                         present
+        vserver:                       "{{ item.0.key }}"
+        fqdn:                          "{{ item.1.fqdn }}"
+        server_ip:                     "{{ item.1.ip }}"
         <<: *input
       loop:
         "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
@@ -168,14 +168,14 @@
   
     - name: Create CIFS server on SVMs
       netapp.ontap.na_ontap_cifs_server:
-        state:                      present
-        name:                       "{{ item.name }}"
-        vserver:                    "{{ item.svm.name }}"
-        service_state:              "started"
-        domain:                     "{{ item.ad_domain.fqdn }}"
-        ou:                         "{{ item.ad_domain.organizational_unit }}"
-        admin_user_name:            "{{ all_ad_join_user }}"
-        admin_password:             "{{ all_ad_join_password }}"
+        state:                         present
+        name:                          "{{ item.name }}"
+        vserver:                       "{{ item.svm.name }}"
+        service_state:                 "started"
+        domain:                        "{{ item.ad_domain.fqdn }}"
+        ou:                            "{{ item.ad_domain.organizational_unit }}"
+        admin_user_name:               "{{ all_ad_join_user }}"
+        admin_password:                "{{ all_ad_join_password }}"
         <<: *input
       loop:
         "{{ protocols_cifs_services }}"
@@ -189,12 +189,12 @@
   
     - name: Patch additional SVM CIFS parameters - comment
       netapp.ontap.na_ontap_rest_cli:
-        command:                    'vserver/cifs'
-        verb:                       'PATCH'
+        command:                       'vserver/cifs'
+        verb:                          'PATCH'
         params: 
-          vserver:                  "{{ item.svm.name }}"
+          vserver:                     "{{ item.svm.name }}"
         body:
-          comment:                  "{{ item.comment }}"
+          comment:                     "{{ item.comment }}"
         <<: *input
       loop:
         "{{ protocols_cifs_services }}"

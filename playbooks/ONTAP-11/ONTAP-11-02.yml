@@ -15,21 +15,21 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-11-02 - Administrative Domain Authentication"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-11-02 - Administrative Domain Authentication"
+  gather_facts:                        false
   #vars_prompt:
-  #  - name:           all_ad_join_password
-  #    prompt:         "Please enter password for user domain join user: {{ all_ad_join_user }}"
-  #    private:        true
+  #  - name:                            all_ad_join_password
+  #    prompt:                          "Please enter password for user domain join user: {{ all_ad_join_user }}"
+  #    private:                         true
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -41,7 +41,7 @@
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - security/authentication/cluster/ad-proxy
-        use_python_keys:            true
+        use_python_keys:               true
         <<: *input
       register: pre_ontap
       ignore_errors: true
@@ -54,21 +54,21 @@
   tasks:
     - name: Create SVM for domain tunnel (proxy)
       netapp.ontap.na_ontap_svm:
-        state:                      present
-        name:                       "{{ item.name }}"
+        state:                         present
+        name:                          "{{ item.name }}"
         services:
           cifs:
-            allowed:                "{{ item.cifs.allowed | default(omit) }}"
+            allowed:                   "{{ item.cifs.allowed | default(omit) }}"
           ndmp:
-            allowed:                "{{ item.ndmp.allowed | default(omit) }}"
+            allowed:                   "{{ item.ndmp.allowed | default(omit) }}"
           nfs:
-            allowed:                "{{ item.nfs.allowed | default(omit) }}"
+            allowed:                   "{{ item.nfs.allowed | default(omit) }}"
           fcp:
-            allowed:                "{{ item.fcp.allowed | default(omit) }}"
+            allowed:                   "{{ item.fcp.allowed | default(omit) }}"
           iscsi:
-            allowed:                "{{ item.iscsi.allowed | default(omit) }}"
+            allowed:                   "{{ item.iscsi.allowed | default(omit) }}"
           nvme:
-            allowed:                "{{ item.nvme.allowed | default(omit) }}"
+            allowed:                   "{{ item.nvme.allowed | default(omit) }}"
         <<: *input
       loop:
         "{{ svm_svms }}"
@@ -80,15 +80,15 @@
   
     - name: Create network interfaces on proxy SVM
       netapp.ontap.na_ontap_interface:
-        state:                      present
-        vserver:                    "{{ item.svm.name }}"
-        interface_name:             "{{ item.name }}"
-        home_node:                  "{{ item.location.home_node.name }}"
-        home_port:                  "{{ item.location.home_port.name }}"
-        address:                    "{{ item.ip.address }}"
-        netmask:                    "{{ item.ip.netmask }}"
-        service_policy:             "{{ item.service_policy.name | default(omit) }}"
-        is_auto_revert:             "{{ item.location.auto_revert | default(omit) }}"
+        state:                         present
+        vserver:                       "{{ item.svm.name }}"
+        interface_name:                "{{ item.name }}"
+        home_node:                     "{{ item.location.home_node.name }}"
+        home_port:                     "{{ item.location.home_port.name }}"
+        address:                       "{{ item.ip.address }}"
+        netmask:                       "{{ item.ip.netmask }}"
+        service_policy:                "{{ item.service_policy.name | default(omit) }}"
+        is_auto_revert:                "{{ item.location.auto_revert | default(omit) }}"
         <<: *input
       loop:
         "{{ network_ip_interfaces }}"
@@ -100,10 +100,10 @@
   
     - name: Configure default route on proxy SVM
       netapp.ontap.na_ontap_net_routes:
-        state:                      present
-        vserver:                    "{{ item.name }}"
-        destination:                "0.0.0.0/0"
-        gateway:                    "{{ all_default_gateway }}"
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        destination:                   "0.0.0.0/0"
+        gateway:                       "{{ all_default_gateway }}"
         <<: *input
       loop:
         "{{ ontap_svms }}"
@@ -115,10 +115,10 @@
   
     - name: Configure DNS on proxy SVM
       netapp.ontap.na_ontap_dns:
-        state:                      present
-        vserver:                    "{{ item.name }}"
-        domains:                    "{{ item.dns.domains }}"
-        nameservers:                "{{ item.dns.servers }}"
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        domains:                       "{{ item.dns.domains }}"
+        nameservers:                   "{{ item.dns.servers }}"
         <<: *input
       loop:
         "{{ svm_svms }}"
@@ -130,10 +130,10 @@
   
     - name: Create active directory preferred domain controllers
       netapp.ontap.na_ontap_active_directory_domain_controllers:
-        state:                      present
-        vserver:                    "{{ item.0.key }}"
-        fqdn:                       "{{ item.1.fqdn }}"
-        server_ip:                  "{{ item.1.ip }}"
+        state:                         present
+        vserver:                       "{{ item.0.key }}"
+        fqdn:                          "{{ item.1.fqdn }}"
+        server_ip:                     "{{ item.1.ip }}"
         <<: *input
       loop:
         "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
@@ -146,14 +146,14 @@
   
     - name: Create CIFS server on SVMs
       netapp.ontap.na_ontap_cifs_server:
-        state:                      present
-        name:                       "{{ item.name }}"                  
-        vserver:                    "{{ item.svm.name }}"
-        service_state:              started
-        domain:                     "{{ item.ad_domain.fqdn }}"
-        ou:                         "{{ item.ad_domain.organizational_unit }}"
-        admin_user_name:            "{{ all_ad_join_user }}"
-        admin_password:             "{{ all_ad_join_password }}"
+        state:                         present
+        name:                          "{{ item.name }}"                  
+        vserver:                       "{{ item.svm.name }}"
+        service_state:                 started
+        domain:                        "{{ item.ad_domain.fqdn }}"
+        ou:                            "{{ item.ad_domain.organizational_unit }}"
+        admin_user_name:               "{{ all_ad_join_user }}"
+        admin_password:                "{{ all_ad_join_password }}"
         <<: *input
       loop:
         "{{ protocols_cifs_services }}"
@@ -165,12 +165,12 @@
   
     - name: Patch additional SVM CIFS parameters - comment
       netapp.ontap.na_ontap_rest_cli:
-        command:                    'vserver/cifs'
-        verb:                       'PATCH'
+        command:                       'vserver/cifs'
+        verb:                          'PATCH'
         params: 
-          vserver:                  "{{ item.svm.name }}"
+          vserver:                     "{{ item.svm.name }}"
         body:
-          comment:                  "{{ item.comment }}"
+          comment:                     "{{ item.comment }}"
         <<: *input
       loop:
         "{{ protocols_cifs_services }}"
@@ -185,8 +185,8 @@
   
     - name: Create domain tunnel for cluster AD authentication
       netapp.ontap.na_ontap_domain_tunnel:
-        state:                      present
-        vserver:                    "{{ security_authentication_cluster_ad_proxy.svm.name }}"
+        state:                         present
+        vserver:                       "{{ security_authentication_cluster_ad_proxy.svm.name }}"
         <<: *input
       when:
         - security_authentication_cluster_ad_proxy.svm.name is defined
@@ -196,7 +196,7 @@
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - security/authentication/cluster/ad-proxy
-        use_python_keys:          true
+        use_python_keys:               true
         <<: *input
       register: ontap
   

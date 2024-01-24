@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-11 - Bulk Protect Volumes - ONTAP Primary"
-  gather_facts:       false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-52-11 - Bulk Protect Volumes - ONTAP Primary"
+  gather_facts:                        false
   vars:
     input_01: &input_01
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -50,17 +50,17 @@
   
   post_tasks:
 
-- hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-52-02 - Protect Volumes - ONTAP Secondary"
-  gather_facts:       false
+- hosts:                               "secondary_storage_cluster"
+  name:                                "ONTAP-52-02 - Protect Volumes - ONTAP Secondary"
+  gather_facts:                        false
   vars:
     input_02: &input_02
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -74,10 +74,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ global_primary_test_cluster }}"
+          cluster:                     "{{ hostvars[primary_storage_cluster].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
-          cluster:                     "{{ global_secondary_test_cluster }}"
+          cluster:                     "{{ hostvars[secondary_storage_cluster].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         create_destination:
           enabled:                     true
@@ -85,11 +85,11 @@
         initialize:                    false
         <<: *input_02
       loop:
-        "{{ hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records }}"
+        "{{ hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records }}"
       loop_control:
         label: "{{ item.svm.name + ':' + item.name }}"
       when:
-        - hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
+        - hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
 
@@ -97,20 +97,20 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ global_primary_test_cluster }}"
+          cluster:                     "{{ hostvars[primary_storage_cluster].cluster.name }}"
           path:                        "{{ item.svm.name + ':' + item.name }}"
         destination_endpoint:
-          cluster:                     "{{ global_secondary_test_cluster }}"
+          cluster:                     "{{ hostvars[secondary_storage_cluster].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         update:                        false
         initialize:                    true
         <<: *input_02
       loop:
-        "{{ hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records }}"
+        "{{ hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records }}"
       loop_control:
         label: "{{ item.svm.name + ':' + item.name }}"
       when:
-        - hostvars[global_primary_test_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
+        - hostvars[primary_storage_cluster].vol_info.ontap_info.storage_volumes.records | length > 0
         - item.name is defined
         - item.svm.name is defined
 

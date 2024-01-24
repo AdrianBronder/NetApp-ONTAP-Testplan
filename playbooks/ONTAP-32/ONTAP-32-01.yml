@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-32-01 - Volumes & Qtrees"
-  gather_facts:                   false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-32-01 - Volumes & Qtrees"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,25 +37,25 @@
   tasks:
     - name: Create volume
       netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ ontap_32_vol_name }}"
-        aggregate_name:             "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
-        size:                       "{{ ontap_default_vol_size_gb }}"
-        size_unit:                  gb
-        space_guarantee:            none
-        tiering_policy:             auto
-        junction_path:              "/{{ ontap_32_vol_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        volume_security_style:      "ntfs"
+        state:                         present
+        name:                          "{{ ontap_32_vol_name }}"
+        aggregate_name:                "{{ hostvars[primary_storage_cluster].storage_aggregates[0].name }}"
+        size:                          "{{ ontap_default_vol_size_gb }}"
+        size_unit:                     gb
+        space_guarantee:               none
+        tiering_policy:                auto
+        junction_path:                 "/{{ ontap_32_vol_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        volume_security_style:         "ntfs"
         <<: *input
 
     - name: Create qtrees
       netapp.ontap.na_ontap_qtree:
-        state:                      present
-        name:                       "{{ item }}"
-        flexvol_name:               "{{ ontap_32_vol_name }}"
-        security_style:             "ntfs"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ item }}"
+        flexvol_name:                  "{{ ontap_32_vol_name }}"
+        security_style:                "ntfs"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"

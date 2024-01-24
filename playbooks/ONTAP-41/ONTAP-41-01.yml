@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-41-01 - Export Policies & Rules"
-  gather_facts:       false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-41-01 - Export Policies & Rules"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,22 +37,22 @@
   tasks:
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "{{ ontap_41_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ ontap_41_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
   
     - name: Create read-write export policy rules for data volumes
       na_ontap_export_policy_rule:
-        state:                      present
-        name:                       "{{ ontap_41_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                    "any"
-        rw_rule:                    "any"
-        protocol:                   "nfs"
-        super_user_security:        "any"
-        allow_suid:                 true
+        state:                         present
+        name:                          "{{ ontap_41_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
         <<: *input
 
   post_tasks:

@@ -111,6 +111,10 @@ The playbooks can be executed in any other non-production environments for demos
 
 
 # Changelog
+## v1.2
+- Adding ONTAP-xx - ???
+- Adding support for ONTAP 9.14.1 lab
+- General Clean-up (comments, format...)
 
 ## v1.1
 - Adding ONTAP-42 - Quality of Service

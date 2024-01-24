@@ -14,9 +14,9 @@
 #
 ################################################################################
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-revert-52 - Backup (SnapMirror) - Windows"
-  gather_facts:       false
+- hosts:                               "win_hosts"
+  name:                                "ONTAP-revert-52 - Backup (SnapMirror) - Windows"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -31,36 +31,38 @@
       block:
         - name: Remove mapped shares
           community.windows.win_shortcut:
-            state:                absent
-            dest:                 "{{ windows_52_mount_dir }}\\{{ item }}.lnk"
+            state:                     absent
+            dest:                      "{{ windows_52_mount_dir }}\\{{ item }}.lnk"
           loop:
             - "{{ ontap_52_win_qtree_name }}"
             - "{{ ontap_52_win_qtree_name }}_dst"
+
         - name: Remove network credentials
           community.windows.win_credential:
-            state:                absent
-            name:                 "{{ global_primary_nas_svm }}"
-            type:                 "domain_password"
+            state:                     absent
+            name:                      "{{ global_primary_nas_svm }}"
+            type:                      "domain_password"
+
         - name: Remove network credentials
           community.windows.win_credential:
-            state:                absent
-            name:                 "{{ global_primary_backup_svm }}"
-            type:                 "domain_password"
+            state:                     absent
+            name:                      "{{ global_primary_backup_svm }}"
+            type:                      "domain_password"
       vars:
         # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
     - name: Remove mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_52_mount_dir }}"
-        state:                    absent
+        path:                          "{{ windows_52_mount_dir }}"
+        state:                         absent
 
-- hosts:              "linux"
-  name:               "ONTAP-revert-52 - Backup (SnapMirror) - Linux"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-52 - Backup (SnapMirror) - Linux"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -70,46 +72,46 @@
   tasks:
     - name: Unmount export on source qtree
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
 
     - name: Unmount export on destination qtree
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_backup_svm }}.{{ all_default_dns_domain }}:/{{ ontap_52_vol_name }}_dst/{{ ontap_52_lin_qtree_name }}"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}_dst"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
 
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_52_mount_dir }}/{{ item }}"
-        state:                      "absent"
-        mode:                       "0755"
+        path:                          "{{ linux_52_mount_dir }}/{{ item }}"
+        state:                         "absent"
+        mode:                          "0755"
       loop:
         - "{{ ontap_52_lin_qtree_name }}"
         - "{{ ontap_52_lin_qtree_name }}_dst"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_52_mount_dir }}"
-        state:                      "absent"
-        mode:                       "0755"
+        path:                          "{{ linux_52_mount_dir }}"
+        state:                         "absent"
+        mode:                          "0755"
 
-- hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Secondary"
-  gather_facts:       false
+- hosts:                               "secondary_storage_cluster"
+  name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Secondary"
+  gather_facts:                        false
   vars:
     input_01: &input_01
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -169,11 +171,11 @@
         state:                         absent
         vserver:                       "{{ global_primary_backup_svm }}"
         peer_vserver:                  "{{ item }}"
-        peer_cluster:                  "{{ global_primary_test_cluster }}"
+        peer_cluster:                  "{{ hostvars[primary_storage_cluster].ansible_host | split('.') | first }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ global_primary_test_cluster }}"
+          hostname: "{{ hostvars[primary_storage_cluster].ansible_host }}"
         <<: *input_01
       loop:
         - "{{ global_primary_nas_svm }}"
@@ -223,17 +225,17 @@
 
   post_tasks:
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Primary"
-  gather_facts:       false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Primary"
+  gather_facts:                        false
   vars:
     input_02: &input_02
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml

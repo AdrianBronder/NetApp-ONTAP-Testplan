@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-11-01 - Cluster/Node Parameters"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-11-01 - Cluster/Node Parameters"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,16 +37,16 @@
   tasks:
     - name: Set timezone on storage cluster
       netapp.ontap.na_ontap_cluster:
-        state:                      present
+        state:                         present
         timezone:
-          name:                     "{{ all_timezone }}"
+          name:                        "{{ all_timezone }}"
         <<: *input
         
     - name: Create login banner and message of the day (MOTD) on storage cluster
       netapp.ontap.na_ontap_login_messages:
-        banner:                     "{{ item.banner | default(omit) }}"
-        motd_message:               "{{ item.message | default(omit) }}"
-        show_cluster_motd:          true
+        banner:                        "{{ item.banner | default(omit) }}"
+        motd_message:                  "{{ item.message | default(omit) }}"
+        show_cluster_motd:             true
         <<: *input
       loop:
         "{{ security_login_messages }}"

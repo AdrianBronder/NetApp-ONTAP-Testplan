@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-35-03 - LUNs & Mappings"
-  gather_facts:                   false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-35-03 - LUNs & Mappings"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,17 +37,17 @@
   tasks:
     - name: Create LUNs
       netapp.ontap.na_ontap_lun:
-        state:                    present
-        vserver:                  "{{ global_primary_san_svm }}"
-        name:                     "{{ (item | split('/'))[3] }}"
-        flexvol_name:             "{{ (item | split('/'))[2] }}"
-        size:                     "{{ ontap_default_lun_size_gb }}"
-        size_unit:                "gb"
-        os_type:                  "{{ 'linux' if 'lin' in (item | split('/'))[3] else
-                                      'windows' if 'win' in (item | split('/'))[3] else
-                                      default(omit) }}"
-        space_reserve:            true
-        space_allocation:         true
+        state:                         present
+        vserver:                       "{{ global_primary_san_svm }}"
+        name:                          "{{ (item | split('/'))[3] }}"
+        flexvol_name:                  "{{ (item | split('/'))[2] }}"
+        size:                          "{{ ontap_default_lun_size_gb }}"
+        size_unit:                     "gb"
+        os_type:                       "{{ 'linux' if 'lin' in (item | split('/'))[3] else
+                                           'windows' if 'win' in (item | split('/'))[3] else
+                                           default(omit) }}"
+        space_reserve:                 true
+        space_allocation:              true
         <<: *input
       loop:
         "{{ ontap_35_lin_luns +
@@ -55,12 +55,12 @@
 
     - name: Map LUNs to iGroups
       netapp.ontap.na_ontap_lun_map:
-        state:                    present
-        vserver:                  "{{ global_primary_san_svm }}"
-        initiator_group_name:     "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[3] else
-                                      ontap_35_win_igroup_name if 'win' in (item | split('/'))[3] else
-                                      default(omit) }}"
-        path:                     "{{ item }}"
+        state:                         present
+        vserver:                       "{{ global_primary_san_svm }}"
+        initiator_group_name:          "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[3] else
+                                           ontap_35_win_igroup_name if 'win' in (item | split('/'))[3] else
+                                           default(omit) }}"
+        path:                          "{{ item }}"
         <<: *input
       loop:
         "{{ ontap_35_lin_luns +

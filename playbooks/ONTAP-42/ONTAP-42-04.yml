@@ -15,9 +15,9 @@
 # 
 ################################################################################
 
-- hosts:              "linux"
-  name:               "ONTAP-42-04 - Client Write"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-42-04 - Client Write"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml

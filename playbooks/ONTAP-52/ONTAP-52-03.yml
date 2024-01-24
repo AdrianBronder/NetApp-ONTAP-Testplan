@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-03 - Prepare Filesystem (Source) - ONTAP"
-  gather_facts:       false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-52-03 - Prepare Filesystem (Source) - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,132 +37,132 @@
   tasks:
     - name: Create read-only export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "ro_{{ global_primary_nas_svm }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "ro_{{ global_primary_nas_svm }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
   
     - name: Create read-only export policy rules for SVM root volume
       na_ontap_export_policy_rule:
-        state:                      present
-        name:                       "ro_{{ global_primary_nas_svm }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                    "any"
-        rw_rule:                    "none"
-        protocol:                   "nfs"
-        super_user_security:        "none"
-        allow_suid:                 false
+        state:                         present
+        name:                          "ro_{{ global_primary_nas_svm }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "none"
+        protocol:                      "nfs"
+        super_user_security:           "none"
+        allow_suid:                    false
         <<: *input
   
     - name: Apply read-only export policy to SVM's root volume
       netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ global_primary_nas_svm.replace('-','_') }}_root"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        export_policy:              "ro_{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ global_primary_nas_svm.replace('-','_') }}_root"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        export_policy:                 "ro_{{ global_primary_nas_svm }}"
         <<: *input
     
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
   
     - name: Create read-write export policy rules
       na_ontap_export_policy_rule:
-        state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                    "any"
-        rw_rule:                    "any"
-        protocol:                   "nfs"
-        super_user_security:        "any"
-        allow_suid:                 true
+        state:                         present
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
         <<: *input
 
     - name: Create volume with custom snapshot policy
       netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ ontap_52_vol_name }}"
-        aggregate_name:             "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
-        size:                       "{{ ontap_default_vol_size_gb }}"
-        size_unit:                  gb
-        space_guarantee:            none
-        snapshot_policy:            "{{ ontap_52_snap_policy_name }}"
-        tiering_policy:             auto
-        export_policy:              "ro_{{ global_primary_nas_svm }}"
-        junction_path:              "/{{ ontap_52_vol_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        volume_security_style:      "unix"
+        state:                         present
+        name:                          "{{ ontap_52_vol_name }}"
+        aggregate_name:                "{{ hostvars[primary_storage_cluster].storage_aggregates[0].name }}"
+        size:                          "{{ ontap_default_vol_size_gb }}"
+        size_unit:                     gb
+        space_guarantee:               none
+        snapshot_policy:               "{{ ontap_52_snap_policy_name }}"
+        tiering_policy:                auto
+        export_policy:                 "ro_{{ global_primary_nas_svm }}"
+        junction_path:                 "/{{ ontap_52_vol_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        volume_security_style:         "unix"
         <<: *input
   
     - name: Create UNIX qtree
       netapp.ontap.na_ontap_qtree:
-        state:                      present
-        name:                       "{{ ontap_52_lin_qtree_name }}"
-        flexvol_name:               "{{ ontap_52_vol_name }}"
-        export_policy:              "{{ ontap_52_policy_name }}"
-        security_style:             "unix"
-        unix_permissions:           0777
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ ontap_52_lin_qtree_name }}"
+        flexvol_name:                  "{{ ontap_52_vol_name }}"
+        export_policy:                 "{{ ontap_52_policy_name }}"
+        security_style:                "unix"
+        unix_permissions:              0777
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
 
     - name: Create NTFS qtree
       netapp.ontap.na_ontap_qtree:
-        state:                      present
-        name:                       "{{ ontap_52_win_qtree_name }}"
-        flexvol_name:               "{{ ontap_52_vol_name }}"
-        security_style:             "ntfs"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ ontap_52_win_qtree_name }}"
+        flexvol_name:                  "{{ ontap_52_vol_name }}"
+        security_style:                "ntfs"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
 
     - name: Create share
       netapp.ontap.na_ontap_cifs:
-        state:                      present
-        name:                       "{{ ontap_52_win_qtree_name }}"
-        path:                       "/{{ ontap_52_vol_name }}/{{ ontap_52_win_qtree_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        browsable:                  true
-        oplocks:                    true
-        show_snapshot:              true
-        comment:                    "Test share created as part of test frame ONTAP-52"
+        state:                         present
+        name:                          "{{ ontap_52_win_qtree_name }}"
+        path:                          "/{{ ontap_52_vol_name }}/{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        comment:                       "Test share created as part of test frame ONTAP-52"
         <<: *input
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      absent
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "Everyone"
-        permission:                 "full_control"
+        state:                         absent
+        share_name:                    "{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        user_or_group:                 "Everyone"
+        permission:                    "full_control"
         <<: *input
 
     - name: Create ACL on test share (admins - Full Control)
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      present
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "{{ ontap_52_ad_admin_group }}"
-        permission:                 "full_control"
+        state:                         present
+        share_name:                    "{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        user_or_group:                 "{{ ontap_52_ad_admin_group }}"
+        permission:                    "full_control"
         <<: *input
 
     - name: Create ACL on test share (read-only users - Read)
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      present
-        share_name:                 "{{ ontap_52_win_qtree_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "{{ ontap_52_ad_ro_group }}"
-        permission:                 "read"
+        state:                         present
+        share_name:                    "{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        user_or_group:                 "{{ ontap_52_ad_ro_group }}"
+        permission:                    "read"
         <<: *input
 
   post_tasks:
 
-- hosts:              "linux"
-  name:               "ONTAP-52-03 - Prepare Filesystem (Source) - Linux"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-52-03 - Prepare Filesystem (Source) - Linux"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -175,32 +175,34 @@
   tasks:
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
   
     - name: Create mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
-        state:                      "directory"
-        mode:                       "0755"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+        state:                         "directory"
+        mode:                          "0755"
   
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
-        state:                      "mounted"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
-        path:                       "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "mounted"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_52_vol_name }}/{{ ontap_52_lin_qtree_name }}"
+        path:                          "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
   
     - name: Create test files
       community.general.filesize:
-        path: "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}/{{ item }}"
-        size: 50MB
+        path:                          "{{ linux_52_mount_dir }}/\
+                                        {{ ontap_52_lin_qtree_name }}/\
+                                        {{ item }}"
+        size:                          50MB
       loop:
         - "testfile01"
         - "testfile02"
@@ -208,9 +210,9 @@
   
   post_tasks:
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-52-03 - Prepare Filesystem (Source) - Windows"
-  gather_facts:       false
+- hosts:                               "win_hosts"
+  name:                                "ONTAP-52-03 - Prepare Filesystem (Source) - Windows"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -252,9 +254,9 @@
             - "testfile03"
       vars:
         # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
   post_tasks:

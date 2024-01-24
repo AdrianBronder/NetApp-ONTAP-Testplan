@@ -15,17 +15,17 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-32-02 - Shares & ACLs (Volume)"
-  gather_facts:                   false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-32-02 - Shares & ACLs (Volume)"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -37,47 +37,47 @@
   tasks:
     - name: Create shares
       netapp.ontap.na_ontap_cifs:
-        state:                      present
-        name:                       "{{ item }}"
-        path:                       "/{{ ontap_32_vol_name }}/{{ item }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        browsable:                  true
-        oplocks:                    true
-        show_snapshot:              true
-        comment:                    "Test share created as part of test frame ONTAP-32"
+        state:                         present
+        name:                          "{{ item }}"
+        path:                          "/{{ ontap_32_vol_name }}/{{ item }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        comment:                       "Test share created as part of test frame ONTAP-32"
         <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      absent
-        share_name:                 "{{ item }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "Everyone"
-        permission:                 "full_control"
+        state:                         absent
+        share_name:                    "{{ item }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        user_or_group:                 "Everyone"
+        permission:                    "full_control"
         <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
 
     - name: Create ACL on test share (admins - Full Control)
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      present
-        share_name:                 "{{ item }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "{{ ontap_32_ad_admin_group }}"
-        permission:                 "full_control"
+        state:                         present
+        share_name:                    "{{ item }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        user_or_group:                 "{{ ontap_32_ad_admin_group }}"
+        permission:                    "full_control"
         <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
 
     - name: Create ACL on test share (read-only users - Read)
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      present
-        share_name:                 "{{ item }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        user_or_group:              "{{ ontap_32_ad_ro_group }}"
-        permission:                 "read"
+        state:                         present
+        share_name:                    "{{ item }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        user_or_group:                 "{{ ontap_32_ad_ro_group }}"
+        permission:                    "read"
         <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"

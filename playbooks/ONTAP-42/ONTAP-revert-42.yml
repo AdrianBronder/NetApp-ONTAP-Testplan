@@ -14,9 +14,9 @@
 #
 ################################################################################
 
-- hosts:              "linux"
-  name:               "ONTAP-revert-42 - Quality of Service - Linux"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-42 - Quality of Service - Linux"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -26,42 +26,42 @@
   tasks:
     - name: Unmount export
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ item }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-        path:                       "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ item }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+        path:                          "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
 
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-        state:                      "absent"
-        mode:                       "0755"
+        path:                          "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+        state:                         "absent"
+        mode:                          "0755"
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_42_mount_dir }}"
-        state:                      "absent"
-        mode:                       "0755"
+        path:                          "{{ linux_42_mount_dir }}"
+        state:                         "absent"
+        mode:                          "0755"
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-revert-42 - Quality of Service - ONTAP"
-  gather_facts:       false
+- hosts:                               "primary_storage_cluster"
+  name:                                "ONTAP-revert-42 - Quality of Service - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml

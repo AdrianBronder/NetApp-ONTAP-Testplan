@@ -1,0 +1,16 @@
+[ontap]
+primary_storage_cluster ansible_host=cluster1.demo.netapp.com
+secondary_storage_cluster ansible_host=cluster2.demo.netapp.com
+
+[linux]
+primary_linux_host ansible_host=rhel1.demo.netapp.com
+
+[win_hosts]
+primary_windows_host win_hostname=jumphost.demo.netapp.com
+
+[win_domain_controllers]
+primary_domain_controller win_hostname=dc1.demo.netapp.com
+
+[windows:children]
+win_hosts
+win_domain_controllers

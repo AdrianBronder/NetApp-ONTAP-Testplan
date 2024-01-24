@@ -11,9 +11,9 @@
 #
 ################################################################################
 
-- hosts:              "dc1"
-  name:               "Initialize Lab DC"
-  gather_facts:       false
+- hosts:                               "primary_domain_controller"
+  name:                                "Initialize Lab DC"
+  gather_facts:                        false
   vars:
     separator: '\'
     ad_org_groups:
@@ -33,64 +33,64 @@
     - microsoft.ad
 
   tasks:
-  - name: Create DNS record for centos1
-    community.windows.win_dns_record:
-      state:                       "present"
-      name:                        "centos1"
-      type:                        "A"
-      value:                       "192.168.0.61"
-      zone:                        "{{ all_default_dns_domain }}"
-
-  - name: Create DNS records for SVM interfaces (DNS name = interace name)
-    community.windows.win_dns_record:
-      state:                       "present"
-      name:                        "{{ item.name }}"
-      type:                        "A"
-      value:                       "{{ item.ip.address }}"
-      zone:                        "{{ all_default_dns_domain }}"
-    when:
-      - item.scope == "svm"
-    loop:
-      "{{ hostvars['cluster1'].network_ip_interfaces | list + 
-          hostvars['cluster2'].network_ip_interfaces | list }}"
-    loop_control:
-      label: "{{ item.name }}"
-
-  - name: Create DNS record for s3server
-    community.windows.win_dns_record:
-      state:                       "present"
-      name:                        "s3server"
-      type:                        "A"
-      value:                       "192.168.0.233"
-      zone:                        "{{ all_default_dns_domain }}"
-
-  - name: Create OU in Active Directory
-    microsoft.ad.ou:
-      state:                       present
-      name:                        "{{ all_storage_ad_ou_path.split(',')[0].split('=')[1] }}"
-      path:                        "{{ ','.join(all_storage_ad_ou_path.split(',')[1:]) }}"
-
-  - name: Create LoD Groups in AD
-    microsoft.ad.group:
-      state:                       present
-      name:                        "{{ item.name }}"
-      scope:                       "global"
-      path:                        "CN=Users,DC=demo,DC=netapp,DC=com"
-    loop:
-      "{{ ad_org_groups }}"
-
-  - name: Create LoD Users in AD
-    microsoft.ad.user:
-      state:                       present
-      name:                        "{{ item.1.name }}"
-      path:                        "CN=Users,DC=demo,DC=netapp,DC=com"
-      password:                    "{{ item.1.password }}"
-      update_password:             "always"
-      password_never_expires:      "yes"
-      user_cannot_change_password: "yes"
-      groups:
-        add:
-          - "{{ item.0.name }}"
-    with_subelements:
-      - "{{ ad_org_groups }}"
-      - users
+    - name: Create DNS record for centos1
+      community.windows.win_dns_record:
+        state:                         "present"
+        name:                          "centos1"
+        type:                          "A"
+        value:                         "192.168.0.61"
+        zone:                          "{{ all_default_dns_domain }}"
+  
+    - name: Create DNS records for SVM interfaces (DNS name = interace name)
+      community.windows.win_dns_record:
+        state:                         "present"
+        name:                          "{{ item.name }}"
+        type:                          "A"
+        value:                         "{{ item.ip.address }}"
+        zone:                          "{{ all_default_dns_domain }}"
+      when:
+        - item.scope == "svm"
+      loop:
+        "{{ hostvars['cluster1'].network_ip_interfaces | list + 
+            hostvars['cluster2'].network_ip_interfaces | list }}"
+      loop_control:
+        label: "{{ item.name }}"
+  
+    - name: Create DNS record for s3server
+      community.windows.win_dns_record:
+        state:                         "present"
+        name:                          "s3server"
+        type:                          "A"
+        value:                         "192.168.0.233"
+        zone:                          "{{ all_default_dns_domain }}"
+  
+    - name: Create OU in Active Directory
+      microsoft.ad.ou:
+        state:                         present
+        name:                          "{{ all_storage_ad_ou_path.split(',')[0].split('=')[1] }}"
+        path:                          "{{ ','.join(all_storage_ad_ou_path.split(',')[1:]) }}"
+  
+    - name: Create LoD Groups in AD
+      microsoft.ad.group:
+        state:                         present
+        name:                          "{{ item.name }}"
+        scope:                         "global"
+        path:                          "CN=Users,DC=demo,DC=netapp,DC=com"
+      loop:
+        "{{ ad_org_groups }}"
+  
+    - name: Create LoD Users in AD
+      microsoft.ad.user:
+        state:                         present
+        name:                          "{{ item.1.name }}"
+        path:                          "CN=Users,DC=demo,DC=netapp,DC=com"
+        password:                      "{{ item.1.password }}"
+        update_password:               "always"
+        password_never_expires:        "yes"
+        user_cannot_change_password:   "yes"
+        groups:
+          add:
+            - "{{ item.0.name }}"
+      with_subelements:
+        - "{{ ad_org_groups }}"
+        - users
