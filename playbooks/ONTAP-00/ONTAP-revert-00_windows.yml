@@ -54,7 +54,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[gropus['primary_storage_clusters'][0]].network_ip_interfaces |
+        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
