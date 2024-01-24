@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "linux_hosts""
+- hosts:                               "linux_hosts"
   name:                                "ONTAP-37-04 - Mount & Write (Linux)"
   gather_facts:                        true
   vars_files:
