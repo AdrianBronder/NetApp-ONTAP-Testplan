@@ -61,6 +61,13 @@
     - name: Flush multipath devices
       ansible.builtin.command:
         cmd: "multipath -F"
+      ignore_errors: true
+
+    - name: Restart Multi-pathing
+      ansible.builtin.systemd_service:
+        state:                         restarted
+        daemon_reload:                 true
+        name:                          "multipathd"
 
   post_tasks:
 
