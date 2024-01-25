@@ -11,6 +11,8 @@
 This repository contains Ansible artifacts (inventories, vars, playbooks...) for executing tests and demos against ONTAP automatically.
 They can be used out of the box in Lab on Demand or - by adjusting varaibles - in any other environment.
 
+[!CAUTION]
+Please consider the content of this repository for lab testing and demo purposes only!
 
 # Quick Start with Lab on Demand
 For NetApp internal and partner use - ready to go in less than 15 minutes
@@ -21,6 +23,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
    ```
    yum install -y git
    git clone https://github.com/AdrianBronder/NetApp-ONTAP-Testplan.git
+
    
    ```
 3. Initialize the environment by running the lab init script:
@@ -30,6 +33,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
    # based on ONTAP (lab) version: ./init/init_eapontap<ontapversion>.sh
    # e.g.
    ./init/init_eapontap9141.sh
+
    
    ```
 4. Execute test steps, e.g. general connection test playbook "ONTAP-01-04.yml"
@@ -37,6 +41,7 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
    # based on ONTAP (lab) version: ./inventories/labondemand_<ontapversion>
    # e.g.
    ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-01/ONTAP-01-04.yml
+
    
    ```
 
@@ -46,22 +51,27 @@ For NetApp internal and partner use - ready to go in less than 15 minutes
 - Execute a single test step (e.g. ONTAP-02-02 - Physical Network):
   ```
   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-02.yml
+
   ```
 - Execute an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-*.yml
+
   ```
 - Revert configuration changed and objects created during a test frame:
   ```
   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-31/ONTAP-revert-31.yml
+
   ```
 - Execute ALL tests with a single command (and track the execution time)
   ```
   time ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
+
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
+
   ```
 
 
