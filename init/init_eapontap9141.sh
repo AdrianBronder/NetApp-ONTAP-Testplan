@@ -80,9 +80,9 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 echo ""
 echo ""
 echo "--> Enable multipath on linux host"
-touch /etc/multipath.conf
 modprobe -v dm-multipath
 systemctl restart multipathd
+mpathconf --enable
 
 echo ""
 echo ""
