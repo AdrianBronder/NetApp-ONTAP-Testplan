@@ -76,7 +76,8 @@
 | Prepare-32         | Prepare test frame 32 - CIFS                               | |
 | Prepare-35         | Prepare test frame 35 - iSCSI                              | |
 | Prepare-37         | Prepare test frame 37 - NVMe/TCP                           | |
-| Prepare-41         | Prepare test frame 41 - NFS FlexClone                      | |
+| Prepare-41         | Prepare test frame 41 - Cloning (NFS)                      | |
+| Prepare-42         | Prepare test frame 42 - Quality of Service                 | |
 | Prepare-51         | Prepare test frame 51 - Local Versioning (Snapshots)       | |
 | Prepare-52         | Prepare test frame 52 - Backup (SnapMirror)                | |
 | ---   | ---                               | ---                                   |
@@ -89,6 +90,6 @@
 | Revert-35         | Revert test frame 35 - iSCSI                                | |
 | Revert-37         | Revert test frame 37 - NVMe/TCP                             | |
 | Revert-41         | Revert test frame 41 - Cloning (NFS)                        | |
-| Revert-41         | Revert test frame 41 - Quality of Service                   | |
+| Revert-42         | Revert test frame 42 - Quality of Service                   | |
 | Revert-51         | Revert test frame 51 - Local Versioning (Snapshots)         | |
 | Revert-52         | Revert test frame 52 - Backup (SnapMirror)                  | |
