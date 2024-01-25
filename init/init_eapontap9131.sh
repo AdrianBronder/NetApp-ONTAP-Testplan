@@ -72,6 +72,7 @@ echo "Configuring Python3..."
 ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
 echo "Installing Python3..."
 make altinstall > /dev/null
+ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
 rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
 echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
 source ~/.bashrc
