@@ -70,6 +70,9 @@
                                                  first ).UUID }}"
       loop:
         "{{ ontap_37_lin_namespaces }}"
+      when:
+        - ansible_distribution == "RedHat" and
+          ansible_distribution_version == "8.9"
 
     - name: Create mount directory  
       ansible.builtin.file:
