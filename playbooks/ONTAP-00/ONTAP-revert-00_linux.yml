@@ -170,22 +170,7 @@
 
     - name: Flush multipath devices
       ansible.builtin.command:
-        cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
-                           {{ (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
-                              selectattr('name', 'defined') |
-                              selectattr('name', '==', item ) |
-                              first ).serial_hex }}"
-      when:
-        - hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.num_records|int > 0
-        - (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
-           selectattr('name', 'defined') |
-           selectattr('name', '==', item ) |
-           first ).serial_hex is defined
-      loop_control:
-        label: "{{ item }}"
-      loop:
-        "{{ ontap_35_lin_luns }}"
-      ignore_errors: true
+        cmd: "multipath -F"
 
     - name: Unmount exports
       ansible.posix.mount:

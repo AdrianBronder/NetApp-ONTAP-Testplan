@@ -58,6 +58,10 @@
           selectattr('NQN', 'search', ontap_37_lin_subsystem_name ) |
           length > 0 
 
+    - name: Flush multipath devices
+      ansible.builtin.command:
+        cmd: "multipath -F"
+
   post_tasks:
 
 - hosts:                               "primary_storage_clusters"
