@@ -34,37 +34,28 @@ echo "OpenSSL path:         $OPENSSLPATH"
 echo ""
 echo ""
 echo "--> Updating Centos system"
-sudo yum -y update
-
-echo ""
-echo ""
-echo "--> Remove Python3"
-sudo yum remove -y python3
-sudo rm -f /usr/bin/python3
-sudo rm -f /usr/bin/pip3
-sudo rm -rf /usr/local/lib
-rm -rf ~/.local/*
+yum -y update
 
 echo ""
 echo ""
 echo "--> Installing additional packages"
-sudo yum install -y wget gcc libffi-devel epel-release zlib-devel python3-devel jq libxml2 git krb5-devel krb5-workstation sshpass ncurses-devel nvme-cli --skip-broken
-sudo yum erase -y openssl
+yum install -y wget gcc libffi-devel epel-release zlib-devel python3-devel jq libxml2 git krb5-devel krb5-workstation sshpass ncurses-devel nvme-cli --skip-broken
+yum erase -y openssl
 
 echo ""
 echo ""
 echo "--> Install OpenSSL"
-sudo mkdir $DOWNLOADPATH
-sudo wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
-sudo tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
+mkdir $DOWNLOADPATH
+wget -P $DOWNLOADPATH https://www.openssl.org/source/openssl-$OPENSSLVERS.tar.gz
+tar xfo $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz -C $DOWNLOADPATH
 cd $DOWNLOADPATH/openssl-$OPENSSLVERS
 echo "Configuring OpenSSL..."
-sudo ./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH > /dev/null
-sudo make > /dev/null
+./config --prefix=$OPENSSLPATH --openssldir=$OPENSSLPATH > /dev/null
+make > /dev/null
 echo "Installing OpenSSL..."
-sudo make install > /dev/null
-sudo echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
-sudo ldconfig
+make install > /dev/null
+echo "$OPENSSLPATH/lib" > /etc/ld.so.conf.d/openssl.conf
+ldconfig
 rm $DOWNLOADPATH/openssl-$OPENSSLVERS.tar.gz
 echo "export PATH=$PATH:$OPENSSLPATH/bin" >> ~/.bashrc
 source ~/.bashrc
@@ -73,18 +64,14 @@ cd $SCRIPTPATH
 echo ""
 echo ""
 echo "--> Install Python3"
-sudo mkdir $DOWNLOADPATH
-sudo wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
-sudo tar xfo $DOWNLOADPATH/Python-$PYTHON3VERS.tgz -C $DOWNLOADPATH
+mkdir $DOWNLOADPATH
+wget -P $DOWNLOADPATH https://www.python.org/ftp/python/$PYTHON3VERS/Python-$PYTHON3VERS.tgz
+tar xfo $DOWNLOADPATH/Python-$PYTHON3VERS.tgz -C $DOWNLOADPATH
 cd $DOWNLOADPATH/Python-$PYTHON3VERS
 echo "Configuring Python3..."
-sudo ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
+./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
 echo "Installing Python3..."
-sudo make altinstall > /dev/null
-sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3
-sudo ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
-sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3
-sudo ln -s /usr/local/bin/pip3.9 /usr/bin/pip3.9
+make altinstall > /dev/null
 rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
 echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
 source ~/.bashrc
@@ -92,19 +79,26 @@ cd $SCRIPTPATH
 
 echo ""
 echo ""
+echo "--> Setting alternative Python to 3.9 as default"
+update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
+update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+update-alternatives --set python3 /usr/local/bin/python3.9
+
+echo ""
+echo ""
 echo "--> Upgrading pip"
-sudo pip3 install --upgrade pip
+python3 -m pip install --upgrade pip
 
 echo ""
 echo ""
 echo "--> Installing additional Python libs"
-sudo pip3 install --upgrade requests six netapp_lib selinux
-sudo pip3 install --upgrade "pywinrm[kerberos]>=0.3.0"
+python3 -m pip install --upgrade requests six netapp_lib selinux
+python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 
 echo ""
 echo ""
 echo "--> Installing Asnible"
-pip3 install ansible-core==$ANSIBLEVERS
+python3 -m pip install ansible-core==$ANSIBLEVERS
 
 echo ""
 echo ""
@@ -121,8 +115,8 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 echo ""
 echo ""
-echo "--> Creating default multi-path config on centos"
-sudo touch /etc/multipath.conf
+echo "--> Creating default multi-path config on linux host"
+touch /etc/multipath.conf
 
 echo ""
 echo ""
@@ -137,10 +131,10 @@ ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9131 $SCRIPTPATH/../p
 echo ""
 echo ""
 echo "--> Install new Linux kernel, change kernel default, add NVMe_TCP module to load after reboot and reboot"
-sudo rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
-sudo yum -y install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
-sudo yum -y --enablerepo=elrepo-kernel install kernel-lt
-sudo sed -i 's/GRUB_DEFAULT=saved/GRUB_DEFAULT=0/g' /etc/default/grub
-sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-sudo echo "nvme_tcp" > /etc/modules-load.d/nvme_tcp.conf
-sudo reboot
+rpm --import https://www.elrepo.org/RPM-GPG-KEY-elrepo.org
+yum -y install https://www.elrepo.org/elrepo-release-7.el7.elrepo.noarch.rpm
+yum -y --enablerepo=elrepo-kernel install kernel-lt
+sed -i 's/GRUB_DEFAULT=saved/GRUB_DEFAULT=0/g' /etc/default/grub
+grub2-mkconfig -o /boot/grub2/grub.cfg
+echo "nvme_tcp" > /etc/modules-load.d/nvme_tcp.conf
+reboot

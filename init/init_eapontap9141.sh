@@ -79,14 +79,14 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 
 echo ""
 echo ""
-echo "--> Enable multipath on RHEL1"
+echo "--> Enable multipath on linux host"
 touch /etc/multipath.conf
 modprobe -v dm-multipath
 systemctl restart multipathd
 
 echo ""
 echo ""
-echo "--> Enable NVMe/TCP on RHEL1"
+echo "--> Enable NVMe/TCP on linux host"
 modprobe nvme_tcp
 
 echo ""
