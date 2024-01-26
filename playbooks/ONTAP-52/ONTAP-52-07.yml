@@ -78,7 +78,7 @@
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         update:                        true
         <<: *input_02
-      retry: 30
+      retries: 30
       delay: 10
 
   post_tasks:
