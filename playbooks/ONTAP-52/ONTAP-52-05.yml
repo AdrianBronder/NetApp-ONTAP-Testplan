@@ -176,8 +176,9 @@
         - name: Map share
           community.windows.win_shortcut:
             state:                     present
-            src:                       "\\\\{{ global_primary_backup_svm }}\\{{ ontap_52_win_qtree_name }}"
+            src:                       "\\\\{{ global_primary_backup_svm }}\\{{ ontap_52_win_qtree_name }}_dst"
             dest:                      "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name }}_dst.lnk"
+
       vars:
         # become is required to save and retrieve the credentials in the tasks
         ansible_become:                "yes"
