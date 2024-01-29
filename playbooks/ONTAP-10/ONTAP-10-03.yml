@@ -52,7 +52,7 @@
         <<: *input
       loop:
         "{{ all_ntp_serveres }}"
-      retries: 5
+      retries: 10
       delay: 3
       register: result
       until: not result.failed
