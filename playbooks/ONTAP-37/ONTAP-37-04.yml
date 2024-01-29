@@ -64,10 +64,10 @@
       community.general.filesystem:
         fstype:                        "ext4"
         dev:                           "/dev/mapper/\
-                                        uuid.{{ (linux_ontap_ns.ONTAPdevices |
-                                                 selectattr('Namespace_Path', 'defined') |
-                                                 selectattr('Namespace_Path', '==', item ) |
-                                                 first ).UUID }}"
+                                        {{ (linux_ontap_ns.ONTAPdevices |
+                                            selectattr('Namespace_Path', 'defined') |
+                                            selectattr('Namespace_Path', '==', item ) |
+                                            first ).UUID }}"
       loop:
         "{{ ontap_37_lin_namespaces }}"
       when:
