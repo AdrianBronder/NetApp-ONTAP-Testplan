@@ -102,10 +102,10 @@
       ansible.posix.mount:
         state:                         "mounted"
         src:                           "/dev/mapper/\
-                                        uuid.{{ (linux_ontap_ns.ONTAPdevices |
-                                                 selectattr('Namespace_Path', 'defined') |
-                                                 selectattr('Namespace_Path', '==', item ) |
-                                                 first ).UUID }}"
+                                        {{ (linux_ontap_ns.ONTAPdevices |
+                                            selectattr('Namespace_Path', 'defined') |
+                                            selectattr('Namespace_Path', '==', item ) |
+                                            first ).UUID }}"
         path:                          "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                        "ext4"
         opts:                          "discard"
