@@ -118,6 +118,7 @@ echo ""
 echo ""
 echo "--> Creating default multi-path config on linux host"
 mpathconf --enable
+systemctl restart multipathd.service
 
 echo ""
 echo ""
