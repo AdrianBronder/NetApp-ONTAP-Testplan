@@ -81,7 +81,7 @@ echo ""
 echo ""
 echo "--> Enable multipath on linux host"
 modprobe -v dm-multipath
-mpathconf --enable
+mpathconf --enable --user_friendly_names n
 systemctl restart multipathd.service
 
 echo ""

@@ -64,10 +64,10 @@
       community.general.filesystem:
         fstype:                        "ext4"
         dev:                           "/dev/mapper/\
-                                        {{ (linux_ontap_ns.ONTAPdevices |
-                                            selectattr('Namespace_Path', 'defined') |
-                                            selectattr('Namespace_Path', '==', item ) |
-                                            first ).UUID }}"
+                                        uuid.{{ (linux_ontap_ns.ONTAPdevices |
+                                                 selectattr('Namespace_Path', 'defined') |
+                                                 selectattr('Namespace_Path', '==', item ) |
+                                                 first ).UUID }}"
       loop:
         "{{ ontap_37_lin_namespaces }}"
       when:
@@ -102,10 +102,10 @@
       ansible.posix.mount:
         state:                         "mounted"
         src:                           "/dev/mapper/\
-                                        {{ (linux_ontap_ns.ONTAPdevices |
-                                            selectattr('Namespace_Path', 'defined') |
-                                            selectattr('Namespace_Path', '==', item ) |
-                                            first ).UUID }}"
+                                        uuid.{{ (linux_ontap_ns.ONTAPdevices |
+                                                 selectattr('Namespace_Path', 'defined') |
+                                                 selectattr('Namespace_Path', '==', item ) |
+                                                 first ).UUID }}"
         path:                          "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                        "ext4"
         opts:                          "discard"

@@ -117,7 +117,7 @@ cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
 echo ""
 echo ""
 echo "--> Creating default multi-path config on linux host"
-mpathconf --enable
+mpathconf --enable --user_friendly_names n
 systemctl restart multipathd.service
 
 echo ""
