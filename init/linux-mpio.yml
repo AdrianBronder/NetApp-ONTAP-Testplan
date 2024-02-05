@@ -48,13 +48,13 @@
   - name: Create initiator name
     ansible.builtin.shell: echo InitiatorName=`iscsi-iname` > /etc/iscsi/initiatorname.iscsi
     args:
-        creates: /etc/iscsi/initiatorname.iscsi
+      creates: /etc/iscsi/initiatorname.iscsi
 
-  - name: Start and enable on boot the iSCSI initiator
+  - name: Start and Enable on boot the iSCSI initiator
     ansible.builtin.service:
-        name: iscsid
-        state: started
-        enabled: yes
+      name: iscsid
+      state: started
+      enabled: yes
 
   # start and enable iscsid
   - name: Make sure iscsid service is running
@@ -69,29 +69,13 @@
     ansible.builtin.debug: 
       var: iscsi_client_iqn
 
-  #Configure multipathd
+  #Configure Basic multipathd
   - name: Create multipath configuration
     ansible.builtin.command: mpathconf --enable --with_multipathd y --user_friendly_names n --find_multipaths y
     args:
-        creates: /etc/multipath.conf
+      creates: /etc/multipath.conf
 
-  # - name: Add NetApp device defintion to multipath.conf
-  #   debug:
-  #     msg:
-  #     - "(Stub) Add device defintion for NetApp LUNs to multipath.conf"
-  #     - "{{ ansible_os_family }}"
-  #     - "Distribution = {{ ansible_facts['distribution'] }}"
-  #     - "Major version = {{ ansible_facts['distribution_major_version'] }}"
-  #     - "device { {{ device_netapp_rhel89 }} }"
-
-  # - name: Test conditional
-  #   debug:
-  #     msg:
-  #     - "(Success) Testing ansibl_facts conditional: RedHat and 8"
-  #   when: 
-  #   - ansible_facts['distribution'] == "RedHat"
-  #   - ansible_facts['distribution_major_version'] == "8" 
-
+  # Copy multipath.conf template in place
   - name: Update multipath configuration with backup
     ansible.builtin.template:
       src: multipath.conf_{{ ansible_os_family }}.j2
@@ -101,13 +85,6 @@
       mode: '0600'
       backup: yes
     register: multipathconf
-
-  # - name: Block in File - Add device defintion
-  #   ansible.builtin.blockinfile:
-  #     path: /etc/multipath.conf
-  #     insertafter: 'devices'
-  #     block: "{{ device_netapp_rhel89 }}"
-  #     backup: yes
 
   # Re the multipathd service
   - name: Start and Enable service on boot - multipath daemon
