@@ -1,0 +1,121 @@
+#######################################################
+# 
+#   Author:     Sean Hatfield
+#   Date:       Feb 1 2024
+# 
+#   Description:  Prepares Enterprise Linux servers to host ONTAP Select nodes
+# 
+#######################################################
+---
+- hosts: rhel1 
+  gather_facts: true
+  name: Update Linux MPIO Configuration 
+  vars:
+    device_netapp_rhel89: |
+      device { 
+              vendor			        NETAPP 
+              product			        LUN.* 
+              detect_prio			    yes 
+              dev_loss_tmo		    "infinity" 
+              failback			      immediate 
+              fast_io_fail_tmo		5 
+              features			      "2 pg_init_retries 50" 
+              flush_on_last_del		"yes" 
+              hardware_handler		"0" 
+              no_path_retry		    queue 
+              path_checker		    "tur" 
+              path_grouping_policy "group_by_prio" 
+              path_selector		    "service-time 0" 
+              polling_interval		5 
+              prio				        "ontap" 
+              retain_attached_hw_handler yes 
+              rr_weight			      "uniform" 
+              user_friendly_names no 
+      }
+
+  tasks:
+
+# Install iSCSI Dependancies
+  - name: Update and install required system packages for iSCSI
+    ansible.builtin.package:
+      name:
+      - iscsi-initiator-utils
+      - device-mapper-multipath
+      - sg3_utils  # contains command: rescan-scsi-bus.sh
+      state: latest
+      update_cache: true
+
+  - name: Create initiator name
+    ansible.builtin.shell: echo InitiatorName=`iscsi-iname` > /etc/iscsi/initiatorname.iscsi
+    args:
+        creates: /etc/iscsi/initiatorname.iscsi
+
+  - name: Start and enable on boot the iSCSI initiator
+    ansible.builtin.service:
+        name: iscsid
+        state: started
+        enabled: yes
+
+  # start and enable iscsid
+  - name: Make sure iscsid service is running
+    ansible.builtin.service:
+      state: started
+      name: iscsid
+
+  - set_fact:
+      iscsi_client_iqn: "iSCSI Client IQN = {{  lookup('ansible.builtin.file', '/etc/iscsi/initiatorname.iscsi').split('=')[1] | lower }}"
+
+  - name: Display Client IQN Info 
+    ansible.builtin.debug: 
+      var: iscsi_client_iqn
+
+  #Configure multipathd
+  - name: Create multipath configuration
+    ansible.builtin.command: mpathconf --enable --with_multipathd y --user_friendly_names n --find_multipaths y
+    args:
+        creates: /etc/multipath.conf
+
+  # - name: Add NetApp device defintion to multipath.conf
+  #   debug:
+  #     msg:
+  #     - "(Stub) Add device defintion for NetApp LUNs to multipath.conf"
+  #     - "{{ ansible_os_family }}"
+  #     - "Distribution = {{ ansible_facts['distribution'] }}"
+  #     - "Major version = {{ ansible_facts['distribution_major_version'] }}"
+  #     - "device { {{ device_netapp_rhel89 }} }"
+
+  # - name: Test conditional
+  #   debug:
+  #     msg:
+  #     - "(Success) Testing ansibl_facts conditional: RedHat and 8"
+  #   when: 
+  #   - ansible_facts['distribution'] == "RedHat"
+  #   - ansible_facts['distribution_major_version'] == "8" 
+
+  - name: Update multipath configuration with backup
+    ansible.builtin.template:
+      src: multipath.conf_{{ ansible_os_family }}.j2
+      dest: /etc/multipath.conf
+      owner: root
+      group: root
+      mode: '0600'
+      backup: yes
+    register: multipathconf
+
+  # - name: Block in File - Add device defintion
+  #   ansible.builtin.blockinfile:
+  #     path: /etc/multipath.conf
+  #     insertafter: 'devices'
+  #     block: "{{ device_netapp_rhel89 }}"
+  #     backup: yes
+
+  # Re the multipathd service
+  - name: Start and Enable service on boot - multipath daemon
+    ansible.builtin.service:
+      name: multipathd
+      state: restarted
+      enabled: true
+    when:
+      - multipathconf.changed
+
+
