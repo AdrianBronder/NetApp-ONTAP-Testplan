@@ -1,0 +1,18 @@
+defaults {
+        user_friendly_names no
+        find_multipaths yes
+        enable_foreign "^$"
+}
+
+blacklist_exceptions {
+        property "(SCSI_IDENT_|ID_WWN)"
+}
+
+blacklist {
+}
+
+devices {
+    
+    {{ device_netapp_rhel89 }}
+    
+}
