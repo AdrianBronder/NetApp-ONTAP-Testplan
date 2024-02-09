@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Service Overview</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('request_services') }}">Request a new share</a>
+        <h1 class="my-4">Service Overview</h1>
+        <canvas id="svmPieChart"></canvas>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Size (GiB)</th>
+                    <th>Owning Department</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for volume in volumes %}
+                    <tr>
+                        <td>{{ volume.name }}</td>
+                        <td>{{ volume.size / 1024**3}}</td>
+                        <td>{{ volume.svm.name }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+    <script>
+    var ctx = document.getElementById('svmPieChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ svm_distribution|map(attribute='0')|list|tojson }},
+            datasets: [{
+                data: {{ svm_distribution|map(attribute='1')|list|tojson }},
+                backgroundColor: {{ colors|tojson }},
+                borderColor: {{ colors|tojson }},
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Volume Distribution per SVM'
+                }
+            }
+        }
+    });
+    </script>
+
+</body>
+</html>

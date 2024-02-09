@@ -140,3 +140,13 @@ ontap_52_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
 ontap_52_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
 ontap_52_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_52_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+
+# ONTAP-81 - Advanced - CIFS Self-Service
+ontap_81_volumes:                 
+  - "ontap_81_students"
+  - "ontap_81_backoffice"
+  - "ontap_81_science"
+  - "ontap_81_board"
+  - "ontap_81_it"
+  - "ontap_81_legal"
+  - "ontap_81_alumni"
