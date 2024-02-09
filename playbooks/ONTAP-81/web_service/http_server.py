@@ -49,12 +49,13 @@ def request_services():
         
         try:
             qtree = Qtree.from_dict(qtreeobj)
-            quota = QuotaRule.from_dict(quotaobj)
             if qtree.post(poll=True) & quota.post(poll=True):
-                message = "Share %s created Successfully" % qtree.name
+                if qtree.post(poll=True) & quota.post(poll=True):
+                    message = "Share %s created Successfully" % qtree.name
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
 
+       
     return render_template('index.html', departments=departments, message=message)
 
 @app.route('/service_overview', methods=['GET'])
