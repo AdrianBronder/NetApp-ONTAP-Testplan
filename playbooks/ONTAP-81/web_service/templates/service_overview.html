@@ -25,7 +25,7 @@
                         <td>{{ quota.volume.name }}</td>
                         <td>{{ quota.qtree.name }}</td>
                         <td>{{ quota.space.hard_limit / 1024**3}}</td>
-                        <td>{{ quota.space.used.hard_limit / 1024**3 if quota.space.used.hard_limit > 0}}</td>
+                        <td>{{ quota.space.used.hard_limit / 1024**3 if quota.space.used and quota.space.used.hard_limit else 0}}</td>
                     </tr>
                 {% endfor %}
             </tbody>
