@@ -79,19 +79,26 @@ def list_services():
     print(list(quotaReport))
 
     # Initialize a dictionary to store the volume distribution per SVM
-    quota_distribution = defaultdict(int)
+    quota_distribution_count = defaultdict(int)
+    quota_distribution_space = defaultdict(int)
 
     for quota in quotaReport:
         # Add the size of each volume to the total size for its SVM
-        quota_distribution[volume.name] += volume.size
+        quota_distribution_count[quota.volume.name] += 1
+        quota_distribution_space[quota.volume.name] += quota.space.hard_limit
 
     # Convert the distribution dictionary to a list of tuples and sort it by SVM name
-    quota_distribution = sorted(quota_distribution.items())
+    quota_distribution_count = sorted(quota_distribution_count.items())
+    quota_distribution_space = sorted(quota_distribution_space.items())
 
     # Generate a list of random RGB colors
-    colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution))]
+    colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution_count))]
 
-    return render_template('service_overview.html', volumes=volumes, quota_distribution=quota_distribution, colors=colors)
+    return render_template('service_overview.html',
+                           quotaReport=quotaReport,
+                           quota_distribution_space=quota_distribution_space,
+                           quota_distribution_count=quota_distribution_count,
+                           colors=colors)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
