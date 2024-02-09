@@ -84,7 +84,7 @@ def list_services():
 
     for quota in quotaReport:
         # Add the size of each volume to the total size for its SVM
-        if quota.space.hard_limit is not None
+        if quota.space.hard_limit is not None:
             quota_distribution_count[quota.volume.name] += 1
             quota_distribution_space[quota.volume.name] += quota.space.hard_limit
 
