@@ -2,22 +2,18 @@
 <html>
 <head>
     <title>Request a new Service</title>
-    <!-- Include Bootstrap CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 </head>
 <body>
     <div class="container">
-        <!-- ... -->
         <a href="{{ url_for('list_services') }}">List services</a>
-    </div>
-    <div class="container">
         <h1 class="my-4">Form</h1>
         <form method="POST">
             <div class="form-group">
-                <label for="svmUUID">Select your department:</label>
-                <select name="svmUUID" id="svmUUID" class="form-control">
-                    {% for svm in svms %}
-                        <option value="{{ svm.uuid }}">{{ svm.name }}</option>
+                <label for="volName">Select your department:</label>
+                <select name="volName" id="volName" class="form-control">
+                    {% for department in departments %}
+                        <option value="{{ department.name }}">{{ department.name }}</option>
                     {% endfor %}
                 </select>
             </div>
@@ -31,15 +27,12 @@
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
         </form>
-
         {% if message %}
             <div class="alert alert-info mt-4">
                 {{ message }}
             </div>
         {% endif %}
     </div>
-
-    <!-- Include Bootstrap JavaScript and jQuery -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 </body>

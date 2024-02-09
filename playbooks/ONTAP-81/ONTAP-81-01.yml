@@ -40,15 +40,15 @@
         state:                         present
         name:                          "{{ item }}"
         aggregate_name:                "{{ storage_aggregates[0].name }}"
-        size:                          "{{ ontap_default_vol_size_gb }}"
+        size:                          1024
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
-        junction_path:                 "/{{ ontap_32_vol_name }}"
+        junction_path:                 "/{{ item }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "ntfs"
         <<: *input
       loop:
-        "{{ ontap_81_volumes }}""
+        "{{ ontap_81_volumes }}"  
   
   post_tasks:

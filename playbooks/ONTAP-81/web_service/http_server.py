@@ -3,22 +3,23 @@ import requests
 import random
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Volume
+from netapp_ontap.resources import Qtree
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def request_services():
-    url = 'https://cluster1.demo.netapp.com/api/svm/svms?name=!*_ad'
+    svm = "ntap-svm01-nas"
+    url = 'https://cluster1.demo.netapp.com/api/storage/volumes?svm.name='+svm+',name=ontap_81_*'
     auth = ('admin', 'Netapp1!')
     response = requests.get(url, auth=auth, verify=False)
     data = response.json()
-    svms = [{'name': svm['name'], 'uuid': svm['uuid']} for svm in data['records']]
+    departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in data['records']]
 
     message = None  # Initialize the message
 
     if request.method == 'POST':
-        selected_svm = request.form.get('svmUUID')
+        department_name = request.form.get('volName')
         share_name = request.form.get('shareName')
         share_size_gib = int(request.form.get('shareSize'))  # Get the size in GiB
 
@@ -33,30 +34,19 @@ def request_services():
             verify=False
         )
 
-        volobj = {}
-        volobj['svm'] = {'uuid': selected_svm}
-        volobj['name'] = share_name
-        volobj['size'] = share_size_bytes
-        volobj['type'] = 'rw'
-        volobj['style'] = 'flexvol'
-        volobj['aggregates'] = [{'name': 'cluster1_01_aggr01'}]
-        volobj['nas'] = {
-            "export_policy":
-            {
-                "name": "default"
-            },
-            "path": "/"+share_name,
-            "security_style": 'ntfs'
-        }
-
+        qtreeobj = {}
+        qtreeobj['svm'] = {'name': svm}
+        qtreeobj['volume'] = {'name': svm}
+        qtreeobj['name'] = share_name
+        qtreeobj['security_style'] = 'ntfs'
         try:
-            volume = Volume.from_dict(volobj)
-            if volume.post(poll=True):
-                message = "Volume %s created Successfully" % volume.name
+            qtree = Qtree.from_dict(qtreeobj)
+            if qtree.post(poll=True):
+                message = "Qtree %s created Successfully" % qtree.name
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
 
-    return render_template('index.html', svms=svms, message=message)
+    return render_template('index.html', departments=departments, message=message)
 
 @app.route('/service_overview', methods=['GET'])
 def list_services():
