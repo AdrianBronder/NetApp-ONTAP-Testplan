@@ -42,10 +42,9 @@ def request_services():
         quotaobj = {}
         quotaobj['svm'] = {'name': svm}
         quotaobj['volume'] = {'name': department_name}
-        quotaobj['qtree'] = qtreeobj['name']
+        quotaobj['qtree'] = share_name
         quotaobj['type'] = "tree"
-        quotaobj['space'] = {"hard_limit": share_size_bytes,
-                             "soft_limit": share_size_bytes * 0.8}
+        quotaobj['space'] = {"hard_limit": share_size_bytes}
         
         try:
             qtree = Qtree.from_dict(qtreeobj)
