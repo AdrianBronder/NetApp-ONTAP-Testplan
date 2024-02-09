@@ -76,20 +76,16 @@ def list_services():
         quotaReport = []
         print("Exception caught :" + str(error))
 
-    print(list(quotaReport))
-
-    # Initialize a dictionary to store the volume distribution per SVM
     quota_distribution_count = defaultdict(int)
     quota_distribution_space = defaultdict(int)
 
     for quota in quotaReport:
         print(quota)
-        # Add the size of each volume to the total size for its SVM
-        if quota.space.hard_limit is not None:
+        hard_limit = getattr(quota.space, 'hard_limit', None)
+        if hard_limit is not None:
             quota_distribution_count[quota.volume.name] += 1
             quota_distribution_space[quota.volume.name] += quota.space.hard_limit
 
-    # Convert the distribution dictionary to a list of tuples and sort it by SVM name
     quota_distribution_count = sorted(quota_distribution_count.items())
     quota_distribution_space = sorted(quota_distribution_space.items())
 
