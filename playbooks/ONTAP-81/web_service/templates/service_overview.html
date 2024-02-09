@@ -21,7 +21,7 @@
             </thead>
             <tbody>
                 {% for quota in quotaReport %}
-                {% if quota.space.used.hard_limit is not None %}
+                {% if 'hard_limit' in quota.space %}
                     <tr>
                         <td>{{ quota.volume.name }}</td>
                         <td>{{ quota.qtree.name }}</td>
