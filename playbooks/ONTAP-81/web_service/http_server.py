@@ -78,11 +78,13 @@ def list_services():
 
     quota_distribution_count = defaultdict(int)
     quota_distribution_space = defaultdict(int)
+    quotaReport_sanitized = []
 
     for quota in quotaReport:
         print(quota)
         hard_limit = getattr(quota.space, 'hard_limit', None)
         if hard_limit is not None:
+            quotaReport_sanitized.append(quota)
             quota_distribution_count[quota.volume.name] += 1
             quota_distribution_space[quota.volume.name] += quota.space.hard_limit
 
@@ -93,7 +95,7 @@ def list_services():
     colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution_count))]
 
     return render_template('service_overview.html',
-                           quotaReport=quotaReport,
+                           quotaReport=quotaReport_sanitized,
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
                            colors=colors)
