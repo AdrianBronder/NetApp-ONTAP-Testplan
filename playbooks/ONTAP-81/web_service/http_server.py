@@ -76,6 +76,8 @@ def list_services():
         quotaReport = []
         print("Exception caught :" + str(error))
 
+    print(list(quotaReport))
+
     quota_distribution_count = defaultdict(int)
     quota_distribution_space = defaultdict(int)
     quotaReport_sanitized = []
