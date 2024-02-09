@@ -76,8 +76,6 @@ def list_services():
         quotaReport = []
         print("Exception caught :" + str(error))
 
-    print(list(quotaReport))
-
     quota_distribution_count = defaultdict(int)
     quota_distribution_space = defaultdict(int)
     quotaReport_sanitized = []
@@ -91,8 +89,6 @@ def list_services():
 
     quota_distribution_count = sorted(quota_distribution_count.items())
     quota_distribution_space = sorted(quota_distribution_space.items())
-
-    print(list(quotaReport_sanitized))
 
     # Generate a list of random RGB colors
     colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution_count))]
