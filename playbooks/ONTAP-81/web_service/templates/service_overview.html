@@ -10,6 +10,7 @@
         <a href="{{ url_for('request_services') }}">Request a new share</a>
         <h1 class="my-4">Service Overview</h1>
         <canvas id="quotaSizePieChart"></canvas>
+        <canvas id="quotaCountPieChart"></canvas>
         <table class="table">
             <thead>
                 <tr>
@@ -42,6 +43,33 @@
             labels: {{ quota_distribution_space|map(attribute='0')|list|tojson }},
             datasets: [{
                 data: {{ quota_distribution_space|map(attribute='1')|list|tojson }},
+                backgroundColor: {{ colors|tojson }},
+                borderColor: {{ colors|tojson }},
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                title: {
+                    display: true,
+                    text: 'Share Distribution (Size) per Department'
+                }
+            }
+        }
+    });
+    </script>
+    <script>
+    var ctx = document.getElementById('quotaCountPieChart').getContext('2d');
+    var chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
+            datasets: [{
+                data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
                 backgroundColor: {{ colors|tojson }},
                 borderColor: {{ colors|tojson }},
                 borderWidth: 1
