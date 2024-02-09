@@ -9,8 +9,14 @@
     <div class="container">
         <a href="{{ url_for('request_services') }}">Request a new share</a>
         <h1 class="my-4">Service Overview</h1>
-        <canvas id="quotaSizePieChart"></canvas>
-        <canvas id="quotaCountPieChart"></canvas>
+        <div class="row">
+            <div class="col-md-6">
+                <canvas id="quotaSizePieChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <canvas id="quotaCountPieChart"></canvas>
+            </div>
+        </div>
         <table class="table">
             <thead>
                 <tr>
@@ -83,7 +89,7 @@
                 },
                 title: {
                     display: true,
-                    text: 'Share Distribution (Size) per Department'
+                    text: 'Share Distribution (Count) per Department'
                 }
             }
         }
