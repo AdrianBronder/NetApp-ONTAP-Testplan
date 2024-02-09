@@ -81,7 +81,6 @@ def list_services():
     quotaReport_sanitized = []
 
     for quota in quotaReport:
-        print(quota)
         hard_limit = getattr(quota.space, 'hard_limit', None)
         if hard_limit is not None:
             quotaReport_sanitized.append(quota)
@@ -90,6 +89,8 @@ def list_services():
 
     quota_distribution_count = sorted(quota_distribution_count.items())
     quota_distribution_space = sorted(quota_distribution_space.items())
+
+    print(list(quotaReport_sanitized))
 
     # Generate a list of random RGB colors
     colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution_count))]
