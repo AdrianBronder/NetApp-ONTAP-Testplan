@@ -31,6 +31,9 @@
   collections:
     - netapp.ontap
 
+  pre_tasks:
+
+  tasks:
     - name: Remove volume
       netapp.ontap.na_ontap_volume:
         state:                         absent
@@ -39,3 +42,5 @@
         <<: *input
       loop:
         "{{ ontap_81_volumes }}"
+
+  post_tasks:
