@@ -49,8 +49,9 @@ def request_services():
         
         try:
             qtree = Qtree.from_dict(qtreeobj)
-            if qtree.post(poll=True) & quota.post(poll=True):
-                if qtree.post(poll=True) & quota.post(poll=True):
+            if qtree.post(poll=True):
+                quota = QuotaRule.from_dict(quotaobj)
+                if quota.post(poll=True):
                     message = "Share %s created Successfully" % qtree.name
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
@@ -92,4 +93,4 @@ def list_services():
     return render_template('service_overview.html', volumes=volumes, svm_distribution=svm_distribution, colors=colors)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
