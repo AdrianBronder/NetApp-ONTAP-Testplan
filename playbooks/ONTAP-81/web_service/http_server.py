@@ -83,6 +83,7 @@ def list_services():
     quota_distribution_space = defaultdict(int)
 
     for quota in quotaReport:
+        print(quota)
         # Add the size of each volume to the total size for its SVM
         if quota.space.hard_limit is not None:
             quota_distribution_count[quota.volume.name] += 1
