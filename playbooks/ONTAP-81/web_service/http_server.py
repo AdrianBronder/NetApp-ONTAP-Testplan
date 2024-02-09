@@ -3,7 +3,7 @@ import requests
 import random
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Qtree,QuotaRule
+from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport
 
 app = Flask(__name__)
 
@@ -55,7 +55,6 @@ def request_services():
                     message = "Share %s created Successfully" % qtree.name
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
-
        
     return render_template('index.html', departments=departments, message=message)
 
@@ -69,20 +68,22 @@ def list_services():
     )
 
     try:
-        volumes = list(Volume.get_collection(
+        quotaReport = list(QuotaReport.get_collection(
             fields='*',
-            name='!*_root',
-            **{'svm.name': '!*_ad'}))
+            type='tree',
+            **{'svm.name': 'ntap-svm01-nas'}))
     except NetAppRestError as error:
-        volumes_list = []
+        quotaReport = []
         print("Exception caught :" + str(error))
 
-    # Initialize a dictionary to store the volume distribution per SVM
-    svm_distribution = defaultdict(int)
+    print(list(quotaReport))
 
-    for volume in volumes:
+    # Initialize a dictionary to store the volume distribution per SVM
+    quota_distribution = defaultdict(int)
+
+    for quota in quotaReport:
         # Add the size of each volume to the total size for its SVM
-        svm_distribution[volume.svm.name] += volume.size
+        quota_distribution[volume.name] += volume.size
 
     # Convert the distribution dictionary to a list of tuples and sort it by SVM name
     svm_distribution = sorted(svm_distribution.items())
