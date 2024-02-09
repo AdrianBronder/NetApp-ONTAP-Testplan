@@ -3,7 +3,7 @@ import requests
 import random
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Qtree
+from netapp_ontap.resources import Qtree,QuotaRule
 
 app = Flask(__name__)
 
@@ -39,10 +39,19 @@ def request_services():
         qtreeobj['volume'] = {'name': department_name}
         qtreeobj['name'] = share_name
         qtreeobj['security_style'] = 'ntfs'
+        quotaobj = {}
+        quotaobj['svm'] = {'name': svm}
+        quotaobj['volume'] = {'name': department_name}
+        quotaobj['qtree'] = qtreeobj['name']
+        quotaobj['type'] = "tree"
+        quotaobj['space'] = {"hard_limit": int(request.form.get('shareSize')),
+                             "soft_limit": int(request.form.get('shareSize')) * 0.8}
+        
         try:
             qtree = Qtree.from_dict(qtreeobj)
-            if qtree.post(poll=True):
-                message = "Qtree %s created Successfully" % qtree.name
+            quota = QuotaRule.from_dict(quotaobj)
+            if qtree.post(poll=True) & quota.post(poll=True):
+                message = "Share %s created Successfully" % qtree.name
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
 
