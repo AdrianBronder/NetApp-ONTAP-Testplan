@@ -10,7 +10,7 @@ app = Flask(__name__)
 @app.route('/', methods=['GET', 'POST'])
 def request_services():
     svm = "ntap-svm01-nas"
-    url = 'https://cluster1.demo.netapp.com/api/storage/volumes?svm.name='+svm+',name=ontap_81_*'
+    url = 'https://cluster1.demo.netapp.com/api/storage/volumes?svm.name='+svm+'&name=ontap_81_*'
     auth = ('admin', 'Netapp1!')
     response = requests.get(url, auth=auth, verify=False)
     data = response.json()
@@ -36,7 +36,7 @@ def request_services():
 
         qtreeobj = {}
         qtreeobj['svm'] = {'name': svm}
-        qtreeobj['volume'] = {'name': svm}
+        qtreeobj['volume'] = {'name': department_name}
         qtreeobj['name'] = share_name
         qtreeobj['security_style'] = 'ntfs'
         try:
