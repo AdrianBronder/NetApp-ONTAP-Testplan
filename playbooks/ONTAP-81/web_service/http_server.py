@@ -1,9 +1,13 @@
 import requests
 import random
+import pprint
 from flask import Flask, render_template, request, url_for
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
 from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport
+from ansible.inventory.manager import InventoryManager
+from ansible.parsing.dataloader import DataLoader
+from ansible.vars.manager import VariableManager
 
 app = Flask(__name__)
 
@@ -100,4 +104,7 @@ def list_services():
                            colors=colors)
 
 if __name__ == '__main__':
+    loader = DataLoader()
+    inventory = InventoryManager(loader=loader, sources=['../../../inveontories/labondemand_latest'])
+    pprint(inventory)
     app.run(host='0.0.0.0', port=80, debug=True)
