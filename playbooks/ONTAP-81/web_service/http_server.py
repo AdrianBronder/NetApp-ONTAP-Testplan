@@ -1,6 +1,6 @@
-from flask import Flask, render_template, request, url_for
 import requests
 import random
+from flask import Flask, render_template, request, url_for
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
 from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport
