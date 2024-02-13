@@ -60,7 +60,7 @@
         volume:                        "{{ ontap_81_volumes[0] }}"
         quota_target:                  "{{ item }}"
         type:                          "tree"
-        disk_limit:                    1073741824
+        disk_limit:                    1048576
         set_quota_status:              True
       loop:
         - "abc"
