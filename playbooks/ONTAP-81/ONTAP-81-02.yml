@@ -77,7 +77,7 @@
       netapp.ontap.na_ontap_cifs:
         state:                         present
         name:                          "{{ (ontap_81_volumes[0] | replace('ontap_81_','')) }}_{{ item }}"
-        path:                          "/{{ ontap_81_volumes[0] }}/{{ (ontap_81_volumes[0] | replace('ontap_81_','')) }}_{{ item }}"
+        path:                          "/{{ ontap_81_volumes[0] }}/{{ item }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         browsable:                     true
         oplocks:                       true
