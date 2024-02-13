@@ -36,11 +36,14 @@
     - name: Create DNS record for linux system
       community.windows.win_dns_record:
         state:                         "present"
-        name:                          "{{ groups['linux_hosts'][0] }}"
+        name:                          "{{ item }}"
         type:                          "A"
         value:                         "192.168.0.61"
         zone:                          "{{ all_default_dns_domain }}"
-  
+      loop:
+        - "{{ groups['linux_hosts'][0] }}"
+        - "self-service"
+
     - name: Create DNS records for SVM interfaces (DNS name = interace name)
       community.windows.win_dns_record:
         state:                         "present"
