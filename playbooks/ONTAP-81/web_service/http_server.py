@@ -103,7 +103,7 @@ def list_services():
                            colors=colors)
 
 if __name__ == '__main__':
-    inventory_path = os.path.join(os.path.dirname(__file__), '../../../inveontories/labondemand_latest'
+    inventory_path = os.path.join(os.path.dirname(__file__), '../../../inveontories/labondemand_latest')
     dataloader = DataLoader()
     ansible_inventory = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
     app.run(host='0.0.0.0', port=80, debug=True)
