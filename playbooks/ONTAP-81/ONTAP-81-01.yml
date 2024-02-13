@@ -48,7 +48,7 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "ntfs"
       loop:
-        "{{ ontap_81_volumes }}"  
+        "{{ ontap_81_volumes }}"
   
     - name: Set default quota rule on volumes
       netapp.ontap.na_ontap_quotas:
@@ -59,6 +59,6 @@
         type:                          tree
         set_quota_status:              True
       loop:
-        "{{ ontap_81_volumes }}"  
+        "{{ ontap_81_volumes }}"
 
   post_tasks:

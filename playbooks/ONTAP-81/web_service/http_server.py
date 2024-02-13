@@ -27,7 +27,8 @@ def request_services():
     message = None  # Initialize the message
 
     if request.method == 'POST':
-        department_name = request.form.get('volName')
+        vol_name = request.form.get('volName')
+        department_name = vol_name.replace('ontap_81_','')
         share_name = request.form.get('shareName')
         share_size_gib = int(request.form.get('shareSize'))  # Get the size in GiB
 
@@ -45,13 +46,13 @@ def request_services():
         # Define Qtree object
         qtreeobj                       = {}
         qtreeobj['svm']                = {'name': svm}
-        qtreeobj['volume']             = {'name': department_name}
+        qtreeobj['volume']             = {'name': vol_name}
         qtreeobj['name']               = share_name
         qtreeobj['security_style']     = 'ntfs'
         # Define Quota object
         quotaobj                       = {}
         quotaobj['svm']                = {'name': svm}
-        quotaobj['volume']             = {'name': department_name}
+        quotaobj['volume']             = {'name': vol_name}
         quotaobj['qtree']              = {'name': share_name}
         quotaobj['type']               = "tree"
         quotaobj['space']              = {"hard_limit": share_size_bytes,
@@ -74,7 +75,7 @@ def request_services():
                     share = CifsShare.from_dict(shareobj)
                     if share.post(poll=True):
                         message = ("Share created Successfully! Access via: \n" + 
-                                   "\\\\" + svm + "demo.netapp.com" + "\\" + share.name)
+                                   "\\\\" + svm + ".demo.netapp.com" + "\\" + share.name)
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
        
