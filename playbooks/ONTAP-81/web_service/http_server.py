@@ -11,9 +11,13 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def request_services():
-    print(ansible_inventory.groups['linux_hosts'][0])
+#    print(ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0])
     svm = "ntap-svm01-nas"
-    url = 'https://cluster1.demo.netapp.com/api/storage/volumes?svm.name='+svm+'&name=ontap_81_*'
+    url = 'https://'
+           +ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0]
+           +'.demo.netapp.com/api/storage/volumes?svm.name='
+           +svm
+           +'&name=ontap_81_*'
     auth = ('admin', 'Netapp1!')
     response = requests.get(url, auth=auth, verify=False)
     data = response.json()
@@ -103,7 +107,7 @@ def list_services():
                            colors=colors)
 
 if __name__ == '__main__':
-    inventory_path = os.path.join(os.path.dirname(__file__), '../../../inveontories/labondemand_latest')
+    inventory_path = os.path.join(os.path.dirname(__file__), '../../../inventories/labondemand_latest')
     dataloader = DataLoader()
     ansible_inventory = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
     app.run(host='0.0.0.0', port=80, debug=True)
