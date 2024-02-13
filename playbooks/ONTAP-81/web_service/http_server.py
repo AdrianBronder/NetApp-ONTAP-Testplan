@@ -72,8 +72,8 @@ def request_services():
                 if quota.post(poll=True):
                     share = CifsShare.from_dict(shareobj)
                     if share.post(poll=True):
-                        message = "Share created Successfully! Access via: \n" +
-                                  "\\\\" + svm + "demo.netapp.com" + "\\" + share.name
+                        message = ("Share created Successfully! Access via: \n" + 
+                                   "\\\\" + svm + "demo.netapp.com" + "\\" + share.name)
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
        
