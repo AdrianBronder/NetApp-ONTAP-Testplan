@@ -73,6 +73,7 @@
         - "vwx"
         - "yz"
 
+    - name: Create CIFS share
       netapp.ontap.na_ontap_cifs:
         state:                         present
         name:                          "{{ (ontap_81_volumes[0] | replace('ontap_81_','')) }}_{{ item }}"
