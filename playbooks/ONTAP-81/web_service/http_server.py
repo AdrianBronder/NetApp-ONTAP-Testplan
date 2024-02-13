@@ -5,6 +5,7 @@ from netapp_ontap import config, HostConnection, NetAppRestError
 from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
+from ansible.parsing.vault import VaultSecret
 from ansible.vars.manager import VariableManager
 
 app = Flask(__name__)
@@ -107,12 +108,25 @@ def list_services():
                            colors=colors)
 
 if __name__ == '__main__':
-    inventory_path = os.path.join(os.path.dirname(__file__), '../../../inventories/labondemand_latest')
+    # Set Paths
+    project_root_path = os.path.join(os.path.dirname(__file__), '../../..')
+    project_root_path = os.path.normpath(project_root_path)
+    inventory_path = project_root_path+'/inventories/labondemand_latest'
+
+    # Import Ansible inventory information
     dataloader = DataLoader()
-    dataloader.set_vault_secrets([('default', ansible.parsing.vault.PrompVaultSecret('Netapp1!'),)])
+    dataloader.set_vault_secrets([('default', VaultSecret(_bytes=ansible.module_utils.common.text.converters.to_bytes('Netapp1!')))])
+
+    # Load inventory vars
     ansible_inventory = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
     ansible_inventory_vars = VariableManager(loader=dataloader, inventory=ansible_inventory)
+    cluster1_vars = ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='ontap')[0], include_hostvars=True)
 
-    print(ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0]))
+    # Load group vars for ONTAP
+    ontap_group_data = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vars.yml')
+    ontap_group_data_vault = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vault.yml')
+    replace_vars(ontap_group_data, ontap_group_data_vault)
+
+    print(ontap_group_data)
 
     app.run(host='0.0.0.0', port=80, debug=True)
