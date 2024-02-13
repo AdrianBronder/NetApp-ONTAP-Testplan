@@ -107,6 +107,21 @@ def list_services():
                            quota_distribution_count=quota_distribution_count,
                            colors=colors)
 
+
+def replace_vars(data, vault_data):
+    for key, value in data.items():
+        if isinstance(value, str) and value.startswith('{{') and value.endswith('}}'):
+            vault_key = value[2:-2].strip()  # Remove '{{' and '}}' and strip whitespace
+            if vault_key in vault_data:
+                data[key] = vault_data[vault_key]
+        elif isinstance(value, dict):
+            replace_vars(value, vault_data)
+        elif isinstance(value, list):
+            for item in value:
+                if isinstance(item, dict):
+                    replace_vars(item, vault_data)
+
+
 if __name__ == '__main__':
     # Set Paths
     project_root_path = os.path.join(os.path.dirname(__file__), '../../..')
