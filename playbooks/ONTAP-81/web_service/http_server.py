@@ -106,5 +106,5 @@ def list_services():
 if __name__ == '__main__':
     dl = DataLoader()
     im = InventoryManager(loader=dl, sources=['../../../inveontories/labondemand_latest'])
-    pprint(inventory)
+    pprint(im)
     app.run(host='0.0.0.0', port=80, debug=True)
