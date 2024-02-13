@@ -2,18 +2,16 @@ import requests, random, os, ansible
 from flask import Flask, render_template, request, url_for
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare, CifsShareAcl
+from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
-from ansible.parsing.vault import VaultSecret
+from ansible.parsing.vault import VaultLib, VaultSecret
 from ansible.vars.manager import VariableManager
 
 app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def request_services():
-    cluster = str(ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0])
-    svm = "ntap-svm01-nas"
     url = ('https://' +
           cluster +
           '.demo.netapp.com/api/storage/volumes?svm.name=' +
@@ -139,22 +137,29 @@ def replace_vars(data, vault_data):
 
 if __name__ == '__main__':
     # Set Paths
-    project_root_path = os.path.join(os.path.dirname(__file__), '../../..')
-    project_root_path = os.path.normpath(project_root_path)
-    inventory_path = project_root_path+'/inventories/labondemand_latest'
+    project_root_path                  = os.path.join(os.path.dirname(__file__), '../../..')
+    project_root_path                  = os.path.normpath(project_root_path)
+    inventory_path                     = project_root_path+'/inventories/labondemand_latest'
 
     # Import Ansible inventory information
-    dataloader = DataLoader()
-    dataloader.set_vault_secrets([('default', VaultSecret(_bytes=ansible.module_utils.common.text.converters.to_bytes('Netapp1!')))])
+    with open(project_root_path+'/init/init_helper/vaultfile.txt', 'rb') as vault_password_file:
+        vault_password = vault_password_file.read().strip()
+    secret                             = VaultSecret(_bytes=vault_password)
+    dataloader                         = DataLoader()
+    dataloader.set_vault_secrets([('default', VaultLib([(None, secret)]))])
 
     # Load inventory vars
-    ansible_inventory = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
-    ansible_inventory_vars = VariableManager(loader=dataloader, inventory=ansible_inventory)
-    cluster1_vars = ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='ontap')[0], include_hostvars=True)
+    ansible_inventory                  = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
+    ansible_inventory_vars             = VariableManager(loader=dataloader, inventory=ansible_inventory)
+    cluster1_vars                      = ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='ontap')[0], include_hostvars=True)
 
     # Load group vars for ONTAP
-    ontap_group_data = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vars.yml')
-    ontap_group_data_vault = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vault.yml')
+    ontap_group_data                   = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vars.yml')
+    ontap_group_data_vault             = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vault.yml')
     replace_vars(ontap_group_data, ontap_group_data_vault)
+
+    # Set global standard variables
+    cluster                            = str(ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0])
+    svm                                = "ntap-svm01-nas"
 
     app.run(host='0.0.0.0', port=80, debug=True)
