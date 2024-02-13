@@ -17,7 +17,7 @@ def request_services():
           ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0] + \
           '.demo.netapp.com/api/storage/volumes?svm.name=' + \
           svm + \
-          '&name=ontap_81_*')
+          '&name=ontap_81_*'
     auth = ('admin', 'Netapp1!')
     response = requests.get(url, auth=auth, verify=False)
     data = response.json()
