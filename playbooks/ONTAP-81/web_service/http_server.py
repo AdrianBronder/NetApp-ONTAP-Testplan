@@ -109,9 +109,10 @@ def list_services():
 if __name__ == '__main__':
     inventory_path = os.path.join(os.path.dirname(__file__), '../../../inventories/labondemand_latest')
     dataloader = DataLoader()
+    dataloader.set_vault_secrets([('default', ansible.parsing.vault.PrompVaultSecret('Netapp1!'),)])
     ansible_inventory = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
     ansible_inventory_vars = VariableManager(loader=dataloader, inventory=ansible_inventory)
 
-    pirnt(ansible_inventory_vars.get_vasr(host='cluster1'))
+    print(ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0]))
 
     app.run(host='0.0.0.0', port=80, debug=True)
