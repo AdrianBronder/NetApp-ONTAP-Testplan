@@ -1,6 +1,4 @@
-import requests
-import random
-import pprint
+import requests, random, pprint, os
 from flask import Flask, render_template, request, url_for
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
@@ -105,6 +103,7 @@ def list_services():
 
 if __name__ == '__main__':
     dl = DataLoader()
+    print(os.getcwd())
     im = InventoryManager(loader=dl, sources=['../../../inveontories/labondemand_latest'])
     pprint(im)
     app.run(host='0.0.0.0', port=80, debug=True)
