@@ -1,4 +1,4 @@
-import requests, random, pprint, os
+import requests, random, os
 from flask import Flask, render_template, request, url_for
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
@@ -11,6 +11,7 @@ app = Flask(__name__)
 
 @app.route('/', methods=['GET', 'POST'])
 def request_services():
+    print(ansible_inventory.groups['linux_hosts'][0])
     svm = "ntap-svm01-nas"
     url = 'https://cluster1.demo.netapp.com/api/storage/volumes?svm.name='+svm+'&name=ontap_81_*'
     auth = ('admin', 'Netapp1!')
@@ -102,9 +103,7 @@ def list_services():
                            colors=colors)
 
 if __name__ == '__main__':
-    pp = pprint.PrettyPrinter(indent=2).pprint
-    dl = DataLoader()
-    print(os.getcwd())
-    im = InventoryManager(loader=dl, sources=['../../../inveontories/labondemand_latest'])
-    pp(im.groups)
+    inventory_path = os.path.join(os.path.dirname(__file__), '../../../inveontories/labondemand_latest'
+    dataloader = DataLoader()
+    ansible_inventory = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
     app.run(host='0.0.0.0', port=80, debug=True)
