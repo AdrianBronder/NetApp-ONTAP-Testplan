@@ -55,7 +55,7 @@
       register: cifs_share_info
   
     - name: Delete all CIFS shares
-      netapp.ontap.na_ontap_cifs_server:
+      netapp.ontap.na_ontap_cifs
         state:                    absent
         name:                     "{{ item.name }}"                  
         vserver:                  "{{ item.svm.name }}"
