@@ -30,16 +30,48 @@
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
 
   pre_tasks:
 
   tasks:
-    - name: Remove volume
+    - name: Get all CIFS shares for test frame 81
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/cifs/shares"
+        fields:
+          - "*"
+        parameters:
+          svm.name:               "{{ global_primary_nas_svm }}"
+          path:                   "/ontap_81_*"
+        use_python_keys:          true
+      register: cifs_share_info
+  
+    - name: Delete all CIFS shares
+      netapp.ontap.na_ontap_cifs_server:
+        state:                    absent
+        name:                     "{{ item.name }}"                  
+        vserver:                  "{{ item.svm.name }}"
+      loop:
+        "{{ cifs_share_info.ontap_info.protocols_cifs_shares.records }}"
+      loop_control:
+        label: "{{ item.svm.name }} - {{ item.name }}"
+      when:
+      - cifs_share_info.ontap_info.protocols_cifs_shares.num_records|int > 0
+      - item.name is defined
+
+    - name: Remove volumes
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ item }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         "{{ ontap_81_volumes }}"
 
