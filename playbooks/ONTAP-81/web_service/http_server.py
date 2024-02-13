@@ -144,7 +144,7 @@ if __name__ == '__main__':
     # Import Ansible inventory information
     with open(project_root_path+'/init/init_helper/vaultfile.txt', 'rb') as vault_password_file:
         vault_password = vault_password_file.read().strip()
-    secret                             = VaultSecret(_bytes=vault_password)
+    secret                             = VaultSecret(vault_password)
     vault                              = VaultLib([(None, secret)])
     dataloader                         = DataLoader()
     dataloader.set_vault_secrets([('default', vault)])
