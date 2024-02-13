@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-81-01 - Volumes"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -47,8 +47,18 @@
         junction_path:                 "/{{ item }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "ntfs"
-        <<: *input
       loop:
         "{{ ontap_81_volumes }}"  
   
+    - name: Set default quota rule on volumes
+      netapp.ontap.na_ontap_quotas:
+        state:                         present
+        vserver:                       "{{ global_primary_nas_svm }}"
+        volume:                        "{{ item }}"
+        quota_target:                  ""
+        type:                          tree
+        set_quota_status:              True
+      loop:
+        "{{ ontap_81_volumes }}"  
+
   post_tasks:
