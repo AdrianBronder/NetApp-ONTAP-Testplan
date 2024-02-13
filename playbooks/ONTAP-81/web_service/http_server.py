@@ -19,7 +19,7 @@ def request_services():
           '.demo.netapp.com/api/storage/volumes?svm.name=' +
           svm +
           '&name=ontap_81_*')
-    auth = ('admin', 'Netapp1!')
+    auth = (ontap_group_data['ontap_admin_user'], ontap_group_data['ontap_admin_password'])
     response = requests.get(url, auth=auth, verify=False)
     data = response.json()
     departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in data['records']]
@@ -70,8 +70,8 @@ def request_services():
 def list_services():
     config.CONNECTION = HostConnection(
         'cluster1.demo.netapp.com',
-        username='admin',
-        password='Netapp1!',
+        username=ontap_group_data['ontap_admin_user'],
+        password=ontap_group_data['ontap_admin_password'],
         verify=False
     )
 
