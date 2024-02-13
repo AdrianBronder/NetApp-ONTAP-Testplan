@@ -104,7 +104,7 @@ def list_services():
                            colors=colors)
 
 if __name__ == '__main__':
-    loader = DataLoader()
-    inventory = InventoryManager(loader=loader, sources=['../../../inveontories/labondemand_latest'])
+    dl = DataLoader()
+    im = InventoryManager(loader=dl, sources=['../../../inveontories/labondemand_latest'])
     pprint(inventory)
     app.run(host='0.0.0.0', port=80, debug=True)
