@@ -2,7 +2,7 @@ import requests, random, os, ansible
 from flask import Flask, render_template, request, url_for
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport
+from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare, CifsShareAcl
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultSecret
@@ -42,25 +42,38 @@ def request_services():
             verify=False
         )
 
-        qtreeobj = {}
-        qtreeobj['svm'] = {'name': svm}
-        qtreeobj['volume'] = {'name': department_name}
-        qtreeobj['name'] = share_name
-        qtreeobj['security_style'] = 'ntfs'
-        quotaobj = {}
-        quotaobj['svm'] = {'name': svm}
-        quotaobj['volume'] = {'name': department_name}
-        quotaobj['qtree'] = {'name': share_name}
-        quotaobj['type'] = "tree"
-        quotaobj['space'] = {"hard_limit": share_size_bytes,
-                             "soft_limit": share_size_bytes * 4 // 5}
-        
+        # Define Qtree object
+        qtreeobj                       = {}
+        qtreeobj['svm']                = {'name': svm}
+        qtreeobj['volume']             = {'name': department_name}
+        qtreeobj['name']               = share_name
+        qtreeobj['security_style']     = 'ntfs'
+        # Define Quota object
+        quotaobj                       = {}
+        quotaobj['svm']                = {'name': svm}
+        quotaobj['volume']             = {'name': department_name}
+        quotaobj['qtree']              = {'name': share_name}
+        quotaobj['type']               = "tree"
+        quotaobj['space']              = {"hard_limit": share_size_bytes,
+                                          "soft_limit": share_size_bytes * 4 // 5}
+        # Define Share object
+        shareobj                       = {}
+        shareobj['name']               = share_name
+        shareobj['path']               = '/'+department_name+'/'+share_name
+        shareobj['show_snapshot']      = True
+        shareobj['change_notify']      = True
+        shareobj['oplocks']            = True
+        shareobj['unix_symlink']       = "local"
+
         try:
             qtree = Qtree.from_dict(qtreeobj)
             if qtree.post(poll=True):
                 quota = QuotaRule.from_dict(quotaobj)
                 if quota.post(poll=True):
-                    message = "Share %s created Successfully" % qtree.name
+                    share = CifsShare.from_dict(shareobj)
+                    if share.post(poll=True):
+                        message = "Share created Successfully! Access via: \n" +
+                                  "\\\\" + svm + "demo.netapp.com" + "\\" + share.name
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
        
@@ -141,7 +154,5 @@ if __name__ == '__main__':
     ontap_group_data = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vars.yml')
     ontap_group_data_vault = dataloader.load_from_file(inventory_path+'/group_vars/ontap/vault.yml')
     replace_vars(ontap_group_data, ontap_group_data_vault)
-
-    print(ontap_group_data)
 
     app.run(host='0.0.0.0', port=80, debug=True)
