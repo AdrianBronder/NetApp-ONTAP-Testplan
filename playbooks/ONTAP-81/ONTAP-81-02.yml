@@ -59,7 +59,7 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         volume:                        "{{ ontap_81_volumes[0] }}"
         quota_target:                  "{{ item }}"
-        type:                          "qtree"
+        type:                          "tree"
         disk_limit:                    1073741824
         set_quota_status:              True
       loop:
