@@ -102,8 +102,9 @@ def list_services():
                            colors=colors)
 
 if __name__ == '__main__':
+    pp = pprint.PrettyPrinter(indent=2).pprint
     dl = DataLoader()
     print(os.getcwd())
     im = InventoryManager(loader=dl, sources=['../../../inveontories/labondemand_latest'])
-    pprint(im)
+    pp(im.groups)
     app.run(host='0.0.0.0', port=80, debug=True)
