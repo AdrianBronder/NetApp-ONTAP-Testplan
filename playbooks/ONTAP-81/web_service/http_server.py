@@ -61,7 +61,7 @@ def request_services():
         shareobj                       = {}
         shareobj['svm']                = {'name': svm}
         shareobj['name']               = department_name + '_' + share_name
-        shareobj['path']               = '/'+department_name+'/'+share_name
+        shareobj['path']               = '/'+ vol_name +'/'+share_name
         shareobj['show_snapshot']      = True
         shareobj['change_notify']      = True
         shareobj['oplocks']            = True
