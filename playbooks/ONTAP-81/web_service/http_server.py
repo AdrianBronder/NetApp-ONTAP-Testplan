@@ -58,6 +58,7 @@ def request_services():
                                           "soft_limit": share_size_bytes * 4 // 5}
         # Define Share object
         shareobj                       = {}
+        shareobj['svm']                = {'name': svm}
         shareobj['name']               = department_name + '_' + share_name
         shareobj['path']               = '/'+department_name+'/'+share_name
         shareobj['show_snapshot']      = True
