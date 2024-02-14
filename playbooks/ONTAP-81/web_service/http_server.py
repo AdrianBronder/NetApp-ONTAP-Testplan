@@ -106,7 +106,7 @@ def list_services():
         if hard_limit is not None:
             quotaReport_sanitized.append(quota)
             quota_distribution_count[quota.volume.name.replace('ontap_81_','')] += 1
-            quota_distribution_space[quota.volume.name.replace('ontap_81_','')] += quota.space.hard_limit
+            quota_distribution_space[quota.volume.name.replace('ontap_81_','')] += quota.space.hard_limit / 1024**3
 
     quota_distribution_count = sorted(quota_distribution_count.items())
     quota_distribution_space = sorted(quota_distribution_space.items())
