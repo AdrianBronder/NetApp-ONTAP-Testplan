@@ -10,6 +10,7 @@ from ansible.vars.manager import VariableManager
 
 app = Flask(__name__)
 
+# Request page
 @app.route('/', methods=['GET', 'POST'])
 def request_services():
     url = ('https://' +
@@ -22,18 +23,19 @@ def request_services():
     data = response.json()
     departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in data['records']]
 
-    message = None  # Initialize the message
+    message = None
 
     if request.method == 'POST':
+        # Get forms data
         vol_name = request.form.get('volName')
-        department_name = vol_name.replace('ontap_81_','')
         share_name = request.form.get('shareName')
-        share_size_gib = int(request.form.get('shareSize'))  # Get the size in GiB
+        share_size_gib = int(request.form.get('shareSize'))
 
-        # Convert the size to bytes
+        # Convert data
         share_size_bytes = share_size_gib * 1024**3
+        department_name = vol_name.replace('ontap_81_','')
 
-        # Make the API call
+        # Establish connection to storage cluster
         config.CONNECTION = HostConnection(
             cluster+'.demo.netapp.com',
             username=ontap_group_data['ontap_admin_user'],
@@ -65,6 +67,7 @@ def request_services():
         shareobj['oplocks']            = True
         shareobj['unix_symlink']       = "local"
 
+        # Execute the API calls
         try:
             qtree = Qtree.from_dict(qtreeobj)
             if qtree.post(poll=True):
@@ -79,8 +82,10 @@ def request_services():
        
     return render_template('index.html', departments=departments, message=message)
 
+# Service overview page
 @app.route('/service_overview', methods=['GET'])
 def list_services():
+    # Establish connection to storage cluster
     config.CONNECTION = HostConnection(
         'cluster1.demo.netapp.com',
         username=ontap_group_data['ontap_admin_user'],
@@ -88,6 +93,7 @@ def list_services():
         verify=False
     )
 
+    # Get quota information
     try:
         quotaReport = list(QuotaReport.get_collection(
             fields='*',
@@ -97,30 +103,32 @@ def list_services():
         quotaReport = []
         print("Exception caught :" + str(error))
 
+    # Initialize lists and dictionaries
     quota_distribution_count = defaultdict(int)
     quota_distribution_space = defaultdict(int)
     quotaReport_sanitized = []
 
+    # Filter on qtrees only with quota set
     for quota in quotaReport:
         hard_limit = getattr(quota.space, 'hard_limit', None)
         if hard_limit is not None:
             quotaReport_sanitized.append(quota)
             quota_distribution_count[quota.volume.name.replace('ontap_81_','')] += 1
             quota_distribution_space[quota.volume.name.replace('ontap_81_','')] += quota.space.hard_limit / 1024**3
-
     quota_distribution_count = sorted(quota_distribution_count.items())
     quota_distribution_space = sorted(quota_distribution_space.items())
 
     # Generate a list of random RGB colors
     colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution_count))]
 
+    # Build page with quota data
     return render_template('service_overview.html',
                            quotaReport=quotaReport_sanitized,
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
                            colors=colors)
 
-
+# helper to merge decrypted vars with other vars
 def replace_vars(data, vault_data):
     for key, value in data.items():
         if isinstance(value, str) and value.startswith('{{') and value.endswith('}}'):
