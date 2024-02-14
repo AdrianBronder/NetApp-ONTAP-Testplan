@@ -13,6 +13,7 @@ app = Flask(__name__)
 # Request page
 @app.route('/', methods=['GET', 'POST'])
 def request_services():
+    # Fetch departments for drop down selection
     url = ('https://' +
           cluster +
           '.demo.netapp.com/api/storage/volumes?svm.name=' +
@@ -25,6 +26,7 @@ def request_services():
 
     message = None
 
+    # Process a request
     if request.method == 'POST':
         # Get forms data
         vol_name = request.form.get('volName')
@@ -75,7 +77,7 @@ def request_services():
                 if quota.post(poll=True):
                     share = CifsShare.from_dict(shareobj)
                     if share.post(poll=True):
-                        message = ("Share created Successfully! Access via: \n" + 
+                        message = ("Share created Successfully! Access via: \r\n" + 
                                    "\\\\" + svm + ".demo.netapp.com" + "\\" + share.name)
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
