@@ -35,9 +35,9 @@ def request_services():
 
         # Make the API call
         config.CONNECTION = HostConnection(
-            'cluster1.demo.netapp.com',
-            username='admin',
-            password='Netapp1!',
+            cluster+'.demo.netapp.com',
+            username=ontap_group_data['ontap_admin_user'],
+            password=ontap_group_data['ontap_admin_password'],
             verify=False
         )
 
