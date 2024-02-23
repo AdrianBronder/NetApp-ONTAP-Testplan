@@ -18,6 +18,8 @@
 | 12-05 | Cluster User Management	        | Administrative Domain Group           |
 | 12-06 | Cluster User Management	        | Domain User Access                    |
 | 12-10 | Cluster User Management	        | Admin Multifactor Authentication      |
+| 15-01 | Cluster Peering                   | Peering Network                       |
+| 15-02 | Cluster Peering                   | Peering                               |
 | 20-01 | Basic Data SVM Setup	            | Storage Virtual Machines (SVMs)       |
 | 20-02 | Basic Data SVM Setup	            | SVM network interfaces (LIFs)         |
 | 20-03 | Basic Data SVM Setup	            | SVM Network Services                  |
