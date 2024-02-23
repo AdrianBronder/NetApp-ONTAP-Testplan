@@ -15,11 +15,11 @@ They can be used out of the box in Lab on Demand or - by adjusting variables - i
 > Please consider the content of this repository for lab testing and demo purposes only!
 
 # Quick Start with Lab on Demand
-For NetApp internal and partner use - ready to go in less than 15 minutes
+For NetApp internal, partner, and customer use - ready to go in less than 15 minutes
 1. Please use one the early adopter virtual hands-on lab (log in with your NetApp support account):
    - https://labondemand.netapp.com/lab/eapontap9131 (ONTAP 9.13.1)
    - https://labondemand.netapp.com/lab/eapontap9141 (ONTAP 9.14.1)
-2. Log into the Linux host ("centos1.demo.netapp.com") and clone this repository:
+2. Log into the Linux host (e.g. "centos1" or "RHEL1") and clone this repository:
    ```
    yum install -y git
    git clone https://github.com/AdrianBronder/NetApp-ONTAP-Testplan.git
