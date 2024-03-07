@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import requests, random, os, ansible
 from flask import Flask, render_template, request, url_for
 from collections import defaultdict
