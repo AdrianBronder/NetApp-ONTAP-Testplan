@@ -39,7 +39,7 @@ yum -y update
 echo ""
 echo ""
 echo "--> Installing additional packages"
-yum install -y wget gcc libffi-devel epel-release zlib-devel python3-devel jq libxml2 git krb5-devel krb5-workstation sshpass ncurses-devel nvme-cli --skip-broken
+yum install -y wget gcc libffi-devel epel-release zlib-devel python3-devel jq libxml2 git krb5-devel krb5-workstation sshpass ncurses-devel nvme-cli java-21-openjdk --skip-broken
 yum erase -y openssl
 
 echo ""
@@ -99,7 +99,7 @@ python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 echo ""
 echo ""
 echo "--> Installing Asnible"
-python3 -m pip install ansible-core==$ANSIBLEVERS
+python3 -m pip install ansible-core==$ANSIBLEVERS ansible-rulebook
 
 echo ""
 echo ""

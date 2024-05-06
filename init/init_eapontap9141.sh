@@ -39,7 +39,7 @@ dnf -y update
 echo ""
 echo ""
 echo "--> Installing additional packages"
-dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11-kerberos krb5-workstation krb5-devel python3.11-pip python3.11-devel nfs-utils --skip-broken
+dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11-kerberos krb5-workstation krb5-devel python3.11-pip python3.11-devel nfs-utils java-21-openjdk --skip-broken
 
 echo ""
 echo ""
@@ -62,7 +62,7 @@ python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 echo ""
 echo ""
 echo "--> Installing Asnible"
-python3 -m pip install ansible-core==$ANSIBLEVERS
+python3 -m pip install ansible-core==$ANSIBLEVERS ansible-rulebook
 
 echo ""
 echo ""

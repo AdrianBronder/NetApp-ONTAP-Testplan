@@ -48,7 +48,7 @@ For NetApp internal, partner, and customer use - ready to go in less than 15 min
 
 # Further Execution Examples
 (keep in mind: based on ONTAP (lab) version: ./inventories/labondemand_< ontapversion >)
-- Execute a single test step (e.g. ONTAP-02-02 - Physical Network):
+- Execute a single test step (e.g. ONTAP-10-02 - Physical Network):
   ```
   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-02.yml
 
@@ -126,6 +126,7 @@ The playbooks can be executed in any other non-production environments for demos
 # Changelog
 ## v1.2
 - Adding ONTAP-xx - ???
+- Adding Ansible Drive Ansible
 - Adding support for ONTAP 9.14.1 lab
 - General Clean-up (comments, format...)
 
