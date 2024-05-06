@@ -91,6 +91,11 @@ modprobe nvme_tcp
 
 echo ""
 echo ""
+echo "--> Copying default ansible config"
+cp $SCRIPTPATH/ansible.cfg ~/ansible.cfg
+
+echo ""
+echo ""
 echo "--> Creating Users and groups in AD (dc1)"
 ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9141 $SCRIPTPATH/init_helper/init_ad.yml
 
