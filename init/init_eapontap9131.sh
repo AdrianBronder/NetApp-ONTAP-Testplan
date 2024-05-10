@@ -87,6 +87,13 @@ update-alternatives --set python3 /usr/local/bin/python3.9
 
 echo ""
 echo ""
+echo "--> Setting alternative JAVA to 21 as default"
+update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-2.el8.x86_64/jre/bin/java 1
+update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java 2
+update-alternatives --set java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java
+
+echo ""
+echo ""
 echo "--> Upgrading pip"
 python3 -m pip install --upgrade pip
 
