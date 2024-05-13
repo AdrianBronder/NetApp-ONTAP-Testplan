@@ -96,7 +96,7 @@ cd $SCRIPTPATH
 
 echo ""
 echo ""
-echo "--> Setting alternative JAVA to 21 as default"
+echo "--> Setting alternative JAVA to 18 as default"
 alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-1.el7_9.x86_64/jre/bin/java 1
 alternatives --install /usr/bin/java java /opt/jdk-18.0.1.1/bin/java 2
 update-alternatives --set java /opt/jdk-18.0.1.1/bin/java
