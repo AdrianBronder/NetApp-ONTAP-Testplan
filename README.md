@@ -125,7 +125,7 @@ The playbooks can be executed in any other non-production environments for demos
 
 # Changelog
 ## v1.2
-- Adding ONTAP-xx - ???
+- Adding ONTAP-11-04  Event Config
 - Adding Ansible Drive Ansible
 - Adding support for ONTAP 9.14.1 lab
 - General Clean-up (comments, format...)

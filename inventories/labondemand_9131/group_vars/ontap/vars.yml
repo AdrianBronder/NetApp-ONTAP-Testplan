@@ -31,6 +31,15 @@ network_ethernet_broadcast_domains:
       name:                       "ip_peering"
     mtu:                          9000
 
+support:
+  ems:
+    destinations:
+      - name:                     "restapi-ems"
+        type:                     "rest_api"
+        filters:                  
+          - "no-info-debug-events"
+        destination:              "http://192.168.0.61:5000/ontap_webhook"
+
 security_key_managers:
   onboard:
     passphrase:                   "{{ vault_security_key_managers.onboard.passphrase }}"
