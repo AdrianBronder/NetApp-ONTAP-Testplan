@@ -44,15 +44,15 @@ dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11
 echo ""
 echo ""
 echo "--> Setting alternative Python to 3.11 as default"
-update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
-update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 1
+alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
 update-alternatives --set python3 /usr/bin/python3.11
 
 echo ""
 echo ""
 echo "--> Setting alternative JAVA to 21 as default"
-update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-2.el8.x86_64/jre/bin/java 1
-update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java 2
+alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-2.el8.x86_64/jre/bin/java 1
+alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java 2
 update-alternatives --set java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java
 
 echo ""

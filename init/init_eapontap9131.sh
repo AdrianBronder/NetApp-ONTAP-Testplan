@@ -39,7 +39,7 @@ yum -y update
 echo ""
 echo ""
 echo "--> Installing additional packages"
-yum install -y wget gcc libffi-devel epel-release zlib-devel python3-devel jq libxml2 git krb5-devel krb5-workstation sshpass ncurses-devel nvme-cli java-21-openjdk --skip-broken
+yum install -y wget gcc libffi-devel epel-release zlib-devel python3-devel jq libxml2 git krb5-devel krb5-workstation sshpass ncurses-devel nvme-cli --skip-broken
 yum erase -y openssl
 
 echo ""
@@ -81,16 +81,25 @@ cd $SCRIPTPATH
 echo ""
 echo ""
 echo "--> Setting alternative Python to 3.9 as default"
-update-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
-update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
+alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
+alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
 update-alternatives --set python3 /usr/local/bin/python3.9
 
 echo ""
 echo ""
+echo "--> Install Open JDK 18"
+mkdir $DOWNLOADPATH
+wget -P $DOWNLOADPATH https://download.java.net/java/GA/jdk18.0.1.1/65ae32619e2f40f3a9af3af1851d6e19/2/GPL/openjdk-18.0.1.1_linux-x64_bin.tar.gz
+tar xfo $DOWNLOADPATH/openjdk-18.0.1.1_linux-x64_bin.tar.gz -C $DOWNLOADPATH
+mv $DOWNLOADPATH/jdk-18.0.1.1 /opt/
+cd $SCRIPTPATH
+
+echo ""
+echo ""
 echo "--> Setting alternative JAVA to 21 as default"
-update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-2.el8.x86_64/jre/bin/java 1
-update-alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java 2
-update-alternatives --set java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java
+alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-1.el7_9.x86_64/jre/bin/java 1
+alternatives --install /usr/bin/java java /opt/jdk-18.0.1.1/bin/java 2
+update-alternatives --set java /opt/jdk-18.0.1.1/bin/java
 
 echo ""
 echo ""
