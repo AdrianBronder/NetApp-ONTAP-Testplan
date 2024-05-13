@@ -478,6 +478,17 @@
           name:                   "Etc/UTC"
         <<: *input
   
+    - name: Remove event configuration
+      netapp.ontap.na_ontap_ems_destination:
+        state:                         "absent"
+        name:                          "{{ item.name }}"
+        type:                          "{{ item.type }}"
+        filters:                       "{{ item.filters }}"
+        destination:                   "{{ item.destination }}"
+        <<: *input
+      loop:
+        "{{ support.ems.destinations }}"
+
     - name: Remove onboard key manager configuration
       netapp.ontap.na_ontap_security_key_manager:
         state:                    absent
