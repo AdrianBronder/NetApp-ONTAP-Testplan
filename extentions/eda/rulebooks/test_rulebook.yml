@@ -18,4 +18,4 @@
 
       action:
         run_playbook:
-          name: NetApp-ONTAP-TestPlan/playbooks/ONTAP-01/ONTAP-01-04.yml
+          name: playbooks/ONTAP-01/ONTAP-01-04.yml
