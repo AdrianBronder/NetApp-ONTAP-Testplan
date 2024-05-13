@@ -9,48 +9,69 @@
 
 # Introduction
 This repository contains Ansible artifacts (inventories, vars, playbooks...) for executing tests and demos against ONTAP automatically.
-They can be used out of the box in Lab on Demand or - by adjusting varaibles - in any other environment.
+They can be used out of the box in Lab on Demand or - by adjusting variables - in any other environment.
 
+> [!CAUTION]
+> Please consider the content of this repository for lab testing and demo purposes only!
 
 # Quick Start with Lab on Demand
-For NetApp internal and partner use - ready to go in less than 15 minutes
-1. Please use the virtual hands-on lab (log in with your NetApp support account):
-   - https://labondemand.netapp.com/node/497
-2. Log into the Linux host ("centos1.demo.netapp.com") and clone this repository:
+For NetApp internal, partner, and customer use - ready to go in less than 15 minutes
+1. Please use one the early adopter virtual hands-on lab (log in with your NetApp support account):
+   - https://labondemand.netapp.com/lab/eapontap9131 (ONTAP 9.13.1)
+   - https://labondemand.netapp.com/lab/eapontap9141 (ONTAP 9.14.1)
+2. Log into the Linux host (e.g. "centos1" or "RHEL1") and clone this repository:
    ```
+   yum install -y git
    git clone https://github.com/AdrianBronder/NetApp-ONTAP-Testplan.git
+
+   
    ```
 3. Initialize the environment by running the lab init script:
+   Caution: The script might end with a reboot of the Linux system. Simply reconnect to execute further steps.
    ```
    cd ./NetApp-ONTAP-Testplan
-   ./init/init_LD00821.sh
+   # based on ONTAP (lab) version: ./init/init_eapontap<ontapversion>.sh
+   # e.g.
+   ./init/init_eapontap9141.sh
+
+   
    ```
 4. Execute test steps, e.g. general connection test playbook "ONTAP-01-04.yml"
    ```
-   ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-01/ONTAP-01-04.yml
+   # based on ONTAP (lab) version: ./inventories/labondemand_<ontapversion>
+   # e.g.
+   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-01/ONTAP-01-04.yml
+
+   
    ```
 
 
 # Further Execution Examples
-- Execute a single test step (e.g. ONTAP-02-02 - Physical Network):
+(keep in mind: based on ONTAP (lab) version: ./inventories/labondemand_< ontapversion >)
+- Execute a single test step (e.g. ONTAP-10-02 - Physical Network):
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-02.yml
+  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-02.yml
+
   ```
 - Execute an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-10/ONTAP-10-*.yml
+  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-*.yml
+
   ```
 - Revert configuration changed and objects created during a test frame:
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-31/ONTAP-revert-31.yml
+  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-31/ONTAP-revert-31.yml
+
   ```
 - Execute ALL tests with a single command (and track the execution time)
   ```
-  time ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
+  time ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
+
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
-  ansible-playbook -i ./inventories/labondemand ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
+  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
+
   ```
 
 
@@ -103,6 +124,11 @@ The playbooks can be executed in any other non-production environments for demos
 
 
 # Changelog
+## v1.2
+- Adding ONTAP-11-04  Event Config
+- Adding Ansible Drive Ansible
+- Adding support for ONTAP 9.14.1 lab
+- General Clean-up (comments, format...)
 
 ## v1.1
 - Adding ONTAP-42 - Quality of Service

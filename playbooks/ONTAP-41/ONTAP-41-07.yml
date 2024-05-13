@@ -15,12 +15,12 @@
 # 
 ################################################################################
 
-- hosts:              "linux"
-  name:               "ONTAP-41-07 - Client Write (Clone)"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-41-07 - Client Write (Clone)"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
     - community.general
@@ -33,7 +33,10 @@
   tasks:
     - name: Create test file on each export
       community.general.filesize:
-        path: "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/extraop_{{ pipe_timestamp }}"
-        size: "{{ filesize | default('500MB') }}"
+        path:                          "{{ linux_41_mount_dir }}/\
+                                        {{ ontap_41_clone_dir_name }}/\
+                                        {{ ontap_41_clone_vol_name }}/\
+                                        extraop_{{ pipe_timestamp }}"
+        size:                          "{{ filesize | default('500MB') }}"
   
   post_tasks:

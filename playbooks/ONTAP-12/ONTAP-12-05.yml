@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-12-05 - Administrative Domain Group"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-12-05 - Administrative Domain Group"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -37,11 +37,11 @@
   tasks:
     - name: Create local users with read-only privileges
       netapp.ontap.na_ontap_user:
-        state:                      present
-        name:                       "{{ item.name }}"
-        application_dicts:          "{{ item.applications }}"
-        set_password:               "{{ vault_security_accounts[item.name].password | default(omit) }}"
-        role_name:                  "{{ item.role.name }}"
+        state:                         present
+        name:                          "{{ item.name }}"
+        application_dicts:             "{{ item.applications }}"
+        set_password:                  "{{ vault_security_accounts[item.name].password | default(omit) }}"
+        role_name:                     "{{ item.role.name }}"
         <<: *input
       loop:
         "{{ security_accounts }}"

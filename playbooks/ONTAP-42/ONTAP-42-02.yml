@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-42-02 - Volumes"
-  gather_facts:       false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-42-02 - Volumes"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -39,7 +39,7 @@
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ ontap_42_vol_name }}"
-        aggregate_name:                "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
+        aggregate_name:                "{{ storage_aggregates[0].name }}"
         size:                          "{{ ontap_default_vol_size_gb }}"
         size_unit:                     gb
         space_guarantee:               none
@@ -54,7 +54,7 @@
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ ontap_42_qos_vol_name }}"
-        aggregate_name:                "{{ hostvars[global_primary_test_cluster].storage_aggregates[0].name }}"
+        aggregate_name:                "{{ storage_aggregates[0].name }}"
         size:                          "{{ ontap_default_vol_size_gb }}"
         size_unit:                     gb
         space_guarantee:               none

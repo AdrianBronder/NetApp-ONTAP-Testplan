@@ -15,27 +15,27 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-12-06 - Domain User Access"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-12-06 - Domain User Access"
+  gather_facts:                        false
   vars:
     input_ro: &input_ro
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_12_ad_ro_user }}"
-      password:                   "{{ ontap_12_ad_ro_user_pw }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_12_ad_ro_user }}"
+      password:                        "{{ ontap_12_ad_ro_user_pw }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
     input_admin: &input_admin
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_12_ad_admin_user }}"
-      password:                   "{{ ontap_12_ad_admin_user_pw }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_12_ad_admin_user }}"
+      password:                        "{{ ontap_12_ad_admin_user_pw }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -46,8 +46,8 @@
       block:
         - name: Create test SVM with read-only account
           netapp.ontap.na_ontap_svm:
-            state:                      present
-            name:                       "{{ ontap_12_test_svm02 }}"
+            state:                     present
+            name:                      "{{ ontap_12_test_svm02 }}"
             <<: *input_ro
           when:
             - ontap_12_test_svm01 is defined
@@ -72,16 +72,16 @@
 
         - name: Create test SVM with admin account
           netapp.ontap.na_ontap_svm:
-            state:                      present
-            name:                       "{{ ontap_12_test_svm02 }}"
+            state:                     present
+            name:                      "{{ ontap_12_test_svm02 }}"
             <<: *input_admin
           when:
             - ontap_12_test_svm01 is defined
 
     - name: Clean-up test SVM with admin account
       netapp.ontap.na_ontap_svm:
-        state:                      absent
-        name:                       "{{ ontap_12_test_svm02 }}"
+        state:                         absent
+        name:                          "{{ ontap_12_test_svm02 }}"
         <<: *input_admin
       when:
         - ontap_12_test_svm01 is defined

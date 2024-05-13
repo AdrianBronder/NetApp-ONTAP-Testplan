@@ -15,12 +15,12 @@
 # 
 ################################################################################
 
-- hosts:              "linux"
-  name:               "ONTAP-41-06 - Mount & Write (Clone)"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-41-06 - Mount & Write (Clone)"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
     - community.general
@@ -33,31 +33,34 @@
   tasks:
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:\
-                                     /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-        path:                       "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:\
+                                        /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        path:                          "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
   
     - name: Create mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-        state:                      "directory"
-        mode:                       "0755"
+        path:                          "{{ linux_default_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        state:                         "directory"
+        mode:                          "0755"
   
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
-        state:                      "mounted"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:\
-                                     /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-        path:                       "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-        # opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "mounted"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:\
+                                        /{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        path:                          "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
+        # opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
   
     - name: Create test file on each export
       community.general.filesize:
-        path: "{{ linux_41_mount_dir }}/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}/newop_{{ pipe_timestamp }}"
-        size: "{{ filesize | default('500MB') }}"
+        path:                          "{{ linux_41_mount_dir }}/\
+                                        {{ ontap_41_clone_dir_name }}/\
+                                        {{ ontap_41_clone_vol_name }}/\
+                                        newop_{{ pipe_timestamp }}"
+        size:                          "{{ filesize | default('500MB') }}"
   
   post_tasks:

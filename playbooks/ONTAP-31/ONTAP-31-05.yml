@@ -9,12 +9,12 @@
 # 
 ################################################################################
 
-- hosts:              "linux"
-  name:               ONTAP-31-05 - Mount & Write (FlexGroups)
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                ONTAP-31-05 - Mount & Write (FlexGroups)
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
     - community.general
@@ -24,31 +24,31 @@
   tasks:
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_31_fg_name }}/{{ item }}"
-        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_31_fg_name }}/{{ item }}"
+        path:                          "{{ linux_31_mount_dir }}/{{ item }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
       loop:
         "{{ ontap_31_fg_qtree_names }}"
   
     - name: Create mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
-        state:                      "directory"
-        mode:                       "0755"
+        path:                          "{{ linux_31_mount_dir }}/{{ item }}"
+        state:                         "directory"
+        mode:                          "0755"
       loop:
         "{{ ontap_31_fg_qtree_names }}"
   
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
-        state:                      "mounted"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ ontap_31_fg_name }}/{{ item }}"
-        path:                       "{{ linux_31_mount_dir }}/{{ item }}"
-        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "mounted"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_31_fg_name }}/{{ item }}"
+        path:                          "{{ linux_31_mount_dir }}/{{ item }}"
+        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
       loop:
         "{{ ontap_31_fg_qtree_names }}"
   

@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-52-01 - SVM Peering"
-  gather_facts:       false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-52-01 - SVM Peering"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -40,11 +40,11 @@
         state:                         present
         vserver:                       "{{ item }}"
         peer_vserver:                  "{{ global_primary_backup_svm }}"
-        peer_cluster:                  "{{ global_secondary_test_cluster }}"
+        peer_cluster:                  "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ global_secondary_test_cluster }}"
+          hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
         <<: *input
       loop:
         - "{{ global_primary_nas_svm }}"

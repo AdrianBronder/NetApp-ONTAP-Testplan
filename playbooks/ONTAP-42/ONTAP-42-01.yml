@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-42-01 - QoS Policy"
-  gather_facts:       false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-42-01 - QoS Policy"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -41,10 +41,10 @@
         name:                          "{{ ontap_42_qos_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         fixed_qos_options:
-          max_throughput_iops: 1000
-          max_throughput_mbps: 10
-          min_throughput_iops: 100
-          min_throughput_mbps: 1
-          capacity_shared: True
+          max_throughput_iops:         1000
+          max_throughput_mbps:         10
+          min_throughput_iops:         100
+          min_throughput_mbps:         1
+          capacity_shared:             True
         <<: *input
   post_tasks:

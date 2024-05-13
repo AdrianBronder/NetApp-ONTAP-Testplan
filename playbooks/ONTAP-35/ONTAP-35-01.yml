@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-35-01 - iGroups"
-  gather_facts:                   false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-35-01 - iGroups"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -37,16 +37,16 @@
   tasks:
     - name: Create a iGroups
       netapp.ontap.na_ontap_igroup:
-        state:                    present
-        vserver:                  "{{ global_primary_san_svm }}"
-        name:                     "{{ item }}"
-        initiator_group_type:     "iscsi"
-        os_type:                  "{{ 'linux' if 'lin' in item else
-                                      'windows' if 'win' in item else
-                                      default(omit) }}"
-        initiator_names:          "{{ ontap_35_lin_igroup_iqns if 'lin' in item else
-                                      ontap_35_win_igroup_iqns if 'win' in item else
-                                      default(omit) }}"
+        state:                         present
+        vserver:                       "{{ global_primary_san_svm }}"
+        name:                          "{{ item }}"
+        initiator_group_type:          "iscsi"
+        os_type:                       "{{ 'linux' if 'lin' in item else
+                                           'windows' if 'win' in item else
+                                           default(omit) }}"
+        initiator_names:               "{{ ontap_35_lin_igroup_iqns if 'lin' in item else
+                                           ontap_35_win_igroup_iqns if 'win' in item else
+                                           default(omit) }}"
         <<: *input
       loop:
         - "{{ ontap_35_lin_igroup_name }}"

@@ -9,20 +9,20 @@
 #
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-35-05 - Mount & Write (Windows) - ONTAP"
-  gather_facts:                   false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-35-05 - Mount & Write (Windows) - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -38,19 +38,19 @@
           - "location"
           - "serial_number"
         parameters:
-          svm.name:               "{{ global_primary_san_svm }}"
-        use_python_keys:          true
+          svm.name:                    "{{ global_primary_san_svm }}"
+        use_python_keys:               true
         <<: *input
       register: lun_info
 
   post_tasks:
 
-- hosts:              "{{ global_primary_windows_host }}"
-  name:               "ONTAP-35-05 - Discover, Login & Mount (Windows) - Windows"
-  gather_facts:       true
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-35-05 - Discover, Login & Mount (Windows) - Windows"
+  gather_facts:                        true
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.windows
     - community.windows
@@ -66,7 +66,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -91,7 +91,7 @@
       loop_control:
         label: "Connect {{ item.1.ipv4.address }} to {{ item.0.ip.address }}"
       loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -104,30 +104,30 @@
 
     - name: Initialize disks
       community.windows.win_initialize_disk:
-        disk_number:              "{{ (win_disk_facts.ansible_facts.ansible_disks |
-                                       selectattr('serial_number', 'defined') |
-                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                                                          selectattr('name', 'defined') |
-                                                                          selectattr('name', '==', item ) |
-                                                                          first ).serial_number) |
-                                       first ).number }}"
-        online:                   true
-        force:                    true
+        disk_number:                   "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                            selectattr('serial_number', 'defined') |
+                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                                                               selectattr('name', 'defined') |
+                                                                               selectattr('name', '==', item ) |
+                                                                               first ).serial_number) |
+                                            first ).number }}"
+        online:                        true
+        force:                         true
       loop:
         "{{ ontap_35_win_luns }}"
 
     - name: Partition disks
       community.windows.win_partition:
-        partition_size:           -1
-        partition_number:         2
-        gpt_type:                 "basic_data"
-        disk_number:              "{{ (win_disk_facts.ansible_facts.ansible_disks |
-                                       selectattr('serial_number', 'defined') |
-                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                                                          selectattr('name', 'defined') |
-                                                                          selectattr('name', '==', item ) |
-                                                                          first ).serial_number) |
-                                       first ).number }}"
+        partition_size:                -1
+        partition_number:              2
+        gpt_type:                      "basic_data"
+        disk_number:                   "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                            selectattr('serial_number', 'defined') |
+                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                                                               selectattr('name', 'defined') |
+                                                                               selectattr('name', '==', item ) |
+                                                                               first ).serial_number) |
+                                            first ).number }}"
       loop:
         "{{ ontap_35_win_luns }}"
 
@@ -137,44 +137,44 @@
 
     - name: Format disks
       community.windows.win_format:
-        file_system:              "ntfs"
-        path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
-                                       selectattr('serial_number', 'defined') |
-                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                                                          selectattr('name', 'defined') |
-                                                                          selectattr('name', '==', item ) |
-                                                                          first ).serial_number) |
-                                       first ).partitions[1].volumes[0].path }}"
-        new_label:                "{{ item | split('/') | last }}"
-        force:                    true
+        file_system:                   "ntfs"
+        path:                          "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                            selectattr('serial_number', 'defined') |
+                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                                                               selectattr('name', 'defined') |
+                                                                               selectattr('name', '==', item ) |
+                                                                               first ).serial_number) |
+                                            first ).partitions[1].volumes[0].path }}"
+        new_label:                     "{{ item | split('/') | last }}"
+        force:                         true
       loop:
         "{{ ontap_35_win_luns }}"
 
     - name: Create root mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_35_mount_dir }}"
-        state:                    directory
+        path:                          "{{ windows_35_mount_dir }}"
+        state:                         directory
 
     - name: Create mount directories for LUNs
       ansible.windows.win_file:
-        path:                     "{{ windows_35_mount_dir }}\\{{ item | split('/') | last }}"
-        state:                    directory
+        path:                          "{{ windows_35_mount_dir }}\\{{ item | split('/') | last }}"
+        state:                         directory
       loop:
         "{{ ontap_35_win_luns }}"
 
     - name: Change ACLs on device path
       ansible.windows.win_acl:
-        state:                    present
-        user:                     "Everyone"
-        rights:                   "Modify,ReadAndExecute,ListDirectory,Read,Write"
-        type:                     "allow"
-        path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
-                                       selectattr('serial_number', 'defined') |
-                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                                                          selectattr('name', 'defined') |
-                                                                          selectattr('name', '==', item ) |
-                                                                          first ).serial_number) |
-                                       first ).partitions[1].access_paths[0] }}"
+        state:                         present
+        user:                          "Everyone"
+        rights:                        "Modify,ReadAndExecute,ListDirectory,Read,Write"
+        type:                          "allow"
+        path:                          "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                            selectattr('serial_number', 'defined') |
+                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                                                               selectattr('name', 'defined') |
+                                                                               selectattr('name', '==', item ) |
+                                                                               first ).serial_number) |
+                                            first ).partitions[1].access_paths[0] }}"
       loop:
         "{{ ontap_35_win_luns }}"
 
@@ -184,7 +184,7 @@
           "Add-PartitionAccessPath \
            -DiskNumber {{ (win_disk_facts.ansible_facts.ansible_disks |
                                        selectattr('serial_number', 'defined') |
-                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
+                                       selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                                                           selectattr('name', 'defined') |
                                                                           selectattr('name', '==', item ) |
                                                                           first ).serial_number) |
@@ -196,24 +196,24 @@
 
     - name: Change ACLs on mount paths
       ansible.windows.win_acl:
-        state:                    present
-        user:                     "Everyone"
-        rights:                   "Modify,ReadAndExecute,ListDirectory,Read,Write"
-        type:                     "allow"
-        path:                     "{{ (win_disk_facts.ansible_facts.ansible_disks |
-                                       selectattr('serial_number', 'defined') |
-                                       selectattr('serial_number', '==', (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                                                                          selectattr('name', 'defined') |
-                                                                          selectattr('name', '==', item ) |
-                                                                          first ).serial_number) |
-                                       first ).partitions[1].access_paths[0] }}"
+        state:                         present
+        user:                          "Everyone"
+        rights:                        "Modify,ReadAndExecute,ListDirectory,Read,Write"
+        type:                          "allow"
+        path:                          "{{ (win_disk_facts.ansible_facts.ansible_disks |
+                                            selectattr('serial_number', 'defined') |
+                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                                                               selectattr('name', 'defined') |
+                                                                               selectattr('name', '==', item ) |
+                                                                               first ).serial_number) |
+                                            first ).partitions[1].access_paths[0] }}"
       loop:
         "{{ ontap_35_win_luns }}"
 
     - name: Create test file on each LUN
       ansible.windows.win_file:
-        path:                     "{{ windows_35_mount_dir }}\\{{ item | split('/') | last }}\\{{ item | split('/') | last }}_testfile"
-        state:                    touch
+        path:                          "{{ windows_35_mount_dir }}\\{{ item | split('/') | last }}\\{{ item | split('/') | last }}_testfile"
+        state:                         touch
       loop:
         "{{ ontap_35_win_luns }}"
 

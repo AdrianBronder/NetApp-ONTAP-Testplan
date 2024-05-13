@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-20-01 - Storage Virtual Machines (SVMs)"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-20-01 - Storage Virtual Machines (SVMs)"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -37,21 +37,21 @@
   tasks:
     - name: Create all SVMs for testing"
       netapp.ontap.na_ontap_svm:
-        state:                      present
-        name:                       "{{ item.name }}"
+        state:                         present
+        name:                          "{{ item.name }}"
         services:
           cifs:
-            allowed:                "{{ item.cifs.allowed | default(omit) }}"
+            allowed:                   "{{ item.cifs.allowed | default(omit) }}"
           ndmp:
-            allowed:                "{{ item.ndmp.allowed | default(omit) }}"
+            allowed:                   "{{ item.ndmp.allowed | default(omit) }}"
           nfs:
-            allowed:                "{{ item.nfs.allowed | default(omit) }}"
+            allowed:                   "{{ item.nfs.allowed | default(omit) }}"
           fcp:
-            allowed:                "{{ item.fcp.allowed | default(omit) }}"
+            allowed:                   "{{ item.fcp.allowed | default(omit) }}"
           iscsi:
-            allowed:                "{{ item.iscsi.allowed | default(omit) }}"
+            allowed:                   "{{ item.iscsi.allowed | default(omit) }}"
           nvme:
-            allowed:                "{{ item.nvme.allowed | default(omit) }}"
+            allowed:                   "{{ item.nvme.allowed | default(omit) }}"
         <<: *input
       loop:
         "{{ svm_svms }}"
@@ -65,12 +65,12 @@
   
     - name: Patch additional SVM parameters - auto_enable_analytics
       netapp.ontap.na_ontap_rest_cli:
-        command:                    'vserver'
-        verb:                       'PATCH'
+        command:                       'vserver'
+        verb:                          'PATCH'
         params: 
-          vserver:                  "{{ item.name }}"
+          vserver:                     "{{ item.name }}"
         body:
-          auto_enable_analytics:    "{{ item.auto_enable_analytics }}"
+          auto_enable_analytics:       "{{ item.auto_enable_analytics }}"
         <<: *input
       loop:
         "{{ svm_svms }}"
@@ -85,12 +85,13 @@
   
     - name: Patch additional SVM parameters - auto_enable_activity_tracking
       netapp.ontap.na_ontap_rest_cli:
-        command:                    'vserver'
-        verb:                       'PATCH'
-        params: 
-          vserver:                  "{{ item.name }}"
+        command:                       'vserver'
+        verb:                          'PATCH'
+        params:
+          vserver:                     "{{ item.name }}"
         body:
-          auto_enable_activity_tracking: "{{ item.auto_enable_activity_tracking }}"
+          auto_enable_activity_tracking:
+                                       "{{ item.auto_enable_activity_tracking }}"
         <<: *input
       loop:
         "{{ svm_svms }}"
@@ -105,9 +106,9 @@
   
     - name: Enable iSCSI on SAN SVM(s)
       netapp.ontap.na_ontap_iscsi:
-        state:                      present
-        service_state:              "started"
-        vserver:                    "{{ item.svm.name }}"
+        state:                         present
+        service_state:                 "started"
+        vserver:                       "{{ item.svm.name }}"
         <<: *input
       loop:
         "{{ protocols_san_iscsi_services }}"
@@ -121,9 +122,9 @@
   
     - name: Enable NVMe on SAN SVM(s)
       netapp.ontap.na_ontap_nvme:
-        state:                      present
-        status_admin:               true
-        vserver:                    "{{ item.svm.name }}"
+        state:                         present
+        status_admin:                  true
+        vserver:                       "{{ item.svm.name }}"
         <<: *input
       loop:
         "{{ protocols_nvme_services }}"

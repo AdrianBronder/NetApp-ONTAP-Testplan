@@ -1,0 +1,2 @@
+iscsi:
+  initiator_name:                 "iqn.1994-05.com.redhat:centos1.demo.netapp.com"

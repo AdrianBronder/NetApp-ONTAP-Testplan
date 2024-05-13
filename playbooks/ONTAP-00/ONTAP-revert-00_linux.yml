@@ -15,20 +15,20 @@
 #
 ################################################################################
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-revert-00 - Return to Day0 - Linux - ONTAP (read)"
-  gather_facts:                   false
+- hosts:                               "{{ groups['primary_storage_clusters'][0] }}"
+  name:                                "ONTAP-revert-00 - Return to Day0 - Linux - ONTAP (read)"
+  gather_facts:                        false
   vars:
     input_read: &input_read
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -48,7 +48,7 @@
         <<: *input_read
       register: iscsi_info
 
-    - name: Get LUNs from "{{ global_primary_test_cluster }}"
+    - name: Get LUNs from "{{ ansible_host }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "storage/luns"
@@ -60,7 +60,7 @@
         <<: *input_read
       register: lun_info
 
-    - name: Get NVMe subsystems from "{{ global_primary_test_cluster }}"
+    - name: Get NVMe subsystems from "{{ ansible_host }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "protocols/nvme/subsystems"
@@ -68,7 +68,7 @@
         <<: *input_read
       register: nvme_subsys_info
 
-    - name: Get all NVMe namespaces from "{{ global_primary_test_cluster }}"
+    - name: Get all NVMe namespaces from "{{ ansible_host }}"
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "storage/namespaces"
@@ -80,12 +80,12 @@
 
   post_tasks:
 
-- hosts:              "linux"
-  name:               "ONTAP-revert-00 - Return to Day0 - Linux"
-  gather_facts:       true
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-00 - Return to Day0 - Linux"
+  gather_facts:                        true
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
 
@@ -147,12 +147,12 @@
         auto_portal_startup:      false
         auto_node_startup:        false
         portal:                   "{{ item.ip.address }}"
-        target:                   "{{ (hostvars[global_primary_test_cluster].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
+        target:                   "{{ (hostvars[groups['primary_storage_clusters'][0]].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
                                        first ).target.name }}"
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -170,21 +170,14 @@
 
     - name: Flush multipath devices
       ansible.builtin.command:
-        cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
-                           {{ (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-                              selectattr('name', 'defined') |
-                              selectattr('name', '==', item ) |
-                              first ).serial_hex }}"
-      when:
-        - hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.num_records|int > 0
-        - (hostvars[global_primary_test_cluster].lun_info.ontap_info.storage_luns.records |
-           selectattr('name', 'defined') |
-           selectattr('name', '==', item ) |
-           first ).serial_hex is defined
-      loop_control:
-        label: "{{ item }}"
-      loop:
-        "{{ ontap_35_lin_luns }}"
+        cmd: "multipath -F"
+      ignore_errors: true
+    
+    - name: Restart Multi-pathing
+      ansible.builtin.systemd_service:
+        state:                         restarted
+        daemon_reload:                 true
+        name:                          "multipathd"
 
     - name: Unmount exports
       ansible.posix.mount:

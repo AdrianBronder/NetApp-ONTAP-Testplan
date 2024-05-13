@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-42-03 - Prepare Filesystem"
-  gather_facts:       false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-42-03 - Prepare Filesystem"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -37,22 +37,22 @@
   tasks:
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "{{ ontap_42_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
+        state:                         present
+        name:                          "{{ ontap_42_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         <<: *input
   
     - name: Create read-write export policy rules for data volumes
       na_ontap_export_policy_rule:
-        state:                      present
-        name:                       "{{ ontap_42_policy_name }}"
-        vserver:                    "{{ global_primary_nas_svm }}"
-        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                    "any"
-        rw_rule:                    "any"
-        protocol:                   "nfs"
-        super_user_security:        "any"
-        allow_suid:                 true
+        state:                         present
+        name:                          "{{ ontap_42_policy_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
         <<: *input
 
     - name: Create UNIX qtree
@@ -138,8 +138,8 @@
   name:               "ONTAP-42-04 - Client Write"
   gather_facts:       false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
     - community.general
@@ -149,33 +149,33 @@
   tasks:
     - name: Ensure stale mounts are removed before proceding (in case a mount exists)
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ item }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-        path:                       "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ item }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+        path:                          "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
 
     - name: Create mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-        state:                      "directory"
-        mode:                       "0755"
+        path:                          "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+        state:                         "directory"
+        mode:                          "0755"
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
 
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
-        state:                      "mounted"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
-                                     {{ item }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-        path:                       "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "mounted"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ item }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+        path:                          "{{ linux_42_mount_dir }}/{{ item }}{{ ontap_42_nfs_suffix }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"

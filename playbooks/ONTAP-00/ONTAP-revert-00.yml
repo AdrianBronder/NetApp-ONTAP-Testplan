@@ -16,20 +16,20 @@
 #
 ################################################################################
 
-- hosts:                          "ontap"
-  name:                           "ONTAP-revert-00 - Return to Day0 - ONTAP"
-  gather_facts:                   false
+- hosts:                               "ontap"
+  name:                                "ONTAP-revert-00 - Return to Day0 - ONTAP"
+  gather_facts:                        false
   vars:            
     input: &input            
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -367,7 +367,7 @@
       netapp.ontap.na_ontap_interface:
         state:                    absent
         interface_name:           "{{ item.name }}"
-        hostname:                 "{{ ansible_host }}"
+#        hostname:                 "{{ ansible_host }}"
         <<: *input
       loop:
         "{{ cluster_ip_int_info.ontap_info.network_ip_interfaces.records }}"
@@ -478,6 +478,17 @@
           name:                   "Etc/UTC"
         <<: *input
   
+    - name: Remove event configuration
+      netapp.ontap.na_ontap_ems_destination:
+        state:                         "absent"
+        name:                          "{{ item.name }}"
+        type:                          "{{ item.type }}"
+        filters:                       "{{ item.filters }}"
+        destination:                   "{{ item.destination }}"
+        <<: *input
+      loop:
+        "{{ support.ems.destinations }}"
+
     - name: Remove onboard key manager configuration
       netapp.ontap.na_ontap_security_key_manager:
         state:                    absent

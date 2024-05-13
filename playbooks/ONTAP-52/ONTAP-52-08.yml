@@ -15,12 +15,12 @@
 # 
 ################################################################################
 
-- hosts:              "linux"
-  name:               "ONTAP-52-08 - Delete Files - Linux"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-52-08 - Delete Files - Linux"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
     - community.general
@@ -28,23 +28,25 @@
   pre_tasks:
 
   tasks:
-    - name: Create additional test files
+    - name: Delete some test files
       ansible.builtin.file:
-        state: absent
-        path: "{{ linux_52_mount_dir }}/{{ ontap_52_lin_qtree_name }}/{{ item }}"
+        state:                         absent
+        path:                          "{{ linux_52_mount_dir }}/\
+                                        {{ ontap_52_lin_qtree_name }}/\
+                                        {{ item }}"
       loop:
-        - "testfile_01"
-        - "testfile_02"
-        - "testfile_03"
+        - "testfile01"
+        - "testfile02"
+        - "testfile03"
   
   post_tasks:
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-52-08 - Delete Files - Windows"
-  gather_facts:       false
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-52-08 - Delete Files - Windows"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.windows
     - community.windows
@@ -52,18 +54,18 @@
   pre_tasks:
 
   tasks:
-    - name: Create additional test files
+    - name: Delete some test files
       ansible.windows.win_file:
-        path:                     "\\\\{{ global_primary_nas_svm }}\\{{ ontap_52_win_qtree_name}}\\{{ item }}"
-        state:                    absent
+        path:                          "\\\\{{ global_primary_nas_svm }}\\{{ ontap_52_win_qtree_name}}\\{{ item }}"
+        state:                         absent
       loop:
-        - "testfile_01"
-        - "testfile_02"
-        - "testfile_03"
+        - "testfile01"
+        - "testfile02"
+        - "testfile03"
       vars:
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
   post_tasks:

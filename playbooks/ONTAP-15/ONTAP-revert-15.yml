@@ -14,20 +14,20 @@
 #
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-revert-15 - Cluster Peering"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-revert-15 - Cluster Peering"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -35,17 +35,24 @@
     - name: Remove cluster peerings
       netapp.ontap.na_ontap_cluster_peer:
         state:                         absent
-        source_cluster_name:           "{{ global_primary_test_cluster if global_primary_test_cluster == cluster.name else global_secondary_test_cluster }}"
-        dest_cluster_name:             "{{ global_secondary_test_cluster if global_primary_test_cluster == cluster.name else global_primary_test_cluster}}"
+        source_cluster_name:           "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name
+                                           if hostvars[groups['primary_storage_clusters'][0]].cluster.name == cluster.name
+                                           else hostvars['secondary_storage_cluster'].cluster.name }}"
+        dest_cluster_name:             "{{ hostvars['secondary_storage_cluster'].cluster.name
+                                           if hostvars[groups['primary_storage_clusters'][0]].cluster.name == cluster.name
+                                           else hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
         peer_options:
-          hostname: "{{ hostvars[global_primary_test_cluster].ansible_host if global_primary_test_cluster == cluster.name else hostvars[global_secondary_test_cluster].ansible_host }}"
+          hostname:                    "{{ hostvars['secondary_storage_cluster'].ansible_host
+                                           if hostvars[groups['primary_storage_clusters'][0]].cluster.name == cluster.name
+                                           else hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
         <<: *input
+      ignore_errors: true
   
     - name: Remove peering interfaces
       netapp.ontap.na_ontap_interface:
-        state:                      absent
-        interface_name:             "{{ item.name }}"
-        ipspace:                    "{{ item.ipspace.name }}"
+        state:                         absent
+        interface_name:                "{{ item.name }}"
+        ipspace:                       "{{ item.ipspace.name }}"
         <<: *input
       loop:
         "{{ network_ip_interfaces }}"
@@ -58,11 +65,11 @@
 
     - name: Remove peering interface groups on storage cluster
       netapp.ontap.na_ontap_net_ifgrp:
-        state:                      absent
-        node:                       "{{ item.node.name }}"
-        broadcast_domain:           "{{ item.broadcast_domain.name }}"
-        ipspace:                    "{{ item.broadcast_domain.ipspace.name }}"
-        ports:                      "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
+        state:                         absent
+        node:                          "{{ item.node.name }}"
+        broadcast_domain:              "{{ item.broadcast_domain.name }}"
+        ipspace:                       "{{ item.broadcast_domain.ipspace.name }}"
+        ports:                         "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
         <<: *input
       loop:
         "{{ network_ethernet_ports }}"
@@ -75,9 +82,9 @@
 
     - name: Remove peering broadcast domain on storage cluster
       netapp.ontap.na_ontap_broadcast_domain:
-        state:                      absent
-        name:                       "{{ item.name }}"
-        ipspace:                    "{{ item.ipspace.name }}"
+        state:                         absent
+        name:                          "{{ item.name }}"
+        ipspace:                       "{{ item.ipspace.name }}"
         <<: *input
       loop:
         "{{ network_ethernet_broadcast_domains }}"
@@ -89,8 +96,8 @@
 
     - name: Remove peering IPspace
       netapp.ontap.na_ontap_ipspace:
-        state:                      absent
-        name:                       "{{ item.name }}"
+        state:                         absent
+        name:                          "{{ item.name }}"
         <<: *input
       loop:
         "{{ network_ipspaces }}"

@@ -15,12 +15,12 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_linux_host }}"
-  name:                           "ONTAP-37-04 - Mount & Write (Linux)"
-  gather_facts:                   true
+- hosts:                               "linux_hosts"
+  name:                                "ONTAP-37-04 - Mount & Write (Linux)"
+  gather_facts:                        true
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - community.general
     - ansible.posix
@@ -34,7 +34,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[global_primary_test_cluster].network_ip_interfaces |
+        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'nvme-tcp') |
@@ -47,7 +47,7 @@
           name: ansible.utils.json
         set_fact: linux_ontap_ns
 
-    - name: Build filesystem on namespaces
+    - name: Build filesystem on namespaces (CentOS 7.9)
       community.general.filesystem:
         fstype:                   "ext4"
         dev:                      "{{ (linux_ontap_ns.ONTAPdevices |
@@ -56,16 +56,33 @@
                                        first ).Device }}"
       loop:
         "{{ ontap_37_lin_namespaces }}"
+      when:
+        - ansible_distribution == "CentOS" and
+          ansible_distribution_version == "7.9"
+
+    - name: Build filesystem on namespaces (RHEL 8.9)
+      community.general.filesystem:
+        fstype:                        "ext4"
+        dev:                           "/dev/mapper/\
+                                        uuid.{{ (linux_ontap_ns.ONTAPdevices |
+                                                 selectattr('Namespace_Path', 'defined') |
+                                                 selectattr('Namespace_Path', '==', item ) |
+                                                 first ).UUID }}"
+      loop:
+        "{{ ontap_37_lin_namespaces }}"
+      when:
+        - ansible_distribution == "RedHat" and
+          ansible_distribution_version == "8.9"
 
     - name: Create mount directory  
       ansible.builtin.file:
-        path:                     "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
-        state:                    "directory"
-        mode:                     "0755"
+        path:                          "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
+        state:                         "directory"
+        mode:                          "0755"
       loop:
         "{{ ontap_37_lin_namespaces }}"
-  
-    - name: Mount namespaces
+
+    - name: Mount namespaces (CentOS 7.9)
       ansible.posix.mount:
         state:                    "mounted"
         src:                      "{{ (linux_ontap_ns.ONTAPdevices |
@@ -77,11 +94,33 @@
         opts:                     "discard"
       loop:
         "{{ ontap_37_lin_namespaces }}"
+      when:
+        - ansible_distribution == "CentOS" and
+          ansible_distribution_version == "7.9"
+
+    - name: Mount namespaces (RHEL 8.9)
+      ansible.posix.mount:
+        state:                         "mounted"
+        src:                           "/dev/mapper/\
+                                        uuid.{{ (linux_ontap_ns.ONTAPdevices |
+                                                 selectattr('Namespace_Path', 'defined') |
+                                                 selectattr('Namespace_Path', '==', item ) |
+                                                 first ).UUID }}"
+        path:                          "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
+        fstype:                        "ext4"
+        opts:                          "discard"
+      loop:
+        "{{ ontap_37_lin_namespaces }}"
+      when:
+        - ansible_distribution == "RedHat" and
+          ansible_distribution_version == "8.9"
   
     - name: Create test file on Namespace
       community.general.filesize:
-        path: "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}/{{ item | split('/') | last }}_testfile"
-        size: 50MB
+        path:                          "{{ linux_37_mount_dir }}/\
+                                        {{ item | split('/') | last }}/\
+                                        {{ item | split('/') | last }}_testfile"
+        size:                          50MB
       loop:
         "{{ ontap_37_lin_namespaces }}"
 

@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "ontap"
-  name:               "ONTAP-10-03 - Network Services"
-  gather_facts:       false
+- hosts:                               "ontap"
+  name:                                "ONTAP-10-03 - Network Services"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -37,22 +37,22 @@
   tasks:
     - name: Create DNS config on storage cluster
       netapp.ontap.na_ontap_dns:
-        state:                      present
-        vserver:                    "{{ inventory_hostname }}"
-        domains:                    "{{ all_dns_domains }}"
-        nameservers:                "{{ all_dns_nameservers }}"
-        use_rest:                   "never"
+        state:                         present
+        vserver:                       "{{ inventory_hostname }}"
+        domains:                       "{{ all_dns_domains }}"
+        nameservers:                   "{{ all_dns_nameservers }}"
+        use_rest:                      "never"
         <<: *input
   
     - name: Create NTP server on storage cluster
       netapp.ontap.na_ontap_ntp:
-        state:                      present
-        server_name:                "{{ item }}"
-        version:                    "auto"
+        state:                         present
+        server_name:                   "{{ item }}"
+        version:                       "auto"
         <<: *input
       loop:
         "{{ all_ntp_serveres }}"
-      retries: 5
+      retries: 10
       delay: 3
       register: result
       until: not result.failed

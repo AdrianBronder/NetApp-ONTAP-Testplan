@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Request a new Service</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <a href="{{ url_for('list_services') }}">List services</a>
+        <h1 class="my-4">CIFS Share</h1>
+        <form method="POST">
+            <div class="form-group">
+                <label for="volName">Select your department:</label>
+                <select name="volName" id="volName" class="form-control">
+                    {% for department in departments %}
+                        <option value="{{ department.name }}">{{ department.name | replace('ontap_81_', '') }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="shareName">Specify share name:</label>
+                <input type="text" name="shareName" id="shareName" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="shareSize">Select requested size (GiB):</label>
+                <input type="number" name="shareSize" id="shareSize" class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+        {% if message %}
+            <div class="alert alert-info mt-4">
+                {{ message }}
+            </div>
+        {% endif %}
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
+</body>
+</html>

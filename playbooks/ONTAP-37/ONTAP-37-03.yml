@@ -15,12 +15,12 @@
 # 
 ################################################################################
 
-- hosts:                          "{{ global_primary_linux_host }}"
-  name:                           "ONTAP-37-03 - Subsystem - Linux"
-  gather_facts:                   true
+- hosts:                               "linux"
+  name:                                "ONTAP-37-03 - Subsystem - Linux"
+  gather_facts:                        true
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - community.general
     - ansible.posix
@@ -32,20 +32,20 @@
   post_tasks:
   
 
-- hosts:                          "{{ global_primary_test_cluster }}"
-  name:                           "ONTAP-37-03 - Subsystem - ONTAP"
-  gather_facts:                   false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-37-03 - Subsystem - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -54,12 +54,12 @@
   tasks:
     - name: Create a Subsystem
       netapp.ontap.na_ontap_nvme_subsystem:
-        state:                    present
-        vserver:                  "{{ global_primary_san_svm }}"
-        subsystem:                "{{ ontap_37_lin_subsystem_name }}"
-        ostype:                   "linux"
-        hosts:                    "{{ hostvars[global_primary_linux_host].ansible_hostnqn }}"
-        paths:                    "{{ ontap_37_lin_namespaces }}"
+        state:                         present
+        vserver:                       "{{ global_primary_san_svm }}"
+        subsystem:                     "{{ ontap_37_lin_subsystem_name }}"
+        ostype:                        "linux"
+        hosts:                         "{{ hostvars[groups['linux_hosts'][0]].ansible_hostnqn }}"
+        paths:                         "{{ ontap_37_lin_namespaces }}"
         <<: *input
 
   post_tasks:

@@ -14,12 +14,12 @@
 #
 ################################################################################
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-revert-51 - Local Versioning (Snapshots) - Windows"
-  gather_facts:       false
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-revert-51 - Local Versioning (Snapshots) - Windows"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/ vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.windows
     - community.windows
@@ -31,71 +31,71 @@
       block:
         - name: Remove mapped shares
           community.windows.win_shortcut:
-            state:                absent
-            dest:                 "{{ windows_51_mount_dir }}\\{{ item }}.lnk"
+            state:                     absent
+            dest:                      "{{ windows_51_mount_dir }}\\{{ item }}.lnk"
           loop:
             - "{{ ontap_51_win_qtree_name }}"
         - name: Remove network credentials
           community.windows.win_credential:
-            state:                absent
-            name:                 "{{ global_primary_nas_svm }}"
-            type:                 "domain_password"
+            state:                     absent
+            name:                      "{{ global_primary_nas_svm }}"
+            type:                      "domain_password"
       vars:
         # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
     - name: Remove mount directory
       ansible.windows.win_file:
-        path:                     "{{ windows_51_mount_dir }}"
-        state:                    absent
+        path:                          "{{ windows_51_mount_dir }}"
+        state:                         absent
 
-- hosts:              "linux"
-  name:               "ONTAP-revert-51 - Local Versioning (Snapshots) - Linux"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-51 - Local Versioning (Snapshots) - Linux"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
 
   tasks:
     - name: Unmount export
       ansible.posix.mount:
-        state:                      "absent"
-        src:                        "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_51_vol_name }}/{{ ontap_51_lin_qtree_name }}"
-        path:                       "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
-#        opts:                       "rw,sync,hard,vers=3"
-        fstype:                     "nfs"
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/{{ ontap_51_vol_name }}/{{ ontap_51_lin_qtree_name }}"
+        path:                          "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
 
     - name: Remove mount directories
       ansible.builtin.file:
-        path:                       "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
-        state:                      "absent"
-        mode:                       "0755"
+        path:                          "{{ linux_51_mount_dir }}/{{ ontap_51_lin_qtree_name }}"
+        state:                         "absent"
+        mode:                          "0755"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
-        path:                       "{{ linux_51_mount_dir }}"
-        state:                      "absent"
-        mode:                       "0755"
+        path:                          "{{ linux_51_mount_dir }}"
+        state:                         "absent"
+        mode:                          "0755"
 
-- hosts:              "{{ global_primary_test_cluster }}"
-  name:               "ONTAP-revert-51 - Local Versioning (Snapshots) - ONTAP"
-  gather_facts:       false
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-revert-51 - Local Versioning (Snapshots) - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:       "{{ ansible_host }}"
-      username:       "{{ ontap_admin_user }}"
-      password:       "{{ ontap_admin_password }}"
-      https:          true
-      validate_certs: false
-      use_rest:       "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 

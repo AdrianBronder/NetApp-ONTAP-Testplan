@@ -15,20 +15,20 @@
 # 
 ################################################################################
 
-- hosts:              "{{ global_secondary_test_cluster }}"
-  name:               "ONTAP-52-05 - Access Backup (read-only) - ONTAP"
-  gather_facts:       false
+- hosts:                               "secondary_storage_clusters"
+  name:                                "ONTAP-52-05 - Access Backup (read-only) - ONTAP"
+  gather_facts:                        false
   vars:
     input: &input
-      hostname:                   "{{ ansible_host }}"
-      username:                   "{{ ontap_admin_user }}"
-      password:                   "{{ ontap_admin_password }}"
-      https:                      true
-      validate_certs:             false
-      use_rest:                   "always"
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
 
@@ -37,80 +37,80 @@
   tasks:
     - name: Apply read-only export policy to backup volume & mount it to SVM's namespace
       netapp.ontap.na_ontap_volume:
-        state:                      present
-        name:                       "{{ ontap_52_vol_name }}_dst"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        export_policy:              "ro_{{ global_primary_backup_svm }}"
-        junction_path:              "/{{ ontap_52_vol_name }}_dst"
+        state:                         present
+        name:                          "{{ ontap_52_vol_name }}_dst"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        export_policy:                 "ro_{{ global_primary_backup_svm }}"
+        junction_path:                 "/{{ ontap_52_vol_name }}_dst"
         <<: *input
 
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
-        state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
-        vserver:                    "{{ global_primary_backup_svm }}"
+        state:                         present
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
         <<: *input
 
     - name: Create read-write export policy rules
       na_ontap_export_policy_rule:
-        state:                      present
-        name:                       "{{ ontap_52_policy_name }}"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        client_match:               "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                    "any"
-        rw_rule:                    "none"
-        protocol:                   "nfs"
-        super_user_security:        "any"
-        allow_suid:                 true
+        state:                         present
+        name:                          "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "none"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
         <<: *input
 
     - name: Apply read-write export policy to UNIX qtree
       netapp.ontap.na_ontap_qtree:
-        state:                      present
-        name:                       "{{ ontap_52_lin_qtree_name }}"
-        flexvol_name:               "{{ ontap_52_vol_name }}_dst"
-        export_policy:              "{{ ontap_52_policy_name }}"
-        vserver:                    "{{ global_primary_backup_svm }}"
+        state:                         present
+        name:                          "{{ ontap_52_lin_qtree_name }}"
+        flexvol_name:                  "{{ ontap_52_vol_name }}_dst"
+        export_policy:                 "{{ ontap_52_policy_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
         <<: *input
 
     - name: Create share
       netapp.ontap.na_ontap_cifs:
-        state:                      present
-        name:                       "{{ ontap_52_win_qtree_name }}_dst"
-        path:                       "/{{ ontap_52_vol_name }}_dst/{{ ontap_52_win_qtree_name }}"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        browsable:                  true
-        oplocks:                    true
-        show_snapshot:              true
-        comment:                    "Test share created as part of test frame ONTAP-52"
+        state:                         present
+        name:                          "{{ ontap_52_win_qtree_name }}_dst"
+        path:                          "/{{ ontap_52_vol_name }}_dst/{{ ontap_52_win_qtree_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        comment:                       "Test share created as part of test frame ONTAP-52"
         <<: *input
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      absent
-        share_name:                 "{{ ontap_52_win_qtree_name }}_dst"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        user_or_group:              "Everyone"
-        permission:                 "full_control"
+        state:                         absent
+        share_name:                    "{{ ontap_52_win_qtree_name }}_dst"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        user_or_group:                 "Everyone"
+        permission:                    "full_control"
         <<: *input
 
     - name: Create ACL on test share (admins - read-only)
       netapp.ontap.na_ontap_cifs_acl:
-        state:                      present
-        share_name:                 "{{ ontap_52_win_qtree_name }}_dst"
-        vserver:                    "{{ global_primary_backup_svm }}"
-        user_or_group:              "{{ ontap_52_ad_admin_group }}"
-        permission:                 "read"
+        state:                         present
+        share_name:                    "{{ ontap_52_win_qtree_name }}_dst"
+        vserver:                       "{{ global_primary_backup_svm }}"
+        user_or_group:                 "{{ ontap_52_ad_admin_group }}"
+        permission:                    "read"
         <<: *input
 
   post_tasks:
 
-- hosts:              "linux"
-  name:               "ONTAP-52-05 - Access Backup (read-only) - Linux"
-  gather_facts:       false
+- hosts:                               "linux"
+  name:                                "ONTAP-52-05 - Access Backup (read-only) - Linux"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.posix
     - community.general
@@ -145,12 +145,12 @@
   
   post_tasks:
 
-- hosts:              "win_hosts"
-  name:               "ONTAP-52-05 - Access Backup (read-only) - Windows"
-  gather_facts:       false
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-52-05 - Access Backup (read-only) - Windows"
+  gather_facts:                        false
   vars_files:
-    - ../../vars/labondemand/vars.yml
-    - ../../vars/labondemand/vault.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.windows
     - community.windows
@@ -176,13 +176,14 @@
         - name: Map share
           community.windows.win_shortcut:
             state:                     present
-            src:                       "\\\\{{ global_primary_backup_svm }}\\{{ ontap_52_win_qtree_name }}"
+            src:                       "\\\\{{ global_primary_backup_svm }}\\{{ ontap_52_win_qtree_name }}_dst"
             dest:                      "{{ windows_52_mount_dir }}\\{{ ontap_52_win_qtree_name }}_dst.lnk"
+
       vars:
         # become is required to save and retrieve the credentials in the tasks
-        ansible_become:           "yes"
-        ansible_become_method:    "runas"
-        ansible_become_user:      "{{ ansible_user }}"
-        ansible_become_pass:      "{{ ansible_password }}"
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
 
   post_tasks:
