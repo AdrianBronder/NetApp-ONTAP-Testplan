@@ -224,28 +224,6 @@ svm_svms:
       allowed:                    false
     language:                     "utf8mb4"
     comment:                      "This is the AstraInc's SVM for multi-tenancy testing"
-  - name:                         "ntap_svm_PolarisLtd"
-    dns:
-      domains:                    "{{ all_dns_domains }}"
-      servers:                    "{{ all_dns_nameservers }}"
-    auto_enable_analytics:        true
-    auto_enable_activity_tracking: true
-    ipspace:
-      name:                       "Default"
-    nfs:
-      allowed:                    true
-    cifs:
-      allowed:                    true
-    iscsi:
-      allowed:                    false
-    fcp:
-      allowed:                    false
-    ndmp:
-      allowed:                    false
-    nvme:
-      allowed:                    false
-    language:                     "utf8mb4"
-    comment:                      "This is the PolarisLtd's SVM for multi-tenancy testing"
 
 protocols_nfs_services:
   - svm:
