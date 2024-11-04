@@ -44,18 +44,20 @@
       loop:
         "{{ ontap_82_tenant_list }}"
 
-    - name: Patch EMS filter to match tenant only
+    - name: Add EMS filter to match tenant only
       netapp.ontap.na_ontap_rest_cli:
-        command:                       'event/filter/rule'
+        command:                       'event/filter/rule/add'
         verb:                          'POST'
-        params: 
-          filter-name:                 "ems_{{ item }}"
+        params:
         body:
+          filter-name:                 "ems_{{ item }}"
           type:                        "include"
           position:                    1
           message-name:                "arw.*"
-          severity:                    "*"
-          parameter-criteria:          "vserverName={{ item }}"
+          severity:
+            - "*"
+          parameter-criteria:
+            - "vserverName={{ item }}"
         <<: *input
       loop:
         "{{ ontap_82_tenant_list }}"
