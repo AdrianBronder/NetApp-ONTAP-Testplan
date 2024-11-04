@@ -23,6 +23,7 @@
 - ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-01.yml
 - ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-02.yml
 - ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-04.yml
 
 - ansible.builtin.import_playbook: ../ONTAP-12/ONTAP-12-01.yml
 - ansible.builtin.import_playbook: ../ONTAP-12/ONTAP-12-02.yml

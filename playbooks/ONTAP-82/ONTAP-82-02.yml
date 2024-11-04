@@ -1,0 +1,62 @@
+################################################################################
+#
+# Title:        ONTAP-82-02 - Configure Events
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-11-04
+# Description:  Anti-Ransomware
+#               - Configure Events
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-82-02 - Configure Events"
+  gather_facts:                        false
+  vars:
+    input: &input
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Configure EMS filters for every tenant
+      netapp.ontap.na_ontap_ems_na_ontap_ems_filter:
+        state:                         "present"
+        name:                          "ems_{{ item }}"
+        rules:
+          - index:                     1
+            type:                      "include"
+            message_criteria:
+              severities:              "*"
+              name_pattern:            "arw.*"
+      loop:
+        "{{ ontap_82_tenant_list }}"
+
+    - name: Configure REST EMS destination for every tenant
+      netapp.ontap.na_ontap_ems_destination:
+        state:                         "present"
+        name:                          "dest_{{ item }}"
+        type:                          "{{ ontap_82_ems_dest_type }}"
+        filters:                       "ems_{{ item }}"
+        destination:                   "{{ ontap_82_ems_dest_destination }}{{ item }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list }}"
+    
+  post_tasks:

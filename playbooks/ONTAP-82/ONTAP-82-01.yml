@@ -1,0 +1,92 @@
+################################################################################
+#
+# Title:        ONTAP-82-01 - Filesystems for Tenants
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-11-04
+# Description:  Anti-Ransomware
+#               - Filesystems for Tenants
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-82-01 - Filesystems for Tenants"
+  gather_facts:                        false
+  vars:
+    input: &input
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:    
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "{{ ontap_82_policy_name }}"
+        vserver:                       "{{ item }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list }}"
+  
+    - name: Create read-write export policy rules for data volumes
+      netapp.ontap.na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "{{ ontap_82_policy }}"
+        vserver:                       "{{ item }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list }}"
+
+    - name: Create volumes
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ item.1 }}"
+        aggregate_name:                "{{ storage_aggregates[0].name }}"
+        size:                          "{{ ontap_default_vol_size_gb }}"
+        size_unit:                     gb
+        space_guarantee:               none
+        tiering_policy:                auto
+        export_policy:                 "ro_{{ global_primary_nas_svm }}"
+        junction_path:                 "/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        volume_security_style:         "unix"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+  
+    - name: Create qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                         present
+        name:                          "{{ item.2 }}"
+        flexvol_name:                  "{{ item.1 }}"
+        export_policy:                 "{{ ontap_82_policy_name }}"
+        security_style:                "unix"
+        unix_permissions:              0777
+        vserver:                       "{{ item.0 }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | product(ontap_82_qtrees) | list }}"
+
+  post_tasks:
