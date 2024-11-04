@@ -36,15 +36,27 @@
 
   tasks:
     - name: Configure EMS filters for every tenant
-      netapp.ontap.na_ontap_ems_na_ontap_ems_filter:
+      netapp.ontap.na_ontap_ems_filter:
         state:                         "present"
         name:                          "ems_{{ item }}"
-        rules:
-          - index:                     1
-            type:                      "include"
-            message_criteria:
-              severities:              "*"
-              name_pattern:            "arw.*"
+        rules:                         []
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list }}"
+
+    - name: Patch EMS filter to match tenant only
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'event/filter/rule'
+        verb:                          'POST'
+        params: 
+          filter-name:                 "ems_{{ item }}"
+        body:
+          type:                        "include"
+          position:                    1
+          message-name:                "arw.*"
+          severity:                    "*"
+          parameter-criteria:          "vserverName={{ item }}"
+        <<: *input
       loop:
         "{{ ontap_82_tenant_list }}"
 
@@ -58,5 +70,5 @@
         <<: *input
       loop:
         "{{ ontap_82_tenant_list }}"
-    
+
   post_tasks:

@@ -47,7 +47,7 @@
     - name: Create read-write export policy rules for data volumes
       netapp.ontap.na_ontap_export_policy_rule:
         state:                         present
-        name:                          "{{ ontap_82_policy }}"
+        name:                          "{{ ontap_82_policy_name }}"
         vserver:                       "{{ item }}"
         client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                       "any"
@@ -68,7 +68,7 @@
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
-        export_policy:                 "ro_{{ global_primary_nas_svm }}"
+        export_policy:                 "ro_{{ item.0 }}"
         junction_path:                 "/{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
         volume_security_style:         "unix"
@@ -87,6 +87,6 @@
         vserver:                       "{{ item.0 }}"
         <<: *input
       loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | product(ontap_82_qtrees) | list }}"
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
 
   post_tasks:
