@@ -37,7 +37,7 @@
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | product(ontap_82_qtrees) | list }}"
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
   
     - name: Create mount directories
       ansible.builtin.file:
@@ -45,7 +45,7 @@
         state:                         "directory"
         mode:                          "0755"
       loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | product(ontap_82_qtrees) | list }}"
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
   
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
@@ -56,7 +56,7 @@
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | product(ontap_82_qtrees) | list }}"
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
   
     - name: Create test file on each export
       community.general.filesize:
