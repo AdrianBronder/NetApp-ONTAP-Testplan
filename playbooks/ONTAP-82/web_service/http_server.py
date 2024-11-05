@@ -47,15 +47,15 @@ def receive_data_polarisltd():
         return jsonify(error="Unsupported Media Type"), 415
 
 @app.route('/show_events_bluecorp')
-def show_data():
+def show_data_bluecorp():
     return render_template('data.html', data=[data.decode('utf8') for data in received_data_bluecorp])
 
 @app.route('/show_events_astrainc')
-def show_data():
+def show_data_astrainc():
     return render_template('data.html', data=[data.decode('utf8') for data in received_data_astrainc])
 
 @app.route('/show_events_polarisltd')
-def show_data():
+def show_data_polarisltd():
     return render_template('data.html', data=[data.decode('utf8') for data in received_data_polarisltd])
 
 if __name__ == '__main__':
