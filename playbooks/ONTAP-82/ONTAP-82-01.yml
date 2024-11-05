@@ -89,4 +89,28 @@
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
 
+    - name: Create shares
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ item.1 }}_{{ item.2 }}"
+        path:                          "/{{ item.1 }}/{{ item.2 }}"
+        vserver:                       "{{ item.0 }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+
+    - name: Remove "Full Control" for "Everyone"
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         absent
+        share_name:                    "{{ item.1 }}_{{ item.2 }}"
+        vserver:                       "{{ item.0 }}"
+        user_or_group:                 "Everyone"
+        permission:                    "read_only"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+
   post_tasks:
