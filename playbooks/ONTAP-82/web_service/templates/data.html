@@ -4,7 +4,20 @@
     <title>Data Received</title>
 </head>
 <body>
-    <h1>Data Received</h1>
+    <h1>Event Summary</h1>
+    <table>
+      <tr>
+        <th>Volume Name</th>
+        <th>Event Count</th>
+      </tr>
+      {% for volume_name, count in summary.items() %}
+      <tr>
+        <td>{{ volume_name }}</td>
+        <td>{{ count }}</td>
+      </tr>
+      {% endfor %}
+    </table>
+    <h1>All Events</h1>
     {% for item in data %}
         <p>{{ item }}</p>
         <hr>

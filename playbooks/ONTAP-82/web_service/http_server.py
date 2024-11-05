@@ -78,15 +78,18 @@ def receive_data_polarisltd():
 
 @app.route('/show_events_bluecorp')
 def show_data_bluecorp():
-    return render_template('data.html', data=[data.decode('utf8') for data in received_data_bluecorp])
+    # Pass the event summary along with the received data to the template
+    return render_template('data.html', data=[data.decode('utf8') for data in received_data_bluecorp], summary=event_summary_bluecorp)
 
 @app.route('/show_events_astrainc')
 def show_data_astrainc():
-    return render_template('data.html', data=[data.decode('utf8') for data in received_data_astrainc])
+    # Pass the event summary along with the received data to the template
+    return render_template('data.html', data=[data.decode('utf8') for data in received_data_astrainc], summary=event_summary_astrainc)
 
 @app.route('/show_events_polarisltd')
 def show_data_polarisltd():
-    return render_template('data.html', data=[data.decode('utf8') for data in received_data_polarisltd])
+    # Pass the event summary along with the received data to the template
+    return render_template('data.html', data=[data.decode('utf8') for data in received_data_polarisltd], summary=event_summary_polarisltd)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
