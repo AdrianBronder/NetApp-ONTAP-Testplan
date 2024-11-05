@@ -71,6 +71,9 @@
       netapp.ontap.na_ontap_ems_destination:
         state:                         "absent"
         name:                          "dest_{{ item }}"
+        type:                          "{{ ontap_82_ems_dest_type }}"
+        filters:                       "ems_{{ item }}"
+        destination:                   "{{ ontap_82_ems_dest_destination }}{{ item }}"
         <<: *input
       loop:
         "{{ ontap_82_tenant_list }}"
