@@ -35,7 +35,7 @@ for i in $(seq 1 $file_count); do
     file_name=$(printf "simdata%06d.txt" "$i")
     # Create a file with random content and specified size
     head -c $file_size /dev/urandom > "$target_path/$file_name"
-    sleep 1
+#    sleep 1
 done
 
 echo "Done creating $file_count files in $target_path."

