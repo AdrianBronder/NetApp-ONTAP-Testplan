@@ -19,7 +19,7 @@
   name:                                "ONTAP-82-03 - Dry-run Anti-ransomware"
   gather_facts:                        false
   vars:
-    input: &input
+    input01: &input01
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
@@ -43,7 +43,7 @@
         body:
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
-        <<: *input
+        <<: *input01
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
       ignore_errors:                   true
@@ -60,7 +60,7 @@
                                        true
           is-enabled-on-snapshot-copy-creation:
                                        true
-        <<: *input
+        <<: *input01
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
 
@@ -88,7 +88,7 @@
   name:                                "ONTAP-82-03 - Activate Anti-ransomware"
   gather_facts:                        false
   vars:
-    input: &input
+    input02: &input02
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
@@ -112,7 +112,7 @@
         body:
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
-        <<: *input
+        <<: *input02
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
       ignore_errors:                   true
