@@ -28,7 +28,7 @@ target_path=$1
 file_count=$2
 
 # Size of each file in bytes (e.g., 1024 bytes = 1KB)
-file_size=1024
+file_size=1048576
 
 for i in $(seq 1 $file_count); do
     # Generate a random file name
