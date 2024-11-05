@@ -93,7 +93,7 @@
         vserver:                       "{{ item.0 }}"
         <<: *input
       loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
 
     - name: Remove volume
       netapp.ontap.na_ontap_volume:
