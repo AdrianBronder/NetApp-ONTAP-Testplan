@@ -46,6 +46,7 @@
         <<: *input
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+      ignore_errors:                   true
 
     - name: Activate additional notifications for ransomware events
       netapp.ontap.na_ontap_rest_cli:
