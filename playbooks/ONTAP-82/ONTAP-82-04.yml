@@ -53,11 +53,13 @@
         command:                       'security/anti-ransomware/volume/event-log'
         verb:                          'PATCH'
         params:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+        body:
           is-enabled-on-new-file-extension-seen:
                                        true
           is-enabled-on-snapshot-copy-creation:
                                        true
-        body:
         <<: *input
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
