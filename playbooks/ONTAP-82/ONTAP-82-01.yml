@@ -104,7 +104,7 @@
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
-        state:                         absent
+        state:                         present
         share_name:                    "{{ item.1 }}_{{ item.2 }}"
         vserver:                       "{{ item.0 }}"
         user_or_group:                 "Everyone"
