@@ -14,7 +14,7 @@ def index():
     return render_template('index.html')
 
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
-def receive_data():
+def receive_data_bluecorp():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
@@ -25,7 +25,7 @@ def receive_data():
         return jsonify(error="Unsupported Media Type"), 415
 
 @app.route('/ntap_svm_astrainc', methods=['POST'])
-def receive_data():
+def receive_data_astrainc():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
@@ -36,7 +36,7 @@ def receive_data():
         return jsonify(error="Unsupported Media Type"), 415
     
 @app.route('/ntap_svm_polarisltd', methods=['POST'])
-def receive_data():
+def receive_data_polarisltd():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
