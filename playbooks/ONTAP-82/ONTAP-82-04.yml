@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-82-04 - Activate Anti-ransomware
+# Title:        ONTAP-82-04 - Simulate Attack
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-11-04
 # Description:  Anti-Ransomware
-#               - Activate Anti-ransomware
+#               - Simulate Attack
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -15,53 +15,22 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-82-04 - Activate Anti-ransomware"
+- hosts:                               "linux"
+  name:                                "ONTAP-82-04 - Simulate Attack"
   gather_facts:                        false
-  vars:
-    input: &input
-      hostname:                        "{{ ansible_host }}"
-      username:                        "{{ ontap_admin_user }}"
-      password:                        "{{ ontap_admin_password }}"
-      https:                           true
-      validate_certs:                  false
-      use_rest:                        "always"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
-    - netapp.ontap
+    - ansible.posix
+    - community.general
 
   pre_tasks:
 
   tasks:
-    - name: Activate Anti-ransomware on volumes
-      netapp.ontap.na_ontap_rest_cli:
-        command:                       'security/anti-ransomware/volume/enable'
-        verb:                          'POST'
-        params:
-        body:
-          vserver:                     "{{ item.0 }}"
-          volume:                      "{{ item.1 }}"
-        <<: *input
+    - name: Encrypt and rename files
+      ansible.builtin.script: ./scripts/ONTAP-82-04.sh "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
       loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
-      ignore_errors:                   true
-
-    - name: Activate additional notifications for ransomware events
-      netapp.ontap.na_ontap_rest_cli:
-        command:                       'security/anti-ransomware/volume/event-log'
-        verb:                          'PATCH'
-        params:
-          vserver:                     "{{ item.0 }}"
-          volume:                      "{{ item.1 }}"
-        body:
-          is-enabled-on-new-file-extension-seen:
-                                       true
-          is-enabled-on-snapshot-copy-creation:
-                                       true
-        <<: *input
-      loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
-
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+  
   post_tasks:

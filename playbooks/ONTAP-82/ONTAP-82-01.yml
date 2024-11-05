@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-82-01 - Filesystems for Tenants"
+  name:                                "ONTAP-82-01 - Filesystems for Tenants - ONTAP"
   gather_facts:                        false
   vars:
     input: &input
@@ -110,6 +110,49 @@
         user_or_group:                 "Everyone"
         permission:                    "read_only"
         <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+
+- hosts:                               "linux"
+  name:                                "ONTAP-82-01 - Filesystems for Tenants - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Ensure stale mounts are removed before proceding (in case a mount exists)
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
+                                        {{ item.1 }}/{{ item.2 }}"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+  
+    - name: Create mount directories
+      ansible.builtin.file:
+        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        state:                         "directory"
+        mode:                          "0755"
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+  
+    - name: Mount NFS export on Linux host
+      ansible.posix.mount:
+        state:                         "mounted"
+        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
+                                        {{ item.1 }}/{{ item.2 }}"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
 

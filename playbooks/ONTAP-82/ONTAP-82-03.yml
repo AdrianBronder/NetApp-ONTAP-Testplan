@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-82-03 - Mount & Write
+# Title:        ONTAP-82-03 - Activate and train Anti-ransomware
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-11-04
@@ -15,8 +15,57 @@
 # 
 ################################################################################
 
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-82-03 - Dry-run Anti-ransomware"
+  gather_facts:                        false
+  vars:
+    input: &input
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Start  Anti-ransomware dry-run on volumes
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/dry-run'
+        verb:                          'POST'
+        params:
+        body:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+      ignore_errors:                   true
+
+    - name: Activate additional notifications for ransomware events
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/event-log'
+        verb:                          'PATCH'
+        params:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+        body:
+          is-enabled-on-new-file-extension-seen:
+                                       true
+          is-enabled-on-snapshot-copy-creation:
+                                       true
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+
 - hosts:                               "linux"
-  name:                                "ONTAP-82-03 - Mount & Write"
+  name:                                "ONTAP-82-03 - Write Data"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -28,39 +77,42 @@
   pre_tasks:
 
   tasks:
-    - name: Ensure stale mounts are removed before proceding (in case a mount exists)
-      ansible.posix.mount:
-        state:                         "absent"
-        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
-                                        {{ item.1 }}/{{ item.2 }}"
-        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
-#        opts:                          "rw,sync,hard,vers=3"
-        fstype:                        "nfs"
-      loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
-  
-    - name: Create mount directories
-      ansible.builtin.file:
-        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
-        state:                         "directory"
-        mode:                          "0755"
-      loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
-  
-    - name: Mount NFS export on Linux host
-      ansible.posix.mount:
-        state:                         "mounted"
-        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
-                                        {{ item.1 }}/{{ item.2 }}"
-        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
-#        opts:                          "rw,sync,hard,vers=3"
-        fstype:                        "nfs"
-      loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
-  
     - name: Create test files on exports
       ansible.builtin.script: ./scripts/ONTAP-82-03.sh "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 1000
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
   
   post_tasks:
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-82-03 - Activate Anti-ransomware"
+  gather_facts:                        false
+  vars:
+    input: &input
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Start  Anti-ransomware dry-run on volumes
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/enable'
+        verb:                          'POST'
+        params:
+        body:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+      ignore_errors:                   true
