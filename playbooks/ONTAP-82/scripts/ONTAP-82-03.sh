@@ -10,13 +10,13 @@
 # 
 ################################################################################
 
-if [ "$#" -ne 2 ]; then
+if [[ "$#" -ne 2 ]]; then
     echo "Usage: $0 <target path> <file count>"
     exit 1
-elif [ -d $1 ]; then
-    echo "$1 does exist."
+elif ! [[ -d $1 ]]; then
+    echo "$1 does not exist"
     exit 1
-elif ! [ $2 =~ ^[0-9]+$ ]
+elif ! [[ $2 =~ ^[0-9]+$ ]]; then
     echo "Integer must be provided for file count. Got: $2"
     exit 1
 fi

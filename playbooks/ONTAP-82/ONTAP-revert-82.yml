@@ -1,10 +1,10 @@
 ################################################################################
 #
-# Title:        ONTAP-revert-81 - Advanced - CIFS Self-Service
+# Title:        ONTAP-revert-82 - Anti-ransomware
 # Author:       NetApp Inc. (badrian)
 # Initial 
-# Create Date:  2024-02-09
-# Description:  Revert all steps performed in test frame 81
+# Create Date:  2024-11-05
+# Description:  Revert all steps performed in test frame 82
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -14,8 +14,43 @@
 #
 ################################################################################
 
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-82 - Anti-ransomware - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+
+  tasks:
+    - name: Unmount exports on volume
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
+                                        {{ item.1 }}/{{ item.2 }}"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+  
+    - name: Remove mount directories
+      ansible.builtin.file:
+        state:                         "absent"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        mode:                          "0755"
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+
+    - name: Remove default parent mount directory
+      ansible.builtin.file:
+        path:                          "{{ linux_82_mount_dir }}"
+        state:                         "absent"
+        mode:                          "0755"
+
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-revert-81 - Advanced - CIFS Self-Service"
+  name:                                "ONTAP-revert-82 - Anti-ransomware - ONTAP"
   gather_facts:                        false
   vars:
     input: &input
@@ -30,49 +65,38 @@
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - netapp.ontap
-  module_defaults:
-    group/netapp.ontap.netapp_ontap:
-      hostname:                        "{{ ansible_host }}"
-      username:                        "{{ ontap_admin_user }}"
-      password:                        "{{ ontap_admin_password }}"
-      https:                           true
-      validate_certs:                  false
-      use_rest:                        "always"
-
-  pre_tasks:
 
   tasks:
-    - name: Get all CIFS shares for test frame 81
-      netapp.ontap.na_ontap_rest_info:
-        gather_subset:
-          - "protocols/cifs/shares"
-        fields:
-          - "*"
-        parameters:
-          svm.name:               "{{ global_primary_nas_svm }}"
-          path:                   "/ontap_81_*"
-        use_python_keys:          true
-      register: cifs_share_info
-  
-    - name: Delete all CIFS shares
-      netapp.ontap.na_ontap_cifs:
-        state:                    absent
-        name:                     "{{ item.name }}"                  
-        vserver:                  "{{ item.svm.name }}"
+    - name: Remove REST EMS destination for every tenant
+      netapp.ontap.na_ontap_ems_destination:
+        state:                         "absent"
+        name:                          "dest_{{ item }}"
+        <<: *input
       loop:
-        "{{ cifs_share_info.ontap_info.protocols_cifs_shares.records }}"
-      loop_control:
-        label: "{{ item.svm.name }} - {{ item.name }}"
-      when:
-      - cifs_share_info.ontap_info.protocols_cifs_shares.num_records|int > 0
-      - item.name is defined
+        "{{ ontap_82_tenant_list }}"
 
-    - name: Remove volumes
+    - name: Remove EMS filters 
+      netapp.ontap.na_ontap_ems_filter:
+        state:                         "absent"
+        name:                          "ems_{{ item }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list }}"
+
+    - name: Remove volume
       netapp.ontap.na_ontap_volume:
-        state:                         absent
-        name:                          "{{ item }}"
-        vserver:                       "{{ global_primary_nas_svm }}"
+        state:                         "absent"
+        name:                          "{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        <<: *input
       loop:
-        "{{ ontap_81_volumes }}"
-
-  post_tasks:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+  
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         absent
+        name:                          "{{ ontap_82_policy_name }}"
+        vserver:                       "{{ item }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list }}"

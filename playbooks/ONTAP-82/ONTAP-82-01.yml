@@ -65,9 +65,9 @@
         name:                          "{{ item.1 }}"
         aggregate_name:                "{{ storage_aggregates[0].name }}"
         size:                          "{{ ontap_default_vol_size_gb }}"
-        size_unit:                     gb
-        space_guarantee:               none
-        tiering_policy:                auto
+        size_unit:                     "gb"
+        space_guarantee:               "none"
+        tiering_policy:                "auto"
         export_policy:                 "ro_{{ item.0 }}"
         junction_path:                 "/{{ item.1 }}"
         vserver:                       "{{ item.0 }}"

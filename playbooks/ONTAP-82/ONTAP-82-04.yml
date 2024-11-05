@@ -1,0 +1,64 @@
+################################################################################
+#
+# Title:        ONTAP-82-04 - Activate Anti-ransomware
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-11-04
+# Description:  Anti-Ransomware
+#               - Activate Anti-ransomware
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-82-04 - Activate Anti-ransomware"
+  gather_facts:                        false
+  vars:
+    input: &input
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+
+  pre_tasks:
+
+  tasks:
+    - name: Activate Anti-ransomware on volumes
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/enable'
+        verb:                          'POST'
+        params:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+        body:
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+
+    - name: Activate additional notifications for ransomware events
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/event-log'
+        verb:                          'PATCH'
+        params:
+          is-enabled-on-new-file-extension-seen:
+                                       true
+          is-enabled-on-snapshot-copy-creation:
+                                       true
+        body:
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+
+  post_tasks:
