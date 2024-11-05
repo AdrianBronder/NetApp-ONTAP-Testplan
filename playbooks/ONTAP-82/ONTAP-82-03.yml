@@ -35,34 +35,18 @@
   pre_tasks:
 
   tasks:
-    - name: Start  Anti-ransomware dry-run on volumes
-      netapp.ontap.na_ontap_rest_cli:
-        command:                       'security/anti-ransomware/volume/dry-run'
-        verb:                          'POST'
-        params:
-        body:
-          vserver:                     "{{ item.0 }}"
-          volume:                      "{{ item.1 }}"
-        <<: *input01
-      loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
-      ignore_errors:                   true
-
-    - name: Activate additional notifications for ransomware events
-      netapp.ontap.na_ontap_rest_cli:
-        command:                       'security/anti-ransomware/volume/event-log'
-        verb:                          'PATCH'
-        params:
-          vserver:                     "{{ item.0 }}"
-          volume:                      "{{ item.1 }}"
-        body:
-          is-enabled-on-new-file-extension-seen:
-                                       true
-          is-enabled-on-snapshot-copy-creation:
-                                       true
-        <<: *input01
-      loop:
-        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+#    - name: Start  Anti-ransomware dry-run on volumes
+#      netapp.ontap.na_ontap_rest_cli:
+#        command:                       'security/anti-ransomware/volume/dry-run'
+#        verb:                          'POST'
+#        params:
+#        body:
+#          vserver:                     "{{ item.0 }}"
+#          volume:                      "{{ item.1 }}"
+#        <<: *input01
+#      loop:
+#        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+#      ignore_errors:                   true
 
 - hosts:                               "linux"
   name:                                "ONTAP-82-03 - Write Data"
@@ -116,3 +100,19 @@
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
       ignore_errors:                   true
+
+    - name: Activate additional notifications for ransomware events
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/event-log'
+        verb:                          'PATCH'
+        params:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+        body:
+          is-enabled-on-new-file-extension-seen:
+                                       true
+          is-enabled-on-snapshot-copy-creation:
+                                       true
+        <<: *input01
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"

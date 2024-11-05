@@ -6,8 +6,14 @@ app = Flask(__name__)
 
 # In-memory storage for demonstration purposes
 received_data_bluecorp = []
+event_summary_bluecorp = {}
 received_data_astrainc = []
+event_summary_astrainc = {}
 received_data_polarisltd = []
+event_summary_polarisltd = {}
+
+# Namespace for xml parsing
+namespaces = {'ns0': 'http://www.netapp.com/filer/admin'}
 
 @app.route('/')
 def index():
@@ -20,6 +26,14 @@ def receive_data_bluecorp():
         root = ET.fromstring(xml_data)  # Parse the XML data
         received_data_bluecorp.append(ET.tostring(root, encoding='utf8', method='xml'))
 
+        # count volume event occurances
+        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
+        # Extract the text from the volumeName element if it exists
+        if vol_element is not None:
+            vol_name = vol_element.text
+            # Increment the count for this volume in the dictionary
+            event_summary_bluecorp[vol_name] = event_summary_bluecorp.get(vol_name, 0) + 1
+
         return jsonify(success=True)  # Acknowledge the receipt
     else:
         return jsonify(error="Unsupported Media Type"), 415
@@ -31,6 +45,14 @@ def receive_data_astrainc():
         root = ET.fromstring(xml_data)  # Parse the XML data
         received_data_astrainc.append(ET.tostring(root, encoding='utf8', method='xml'))
 
+        # count volume event occurances
+        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
+        # Extract the text from the volumeName element if it exists
+        if vol_element is not None:
+            vol_name = vol_element.text
+            # Increment the count for this volume in the dictionary
+            event_summary_astrainc[vol_name] = event_summary_astrainc.get(vol_name, 0) + 1
+
         return jsonify(success=True)  # Acknowledge the receipt
     else:
         return jsonify(error="Unsupported Media Type"), 415
@@ -41,6 +63,14 @@ def receive_data_polarisltd():
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
         received_data_polarisltd.append(ET.tostring(root, encoding='utf8', method='xml'))
+
+        # count volume event occurances
+        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
+        # Extract the text from the volumeName element if it exists
+        if vol_element is not None:
+            vol_name = vol_element.text
+            # Increment the count for this volume in the dictionary
+            event_summary_polarisltd[vol_name] = event_summary_polarisltd.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
