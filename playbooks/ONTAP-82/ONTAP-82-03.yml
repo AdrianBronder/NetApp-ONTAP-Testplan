@@ -62,7 +62,7 @@
 
   tasks:
     - name: Create test files on exports
-      ansible.builtin.script: ./scripts/ONTAP-82-03.sh "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 100
+      ansible.builtin.script: ./scripts/ONTAP-82-03.sh "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
   
