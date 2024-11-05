@@ -40,9 +40,9 @@
         command:                       'security/anti-ransomware/volume/enable'
         verb:                          'POST'
         params:
+        body:
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
-        body:
         <<: *input
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
