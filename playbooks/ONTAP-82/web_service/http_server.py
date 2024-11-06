@@ -9,14 +9,14 @@ logging.basicConfig(level=logging.DEBUG)
 app = Flask(__name__)
 
 # Configuration for LDAP
-app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'  # e.g., 'ldap://your-ad-domain.com'
-app.config['LDAP_BASE_DN'] = 'dc=demo,dc=netapp,dc=com'  # Base DN of your directory
-app.config['LDAP_USER_DN'] = 'cn=Users'  # DN of users, e.g., 'ou=People'
-app.config['LDAP_GROUP_DN'] = 'ou=Groups'  # DN of groups, e.g., 'ou=Groups'
-#app.config['LDAP_USER_RDN_ATTR'] = 'cn'  # The attribute to use for RDN
+app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'  # or 'ldaps://dc1.demo.netapp.com' for LDAPS
+app.config['LDAP_BASE_DN'] = 'DC=demo,DC=netapp,DC=com'  # Base DN of your directory
+app.config['LDAP_USER_DN'] = 'CN=Users'  # DN of the default Users container
+app.config['LDAP_GROUP_DN'] = 'OU=Groups'  # Adjust if your groups are in a different OU
+app.config['LDAP_USER_RDN_ATTR'] = 'cn'  # The attribute to use for RDN
 app.config['LDAP_USER_LOGIN_ATTR'] = 'sAMAccountName'  # Attribute for logging in
-app.config['LDAP_BIND_USER_DN'] = 'Administrator@demo.netapp.com'  # The DN to bind with for authentication
-app.config['LDAP_BIND_USER_PASSWORD'] = 'Netapp1!'  # The password to bind with
+app.config['LDAP_BIND_USER_DN'] = 'Administrator@demo.netapp.com'  # UPN for the bind user
+app.config['LDAP_BIND_USER_PASSWORD'] = 'Netapp1!'  # Password for the bind user
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
