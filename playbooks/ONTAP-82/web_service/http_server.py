@@ -15,7 +15,7 @@ app.config['LDAP_USER_DN'] = 'ou=Users'  # DN of users, e.g., 'ou=People'
 app.config['LDAP_GROUP_DN'] = 'ou=Users'  # DN of groups, e.g., 'ou=Groups'
 app.config['LDAP_USER_RDN_ATTR'] = 'cn'  # The attribute to use for RDN
 app.config['LDAP_USER_LOGIN_ATTR'] = 'sAMAccountName'  # Attribute for logging in
-app.config['LDAP_BIND_USER_DN'] = 'Administrator'  # The DN to bind with for authentication
+app.config['LDAP_BIND_USER_DN'] = 'Administrator@demo.netapp.com'  # The DN to bind with for authentication
 app.config['LDAP_BIND_USER_PASSWORD'] = 'Netapp1!'  # The password to bind with
 
 # Initialize the LDAP3 Login Manager
