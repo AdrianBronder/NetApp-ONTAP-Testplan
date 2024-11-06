@@ -3,7 +3,7 @@
 ################################################################################
 #
 # Title:        init_eapontap9131.sh
-# Author:       Adrian Bronder
+# Author:       NetApp Inc. (badrian)
 # Initial Date: 2023-08-16
 # Description:  Prepare linux host "centos1" in LoD lab 497
 #               --> "Early Adopter Lab for ONTAP 9.13.1"
@@ -109,7 +109,7 @@ python3 -m pip install --upgrade pip
 echo ""
 echo ""
 echo "--> Installing additional Python libs"
-python3 -m pip install --upgrade requests six netapp_lib selinux
+python3 -m pip install --upgrade requests six netapp_lib flask Flask-LDAP3-Login selinux netapp_ontap
 python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 
 echo ""

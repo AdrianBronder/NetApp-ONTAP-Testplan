@@ -1,7 +1,7 @@
 #!/bin/bash
 ################################################################################
 #
-# Title:        ONTAP-82-03.sh - Mount & Write
+# Title:        ONTAP-82-03.sh - Write Files
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-11-04

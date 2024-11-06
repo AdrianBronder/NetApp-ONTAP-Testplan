@@ -2,13 +2,13 @@
 
 ################################################################################
 #
-# Title:        init_eapontap9141.sh
+# Title:        init_eapontap9161.sh
 # Author:       NetApp Inc. (badrian)
-# Initial Date: 2024-01-23
-# Description:  Prepare linux host "rhel1" in LoD lab 724
-#               --> "Early Adopter Lab for ONTAP 9.14.1"
+# Initial Date: 2024-11-04
+# Description:  Prepare linux host "rhel1" in LoD lab 1028
+#               --> "Early Access for Unified ONTAP 9.16.1"
 #
-# URLs:         https://labondemand.netapp.com/node/724
+# URLs:         https://labondemand.netapp.com/node/1028
 #               https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
 #
