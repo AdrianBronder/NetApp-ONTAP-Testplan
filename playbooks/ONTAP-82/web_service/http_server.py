@@ -10,7 +10,7 @@ app = Flask(__name__)
 
 # Configuration for LDAP
 app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'  # e.g., 'ldap://your-ad-domain.com'
-app.config['LDAP_BASE_DN'] = 'dc=demo,dc=netapp,dc=com'  # Base DN of your directory
+app.config['LDAP_BASE_DN'] = 'cn=Users,dc=demo,dc=netapp,dc=com'  # Base DN of your directory
 app.config['LDAP_USER_DN'] = 'ou=Users'  # DN of users, e.g., 'ou=People'
 app.config['LDAP_GROUP_DN'] = 'ou=Users'  # DN of groups, e.g., 'ou=Groups'
 app.config['LDAP_USER_RDN_ATTR'] = 'cn'  # The attribute to use for RDN
