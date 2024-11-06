@@ -2,6 +2,9 @@
 from flask import Flask, request, redirect, url_for, render_template, session, jsonify
 from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 import xml.etree.ElementTree as ET
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
