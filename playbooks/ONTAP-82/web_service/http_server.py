@@ -1,8 +1,22 @@
 #!/usr/bin/env python3
 from flask import Flask, request, render_template, jsonify
+from flask_ldap3_login import LDAP3LoginManager
 import xml.etree.ElementTree as ET
 
 app = Flask(__name__)
+
+# Configuration for LDAP
+app.config['LDAP_HOST'] = 'ldap://demo.netapp.com'  # e.g., 'ldap://your-ad-domain.com'
+app.config['LDAP_BASE_DN'] = 'dc=demo,dc=netapp,dc=com'  # Base DN of your directory
+app.config['LDAP_USER_DN'] = 'ou=Users'  # DN of users, e.g., 'ou=People'
+app.config['LDAP_GROUP_DN'] = 'ou=Users'  # DN of groups, e.g., 'ou=Groups'
+app.config['LDAP_USER_RDN_ATTR'] = 'cn'  # The attribute to use for RDN
+app.config['LDAP_USER_LOGIN_ATTR'] = 'sAMAccountName'  # Attribute for logging in
+app.config['LDAP_BIND_USER_DN'] = None  # The DN to bind with for authentication
+app.config['LDAP_BIND_USER_PASSWORD'] = None  # The password to bind with
+
+# Initialize the LDAP3 Login Manager
+ldap_manager = LDAP3LoginManager(app)
 
 # In-memory storage for demonstration purposes
 received_data_bluecorp = []
@@ -18,6 +32,22 @@ namespaces = {'ns0': 'http://www.netapp.com/filer/admin'}
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Authenticate the user
+        response = ldap_manager.authenticate(username, password)
+        if response == AuthenticationResponseStatus.success:
+            # User is authenticated, proceed to the protected area
+            return redirect(url_for('protected_area'))
+        else:
+            # Authentication failed, show login form again with an error
+            return render_template('login.html', error='Invalid credentials')
+    # GET request, show the login form
+    return render_template('login.html')
 
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
