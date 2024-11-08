@@ -106,9 +106,12 @@ def receive_data_bluecorp():
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
 
+        timestamp = int(root.find('.//ns0:time', namespaces).text)
+        readable_timestamp = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
         # Extract details from the XML
         event_details = {
-            'timestamp': root.find('.//ns0:time', namespaces).text,
+            'timestamp': readable_timestamp,
             'seq_num': root.find('.//ns0:seq-num', namespaces).text,
             'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
             'node_uuid': root.find('.//ns0:node-uuid', namespaces).text,
@@ -135,9 +138,12 @@ def receive_data_astrainc():
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
 
+        timestamp = int(root.find('.//ns0:time', namespaces).text)
+        readable_timestamp = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
         # Extract details from the XML
         event_details = {
-            'timestamp': root.find('.//ns0:time', namespaces).text,
+            'timestamp': readable_timestamp,
             'seq_num': root.find('.//ns0:seq-num', namespaces).text,
             'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
             'node_uuid': root.find('.//ns0:node-uuid', namespaces).text,
@@ -164,9 +170,12 @@ def receive_data_polarisltd():
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
 
+        timestamp = int(root.find('.//ns0:time', namespaces).text)
+        readable_timestamp = datetime.utcfromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S')
+
         # Extract details from the XML
         event_details = {
-            'timestamp': root.find('.//ns0:time', namespaces).text,
+            'timestamp': readable_timestamp,
             'seq_num': root.find('.//ns0:seq-num', namespaces).text,
             'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
             'node_uuid': root.find('.//ns0:node-uuid', namespaces).text,
