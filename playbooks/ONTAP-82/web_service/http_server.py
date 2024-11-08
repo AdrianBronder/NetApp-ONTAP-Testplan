@@ -25,6 +25,7 @@ app.config['LDAP_USER_SEARCH_SCOPE'] = 'SUBTREE'
 app.config['LDAP_GROUP_SEARCH_BASE'] = 'dc=demo,dc=netapp,dc=com'  # Base DN for group search
 app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'  # Filter for group search
 app.config['LDAP_GROUP_SEARCH_SCOPE'] = 'SUBTREE'  # Scope for group search
+app.config['SECRET_KEY'] = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
 app.config['DEBUG'] = True
 
 # Initialize the LDAP3 Login Manager
