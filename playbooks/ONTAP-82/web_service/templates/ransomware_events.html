@@ -59,6 +59,27 @@
 <body>
     <div class="container">
         <h1>Events for {{ company }}</h1>
+        
+        <!-- Volume Summary Section -->
+        <h2>Volume Summary</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Volume Name</th>
+                    <th>Event Count</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for volume, count in summary.items() %}
+                    <tr>
+                        <td>{{ volume }}</td>
+                        <td>{{ count }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <!-- Event Details Section -->
         {% for event in data %}
             <div class="event">
                 <p><strong class="event-name">{{ event['message_name'] }}</strong></p>
