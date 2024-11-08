@@ -43,18 +43,6 @@ event_summary_polarisltd = {}
 # Namespace for xml parsing
 namespaces = {'ns0': 'http://www.netapp.com/filer/admin'}
 
-# Function to retrieve group memberships from LDAP
-def get_user_groups(user_dn):
-    server = Server(app.config['LDAP_HOST'], get_info=ALL)
-    conn = Connection(server, user=app.config['LDAP_BIND_USER_DN'], password=app.config['LDAP_BIND_USER_PASSWORD'], auto_bind=True)
-    conn.search(search_base=app.config['LDAP_GROUP_DN'],
-                search_filter=f'(&(objectClass=group)(member={user_dn}))',
-                search_scope='SUBTREE',
-                attributes=['cn'])
-    groups = [entry['attributes']['cn'][0] for entry in conn.entries]
-    conn.unbind()
-    return groups
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -66,13 +54,12 @@ def login():
         password = request.form['password']
         # Authenticate the user
         response = ldap_manager.authenticate(username, password)
-        logger.debug(f"User groups for session: {response.user_groups}")  # Debug log statement
         if response.status == AuthenticationResponseStatus.success:
             user_dn = response.user_dn
-            # Retrieve and store user's group memberships
-            user_groups = get_user_groups(user_dn)
+            user_groups = response.user_groups  # Retrieve group information
             session['username'] = username
             session['groups'] = user_groups
+            logger.debug(f"User groups for session: {session['groups']}")  # Debug log statement
             # Redirect to a route that shows data based on user groups
             return redirect(url_for('show_events'))
         else:
@@ -169,6 +156,12 @@ def show_data_astrainc():
 def show_data_polarisltd():
     # Pass the event summary along with the received data to the template
     return render_template('data.html', data=[data.decode('utf8') for data in received_data_polarisltd], summary=event_summary_polarisltd)
+
+# Define a logout route
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
