@@ -15,6 +15,7 @@ app.config['LDAP_USER_DN'] = 'cn=Users'  # DN of users, e.g., 'ou=People'
 #app.config['LDAP_GROUP_DN'] = 'dc=demo,dc=netapp,dc=com'  # DN of groups, e.g., 'ou=Groups'
 app.config['LDAP_USER_RDN_ATTR'] = 'cn'  # The attribute to use for RDN
 app.config['LDAP_USER_LOGIN_ATTR'] = 'sAMAccountName'  # Attribute for logging in
+app.config['LDAP_GROUP_MEMBERS_ATTR'] = 'member'
 app.config['LDAP_BIND_USER_DN'] = 'Administrator@demo.netapp.com'  # The DN to bind with for authentication
 app.config['LDAP_BIND_USER_PASSWORD'] = 'Netapp1!'  # The password to bind with
 #app.config['LDAP_GROUP_SEARCH_FILTER'] = '(&(objectclass=group)(member={user_dn}))'
@@ -24,13 +25,6 @@ app.config['LDAP_GROUP_SEARCH_BASE'] = 'dc=demo,dc=netapp,dc=com'  # Base DN for
 app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'  # Filter for group search
 app.config['LDAP_GROUP_SEARCH_SCOPE'] = 'SUBTREE'  # Scope for group search
 app.config['DEBUG'] = True
-
-
-# Change the group search filter to use the 'member' attribute
-group_filter = '(&(objectclass=group)(member={user_dn}))'
-
-# Change the scope to 'SUBTREE' to search all levels under the base DN
-group_scope = 'SUBTREE'
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
