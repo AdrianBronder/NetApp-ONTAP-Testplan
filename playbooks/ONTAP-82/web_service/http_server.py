@@ -24,10 +24,6 @@ app.config['LDAP_GROUP_SEARCH_BASE']   = 'dc=demo,dc=netapp,dc=com'  # Base DN f
 app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'  # Filter for group search
 app.config['LDAP_GROUP_SEARCH_SCOPE']  = 'SUBTREE'  # Scope for group search
 app.config['SECRET_KEY']               = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
-app.config['DEBUG'] = True
-#app.config['LDAP_GROUP_DN'] = 'dc=demo,dc=netapp,dc=com'  # DN of groups, e.g., 'ou=Groups'
-#app.config['LDAP_GROUP_SEARCH_FILTER'] = '(&(objectclass=group)(member={user_dn}))'
-#app.config['LDAP_SEARCH_FOR_GROUPS'] = False
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
@@ -45,7 +41,7 @@ namespaces = {'ns0': 'http://www.netapp.com/filer/admin'}
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -58,39 +54,41 @@ def login():
             user_dn = response.user_dn
             user_groups = response.user_groups  # Retrieve group information
             user_groups_list = [group['name'] for group in user_groups]
-            session['username'] = username
+            session['username'] = user_dn
             session['groups'] = user_groups_list
-#            logger.debug(f"User groups for session: {session['groups']}")  # Debug log statement
-            # Redirect to a route that shows data based on user groups
-            return redirect(url_for('show_events'))
+            return redirect(url_for('ransomware_events'))
         else:
             # Authentication failed, show login form again with an error
-            return render_template('login.html', error='Invalid credentials')
+            return render_template('login.html', error='Login failed, try again.')
     # GET request, show the login form
     return render_template('login.html')
 
 # Define a route to show data based on user groups
-@app.route('/show_events')
-def show_events():
+@app.route('/ransomware_events')
+def ransomware_events():
     if 'username' not in session:
         return redirect(url_for('login'))
-    # Retrieve user's groups from the session
-    user_groups = session['groups']
     # Determine what data to show based on group membership
-    if 'bluecorp' in user_groups:
+    if 'bluecorp' in session['groups']:
+        company_name = "Blue Corp"
         event_data = received_data_bluecorp
         summary_data = event_summary_bluecorp
-    elif 'astrainc' in user_groups:
+    elif 'astrainc' in session['groups']:
+        company_name = "Astra Inc"
         event_data = received_data_astrainc
         summary_data = event_summary_astrainc
-    elif 'polarisltd' in user_groups:
+    elif 'polarisltd' in session['groups']:
+        company_name = "Polaris Ltd"
         event_data = received_data_polarisltd
         summary_data = event_summary_polarisltd
     else:
         event_data = []
         summary_data = {}
     # Render a template with the appropriate data and group memberships
-    return render_template('data.html', data=[data.decode('utf8') for data in event_data], summary=summary_data)
+    return render_template('ransomware_events.html',
+                            data=[data.decode('utf8') for data in event_data],
+                            summary=summary_data,
+                            company=company_name)
 
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
@@ -148,21 +146,6 @@ def receive_data_polarisltd():
         return jsonify(success=True)  # Acknowledge the receipt
     else:
         return jsonify(error="Unsupported Media Type"), 415
-
-@app.route('/show_events_bluecorp')
-def show_data_bluecorp():
-    # Pass the event summary along with the received data to the template
-    return render_template('data.html', data=[data.decode('utf8') for data in received_data_bluecorp], summary=event_summary_bluecorp)
-
-@app.route('/show_events_astrainc')
-def show_data_astrainc():
-    # Pass the event summary along with the received data to the template
-    return render_template('data.html', data=[data.decode('utf8') for data in received_data_astrainc], summary=event_summary_astrainc)
-
-@app.route('/show_events_polarisltd')
-def show_data_polarisltd():
-    # Pass the event summary along with the received data to the template
-    return render_template('data.html', data=[data.decode('utf8') for data in received_data_polarisltd], summary=event_summary_polarisltd)
 
 # Define a logout route
 @app.route('/logout')
