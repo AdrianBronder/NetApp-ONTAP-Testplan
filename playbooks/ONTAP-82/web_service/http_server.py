@@ -57,8 +57,9 @@ def login():
         if response.status == AuthenticationResponseStatus.success:
             user_dn = response.user_dn
             user_groups = response.user_groups  # Retrieve group information
+            user_groups_list = list(user_groups.keys())
             session['username'] = username
-            session['groups'] = user_groups
+            session['groups'] = user_groups_list
             logger.debug(f"User groups for session: {session['groups']}")  # Debug log statement
             # Redirect to a route that shows data based on user groups
             return redirect(url_for('show_events'))
