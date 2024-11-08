@@ -63,11 +63,15 @@ def login():
     # GET request, show the login form
     return render_template('login.html')
 
-# Define a route to show data based on user groups
 @app.route('/ransomware_events')
 def ransomware_events():
     if 'username' not in session:
         return redirect(url_for('login'))
+    
+    company_name = "Unknown"
+    event_data = []
+    summary_data = {}
+
     # Determine what data to show based on group membership
     if 'bluecorp' in session['groups']:
         company_name = "Blue Corp"
@@ -81,9 +85,7 @@ def ransomware_events():
         company_name = "Polaris Ltd"
         event_data = received_data_polarisltd
         summary_data = event_summary_polarisltd
-    else:
-        event_data = []
-        summary_data = {}
+
     # Render a template with the appropriate data and group memberships
     return render_template('ransomware_events.html',
                             data=[data.decode('utf8') for data in event_data],

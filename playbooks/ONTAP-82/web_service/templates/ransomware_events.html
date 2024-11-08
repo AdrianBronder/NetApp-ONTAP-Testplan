@@ -2,25 +2,87 @@
 <html>
 <head>
     <title>Events for {{ company }}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        .event {
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .event p {
+            margin: 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+    </style>
 </head>
 <body>
-    <h1>Event Summary</h1>
-    <table>
-      <tr>
-        <th>Volume Name</th>
-        <th>Event Count</th>
-      </tr>
-      {% for volume_name, count in summary.items() %}
-      <tr>
-        <td>{{ volume_name }}</td>
-        <td>{{ count }}</td>
-      </tr>
-      {% endfor %}
-    </table>
-    <h1>All Events</h1>
-    {% for item in data %}
-        <p>{{ item }}</p>
-        <hr>
-    {% endfor %}
+    <div class="container">
+        <h1>Event Summary for {{ company }}</h1>
+        <table>
+            <tr>
+                <th>Volume Name</th>
+                <th>Event Count</th>
+            </tr>
+            {% for volume_name, count in summary.items() %}
+            <tr>
+                <td>{{ volume_name }}</td>
+                <td>{{ count }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+
+        <h1>All Events</h1>
+        {% for item in data %}
+        <div class="event">
+            <p>{{ item }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="footer">
+        <p>&copy; 2024 Your Company. All rights reserved.</p>
+    </div>
 </body>
 </html>
