@@ -86,6 +86,7 @@ def show_events():
         return redirect(url_for('login'))
     # Retrieve user's groups from the session
     user_groups = session['groups']
+    logger.debug(f"User groups for session: {user_groups}")  # Debug log statement
     # Determine what data to show based on group membership
     if 'na_ad_admin_group' in user_groups:
         event_data = received_data_bluecorp
