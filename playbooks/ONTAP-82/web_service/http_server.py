@@ -89,12 +89,16 @@ def ransomware_events():
         event_data = received_data_polarisltd
         summary_data = event_summary_polarisltd
 
+    # Sort event data in reverse order based on timestamp
+    event_data_sorted = sorted(event_data, key=lambda x: x['timestamp'], reverse=True)
+
     logger.info(f"User {session['username']} belongs to company: {company_name}")
     # Render a template with the appropriate data and group memberships
     return render_template('ransomware_events.html',
-                           data=[data.decode('utf8') for data in event_data],
+                           data=event_data_sorted,
                            summary=summary_data,
                            company=company_name)
+
 
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
