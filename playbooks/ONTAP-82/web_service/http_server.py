@@ -101,15 +101,25 @@ def receive_data_bluecorp():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
-        received_data_bluecorp.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # count volume event occurrences
-        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
-        # Extract the text from the volumeName element if it exists
-        if vol_element is not None:
-            vol_name = vol_element.text
-            # Increment the count for this volume in the dictionary
-            event_summary_bluecorp[vol_name] = event_summary_bluecorp.get(vol_name, 0) + 1
+        # Extract details from the XML
+        event_details = {
+            'timestamp': root.find('.//ns0:time', namespaces).text,
+            'seq_num': root.find('.//ns0:seq-num', namespaces).text,
+            'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
+            'node_uuid': root.find('.//ns0:node-uuid', namespaces).text,
+            'node': root.find('.//ns0:node', namespaces).text,
+            'message_name': root.find('.//ns0:message-name', namespaces).text,
+            'event': root.find('.//ns0:event', namespaces).text,
+            'volume_name': root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces).text,
+            'vserver_name': root.find('.//ns0:parameter[ns0:name="vserverName"]/ns0:value', namespaces).text,
+        }
+
+        received_data_bluecorp.append(event_details)
+
+        # Count volume event occurrences
+        vol_name = event_details['volume_name']
+        event_summary_bluecorp[vol_name] = event_summary_bluecorp.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
@@ -120,15 +130,25 @@ def receive_data_astrainc():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
-        received_data_astrainc.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # count volume event occurrences
-        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
-        # Extract the text from the volumeName element if it exists
-        if vol_element is not None:
-            vol_name = vol_element.text
-            # Increment the count for this volume in the dictionary
-            event_summary_astrainc[vol_name] = event_summary_astrainc.get(vol_name, 0) + 1
+        # Extract details from the XML
+        event_details = {
+            'timestamp': root.find('.//ns0:time', namespaces).text,
+            'seq_num': root.find('.//ns0:seq-num', namespaces).text,
+            'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
+            'node_uuid': root.find('.//ns0:node-uuid', namespaces).text,
+            'node': root.find('.//ns0:node', namespaces).text,
+            'message_name': root.find('.//ns0:message-name', namespaces).text,
+            'event': root.find('.//ns0:event', namespaces).text,
+            'volume_name': root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces).text,
+            'vserver_name': root.find('.//ns0:parameter[ns0:name="vserverName"]/ns0:value', namespaces).text,
+        }
+
+        received_data_astrainc.append(event_details)
+
+        # Count volume event occurrences
+        vol_name = event_details['volume_name']
+        event_summary_astrainc[vol_name] = event_summary_astrainc.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
@@ -139,15 +159,25 @@ def receive_data_polarisltd():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
         root = ET.fromstring(xml_data)  # Parse the XML data
-        received_data_polarisltd.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # count volume event occurrences
-        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
-        # Extract the text from the volumeName element if it exists
-        if vol_element is not None:
-            vol_name = vol_element.text
-            # Increment the count for this volume in the dictionary
-            event_summary_polarisltd[vol_name] = event_summary_polarisltd.get(vol_name, 0) + 1
+        # Extract details from the XML
+        event_details = {
+            'timestamp': root.find('.//ns0:time', namespaces).text,
+            'seq_num': root.find('.//ns0:seq-num', namespaces).text,
+            'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
+            'node_uuid': root.find('.//ns0:node-uuid', namespaces).text,
+            'node': root.find('.//ns0:node', namespaces).text,
+            'message_name': root.find('.//ns0:message-name', namespaces).text,
+            'event': root.find('.//ns0:event', namespaces).text,
+            'volume_name': root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces).text,
+            'vserver_name': root.find('.//ns0:parameter[ns0:name="vserverName"]/ns0:value', namespaces).text,
+        }
+
+        received_data_polarisltd.append(event_details)
+
+        # Count volume event occurrences
+        vol_name = event_details['volume_name']
+        event_summary_polarisltd[vol_name] = event_summary_polarisltd.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:

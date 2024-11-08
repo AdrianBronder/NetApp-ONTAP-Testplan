@@ -80,21 +80,37 @@
         </table>
         
         <!-- Event Details Section -->
-        {% for event in data %}
-            <div class="event">
-                <p><strong class="event-name">{{ event['message_name'] }}</strong></p>
-                <p>Cluster UUID: {{ event['cluster_uuid'] }}</p>
-                <p>Node UUID: {{ event['node_uuid'] }}</p>
-                <p>Node: {{ event['node'] }}</p>
-                <p>Version: {{ event['version'] }}</p>
-                <p>Parameters:</p>
-                <ul>
-                    {% for param in event['parameters'] %}
-                        <li>{{ param['name'] }}: {{ param['value'] }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endfor %}
+        <h2>Event Details</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Timestamp</th>
+                    <th>Sequence Number</th>
+                    <th>Cluster UUID</th>
+                    <th>Node UUID</th>
+                    <th>Node</th>
+                    <th>Vserver</th>
+                    <th>Volume</th>
+                    <th>Message Name</th>
+                    <th>Event Detail</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in data %}
+                    <tr>
+                        <td>{{ event.timestamp }}</td>
+                        <td>{{ event.seq_num }}</td>
+                        <td>{{ event.cluster_uuid }}</td>
+                        <td>{{ event.node_uuid }}</td>
+                        <td>{{ event.node }}</td>
+                        <td>{{ event.vserver_name }}</td>
+                        <td>{{ event.volume_name }}</td>
+                        <td>{{ event.message_name }}</td>
+                        <td>{{ event.event }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 </body>
 </html>
