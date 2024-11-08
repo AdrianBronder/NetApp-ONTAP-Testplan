@@ -40,6 +40,18 @@ event_summary_polarisltd = {}
 # Namespace for xml parsing
 namespaces = {'ns0': 'http://www.netapp.com/filer/admin'}
 
+# Function to retrieve group memberships from LDAP
+def get_user_groups(user_dn):
+    server = Server(app.config['LDAP_HOST'], get_info=ALL)
+    conn = Connection(server, user=app.config['LDAP_BIND_USER_DN'], password=app.config['LDAP_BIND_USER_PASSWORD'], auto_bind=True)
+    conn.search(search_base=app.config['LDAP_GROUP_DN'],
+                search_filter=f'(&(objectClass=group)(member={user_dn}))',
+                search_scope='SUBTREE',
+                attributes=['cn'])
+    groups = [entry['attributes']['cn'][0] for entry in conn.entries]
+    conn.unbind()
+    return groups
+
 @app.route('/')
 def index():
     return render_template('index.html')
