@@ -26,13 +26,16 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
+            table-layout: fixed; /* Ensure table fits within the container */
         }
         table, th, td {
             border: 1px solid #555;
         }
         th, td {
-            padding: 12px;
+            padding: 8px; /* Reduce padding to fit more content */
             text-align: left;
+            font-size: 0.9em; /* Reduce font size for better fit */
+            word-wrap: break-word; /* Ensure long text wraps within the cell */
         }
         th {
             background-color: #2196F3;
@@ -74,6 +77,7 @@
             padding: 20px;
             border: 1px solid #888;
             width: 80%;
+            color: black; /* Change font color to black for readability */
         }
         .close {
             color: #aaa;
@@ -150,7 +154,7 @@
         </div>
     </div>
 
-    <script>
+   >
         // Get the modal
         var modal = document.getElementById("eventModal");
 
