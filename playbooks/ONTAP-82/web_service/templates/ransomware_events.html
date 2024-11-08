@@ -5,8 +5,8 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
-            color: #333;
+            background-color: #1e1e1e;
+            color: #cfcfcf;
             margin: 0;
             padding: 0;
         }
@@ -14,13 +14,13 @@
             max-width: 800px;
             margin: 50px auto;
             padding: 20px;
-            background-color: #fff;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            background-color: #2e2e2e;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
         }
         h1 {
             text-align: center;
-            color: #4CAF50;
+            color: #2196F3;
         }
         table {
             width: 100%;
@@ -28,63 +28,52 @@
             margin-bottom: 20px;
         }
         table, th, td {
-            border: 1px solid #ddd;
+            border: 1px solid #555;
         }
         th, td {
             padding: 12px;
             text-align: left;
         }
         th {
-            background-color: #4CAF50;
+            background-color: #2196F3;
             color: white;
         }
         tr:nth-child(even) {
-            background-color: #f2f2f2;
+            background-color: #3e3e3e;
+        }
+        tr:nth-child(odd) {
+            background-color: #2e2e2e;
         }
         .event {
-            background-color: #fff;
+            background-color: #2e2e2e;
             padding: 10px;
             margin-bottom: 10px;
-            border: 1px solid #ddd;
+            border: 1px solid #555;
             border-radius: 4px;
         }
-        .event pre {
-            margin: 0;
-            white-space: pre-wrap; /* Enable wrapping of long lines */
-            word-wrap: break-word; /* Enable wrapping of long words */
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #777;
+        .event-name {
+            color: #2196F3;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Event Summary for {{ company }}</h1>
-        <table>
-            <tr>
-                <th>Volume Name</th>
-                <th>Event Count</th>
-            </tr>
-            {% for volume_name, count in summary.items() %}
-            <tr>
-                <td>{{ volume_name }}</td>
-                <td>{{ count }}</td>
-            </tr>
-            {% endfor %}
-        </table>
-
-        <h1>All Events</h1>
-        {% for item in data %}
-        <div class="event">
-            <pre>{{ item | tojson(indent=2) }}</pre>
-        </div>
+        <h1>Events for {{ company }}</h1>
+        {% for event in data %}
+            <div class="event">
+                <p><strong class="event-name">{{ event['message_name'] }}</strong></p>
+                <p>Cluster UUID: {{ event['cluster_uuid'] }}</p>
+                <p>Node UUID: {{ event['node_uuid'] }}</p>
+                <p>Node: {{ event['node'] }}</p>
+                <p>Version: {{ event['version'] }}</p>
+                <p>Parameters:</p>
+                <ul>
+                    {% for param in event['parameters'] %}
+                        <li>{{ param['name'] }}: {{ param['value'] }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
         {% endfor %}
-    </div>
-    <div class="footer">
-        <p>&copy; 2024 Your Company. All rights reserved.</p>
     </div>
 </body>
 </html>
