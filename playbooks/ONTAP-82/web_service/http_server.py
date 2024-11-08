@@ -59,7 +59,59 @@ def xml_to_json(xml_data):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect(url_for('login'))
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        # Authenticate the user
+        response = ldap_manager.authenticate(username, password)
+        if response.status == AuthenticationResponseStatus.success:
+            user_dn = response.user_dn
+            user_groups = response.user_groups  # Retrieve group information
+            user_groups_list = [group['name'] for group in user_groups]
+            session['username'] = user_dn
+            session['groups'] = user_groups_list
+            logger.debug(f"User {username} authenticated successfully with groups: {user_groups_list}")
+            return redirect(url_for('ransomware_events'))
+        else:
+            logger.debug(f"Login failed for user {username}")
+            # Authentication failed, show login form again with an error
+            return render_template('login.html', error='Login failed, try again.')
+    # GET request, show the login form
+    return render_template('login.html')
+
+@app.route('/ransomware_events')
+def ransomware_events():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    
+    company_name = "Unknown"
+    event_data = []
+    summary_data = {}
+
+    # Determine what data to show based on group membership
+    if 'bluecorp' in session['groups']:
+        company_name = "Blue Corp"
+        event_data = received_data_bluecorp
+        summary_data = event_summary_bluecorp
+    elif 'astrainc' in session['groups']:
+        company_name = "Astra Inc"
+        event_data = received_data_astrainc
+        summary_data = event_summary_astrainc
+    elif 'polarisltd' in session['groups']:
+        company_name = "Polaris Ltd"
+        event_data = received_data_polarisltd
+        summary_data = event_summary_polarisltd
+
+    logger.debug(f"User {session['username']} belongs to company: {company_name}")
+    # Render a template with the appropriate data and group memberships
+    return render_template('ransomware_events.html',
+                           data=[data.decode('utf8') for data in event_data],
+                           summary=summary_data,
+                           company=company_name)
 
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
