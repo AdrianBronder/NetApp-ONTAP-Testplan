@@ -27,16 +27,16 @@
             password: "{{ ontap_12_ad_admin_user_pw }}"
       - name:         "bluecorp"
         users:        
-          - name:     "bluecorp_user"
-            password: "Netapp1!"
+          - name:     "{{ ontap_82_bluecorp_user }}"
+            password: "{{ ontap_82_bluecorp_user_pw }}"
       - name:         "astrainc"
         users:
-          - name:     "astrainc_user"
-            password: "Netapp1!"
+          - name:     "{{ ontap_82_astrainc_user }}"
+            password: "{{ ontap_82_astrainc_user_pw }}"
       - name:         "polarisltd"
         users:
-          - name:     "polarisltd_user"
-            password: "Netapp1!"
+          - name:     "{{ ontap_82_polarisltd_user }}"
+            password: "{{ ontap_82_polarisltd_user_pw }}"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
