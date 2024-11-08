@@ -4,7 +4,6 @@ from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 from ldap3 import Server, Connection, ALL
 import xml.etree.ElementTree as ET
 import logging
-import json
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -25,37 +24,21 @@ app.config['LDAP_USER_SEARCH_SCOPE'] = 'SUBTREE'
 app.config['LDAP_GROUP_SEARCH_BASE'] = 'dc=demo,dc=netapp,dc=com'
 app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'
 app.config['LDAP_GROUP_SEARCH_SCOPE'] = 'SUBTREE'
-app.config['SECRET_KEY'] = 'your-secret-key'  # Replace with a real secret key
+app.config['SECRET_KEY'] = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
 
 # In-memory storage for demonstration purposes
 received_data_bluecorp = []
+event_summary_bluecorp = {}
 received_data_astrainc = []
+event_summary_astrainc = {}
 received_data_polarisltd = []
+event_summary_polarisltd = {}
 
 # Namespace for XML parsing
 namespaces = {'ns0': 'http://www.netapp.com/filer/admin'}
-
-# Define a function to convert XML to JSON
-def xml_to_json(xml_data):
-    root = ET.fromstring(xml_data)
-    json_data = {
-        'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
-        'node_uuid': root.find('.//ns0:node-uuid', namespaces).text,
-        'node': root.find('.//ns0:node', namespaces).text,
-        'message_name': root.find('.//ns0:message-name', namespaces).text,
-        'version': root.find('.//ns0:version', namespaces).text,
-        'parameters': [
-            {
-                'name': param.find('ns0:name', namespaces).text,
-                'value': param.find('ns0:value', namespaces).text
-            }
-            for param in root.findall('.//ns0:parameter', namespaces)
-        ]
-    }
-    return json_data
 
 @app.route('/')
 def index():
@@ -74,10 +57,10 @@ def login():
             user_groups_list = [group['name'] for group in user_groups]
             session['username'] = user_dn
             session['groups'] = user_groups_list
-            logger.debug(f"User {username} authenticated successfully with groups: {user_groups_list}")
+            logger.info(f"User {username} authenticated successfully with groups: {user_groups_list}")
             return redirect(url_for('ransomware_events'))
         else:
-            logger.debug(f"Login failed for user {username}")
+            logger.info(f"Login failed for user {username}")
             # Authentication failed, show login form again with an error
             return render_template('login.html', error='Login failed, try again.')
     # GET request, show the login form
@@ -106,7 +89,7 @@ def ransomware_events():
         event_data = received_data_polarisltd
         summary_data = event_summary_polarisltd
 
-    logger.debug(f"User {session['username']} belongs to company: {company_name}")
+    logger.info(f"User {session['username']} belongs to company: {company_name}")
     # Render a template with the appropriate data and group memberships
     return render_template('ransomware_events.html',
                            data=[data.decode('utf8') for data in event_data],
@@ -117,11 +100,16 @@ def ransomware_events():
 def receive_data_bluecorp():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
-        json_data = xml_to_json(xml_data)  # Convert XML to JSON
-        received_data_bluecorp.append(json_data)  # Store JSON data
+        root = ET.fromstring(xml_data)  # Parse the XML data
+        received_data_bluecorp.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # Log the received data
-        logger.info(f"Received data for Bluecorp: {json_data}")
+        # count volume event occurrences
+        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
+        # Extract the text from the volumeName element if it exists
+        if vol_element is not None:
+            vol_name = vol_element.text
+            # Increment the count for this volume in the dictionary
+            event_summary_bluecorp[vol_name] = event_summary_bluecorp.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
@@ -131,41 +119,44 @@ def receive_data_bluecorp():
 def receive_data_astrainc():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
-        json_data = xml_to_json(xml_data)  # Convert XML to JSON
-        received_data_astrainc.append(json_data)  # Store JSON data
+        root = ET.fromstring(xml_data)  # Parse the XML data
+        received_data_astrainc.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # Log the received data
-        logger.info(f"Received data for Astrainc: {json_data}")
+        # count volume event occurrences
+        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
+        # Extract the text from the volumeName element if it exists
+        if vol_element is not None:
+            vol_name = vol_element.text
+            # Increment the count for this volume in the dictionary
+            event_summary_astrainc[vol_name] = event_summary_astrainc.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
         return jsonify(error="Unsupported Media Type"), 415
-
+    
 @app.route('/ntap_svm_polarisltd', methods=['POST'])
 def receive_data_polarisltd():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
-        json_data = xml_to_json(xml_data)  # Convert XML to JSON
-        received_data_polarisltd.append(json_data)  # Store JSON data
+        root = ET.fromstring(xml_data)  # Parse the XML data
+        received_data_polarisltd.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # Log the received data
-        logger.info(f"Received data for Polaris Ltd: {json_data}")
+        # count volume event occurrences
+        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
+        # Extract the text from the volumeName element if it exists
+        if vol_element is not None:
+            vol_name = vol_element.text
+            # Increment the count for this volume in the dictionary
+            event_summary_polarisltd[vol_name] = event_summary_polarisltd.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
         return jsonify(error="Unsupported Media Type"), 415
 
-@app.route('/show_events_bluecorp')
-def show_data_bluecorp():
-    return render_template('data.html', data=received_data_bluecorp)
-
-@app.route('/show_events_astrainc')
-def show_data_astrainc():
-    return render_template('data.html', data=received_data_astrainc)
-
-@app.route('/show_events_polarisltd')
-def show_data_polarisltd():
-    return render_template('data.html', data=received_data_polarisltd)
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
