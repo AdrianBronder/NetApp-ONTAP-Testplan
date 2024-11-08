@@ -51,7 +51,7 @@ def login():
         password = request.form['password']
         # Authenticate the user
         response = ldap_manager.authenticate(username, password)
-        if response == AuthenticationResponseStatus.success:
+        if response.status == AuthenticationResponseStatus.success:
             # User is authenticated, proceed to the protected area
             return redirect(url_for('protected_area'))
         else:
