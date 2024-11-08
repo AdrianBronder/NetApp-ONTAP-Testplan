@@ -2,6 +2,7 @@
 from flask import Flask, request, redirect, url_for, render_template, session, jsonify
 from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 from ldap3 import Server, Connection, ALL
+from datetime import datetime
 import xml.etree.ElementTree as ET
 import logging
 
