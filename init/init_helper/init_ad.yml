@@ -27,15 +27,15 @@
             password: "{{ ontap_12_ad_admin_user_pw }}"
       - name:         "bluecorp"
         users:        
-          - name:     "{{ ontap_82_bluecorp_user }}"
+          - name:     "{{ ontap_82_bluecorp_user.split(separator)[-1]  }}"
             password: "{{ ontap_82_bluecorp_user_pw }}"
       - name:         "astrainc"
         users:
-          - name:     "{{ ontap_82_astrainc_user }}"
+          - name:     "{{ ontap_82_astrainc_user.split(separator)[-1]  }}"
             password: "{{ ontap_82_astrainc_user_pw }}"
       - name:         "polarisltd"
         users:
-          - name:     "{{ ontap_82_polarisltd_user }}"
+          - name:     "{{ ontap_82_polarisltd_user.split(separator)[-1]  }}"
             password: "{{ ontap_82_polarisltd_user_pw }}"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
