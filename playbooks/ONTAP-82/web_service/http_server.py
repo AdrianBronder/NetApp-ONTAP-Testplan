@@ -91,8 +91,8 @@ def show_events():
         event_data = received_data_bluecorp
         summary_data = event_summary_bluecorp
     else:
-        event_data = ''
-        summary_data = ''
+        event_data = []
+        summary_data = {}
     # Render a template with the appropriate data and group memberships
     return render_template('data.html', data=[data.decode('utf8') for data in event_data], summary=summary_data)
 
