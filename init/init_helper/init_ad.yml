@@ -17,14 +17,26 @@
   vars:
     separator: '\'
     ad_org_groups:
-      - name: "{{ ontap_12_ad_ro_group.split(separator)[-1] }}"
+      - name:         "{{ ontap_12_ad_ro_group.split(separator)[-1] }}"
         users:
           - name:     "{{ ontap_12_ad_ro_user.split(separator)[-1] }}"
             password: "{{ ontap_12_ad_ro_user_pw }}"
-      - name: "{{ ontap_12_ad_admin_group.split(separator)[-1] }}"
+      - name:         "{{ ontap_12_ad_admin_group.split(separator)[-1] }}"
         users:
           - name:     "{{ ontap_12_ad_admin_user.split(separator)[-1] }}"
             password: "{{ ontap_12_ad_admin_user_pw }}"
+      - name:         "bluecorp"
+        users:        
+          - name:     "bluecorp_user"
+            password: "Netapp1!"
+      - name:         "astrainc"
+        users:
+          - name:     "astrainc_user"
+            password: "Netapp1!"
+      - name:         "polarisltd"
+        users:
+          - name:     "polarisltd_user"
+            password: "Netapp1!"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml

@@ -57,10 +57,10 @@ def login():
         if response.status == AuthenticationResponseStatus.success:
             user_dn = response.user_dn
             user_groups = response.user_groups  # Retrieve group information
-            user_groups_list = list(user_groups.keys())
+            user_groups_list = [group['name'] for group in user_groups]
             session['username'] = username
             session['groups'] = user_groups_list
-            logger.debug(f"User groups for session: {session['groups']}")  # Debug log statement
+#            logger.debug(f"User groups for session: {session['groups']}")  # Debug log statement
             # Redirect to a route that shows data based on user groups
             return redirect(url_for('show_events'))
         else:
@@ -77,9 +77,15 @@ def show_events():
     # Retrieve user's groups from the session
     user_groups = session['groups']
     # Determine what data to show based on group membership
-    if 'na_ad_admin_group' in user_groups:
+    if 'bluecorp' in user_groups:
         event_data = received_data_bluecorp
         summary_data = event_summary_bluecorp
+    elif 'astrainc' in user_groups:
+        event_data = received_data_astrainc
+        summary_data = event_summary_astrainc
+    elif 'polarisltd' in user_groups:
+        event_data = received_data_polarisltd
+        summary_data = event_summary_polarisltd
     else:
         event_data = []
         summary_data = {}
