@@ -5,29 +5,29 @@ from ldap3 import Server, Connection, ALL
 import xml.etree.ElementTree as ET
 import logging
 
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
 # Configuration for LDAP
-app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'  # e.g., 'ldap://your-ad-domain.com'
-app.config['LDAP_BASE_DN'] = 'dc=demo,dc=netapp,dc=com'  # Base DN of your directory
-app.config['LDAP_USER_DN'] = 'cn=Users'  # DN of users, e.g., 'ou=People'
-#app.config['LDAP_GROUP_DN'] = 'dc=demo,dc=netapp,dc=com'  # DN of groups, e.g., 'ou=Groups'
-app.config['LDAP_USER_RDN_ATTR'] = 'cn'  # The attribute to use for RDN
-app.config['LDAP_USER_LOGIN_ATTR'] = 'sAMAccountName'  # Attribute for logging in
-app.config['LDAP_GROUP_MEMBERS_ATTR'] = 'member'
-app.config['LDAP_BIND_USER_DN'] = 'Administrator@demo.netapp.com'  # The DN to bind with for authentication
-app.config['LDAP_BIND_USER_PASSWORD'] = 'Netapp1!'  # The password to bind with
-#app.config['LDAP_GROUP_SEARCH_FILTER'] = '(&(objectclass=group)(member={user_dn}))'
-app.config['LDAP_USER_SEARCH_SCOPE'] = 'SUBTREE'
-#app.config['LDAP_SEARCH_FOR_GROUPS'] = False
-app.config['LDAP_GROUP_SEARCH_BASE'] = 'dc=demo,dc=netapp,dc=com'  # Base DN for group search
+app.config['LDAP_HOST']                = 'ldap://dc1.demo.netapp.com'  # e.g., 'ldap://your-ad-domain.com'
+app.config['LDAP_BASE_DN']             = 'dc=demo,dc=netapp,dc=com'  # Base DN of your directory
+app.config['LDAP_USER_DN']             = 'cn=Users'  # DN of users, e.g., 'ou=People'
+app.config['LDAP_USER_RDN_ATTR']       = 'cn'  # The attribute to use for RDN
+app.config['LDAP_USER_LOGIN_ATTR']     = 'sAMAccountName'  # Attribute for logging in
+app.config['LDAP_GROUP_MEMBERS_ATTR']  = 'member'
+app.config['LDAP_BIND_USER_DN']        = 'Administrator@demo.netapp.com'  # The DN to bind with for authentication
+app.config['LDAP_BIND_USER_PASSWORD']  = 'Netapp1!'  # The password to bind with
+app.config['LDAP_USER_SEARCH_SCOPE']   = 'SUBTREE'
+app.config['LDAP_GROUP_SEARCH_BASE']   = 'dc=demo,dc=netapp,dc=com'  # Base DN for group search
 app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'  # Filter for group search
-app.config['LDAP_GROUP_SEARCH_SCOPE'] = 'SUBTREE'  # Scope for group search
-app.config['SECRET_KEY'] = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
+app.config['LDAP_GROUP_SEARCH_SCOPE']  = 'SUBTREE'  # Scope for group search
+app.config['SECRET_KEY']               = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
 app.config['DEBUG'] = True
+#app.config['LDAP_GROUP_DN'] = 'dc=demo,dc=netapp,dc=com'  # DN of groups, e.g., 'ou=Groups'
+#app.config['LDAP_GROUP_SEARCH_FILTER'] = '(&(objectclass=group)(member={user_dn}))'
+#app.config['LDAP_SEARCH_FOR_GROUPS'] = False
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
