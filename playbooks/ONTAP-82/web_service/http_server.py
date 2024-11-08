@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 import logging
 
 logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
