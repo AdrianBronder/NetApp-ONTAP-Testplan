@@ -4,26 +4,28 @@ from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 from ldap3 import Server, Connection, ALL
 import xml.etree.ElementTree as ET
 import logging
+import json
 
-#logging.basicConfig(level=logging.DEBUG)
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 
 # Configuration for LDAP
-app.config['LDAP_HOST']                = 'ldap://dc1.demo.netapp.com'  # e.g., 'ldap://your-ad-domain.com'
-app.config['LDAP_BASE_DN']             = 'dc=demo,dc=netapp,dc=com'  # Base DN of your directory
-app.config['LDAP_USER_DN']             = 'cn=Users'  # DN of users, e.g., 'ou=People'
-app.config['LDAP_USER_RDN_ATTR']       = 'cn'  # The attribute to use for RDN
-app.config['LDAP_USER_LOGIN_ATTR']     = 'sAMAccountName'  # Attribute for logging in
-app.config['LDAP_GROUP_MEMBERS_ATTR']  = 'member'
-app.config['LDAP_BIND_USER_DN']        = 'Administrator@demo.netapp.com'  # The DN to bind with for authentication
-app.config['LDAP_BIND_USER_PASSWORD']  = 'Netapp1!'  # The password to bind with
-app.config['LDAP_USER_SEARCH_SCOPE']   = 'SUBTREE'
-app.config['LDAP_GROUP_SEARCH_BASE']   = 'dc=demo,dc=netapp,dc=com'  # Base DN for group search
-app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'  # Filter for group search
-app.config['LDAP_GROUP_SEARCH_SCOPE']  = 'SUBTREE'  # Scope for group search
-app.config['SECRET_KEY']               = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
+app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'
+app.config['LDAP_BASE_DN'] = 'dc=demo,dc=netapp,dc=com'
+app.config['LDAP_USER_DN'] = 'cn=Users'
+app.config['LDAP_USER_RDN_ATTR'] = 'cn'
+app.config['LDAP_USER_LOGIN_ATTR'] = 'sAMAccountName'
+app.config['LDAP_GROUP_MEMBERS_ATTR'] = 'member'
+app.config['LDAP_BIND_USER_DN'] = 'Administrator@demo.netapp.com'
+app.config['LDAP_BIND_USER_PASSWORD'] = 'Netapp1!'
+app.config['LDAP_USER_SEARCH_SCOPE'] = 'SUBTREE'
+app.config['LDAP_GROUP_SEARCH_BASE'] = 'dc=demo,dc=netapp,dc=com'
+app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'
+app.config['LDAP_GROUP_SEARCH_SCOPE'] = 'SUBTREE'
+app.config['SECRET_KEY'] = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
@@ -36,7 +38,7 @@ event_summary_astrainc = {}
 received_data_polarisltd = []
 event_summary_polarisltd = {}
 
-# Namespace for xml parsing
+# Namespace for XML parsing
 namespaces = {'ns0': 'http://www.netapp.com/filer/admin'}
 
 @app.route('/')
@@ -56,8 +58,10 @@ def login():
             user_groups_list = [group['name'] for group in user_groups]
             session['username'] = user_dn
             session['groups'] = user_groups_list
+            logger.debug(f"User {username} authenticated successfully with groups: {user_groups_list}")
             return redirect(url_for('ransomware_events'))
         else:
+            logger.debug(f"Login failed for user {username}")
             # Authentication failed, show login form again with an error
             return render_template('login.html', error='Login failed, try again.')
     # GET request, show the login form
@@ -86,26 +90,45 @@ def ransomware_events():
         event_data = received_data_polarisltd
         summary_data = event_summary_polarisltd
 
+    logger.debug(f"User {session['username']} belongs to company: {company_name}")
     # Render a template with the appropriate data and group memberships
     return render_template('ransomware_events.html',
-                            data=[data.decode('utf8') for data in event_data],
-                            summary=summary_data,
-                            company=company_name)
+                           data=event_data,
+                           summary=summary_data,
+                           company=company_name)
+
+def parse_xml_to_json(xml_data):
+    root = ET.fromstring(xml_data)
+    event_info = root.find('.//ns0:ems-message-info', namespaces)
+    json_data = {
+        'node': event_info.find('ns0:node', namespaces).text,
+        'message_name': event_info.find('ns0:message-name', namespaces).text,
+        'version': event_info.find('ns0:version', namespaces).text,
+        'parameters': {param.find('ns0:name', namespaces).text: param.find('ns0:value', namespaces).text for param in event_info.find('ns0:parameters', namespaces)},
+        'seq_num': event_info.find('ns0:seq-num', namespaces).text,
+        'severity': event_info.find('ns0:severity', namespaces).text,
+        'time': event_info.find('ns0:time', namespaces).text,
+        'event': event_info.find('ns0:event', namespaces).text,
+        'num_suppressed_since_last': event_info.find('ns0:num-suppressed-since-last', namespaces).text,
+        'ems_severity': event_info.find('ns0:ems-severity', namespaces).text,
+        'event_xml_len': event_info.find('ns0:event-xml-len', namespaces).text,
+        'source': event_info.find('ns0:source', namespaces).text
+    }
+    return json_data
 
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
-        root = ET.fromstring(xml_data)  # Parse the XML data
-        received_data_bluecorp.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # count volume event occurances
-        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
-        # Extract the text from the volumeName element if it exists
-        if vol_element is not None:
-            vol_name = vol_element.text
-            # Increment the count for this volume in the dictionary
-            event_summary_bluecorp[vol_name] = event_summary_bluecorp.get(vol_name, 0) + 1
+        # Convert XML to JSON and add to received data
+        json_data = parse_xml_to_json(xml_data)
+        received_data_bluecorp.append(json_data)
+
+        # Extract volume name and update event summary
+        vol_element = json_data['parameters'].get('volumeName')
+        if vol_element:
+            event_summary_bluecorp[vol_element] = event_summary_bluecorp.get(vol_element, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
@@ -115,16 +138,15 @@ def receive_data_bluecorp():
 def receive_data_astrainc():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
-        root = ET.fromstring(xml_data)  # Parse the XML data
-        received_data_astrainc.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # count volume event occurances
-        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
-        # Extract the text from the volumeName element if it exists
-        if vol_element is not None:
-            vol_name = vol_element.text
-            # Increment the count for this volume in the dictionary
-            event_summary_astrainc[vol_name] = event_summary_astrainc.get(vol_name, 0) + 1
+        # Convert XML to JSON and add to received data
+        json_data = parse_xml_to_json(xml_data)
+        received_data_astrainc.append(json_data)
+
+        # Extract volume name and update event summary
+        vol_element = json_data['parameters'].get('volumeName')
+        if vol_element:
+            event_summary_astrainc[vol_element] = event_summary_astrainc.get(vol_element, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
@@ -134,22 +156,20 @@ def receive_data_astrainc():
 def receive_data_polarisltd():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
-        root = ET.fromstring(xml_data)  # Parse the XML data
-        received_data_polarisltd.append(ET.tostring(root, encoding='utf8', method='xml'))
 
-        # count volume event occurances
-        vol_element = root.find('.//ns0:parameter[ns0:name="volumeName"]/ns0:value', namespaces)
-        # Extract the text from the volumeName element if it exists
-        if vol_element is not None:
-            vol_name = vol_element.text
-            # Increment the count for this volume in the dictionary
-            event_summary_polarisltd[vol_name] = event_summary_polarisltd.get(vol_name, 0) + 1
+        # Convert XML to JSON and add to received data
+        json_data = parse_xml_to_json(xml_data)
+        received_data_polarisltd.append(json_data)
+
+        # Extract volume name and update event summary
+        vol_element = json_data['parameters'].get('volumeName')
+        if vol_element:
+            event_summary_polarisltd[vol_element] = event_summary_polarisltd.get(vol_element, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
     else:
         return jsonify(error="Unsupported Media Type"), 415
 
-# Define a logout route
 @app.route('/logout')
 def logout():
     session.clear()
