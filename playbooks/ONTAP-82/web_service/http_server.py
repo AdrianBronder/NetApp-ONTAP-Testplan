@@ -52,13 +52,35 @@ def login():
         # Authenticate the user
         response = ldap_manager.authenticate(username, password)
         if response.status == AuthenticationResponseStatus.success:
-            # User is authenticated, proceed to the protected area
-            return redirect(url_for('protected_area'))
+            user_dn = response.user_dn
+            # Retrieve and store user's group memberships
+            user_groups = get_user_groups(user_dn)
+            session['username'] = username
+            session['groups'] = user_groups
+            # Redirect to a route that shows data based on user groups
+            return redirect(url_for('show_events'))
         else:
             # Authentication failed, show login form again with an error
             return render_template('login.html', error='Invalid credentials')
     # GET request, show the login form
     return render_template('login.html')
+
+# Define a route to show data based on user groups
+@app.route('/show_events')
+def show_events():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    # Retrieve user's groups from the session
+    user_groups = session['groups']
+    # Determine what data to show based on group membership
+    if 'na_ad_admin_group' in user_groups:
+        event_data = received_data_bluecorp
+        summary_data = event_summary_bluecorp
+    else:
+        event_data = ''
+        summary_data = ''
+    # Render a template with the appropriate data and group memberships
+    return render_template('data.html', data=[data.decode('utf8') for data in event_data], summary=summary_data)
 
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
