@@ -1,10 +1,17 @@
 #!/usr/bin/env python3
 from flask import Flask, request, redirect, url_for, render_template, session, jsonify
 from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
-from ldap3 import Server, Connection, ALL
+#from ldap3 import Server, Connection, ALL
 from datetime import datetime
 import xml.etree.ElementTree as ET
-import logging
+import logging, os
+from collections import defaultdict
+from netapp_ontap import config, HostConnection, NetAppRestError
+from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare
+from ansible.inventory.manager import InventoryManager
+from ansible.parsing.dataloader import DataLoader
+from ansible.parsing.vault import VaultLib, VaultSecret
+from ansible.vars.manager import VariableManager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -100,7 +107,25 @@ def ransomware_events():
                            summary=summary_data,
                            company=company_name)
 
+@app.route('/ransomware_events_operator')
+def ransomware_events_operator():
+    # Merge received data from all companies
+    all_received_data = received_data_bluecorp + received_data_astrainc + received_data_polarisltd
 
+    # Sort event data in reverse order based on timestamp
+    event_data_sorted = sorted(all_received_data, key=lambda x: x['timestamp'], reverse=True)
+
+    # Create a summary of events by company
+    summary_data = {
+        'Blue Corp': len(received_data_bluecorp),
+        'Astra Inc': len(received_data_astrainc),
+        'Polaris Ltd': len(received_data_polarisltd)
+    }
+
+    # Render a template with the appropriate data and summary
+    return render_template('ransomware_events_operator.html',
+                           data=event_data_sorted,
+                           summary=summary_data)
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
     if request.headers['Content-Type'] == 'application/xml':
@@ -112,6 +137,7 @@ def receive_data_bluecorp():
 
         # Extract details from the XML
         event_details = {
+            'company': 'Blue Corp',  # adding custom customer name to the event array
             'timestamp': readable_timestamp,
             'seq_num': root.find('.//ns0:seq-num', namespaces).text,
             'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
@@ -144,6 +170,7 @@ def receive_data_astrainc():
 
         # Extract details from the XML
         event_details = {
+            'company': 'Astra Inc',  # adding custom customer name to the event array
             'timestamp': readable_timestamp,
             'seq_num': root.find('.//ns0:seq-num', namespaces).text,
             'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
@@ -176,6 +203,7 @@ def receive_data_polarisltd():
 
         # Extract details from the XML
         event_details = {
+            'company': 'Polaris Ltd',  # adding custom customer name to the event array
             'timestamp': readable_timestamp,
             'seq_num': root.find('.//ns0:seq-num', namespaces).text,
             'cluster_uuid': root.find('.//ns0:cluster-uuid', namespaces).text,
@@ -203,4 +231,22 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
+    # Set Paths
+    project_root_path                  = os.path.join(os.path.dirname(__file__), '../../..')
+    project_root_path                  = os.path.normpath(project_root_path)
+    inventory_path                     = project_root_path+'/inventories/labondemand_latest'
+
+    # Import Ansible inventory information
+    with open(project_root_path+'/init/init_helper/vaultfile.txt', 'rb') as vault_password_file:
+        vault_password = vault_password_file.read().strip()
+    secret                             = VaultSecret(vault_password)
+    vault                              = VaultLib(secrets=[(None, secret)])
+    dataloader                         = DataLoader()
+    dataloader.set_vault_secrets(vault.secrets)
+
+    # Load inventory vars
+    ansible_inventory                  = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
+    ansible_inventory_vars             = VariableManager(loader=dataloader, inventory=ansible_inventory)
+    cluster1_vars                      = ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='ontap')[0], include_hostvars=True)
+
     app.run(host='0.0.0.0', port=5000, debug=True)
