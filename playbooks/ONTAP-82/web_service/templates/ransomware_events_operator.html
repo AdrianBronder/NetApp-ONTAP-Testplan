@@ -102,9 +102,15 @@
             text-decoration: none;
             cursor: pointer;
         }
+        .charts-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
         .chart-container {
             width: 100%;
-            max-width: 600px;
+            max-width: 400px;
             margin: 0 auto 20px auto;
         }
     </style>
@@ -114,49 +120,16 @@
     <div class="container">
         <h1>Operator View - Ransomware Events</h1>
         
-        <!-- Summary Section -->
-        <h2>Summary</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Company</th>
-                    <th>Event Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for company, count in summary.items() %}
-                    <tr>
-                        <td>{{ company }}</td>
-                        <td>{{ count }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
         <!-- Detailed Per Volume Summary Section -->
         <h2>Detailed Per Volume Summary</h2>
-        {% for company, volumes in detailed_summary.items() %}
-            <h3>{{ company }}</h3>
-            <div class="chart-container">
-                <canvas id="chart-{{ loop.index }}"></canvas>
-            </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Volume Name</th>
-                        <th>Event Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for volume, count in volumes.items() %}
-                        <tr>
-                            <td>{{ volume }}</td>
-                            <td>{{ count }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        {% endfor %}
+        <div class="charts-container">
+            {% for company, volumes in detailed_summary.items() %}
+                <div class="chart-container">
+                    <h3>{{ company }}</h3>
+                    <canvas id="chart-{{ loop.index }}"></canvas>
+                </div>
+            {% endfor %}
+        </div>
         
         <!-- Event Details Section -->
         <h2>Event Details</h2>
