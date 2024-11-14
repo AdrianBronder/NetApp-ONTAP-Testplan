@@ -119,9 +119,7 @@
 <body>
     <div class="container">
         <h1>Operator View - Ransomware Events</h1>
-        
-        <!-- Detailed Per Volume Summary Section -->
-        <h2>Detailed Per Volume Summary</h2>
+        <h2>Customer Volume Summary</h2>
         <div class="charts-container">
             {% for company, volumes in detailed_summary.items() %}
                 <div class="chart-container">
@@ -130,8 +128,6 @@
                 </div>
             {% endfor %}
         </div>
-        
-        <!-- Event Details Section -->
         <h2>Event Details</h2>
         <table>
             <thead>
