@@ -104,9 +104,9 @@ cp $SCRIPTPATH/ansible.cfg ~/ansible.cfg
 echo ""
 echo ""
 echo "--> Creating Users and groups in AD (dc1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9141 $SCRIPTPATH/init_helper/init_ad.yml
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9161 $SCRIPTPATH/init_helper/init_ad.yml
 
 echo ""
 echo ""
 echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9141 $SCRIPTPATH/../playbooks/ONTAP-00/ONTAP-revert-00.yml
+ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9161 $SCRIPTPATH/../playbooks/ONTAP-00/ONTAP-revert-00.yml
