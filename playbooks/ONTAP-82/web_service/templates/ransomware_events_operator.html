@@ -154,7 +154,7 @@
                         <td>{{ event.volume_name }}</td>
                         <td>{{ event.message_name }}</td>
                         <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
-                        <td><a href="\\\\{{ event.vserver_name }}\\{{ event.volume_name }}" class="event-link">View Volume</a></td>
+                        <td><a href="\\\\{{ event.vserver_name }}\\{{ event.volume_name }}" target="_blank">View Volume</a></td>
                     </tr>
                 {% endfor %}
             </tbody>
