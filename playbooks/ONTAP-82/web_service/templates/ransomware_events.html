@@ -18,6 +18,30 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
         }
+        .sidebar {
+            width: 200px;
+            background-color: #2e2e2e;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin: 50px 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #cfcfcf;
+            padding: 10px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .sidebar a:hover {
+            background-color: #2196F3;
+            color: white;
+        }
+        .sidebar a.active {
+            background-color: #2196F3;
+            color: white;
+        }
         h1 {
             text-align: center;
             color: #2196F3;
@@ -155,6 +179,11 @@
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    <div class="sidebar">
+        <a href="{{ url_for('ransomware_events_operator') }}">Operator View</a>
+        <a href="{{ url_for('ransomware_events') }}" class="active">Customer View</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 
     <!-- The Modal -->

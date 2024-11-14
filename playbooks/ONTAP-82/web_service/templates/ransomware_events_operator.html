@@ -9,14 +9,64 @@
             color: #cfcfcf;
             margin: 0;
             padding: 0;
+            display: flex;
         }
         .container {
+            flex: 1;
             max-width: 1200px;
             margin: 50px auto;
             padding: 20px;
             background-color: #2e2e2e;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #2e2e2e;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin: 50px 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #cfcfcf;
+            padding: 10px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .sidebar a:hover {
+            background-color: #2196F3;
+            color: white;
+        }
+        .sidebar a.active {
+            background-color: #2196F3;
+            color: white;
+        }
+        .sidebar {
+            width: 200px;
+            background-color: #2e2e2e;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            margin: 50px 20px;
+        }
+        .sidebar a {
+            display: block;
+            color: #cfcfcf;
+            padding: 10px;
+            text-decoration: none;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .sidebar a:hover {
+            background-color: #2196F3;
+            color: white;
+        }
+        .sidebar a.active {
+            background-color: #2196F3;
+            color: white;
         }
         h1 {
             text-align: center;
@@ -117,9 +167,16 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+    <div class="sidebar">
+        <a href="{{ url_for('ransomware_events_operator') }}" class="{% if request.endpoint == 'ransomware_events_operator' %}active{% endif %}">Operator View</a>
+        <a href="{{ url_for('ransomware_events') }}" class="{% if request.endpoint == 'ransomware_events' %}active{% endif %}">Customer View</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </div>
     <div class="container">
         <h1>Operator View - Ransomware Events</h1>
-        <h2>Customer Volume Summary</h2>
+        
+        <!-- Detailed Per Volume Summary Section -->
+        <h2>Detailed Per Volume Summary</h2>
         <div class="charts-container">
             {% for company, volumes in detailed_summary.items() %}
                 <div class="chart-container">
@@ -128,6 +185,8 @@
                 </div>
             {% endfor %}
         </div>
+        
+        <!-- Event Details Section -->
         <h2>Event Details</h2>
         <table>
             <thead>
@@ -167,6 +226,11 @@
             <span class="close">&times;</span>
             <p id="eventDetail"></p>
         </div>
+    </div>
+    <div class="sidebar">
+        <a href="{{ url_for('ransomware_events_operator') }}" class="active">Operator View</a>
+        <a href="{{ url_for('ransomware_events') }}">Customer View</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 
     <script>
