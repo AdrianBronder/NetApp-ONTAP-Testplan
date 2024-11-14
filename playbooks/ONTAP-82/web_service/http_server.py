@@ -115,11 +115,11 @@ def ransomware_events_operator():
     # Sort event data in reverse order based on timestamp
     event_data_sorted = sorted(all_received_data, key=lambda x: x['timestamp'], reverse=True)
 
-    # Create a summary of events by company
-    summary_data = {
-        'Blue Corp': len(received_data_bluecorp),
-        'Astra Inc': len(received_data_astrainc),
-        'Polaris Ltd': len(received_data_polarisltd)
+    # Create a detailed summary of events by company and volume
+    detailed_summary = {
+        'Blue Corp': dict(event_summary_bluecorp),
+        'Astra Inc': dict(event_summary_astrainc),
+        'Polaris Ltd': dict(event_summary_polarisltd)
     }
 
     # Render a template with the appropriate data and summary
