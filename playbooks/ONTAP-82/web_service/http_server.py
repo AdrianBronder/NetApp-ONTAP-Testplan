@@ -125,7 +125,13 @@ def ransomware_events_operator():
     # Render a template with the appropriate data and summary
     return render_template('ransomware_events_operator.html',
                            data=event_data_sorted,
-                           summary=summary_data)
+                           summary={
+                               'Blue Corp': len(received_data_bluecorp),
+                               'Astra Inc': len(received_data_astrainc),
+                               'Polaris Ltd': len(received_data_polarisltd)
+                           },
+                           detailed_summary=detailed_summary)
+
 @app.route('/ntap_svm_bluecorp', methods=['POST'])
 def receive_data_bluecorp():
     if request.headers['Content-Type'] == 'application/xml':

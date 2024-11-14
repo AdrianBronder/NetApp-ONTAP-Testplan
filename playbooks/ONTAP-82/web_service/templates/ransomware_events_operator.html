@@ -102,7 +102,13 @@
             text-decoration: none;
             cursor: pointer;
         }
+        .chart-container {
+            width: 100%;
+            max-width: 600px;
+            margin: 0 auto 20px auto;
+        }
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <div class="container">
@@ -126,6 +132,31 @@
                 {% endfor %}
             </tbody>
         </table>
+
+        <!-- Detailed Per Volume Summary Section -->
+        <h2>Detailed Per Volume Summary</h2>
+        {% for company, volumes in detailed_summary.items() %}
+            <h3>{{ company }}</h3>
+            <div class="chart-container">
+                <canvas id="chart-{{ loop.index }}"></canvas>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Volume Name</th>
+                        <th>Event Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for volume, count in volumes.items() %}
+                        <tr>
+                            <td>{{ volume }}</td>
+                            <td>{{ count }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% endfor %}
         
         <!-- Event Details Section -->
         <h2>Event Details</h2>
@@ -197,6 +228,50 @@
                 var eventDetail = this.getAttribute("data-event");
                 document.getElementById("eventDetail").innerText = eventDetail;
                 modal.style.display = "block";
+            }
+        }
+
+        // Chart.js configuration
+        var detailedSummary = {{ detailed_summary | tojson }};
+        var chartIndex = 1;
+
+        for (var company in detailedSummary) {
+            if (detailedSummary.hasOwnProperty(company)) {
+                var ctx = document.getElementById('chart-' + chartIndex).getContext('2d');
+                var volumes = detailedSummary[company];
+                var labels = Object.keys(volumes);
+                var data = Object.values(volumes);
+
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: data,
+                            backgroundColor: [
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(tooltipItem) {
+                                        return tooltipItem.label + ': ' + tooltipItem.raw;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                chartIndex++;
             }
         }
     </script>
