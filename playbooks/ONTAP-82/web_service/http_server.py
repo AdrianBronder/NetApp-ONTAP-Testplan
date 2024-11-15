@@ -4,7 +4,7 @@ from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 #from ldap3 import Server, Connection, ALL
 from datetime import datetime
 import xml.etree.ElementTree as ET
-import logging, os
+import logging, os, re
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
 from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare
@@ -18,6 +18,22 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+
+# Set Paths
+project_root_path                  = os.path.join(os.path.dirname(__file__), '../../..')
+project_root_path                  = os.path.normpath(project_root_path)
+inventory_path                     = project_root_path+'/inventories/labondemand_latest'
+# Import Ansible inventory information
+with open(project_root_path+'/init/init_helper/vaultfile.txt', 'rb') as vault_password_file:
+    vault_password = vault_password_file.read().strip()
+secret                             = VaultSecret(vault_password)
+vault                              = VaultLib(secrets=[(None, secret)])
+dataloader                         = DataLoader()
+dataloader.set_vault_secrets(vault.secrets)
+# Load inventory vars
+ansible_inventory                  = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
+ansible_inventory_vars             = VariableManager(loader=dataloader, inventory=ansible_inventory)
+cluster1_vars                      = ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='ontap')[0], include_hostvars=True)
 
 # Configuration for LDAP
 app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'
@@ -54,6 +70,7 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    logger.info(cluster1_vars)
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -168,8 +185,8 @@ def receive_data_bluecorp():
 
         received_data_bluecorp.append(event_details)
 
-        # Count volume event occurrences
-        vol_name = event_details['volume_name']
+        # Count volume event occurrences (correct "bugy" names ending with numbers in round brackets)
+        vol_name = re.sub(r'\s*\(\d+\)$', '', event_details['volume_name'])
         event_summary_bluecorp[vol_name] = event_summary_bluecorp.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
@@ -201,8 +218,8 @@ def receive_data_astrainc():
 
         received_data_astrainc.append(event_details)
 
-        # Count volume event occurrences
-        vol_name = event_details['volume_name']
+        # Count volume event occurrences (correct "bugy" names ending with numbers in round brackets)
+        vol_name = re.sub(r'\s*\(\d+\)$', '', event_details['volume_name'])
         event_summary_astrainc[vol_name] = event_summary_astrainc.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
@@ -234,8 +251,8 @@ def receive_data_polarisltd():
 
         received_data_polarisltd.append(event_details)
 
-        # Count volume event occurrences
-        vol_name = event_details['volume_name']
+        # Count volume event occurrences (correct "bugy" names ending with numbers in round brackets)
+        vol_name = re.sub(r'\s*\(\d+\)$', '', event_details['volume_name'])
         event_summary_polarisltd[vol_name] = event_summary_polarisltd.get(vol_name, 0) + 1
 
         return jsonify(success=True)  # Acknowledge the receipt
@@ -248,22 +265,4 @@ def logout():
     return redirect(url_for('login'))
 
 if __name__ == '__main__':
-    # Set Paths
-    project_root_path                  = os.path.join(os.path.dirname(__file__), '../../..')
-    project_root_path                  = os.path.normpath(project_root_path)
-    inventory_path                     = project_root_path+'/inventories/labondemand_latest'
-
-    # Import Ansible inventory information
-    with open(project_root_path+'/init/init_helper/vaultfile.txt', 'rb') as vault_password_file:
-        vault_password = vault_password_file.read().strip()
-    secret                             = VaultSecret(vault_password)
-    vault                              = VaultLib(secrets=[(None, secret)])
-    dataloader                         = DataLoader()
-    dataloader.set_vault_secrets(vault.secrets)
-
-    # Load inventory vars
-    ansible_inventory                  = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
-    ansible_inventory_vars             = VariableManager(loader=dataloader, inventory=ansible_inventory)
-    cluster1_vars                      = ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='ontap')[0], include_hostvars=True)
-
     app.run(host='0.0.0.0', port=5000, debug=True)
