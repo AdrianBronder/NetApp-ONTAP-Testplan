@@ -27,6 +27,12 @@
         color: #2196F3;
         margin-bottom: 20px;
     }
+    form {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     .form-input {
         margin-bottom: 15px;
         width: 100%;
@@ -75,16 +81,16 @@
     {% if error %}
         <div class="error">{{ error }}</div>
     {% endif %}
-    <form method="POST" action="{{ url_for('login') }}" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
-        <div class="form-input" style="width: 100%;">
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-input">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
         </div>
-        <div class="form-input" style="width: 100%;">
+        <div class="form-input">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
-        <div class="form-input" style="width: 100%;">
+        <div class="form-input">
             <button type="submit">Login</button>
         </div>
     </form>
