@@ -57,13 +57,13 @@ app.config['LDAP_USER_DN']             = ansible_file_vars['ontap_80_user_dn']
 app.config['LDAP_USER_RDN_ATTR']       = ansible_file_vars['ontap_80_user_rdn_attr']
 app.config['LDAP_USER_LOGIN_ATTR']     = ansible_file_vars['ontap_80_user_login_attr']
 app.config['LDAP_BIND_USER_DN']        = ansible_file_vars['ontap_80_bind_user_dn']
-app.config['LDAP_BIND_USER_PASSWORD']  = ansible_file_vars['ontap_80_bind_user_pw']
+app.config['LDAP_BIND_USER_PASSWORD']  = ansible_file_vars['vault_ontap_80_bind_user_pw']
 app.config['LDAP_USER_SEARCH_SCOPE']   = ansible_file_vars['ontap_80_user_search_scope']
 app.config['LDAP_GROUP_SEARCH_BASE']   = ansible_file_vars['ontap_80_group_search_base']
 app.config['LDAP_GROUP_SEARCH_FILTER'] = ansible_file_vars['ontap_80_group_search_filter']
 app.config['LDAP_GROUP_SEARCH_SCOPE']  = ansible_file_vars['ontap_80_group_search_scope']
 app.config['LDAP_GROUP_MEMBERS_ATTR']  = ansible_file_vars['ontap_80_group_members_attr']
-app.config['SECRET_KEY']               = ansible_file_vars['ontap_80_secret_key']
+app.config['SECRET_KEY']               = ansible_file_vars['vault_ontap_80_secret_key']
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
