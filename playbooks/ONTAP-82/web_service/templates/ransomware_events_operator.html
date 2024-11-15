@@ -51,6 +51,9 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Include Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <!-- The Modal -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
@@ -91,7 +94,7 @@
     }
 
     // Chart.js configuration
-    var detailedSummary = {{ detailed_summary | tojson }};
+    var detailedSummary = {{ detailed_summary | tojson | safe }};
     var chartIndex = 1;
 
     for (var company in detailedSummary) {
