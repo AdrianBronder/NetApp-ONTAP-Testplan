@@ -36,6 +36,7 @@
             <th>Volume</th>
             <th>Message Name</th>
             <th>Event Detail</th>
+            <th>Access Path</th>
         </tr>
     </thead>
     <tbody>
@@ -48,6 +49,7 @@
                 <td>{{ event.volume_name }}</td>
                 <td>{{ event.message_name }}</td>
                 <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
+                <td><a href="#" class="event-link" data-event="\\{{ event.vserver_name }}">View Path</a></td>
             </tr>
         {% endfor %}
     </tbody>
