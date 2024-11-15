@@ -9,8 +9,10 @@
             color: #cfcfcf;
             margin: 0;
             padding: 0;
+            display: flex;
         }
         .container {
+            flex: 1;
             max-width: 800px;
             margin: 50px auto;
             padding: 20px;
@@ -24,7 +26,10 @@
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
-            margin: 50px 20px;
+            position: fixed; /* Fix the sidebar position */
+            right: 0; /* Position it to the right */
+            top: 0; /* Align it to the top */
+            height: 100%; /* Make it span the full height of the page */
         }
         .sidebar a {
             display: block;
@@ -180,6 +185,7 @@
             </tbody>
         </table>
     </div>
+
     <div class="sidebar">
         <a href="{{ url_for('ransomware_events_operator') }}">Operator View</a>
         <a href="{{ url_for('ransomware_events') }}" class="active">Customer View</a>
