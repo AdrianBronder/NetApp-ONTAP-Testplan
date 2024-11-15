@@ -1,235 +1,97 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Events for {{ company }}</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e1e;
-            color: #cfcfcf;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-        .container {
-            flex: 1;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #2e2e2e;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-        }
-        .sidebar {
-            width: 200px;
-            background-color: #2e2e2e;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            position: fixed; /* Fix the sidebar position */
-            right: 0; /* Position it to the right */
-            top: 0; /* Align it to the top */
-            height: 100%; /* Make it span the full height of the page */
-        }
-        .sidebar a {
-            display: block;
-            color: #cfcfcf;
-            padding: 10px;
-            text-decoration: none;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-        .sidebar a:hover {
-            background-color: #2196F3;
-            color: white;
-        }
-        .sidebar a.active {
-            background-color: #2196F3;
-            color: white;
-        }
-        h1 {
-            text-align: center;
-            color: #2196F3;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            table-layout: fixed; /* Ensure table fits within the container */
-        }
-        table, th, td {
-            border: 1px solid #555;
-        }
-        th, td {
-            padding: 8px; /* Reduce padding to fit more content */
-            text-align: left;
-            font-size: 0.9em; /* Reduce font size for better fit */
-            word-wrap: break-word; /* Ensure long text wraps within the cell */
-        }
-        th {
-            background-color: #2196F3;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #3e3e3e;
-        }
-        tr:nth-child(odd) {
-            background-color: #2e2e2e;
-        }
-        .event {
-            background-color: #2e2e2e;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #555;
-            border-radius: 4px;
-        }
-        .event-name {
-            color: #2196F3;
-        }
-        /* Link Styles */
-        a {
-            color: white;
-            text-decoration: none;
-        }
-        a:visited {
-            color: white; /* Ensure the link remains white after being clicked */
-        }
-        a:hover {
-            text-decoration: underline; /* Optional: Add underline on hover */
-        }
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-            padding-top: 60px;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            color: black; /* Change font color to black for readability */
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Events for {{ company }}</h1>
-        
-        <!-- Volume Summary Section -->
-        <h2>Volume Summary</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Volume Name</th>
-                    <th>Event Count</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for volume, count in summary.items() %}
-                    <tr>
-                        <td>{{ volume }}</td>
-                        <td>{{ count }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        
-        <!-- Event Details Section -->
-        <h2>Event Details</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Sequence Number</th>
-                    <th>Node</th>
-                    <th>Vserver</th>
-                    <th>Volume</th>
-                    <th>Message Name</th>
-                    <th>Event Detail</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for event in data %}
-                    <tr>
-                        <td>{{ event.timestamp }}</td>
-                        <td>{{ event.seq_num }}</td>
-                        <td>{{ event.node }}</td>
-                        <td>{{ event.vserver_name }}</td>
-                        <td>{{ event.volume_name }}</td>
-                        <td>{{ event.message_name }}</td>
-                        <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+{% extends "base.html" %}
+
+{% block title %}Events for {{ company }}{% endblock %}
+
+{% block content %}
+<h1>Events for {{ company }}</h1>
+
+<!-- Volume Summary Section -->
+<h2>Volume Summary</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Volume Name</th>
+            <th>Event Count</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for volume, count in summary.items() %}
+            <tr>
+                <td>{{ volume }}</td>
+                <td>{{ count }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Event Details Section -->
+<h2>Event Details</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Sequence Number</th>
+            <th>Node</th>
+            <th>Vserver</th>
+            <th>Volume</th>
+            <th>Message Name</th>
+            <th>Event Detail</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in data %}
+            <tr>
+                <td>{{ event.timestamp }}</td>
+                <td>{{ event.seq_num }}</td>
+                <td>{{ event.node }}</td>
+                <td>{{ event.vserver_name }}</td>
+                <td>{{ event.volume_name }}</td>
+                <td>{{ event.message_name }}</td>
+                <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<!-- The Modal -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="eventDetail"></p>
     </div>
+</div>
 
-    <div class="sidebar">
-        <a href="{{ url_for('ransomware_events_operator') }}">Operator View</a>
-        <a href="{{ url_for('ransomware_events') }}" class="active">Customer View</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
+<script>
+    // Get the modal
+    var modal = document.getElementById("eventModal");
 
-    <!-- The Modal -->
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p id="eventDetail"></p>
-        </div>
-    </div>
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
 
-    <script>
-        // Get the modal
-        var modal = document.getElementById("eventModal");
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
 
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
             modal.style.display = "none";
         }
+    }
 
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+    // Get all event links
+    var eventLinks = document.getElementsByClassName("event-link");
+
+    // Add click event to each link
+    for (var i = 0; i < eventLinks.length; i++) {
+        eventLinks[i].onclick = function() {
+            var eventDetail = this.getAttribute("data-event");
+            document.getElementById("eventDetail").innerText = eventDetail;
+            modal.style.display = "block";
         }
-
-        // Get all event links
-        var eventLinks = document.getElementsByClassName("event-link");
-
-        // Add click event to each link
-        for (var i = 0; i < eventLinks.length; i++) {
-            eventLinks[i].onclick = function() {
-                var eventDetail = this.getAttribute("data-event");
-                document.getElementById("eventDetail").innerText = eventDetail;
-                modal.style.display = "block";
-            }
-        }
-    </script>
-</body>
-</html>
+    }
+</script>
+{% endblock %}

@@ -1,288 +1,137 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Operator View - Ransomware Events</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #1e1e1e;
-            color: #cfcfcf;
-            margin: 0;
-            padding: 0;
-            display: flex;
-        }
-        .container {
-            flex: 1;
-            max-width: 1200px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #2e2e2e;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-        }
-        .sidebar {
-            width: 200px;
-            background-color: #2e2e2e;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            margin: 50px 20px;
-            position: fixed; /* Fix the sidebar position */
-            right: 0; /* Position it to the right */
-            top: 0; /* Align it to the top */
-            height: 100%; /* Make it span the full height of the page */
-        }
-        .sidebar a {
-            display: block;
-            color: #cfcfcf;
-            padding: 10px;
-            text-decoration: none;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-        .sidebar a:hover {
-            background-color: #2196F3;
-            color: white;
-        }
-        .sidebar a.active {
-            background-color: #2196F3;
-            color: white;
-        }
-        h1 {
-            text-align: center;
-            color: #2196F3;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-            table-layout: fixed; /* Ensure table fits within the container */
-        }
-        table, th, td {
-            border: 1px solid #555;
-        }
-        th, td {
-            padding: 8px; /* Reduce padding to fit more content */
-            text-align: left;
-            font-size: 0.9em; /* Reduce font size for better fit */
-            word-wrap: break-word; /* Ensure long text wraps within the cell */
-        }
-        th {
-            background-color: #2196F3;
-            color: white;
-        }
-        tr:nth-child(even) {
-            background-color: #3e3e3e;
-        }
-        tr:nth-child(odd) {
-            background-color: #2e2e2e;
-        }
-        .event {
-            background-color: #2e2e2e;
-            padding: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #555;
-            border-radius: 4px;
-        }
-        .event-name {
-            color: #2196F3;
-        }
-        /* Link Styles */
-        a {
-            color: white;
-            text-decoration: none;
-        }
-        a:visited {
-            color: white; /* Ensure the link remains white after being clicked */
-        }
-        a:hover {
-            text-decoration: underline; /* Optional: Add underline on hover */
-        }
-        /* Modal Styles */
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgb(0,0,0);
-            background-color: rgba(0,0,0,0.4);
-            padding-top: 60px;
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
-            color: black; /* Change font color to black for readability */
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-        }
-        .close:hover,
-        .close:focus {
-            color: black;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .charts-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: center;
-        }
-        .chart-container {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto 20px auto;
-        }
-    </style>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Operator View - Ransomware Events</h1>
-        
-        <!-- Detailed Per Volume Summary Section -->
-        <h2>Detailed Per Volume Summary</h2>
-        <div class="charts-container">
-            {% for company, volumes in detailed_summary.items() %}
-                <div class="chart-container">
-                    <h3>{{ company }}</h3>
-                    <canvas id="chart-{{ loop.index }}"></canvas>
-                </div>
-            {% endfor %}
+{% extends "base.html" %}
+
+{% block title %}Operator View - Ransomware Events{% endblock %}
+
+{% block content %}
+<h1>Operator View - Ransomware Events</h1>
+
+<!-- Detailed Per Volume Summary Section -->
+<h2>Detailed Per Volume Summary</h2>
+<div class="charts-container">
+    {% for company, volumes in detailed_summary.items() %}
+        <div class="chart-container">
+            <h3>{{ company }}</h3>
+            <canvas id="chart-{{ loop.index }}"></canvas>
         </div>
-        
-        <!-- Event Details Section -->
-        <h2>Event Details</h2>
-        <table>
-            <thead>
-                <tr>
-                    <th>Company</th>
-                    <th>Timestamp</th>
-                    <th>Sequence Number</th>
-                    <th>Node</th>
-                    <th>Vserver</th>
-                    <th>Volume</th>
-                    <th>Message Name</th>
-                    <th>Event Detail</th>
-                    <th>Volume Path</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for event in data %}
-                    <tr>
-                        <td>{{ event.company }}</td>
-                        <td>{{ event.timestamp }}</td>
-                        <td>{{ event.seq_num }}</td>
-                        <td>{{ event.node }}</td>
-                        <td>{{ event.vserver_name }}</td>
-                        <td>{{ event.volume_name }}</td>
-                        <td>{{ event.message_name }}</td>
-                        <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
-                        <td><a href="#" class="event-link" data-event="\\{{ event.vserver_name }}\{{ event.volume_name }}">Volume Path</a></td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    {% endfor %}
+</div>
+
+<!-- Event Details Section -->
+<h2>Event Details</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Timestamp</th>
+            <th>Sequence Number</th>
+            <th>Node</th>
+            <th>Vserver</th>
+            <th>Volume</th>
+            <th>Message Name</th>
+            <th>Event Detail</th>
+            <th>Volume Path</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in data %}
+            <tr>
+                <td>{{ event.company }}</td>
+                <td>{{ event.timestamp }}</td>
+                <td>{{ event.seq_num }}</td>
+                <td>{{ event.node }}</td>
+                <td>{{ event.vserver_name }}</td>
+                <td>{{ event.volume_name }}</td>
+                <td>{{ event.message_name }}</td>
+                <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
+                <td><a href="#" class="event-link" data-event="\\{{ event.vserver_name }}\{{ event.volume_name }}">Volume Path</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<!-- The Modal -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="eventDetail"></p>
     </div>
+</div>
 
-    <!-- The Modal -->
-    <div id="eventModal" class="modal">
-        <div class="modal-content">
-            <span class="close">&times;</span>
-            <p id="eventDetail"></p>
-        </div>
-    </div>
+<script>
+    // Get the modal
+    var modal = document.getElementById("eventModal");
 
-    <div class="sidebar">
-        <a href="{{ url_for('ransomware_events_operator') }}" class="{% if request.endpoint == 'ransomware_events_operator' %}active{% endif %}">Operator View</a>
-        <a href="{{ url_for('ransomware_events') }}" class="{% if request.endpoint == 'ransomware_events' %}active{% endif %}">Customer View</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
 
-    <script>
-        // Get the modal
-        var modal = document.getElementById("eventModal");
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
 
-        // Get the <span> element that closes the modal
-        var span = document.getElementsByClassName("close")[0];
-
-        // When the user clicks on <span> (x), close the modal
-        span.onclick = function() {
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
             modal.style.display = "none";
         }
+    }
 
-        // When the user clicks anywhere outside of the modal, close it
-        window.onclick = function(event) {
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
+    // Get all event links
+    var eventLinks = document.getElementsByClassName("event-link");
+
+    // Add click event to each link
+    for (var i = 0; i < eventLinks.length; i++) {
+        eventLinks[i].onclick = function() {
+            var eventDetail = this.getAttribute("data-event");
+            document.getElementById("eventDetail").innerText = eventDetail;
+            modal.style.display = "block";
         }
+    }
 
-        // Get all event links
-        var eventLinks = document.getElementsByClassName("event-link");
+    // Chart.js configuration
+    var detailedSummary = {{ detailed_summary | tojson }};
+    var chartIndex = 1;
 
-        // Add click event to each link
-        for (var i = 0; i < eventLinks.length; i++) {
-            eventLinks[i].onclick = function() {
-                var eventDetail = this.getAttribute("data-event");
-                document.getElementById("eventDetail").innerText = eventDetail;
-                modal.style.display = "block";
-            }
-        }
+    for (var company in detailedSummary) {
+        if (detailedSummary.hasOwnProperty(company)) {
+            var ctx = document.getElementById('chart-' + chartIndex).getContext('2d');
+            var volumes = detailedSummary[company];
+            var labels = Object.keys(volumes);
+            var data = Object.values(volumes);
 
-        // Chart.js configuration
-        var detailedSummary = {{ detailed_summary | tojson }};
-        var chartIndex = 1;
-
-        for (var company in detailedSummary) {
-            if (detailedSummary.hasOwnProperty(company)) {
-                var ctx = document.getElementById('chart-' + chartIndex).getContext('2d');
-                var volumes = detailedSummary[company];
-                var labels = Object.keys(volumes);
-                var data = Object.values(volumes);
-
-                new Chart(ctx, {
-                    type: 'pie',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: data,
-                            backgroundColor: [
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
-                                '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
-                            ]
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                position: 'top',
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(tooltipItem) {
-                                        return tooltipItem.label + ': ' + tooltipItem.raw;
-                                    }
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw;
                                 }
                             }
                         }
                     }
-                });
+                }
+            });
 
-                chartIndex++;
-            }
+            chartIndex++;
         }
-    </script>
-</body>
-</html>
+    }
+</script>
+{% endblock %}

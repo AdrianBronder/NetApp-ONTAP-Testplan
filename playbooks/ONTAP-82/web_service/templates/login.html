@@ -1,37 +1,27 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
-    <style>
-        body { font-family: Arial, sans-serif; }
-        .container { max-width: 300px; margin: auto; padding-top: 50px; }
-        .form-input { margin-bottom: 10px; }
-        .form-input label { display: block; }
-        .form-input input { width: 100%; padding: 8px; }
-        .error { color: red; }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h2>Login</h2>
-        {% if error %}
-            <div class="error">{{ error }}</div>
-        {% endif %}
-        <form method="POST" action="{{ url_for('login') }}">
-            <div class="form-input">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-input">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-input">
-                <button type="submit">Login</button>
-            </div>
-        </form>
-    </div>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2>Login</h2>
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-input">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+        </div>
+        <div class="form-input">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-input">
+            <button type="submit">Login</button>
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block sidebar %}{% endblock %}
