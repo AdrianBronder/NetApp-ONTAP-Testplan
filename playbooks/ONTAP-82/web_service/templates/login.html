@@ -75,16 +75,16 @@
     {% if error %}
         <div class="error">{{ error }}</div>
     {% endif %}
-    <form method="POST" action="{{ url_for('login') }}">
-        <div class="form-input">
+    <form method="POST" action="{{ url_for('login') }}" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+        <div class="form-input" style="width: 100%;">
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
         </div>
-        <div class="form-input">
+        <div class="form-input" style="width: 100%;">
             <label for="password">Password:</label>
             <input type="password" id="password" name="password" required>
         </div>
-        <div class="form-input">
+        <div class="form-input" style="width: 100%;">
             <button type="submit">Login</button>
         </div>
     </form>
