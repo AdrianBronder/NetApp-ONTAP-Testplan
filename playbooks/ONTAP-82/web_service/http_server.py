@@ -13,20 +13,6 @@ from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultLib, VaultSecret
 from ansible.vars.manager import VariableManager
 
-def read_yaml(file_path):
-    with open(file_path, 'r') as file:
-        return yaml.safe_load(file)
-
-def get_vars_from_files():
-    project_root_path = os.path.dirname(os.path.abspath(__file__))
-    vars_file_path = os.path.join(project_root_path, 'labondemand_9161', 'vars.yml')
-    vault_file_path = os.path.join(project_root_path, 'labondemand_9161', 'vault.yml')
-
-    vars_data = read_yaml(vars_file_path)
-    vault_data = read_yaml(vault_file_path)
-
-    return vars_data, vault_data
-
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -62,22 +48,22 @@ def load_vars_from_files(vars_path, dataloader):
     return vars_data
 
 # Load variables from files in vars_path
-all_vars = load_vars_from_files(vars_path, dataloader)
+ansible_file_vars = load_vars_from_files(vars_path, dataloader)
 
 # Configuration for LDAP
-app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'
-app.config['LDAP_BASE_DN'] = 'dc=demo,dc=netapp,dc=com'
-app.config['LDAP_USER_DN'] = 'cn=Users'
-app.config['LDAP_USER_RDN_ATTR'] = 'cn'
-app.config['LDAP_USER_LOGIN_ATTR'] = 'sAMAccountName'
-app.config['LDAP_GROUP_MEMBERS_ATTR'] = 'member'
-app.config['LDAP_BIND_USER_DN'] = 'Administrator@demo.netapp.com'
-app.config['LDAP_BIND_USER_PASSWORD'] = 'Netapp1!'
-app.config['LDAP_USER_SEARCH_SCOPE'] = 'SUBTREE'
-app.config['LDAP_GROUP_SEARCH_BASE'] = 'dc=demo,dc=netapp,dc=com'
-app.config['LDAP_GROUP_SEARCH_FILTER'] = '(objectclass=group)'
-app.config['LDAP_GROUP_SEARCH_SCOPE'] = 'SUBTREE'
-app.config['SECRET_KEY'] = 'ThisIsMySuperSecretKey'  # Replace with a real secret key
+app.config['LDAP_HOST']                = ansible_file_vars['ontap_80_ldap_host']
+app.config['LDAP_BASE_DN']             = ansible_file_vars['ontap_80_base_dn']
+app.config['LDAP_USER_DN']             = ansible_file_vars['ontap_80_user_dn']
+app.config['LDAP_USER_RDN_ATTR']       = ansible_file_vars['ontap_80_user_rdn_attr']
+app.config['LDAP_USER_LOGIN_ATTR']     = ansible_file_vars['ontap_80_user_login_attr']
+app.config['LDAP_BIND_USER_DN']        = ansible_file_vars['ontap_80_bind_user_dn']
+app.config['LDAP_BIND_USER_PASSWORD']  = ansible_file_vars['ontap_80_bind_user_pw']
+app.config['LDAP_USER_SEARCH_SCOPE']   = ansible_file_vars['ontap_80_user_search_scope']
+app.config['LDAP_GROUP_SEARCH_BASE']   = ansible_file_vars['ontap_80_group_search_base']
+app.config['LDAP_GROUP_SEARCH_FILTER'] = ansible_file_vars['ontap_80_group_search_filter']
+app.config['LDAP_GROUP_SEARCH_SCOPE']  = ansible_file_vars['ontap_80_group_search_scope']
+app.config['LDAP_GROUP_MEMBERS_ATTR']  = ansible_file_vars['ontap_80_group_members_attr']
+app.config['SECRET_KEY']               = ansible_file_vars['ontap_80_secret_key']
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
@@ -99,7 +85,6 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    logger.info(all_vars)
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
