@@ -27,30 +27,10 @@
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
             margin: 50px 20px;
-        }
-        .sidebar a {
-            display: block;
-            color: #cfcfcf;
-            padding: 10px;
-            text-decoration: none;
-            margin-bottom: 10px;
-            border-radius: 4px;
-        }
-        .sidebar a:hover {
-            background-color: #2196F3;
-            color: white;
-        }
-        .sidebar a.active {
-            background-color: #2196F3;
-            color: white;
-        }
-        .sidebar {
-            width: 200px;
-            background-color: #2e2e2e;
-            padding: 20px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            border-radius: 8px;
-            margin: 50px 20px;
+            position: fixed; /* Fix the sidebar position */
+            right: 0; /* Position it to the right */
+            top: 0; /* Align it to the top */
+            height: 100%; /* Make it span the full height of the page */
         }
         .sidebar a {
             display: block;
@@ -167,11 +147,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <div class="sidebar">
-        <a href="{{ url_for('ransomware_events_operator') }}" class="{% if request.endpoint == 'ransomware_events_operator' %}active{% endif %}">Operator View</a>
-        <a href="{{ url_for('ransomware_events') }}" class="{% if request.endpoint == 'ransomware_events' %}active{% endif %}">Customer View</a>
-        <a href="{{ url_for('logout') }}">Logout</a>
-    </div>
     <div class="container">
         <h1>Operator View - Ransomware Events</h1>
         
@@ -227,9 +202,10 @@
             <p id="eventDetail"></p>
         </div>
     </div>
+
     <div class="sidebar">
-        <a href="{{ url_for('ransomware_events_operator') }}" class="active">Operator View</a>
-        <a href="{{ url_for('ransomware_events') }}">Customer View</a>
+        <a href="{{ url_for('ransomware_events_operator') }}" class="{% if request.endpoint == 'ransomware_events_operator' %}active{% endif %}">Operator View</a>
+        <a href="{{ url_for('ransomware_events') }}" class="{% if request.endpoint == 'ransomware_events' %}active{% endif %}">Customer View</a>
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
 
