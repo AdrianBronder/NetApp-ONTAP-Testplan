@@ -66,7 +66,11 @@ def login():
             session['username'] = user_dn
             session['groups'] = user_groups_list
             logger.info(f"User {username} authenticated successfully with groups: {user_groups_list}")
-            return redirect(url_for('ransomware_events'))
+            
+            if 'operators' in session['groups']:
+                return redirect(url_for('ransomware_events_operator'))
+            else:
+                return redirect(url_for('ransomware_events'))
         else:
             logger.info(f"Login failed for user {username}")
             # Authentication failed, show login form again with an error
@@ -78,6 +82,8 @@ def login():
 def ransomware_events():
     if 'username' not in session:
         return redirect(url_for('login'))
+    elif 'operators' in session['groups']:
+        return redirect(url_for('ransomware_events_operator'))
 
     company_name = "Unknown"
     event_data = []
