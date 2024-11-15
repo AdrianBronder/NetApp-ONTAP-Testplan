@@ -37,6 +37,10 @@
         users:
           - name:     "{{ ontap_82_polarisltd_user.split(separator)[-1]  }}"
             password: "{{ ontap_82_polarisltd_user_pw }}"
+      - name:         "operators"
+        users:
+          - name:     "{{ ontap_82_operator_user.split(separator)[-1]  }}"
+            password: "{{ ontap_82_operator_user_pw }}"
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
