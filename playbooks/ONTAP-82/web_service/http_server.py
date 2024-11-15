@@ -4,7 +4,7 @@ from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 #from ldap3 import Server, Connection, ALL
 from datetime import datetime
 import xml.etree.ElementTree as ET
-import logging, os, re
+import logging, os, re, yaml
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
 from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare
@@ -12,6 +12,20 @@ from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultLib, VaultSecret
 from ansible.vars.manager import VariableManager
+
+def read_yaml(file_path):
+    with open(file_path, 'r') as file:
+        return yaml.safe_load(file)
+
+def get_vars_from_files():
+    project_root_path = os.path.dirname(os.path.abspath(__file__))
+    vars_file_path = os.path.join(project_root_path, 'labondemand_9161', 'vars.yml')
+    vault_file_path = os.path.join(project_root_path, 'labondemand_9161', 'vault.yml')
+
+    vars_data = read_yaml(vars_file_path)
+    vault_data = read_yaml(vault_file_path)
+
+    return vars_data, vault_data
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,6 +37,7 @@ app = Flask(__name__)
 project_root_path                  = os.path.join(os.path.dirname(__file__), '../../..')
 project_root_path                  = os.path.normpath(project_root_path)
 inventory_path                     = project_root_path+'/inventories/labondemand_latest'
+vars_path                          = project_root_path+'/vars/labondemand_latest'
 # Import Ansible inventory information
 with open(project_root_path+'/init/init_helper/vaultfile.txt', 'rb') as vault_password_file:
     vault_password = vault_password_file.read().strip()
@@ -30,10 +45,24 @@ secret                             = VaultSecret(vault_password)
 vault                              = VaultLib(secrets=[(None, secret)])
 dataloader                         = DataLoader()
 dataloader.set_vault_secrets(vault.secrets)
+
 # Load inventory vars
 ansible_inventory                  = InventoryManager(loader=dataloader, sources=[os.path.normpath(inventory_path)])
 ansible_inventory_vars             = VariableManager(loader=dataloader, inventory=ansible_inventory)
 cluster1_vars                      = ansible_inventory_vars.get_vars(host=ansible_inventory.get_hosts(pattern='ontap')[0], include_hostvars=True)
+
+# Load vars
+def load_vars_from_files(vars_path, dataloader):
+    vars_data = {}
+    for filename in os.listdir(vars_path):
+        file_path = os.path.join(vars_path, filename)
+        if os.path.isfile(file_path) and filename.endswith(('.yml', '.yaml')):
+            file_vars = dataloader.load_from_file(file_path)
+            vars_data.update(file_vars)
+    return vars_data
+
+# Load variables from files in vars_path
+all_vars = load_vars_from_files(vars_path, dataloader)
 
 # Configuration for LDAP
 app.config['LDAP_HOST'] = 'ldap://dc1.demo.netapp.com'
@@ -70,7 +99,7 @@ def index():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    logger.info(cluster1_vars)
+    logger.info(all_vars)
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
