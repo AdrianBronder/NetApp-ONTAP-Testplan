@@ -115,7 +115,8 @@ def ransomware_events():
 
 @app.route('/ransomware_events_operator')
 def ransomware_events_operator():
-        
+    if 'username' not in session:
+        return redirect(url_for('login'))
     if not 'operators' in session['groups']:
         return redirect(url_for('ransomware_events'))
     
