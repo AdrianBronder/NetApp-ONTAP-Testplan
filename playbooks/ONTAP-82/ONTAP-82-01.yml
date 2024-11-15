@@ -89,7 +89,7 @@
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
 
-    - name: Create shares
+    - name: Create Qtree shares
       netapp.ontap.na_ontap_cifs:
         state:                         present
         name:                          "{{ item.1 }}_{{ item.2 }}"
@@ -101,6 +101,20 @@
         <<: *input
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+
+    - name: Create volume shares
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ item.1 }}"
+        path:                          "/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
+
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:

@@ -86,7 +86,7 @@
       loop:
         "{{ ontap_82_tenant_list }}"
 
-    - name: Remove shares
+    - name: Remove qtree shares
       netapp.ontap.na_ontap_cifs:
         state:                         absent
         name:                          "{{ item.1 }}_{{ item.2 }}"
@@ -94,6 +94,15 @@
         <<: *input
       loop:
         "{{ ontap_82_tenant_list | product(ontap_82_volumes, ontap_82_qtrees) | list }}"
+
+    - name: Remove volume shares
+      netapp.ontap.na_ontap_cifs:
+        state:                         absent
+        name:                          "{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        <<: *input
+      loop:
+        "{{ ontap_82_tenant_list | product(ontap_82_volumes) | list }}"
 
     - name: Remove volume
       netapp.ontap.na_ontap_volume:
