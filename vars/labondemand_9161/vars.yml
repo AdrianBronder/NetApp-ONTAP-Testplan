@@ -141,6 +141,21 @@ ontap_52_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
 ontap_52_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_52_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
+# ONTAP-80 - Advanced
+ontap_80_ldap_host:               "ldap://dc1.demo.netapp.com"
+ontap_80_base_dn:                 "dc=demo,dc=netapp,dc=com"
+ontap_80_user_dn:                 "cn=Users"
+ontap_80_user_rdn_attr:           "cn"
+ontap_80_user_login_attr:         "sAMAccountName"
+ontap_80_bind_user_dn:            "Administrator@demo.netapp.com"
+ontap_80_bind_user_pw:            "{{ vault_ontap_80_bind_user_pw }}"
+ontap_80_user_search_scope:       "SUBTREE"
+ontap_80_group_search_base:       "{{ ontap_80_base_dn }}"
+ontap_80_group_members_attr:      "member"
+ontap_80_group_search_filter:     "(objectclass=group)"
+ontap_80_group_search_scope:      "{{ ontap_80_user_search_scope }}"
+ontap_80_secret_key:              "{{ vault_ontap_80_secret_key }}"
+
 # ONTAP-81 - Advanced - CIFS Self-Service
 ontap_81_volumes:                 
   - "ontap_81_board"
