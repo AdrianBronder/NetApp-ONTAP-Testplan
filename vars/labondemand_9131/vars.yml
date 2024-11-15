@@ -150,3 +150,34 @@ ontap_81_volumes:
   - "ontap_81_it"
   - "ontap_81_legal"
   - "ontap_81_alumni"
+
+  # ONTAP-82 - Advanced - Anti-Ransomware
+ontap_82_bluecorp_user:           "DEMO\\bluecorp_user"
+ontap_82_bluecorp_user_pw:        "{{ vault_ontap_82_bluecorp_user_pw }}"
+ontap_82_astrainc_user:           "DEMO\\astrainc_user"
+ontap_82_astrainc_user_pw:        "{{ vault_ontap_82_astrainc_user_pw }}"
+ontap_82_polarisltd_user:         "DEMO\\polarisltd_user"
+ontap_82_polarisltd_user_pw:      "{{ vault_ontap_82_polarisltd_user_pw }}"
+ontap_82_operator_user:           "DEMO\\operator"
+ontap_82_operator_user_pw:        "{{ vault_ontap_82_operator_user_pw }}"
+
+ontap_82_tenant_list:                 
+  - "ntap_svm_bluecorp"
+  - "ntap_svm_astrainc"
+  - "ntap_svm_polarisltd"
+ontap_82_policy_name:             "ontap_82_policy"
+ontap_82_volumes:                 
+  - "ontap_82_board"
+  - "ontap_82_research"
+  - "ontap_82_hr"
+  - "ontap_82_legal"
+  - "ontap_82_it"
+  - "ontap_82_finance"
+  - "ontap_82_sales"
+ontap_82_qtrees:
+  - "ontap_82_qt1"
+  - "ontap_82_qt2"
+  - "ontap_82_qt3"
+ontap_82_ems_dest_type:           "rest_api"
+ontap_82_ems_dest_destination:    "http://192.168.0.61:5000/"
+linux_82_mount_dir:               "{{ linux_default_mount_dir }}/82"

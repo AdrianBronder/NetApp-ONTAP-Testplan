@@ -158,6 +158,8 @@ ontap_82_astrainc_user:           "DEMO\\astrainc_user"
 ontap_82_astrainc_user_pw:        "{{ vault_ontap_82_astrainc_user_pw }}"
 ontap_82_polarisltd_user:         "DEMO\\polarisltd_user"
 ontap_82_polarisltd_user_pw:      "{{ vault_ontap_82_polarisltd_user_pw }}"
+ontap_82_operator_user:           "DEMO\\operator"
+ontap_82_operator_user_pw:        "{{ vault_ontap_82_operator_user_pw }}"
 
 ontap_82_tenant_list:                 
   - "ntap_svm_bluecorp"
