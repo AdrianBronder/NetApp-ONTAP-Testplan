@@ -53,6 +53,7 @@
         </thead>
         <tbody>
             {% for department in departments %}
+            {% if not '_root' in department.name  %}
                 <tr>
                     <td>{{ department.name | replace('ontap_81_', '') }}</td>
                     {% if department.snapshot_policy.name == "none" %}
@@ -68,6 +69,7 @@
                     {% endif %}
                     <td>unknown</td>
                 </tr>
+            {% endif %}
             {% endfor %}
         </tbody>
     </table>
