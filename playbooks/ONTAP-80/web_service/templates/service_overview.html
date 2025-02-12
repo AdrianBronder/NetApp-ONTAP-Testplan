@@ -4,8 +4,7 @@
 
 {% block content %}
 <div class="container">
-    <a href="{{ url_for('service_overview') }}" class="btn btn-primary my-3">Service Overview</a>
-    <h1 class="my-4">Service Overview</h1>
+    <h1 class="my-4">Service Overview for {{ company }}</h1>
     <div class="charts-container">
         <div class="chart-container">
             <canvas id="quotaSizePieChart"></canvas>
@@ -30,6 +29,36 @@
                     <td>{{ quota.qtree.name }}</td>
                     <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
                     <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="container">
+    <h1 class="my-4">Add-on Services</h1>
+    <div class="charts-container">
+        <div class="chart-container">
+            <canvas id="quotaCountPieChart"></canvas>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Local Versioning</th>
+                <th>Backup</th>
+                <th>Ransom-ware Protected</th>
+                <th>Data Pipeline</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for department in volumeList %}
+                <tr>
+                    <td>{{ department.name | replace('ontap_81_', '') }}</td>
+                    <td>{{ department.snapshot_policy.name }}</td>
+                    <td>unknown</td>
+                    <td>{{ department.snapshot_policy.name }}</td>
+                    <td>unknown</td>
                 </tr>
             {% endfor %}
         </tbody>

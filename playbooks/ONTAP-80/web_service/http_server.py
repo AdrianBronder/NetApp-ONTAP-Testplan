@@ -7,7 +7,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare
+from netapp_ontap.resources import Qtree,QuotaRule,Volume,QuotaReport,CifsShare
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultLib, VaultSecret
@@ -136,6 +136,14 @@ def service_overview():
         password=ontap_group_data['ontap_admin_password'],
         verify=False
     )
+    # Get volume information
+    try:
+        volumeList = list(Volume.get_collection(
+            fields='*',
+            **{'svm.name': primary_svm}))
+    except NetAppRestError as error:
+        quotaReport = []
+        print("Exception caught :" + str(error))
 
     # Get quota information
     try:
@@ -170,6 +178,7 @@ def service_overview():
                            quotaReport=quotaReport_sanitized,
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
+                           departments=volumeList,
                            colors=colors)
 
 @app.route('/ransomware_events')
