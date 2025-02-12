@@ -3,8 +3,43 @@
 {% block title %}Service Overview{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container mt-0">
     <h1 class="my-4">Service Overview for {{ company }}</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Local Versioning</th>
+                <th>Backup</th>
+                <th>Ransom-ware Protected</th>
+                <th>Data Pipeline</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for department in departments %}
+            {% if not '_root' in department.name %}
+                <tr>
+                    <td>{{ department.name | replace('ontap_81_', '') }}</td>
+                    {% if department.snapshot_policy.name == "none" %}
+                    <td>disabled</td>
+                    {% else %}
+                    <td>enabled</td>
+                    {% endif %}
+                    <td>unknown</td>
+                    {% if department.anti_ransomware is defined %}
+                    <td>{{ department.anti_ransomware.state }}</td>
+                    {% else %}
+                    <td>disabled</td>
+                    {% endif %}
+                    <td>unknown</td>
+                </tr>
+            {% endif %}
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="container">
+    <h1 class="my-4">Storage Units</h1>
     <div class="charts-container">
         <div class="chart-container">
             <canvas id="quotaSizePieChart"></canvas>
@@ -34,46 +69,6 @@
         </tbody>
     </table>
 </div>
-<div class="container">
-    <h1 class="my-4">Add-on Services</h1>
-    <div class="charts-container">
-        <div class="chart-container">
-            <canvas id="quotaCountPieChart"></canvas>
-        </div>
-    </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Department</th>
-                <th>Local Versioning</th>
-                <th>Backup</th>
-                <th>Ransom-ware Protected</th>
-                <th>Data Pipeline</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for department in departments %}
-            {% if not '_root' in department.name  %}
-                <tr>
-                    <td>{{ department.name | replace('ontap_81_', '') }}</td>
-                    {% if department.snapshot_policy.name == "none" %}
-                    <td>disabled</td>
-                    {% else %}
-                    <td>enabled</td>
-                    {% endif %}
-                    <td>unknown</td>
-                    {% if department.anti_ransomware is defined %}
-                    <td>{{ department.anti_ransomware.state }}</td>
-                    {% else %}
-                    <td>disbaled</td>
-                    {% endif %}
-                    <td>unknown</td>
-                </tr>
-            {% endif %}
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 {% endblock %}
 
 {% block styles %}
@@ -90,6 +85,9 @@
     .chart-container canvas {
         width: 100% !important;
         height: 100% !important;
+    }
+    .container.mt-0 {
+        margin-top: 0 !important;
     }
 </style>
 {% endblock %}
@@ -145,6 +143,33 @@ var quotaCountPieChart = new Chart(ctx, {
             title: {
                 display: true,
                 text: 'Share Distribution (Count) per Department'
+            }
+        }
+    }
+});
+</script>
+<script>
+var ctx = document.getElementById('addonQuotaCountPieChart').getContext('2d');
+var addonQuotaCountPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Add-on Service Distribution (Count) per Department'
             }
         }
     }
