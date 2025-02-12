@@ -179,6 +179,7 @@ def service_overview():
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
                            departments=volumeList,
+                           company=company_name,
                            colors=colors)
 
 @app.route('/ransomware_events')
