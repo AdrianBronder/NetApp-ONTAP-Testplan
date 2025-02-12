@@ -156,6 +156,11 @@ ontap_80_group_search_scope:      "SUBTREE"
 ontap_80_group_members_attr:      "member"
 ontap_80_secret_key:              "{{ vault_ontap_80_secret_key }}"
 
+ontap_80_svms:
+  - "ntap_svm_bluecorp"
+  - "ntap_svm_astrainc"
+  - "ntap_svm_polarisltd"
+
 # ONTAP-81 - Advanced - CIFS Self-Service
 ontap_81_volumes:                 
   - "ontap_81_board"

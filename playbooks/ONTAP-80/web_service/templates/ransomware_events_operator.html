@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block title %}Operator View - Ransomware Events{% endblock %}
+
+{% block content %}
+<h1>Operator View - Ransomware Events</h1>
+
+<!-- Detailed Per Volume Summary Section -->
+<h2>Detailed Per Volume Summary</h2>
+<div class="charts-container">
+    {% for company, volumes in detailed_summary.items() %}
+        <div class="chart-container">
+            <h3>{{ company }}</h3>
+            <canvas id="chart-{{ loop.index }}"></canvas>
+        </div>
+    {% endfor %}
+</div>
+
+<!-- Event Details Section -->
+<h2>Event Details</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Company</th>
+            <th>Timestamp</th>
+            <th>Sequence Number</th>
+            <th>Node</th>
+            <th>Vserver</th>
+            <th>Volume</th>
+            <th>Message Name</th>
+            <th>Event Detail</th>
+            <th>Access Path</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for event in data %}
+            <tr>
+                <td>{{ event.company }}</td>
+                <td>{{ event.timestamp }}</td>
+                <td>{{ event.seq_num }}</td>
+                <td>{{ event.node }}</td>
+                <td>{{ event.vserver_name }}</td>
+                <td>{{ event.volume_name }}</td>
+                <td>{{ event.message_name }}</td>
+                <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
+                <td><a href="#" class="event-link" data-event="\\{{ event.vserver_name }}\{{ event.volume_name }}">View Path</a></td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
+{% block scripts %}
+<!-- Include Chart.js from CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- The Modal -->
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <p id="eventDetail"></p>
+    </div>
+</div>
+
+<script>
+    // Get the modal
+    var modal = document.getElementById("eventModal");
+
+    // Get the <span> element that closes the modal
+    var span = document.getElementsByClassName("close")[0];
+
+    // When the user clicks on <span> (x), close the modal
+    span.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // When the user clicks anywhere outside of the modal, close it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+    }
+
+    // Get all event links
+    var eventLinks = document.getElementsByClassName("event-link");
+
+    // Add click event to each link
+    for (var i = 0; i < eventLinks.length; i++) {
+        eventLinks[i].onclick = function() {
+            var eventDetail = this.getAttribute("data-event");
+            document.getElementById("eventDetail").innerText = eventDetail;
+            modal.style.display = "block";
+        }
+    }
+
+    // Chart.js configuration
+    var detailedSummary = {{ detailed_summary | tojson | safe }};
+    var chartIndex = 1;
+
+    for (var company in detailedSummary) {
+        if (detailedSummary.hasOwnProperty(company)) {
+            var ctx = document.getElementById('chart-' + chartIndex).getContext('2d');
+            var volumes = detailedSummary[company];
+            var labels = Object.keys(volumes);
+            var data = Object.values(volumes);
+
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: [
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40',
+                            '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40'
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            chartIndex++;
+        }
+    }
+</script>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .charts-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+    .chart-container {
+        flex: 1 1 300px; /* Adjust the width as needed */
+        max-width: 400px; /* Adjust the max-width as needed */
+    }
+    .chart-container canvas {
+        width: 100%;
+        height: auto;
+    }
+</style>
+{% endblock %}
