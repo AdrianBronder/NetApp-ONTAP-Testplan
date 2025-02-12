@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
+import logging, os, re, yaml, random
 from flask import Flask, request, redirect, url_for, render_template, session, jsonify
 from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 #from ldap3 import Server, Connection, ALL
 from datetime import datetime
 import xml.etree.ElementTree as ET
-import logging, os, re, yaml
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
 from netapp_ontap.resources import Qtree,QuotaRule,QuotaReport,CifsShare
