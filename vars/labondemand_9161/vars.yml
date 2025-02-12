@@ -170,6 +170,10 @@ ontap_81_volumes:
   - "ontap_81_it"
   - "ontap_81_finance"
   - "ontap_81_sales"
+ontap_81_qtrees:
+  - "abc"
+  - "def"
+  - "ghi"
 
 # ONTAP-82 - Advanced - Anti-Ransomware
 ontap_82_bluecorp_user:           "DEMO\\bluecorp_user"

@@ -38,60 +38,36 @@
     - name: Create qtrees
       netapp.ontap.na_ontap_qtree:
         state:                         present
-        name:                          "{{ item }}"
+        name:                          "{{ item.1 }}"
         flexvol_name:                  "{{ ontap_81_volumes[0] }}"
         security_style:                "ntfs"
-        vserver:                       "{{ global_primary_nas_svm }}"
+        vserver:                       "{{ item.0 }}"
       loop:
-        - "abc"
-        - "def"
-        - "ghi"
-        - "jkl"
-        - "mno"
-        - "pqr"
-        - "stu"
-        - "vwx"
-        - "yz"
+        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
 
     - name: Set quota (1GiB)
       netapp.ontap.na_ontap_quotas:
         state:                         present
-        vserver:                       "{{ global_primary_nas_svm }}"
+        vserver:                       "{{ item.0 }}"
         volume:                        "{{ ontap_81_volumes[0] }}"
-        quota_target:                  "{{ item }}"
+        quota_target:                  "{{ item.1 }}"
         type:                          "tree"
         disk_limit:                    1048576
         set_quota_status:              True
       loop:
-        - "abc"
-        - "def"
-        - "ghi"
-        - "jkl"
-        - "mno"
-        - "pqr"
-        - "stu"
-        - "vwx"
-        - "yz"
+        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
 
     - name: Create CIFS share
       netapp.ontap.na_ontap_cifs:
         state:                         present
         name:                          "{{ (ontap_81_volumes[0] | replace('ontap_81_','')) }}_{{ item }}"
-        path:                          "/{{ ontap_81_volumes[0] }}/{{ item }}"
-        vserver:                       "{{ global_primary_nas_svm }}"
+        path:                          "/{{ ontap_81_volumes[0] }}/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
         browsable:                     true
         oplocks:                       true
         show_snapshot:                 true
         comment:                       "Test share created as part of test frame ONTAP-81"
       loop:
-        - "abc"
-        - "def"
-        - "ghi"
-        - "jkl"
-        - "mno"
-        - "pqr"
-        - "stu"
-        - "vwx"
-        - "yz"
+        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
 
   post_tasks:
