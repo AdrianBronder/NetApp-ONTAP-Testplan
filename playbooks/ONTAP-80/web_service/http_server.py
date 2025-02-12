@@ -382,6 +382,6 @@ if __name__ == '__main__':
 
     # Set global standard variables
     primary_cluster                    = str(ansible_inventory.get_hosts(pattern='primary_storage_clusters')[0])
-    secondary_cluster                  = str(ansible_inventory.get_hosts(pattern='primary_storage_clusters')[1])
+    secondary_cluster                  = str(ansible_inventory.get_hosts(pattern='secondary_storage_clusters')[0])
 
     app.run(host='0.0.0.0', port=80, debug=True)
