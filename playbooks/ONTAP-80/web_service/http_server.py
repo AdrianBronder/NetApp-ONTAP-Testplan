@@ -110,7 +110,7 @@ def login():
     return render_template('login.html')
 
 @app.route('/service_overview', methods=['GET'])
-def list_services():
+def service_overview():
     if 'username' not in session:
         return redirect(url_for('login'))
     elif 'operators' in session['groups']:
