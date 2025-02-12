@@ -131,7 +131,7 @@ def service_overview():
         primary_svm = "ntap_svm_polarisltd"
     # Establish connection to storage cluster
     config.CONNECTION = HostConnection(
-        primary_cluster + 'demo.netapp.com',
+        primary_cluster + '.demo.netapp.com',
         username=ontap_group_data['ontap_admin_user'],
         password=ontap_group_data['ontap_admin_password'],
         verify=False
