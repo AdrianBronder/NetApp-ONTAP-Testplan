@@ -61,7 +61,11 @@
                     <td>enabled</td>
                     {% endif %}
                     <td>unknown</td>
+                    {% if department.anti_ransomware is defined %}
                     <td>{{ department.anti_ransomware.state }}</td>
+                    {% else %}
+                    <td>disbaled</td>
+                    {% endif %}
                     <td>unknown</td>
                 </tr>
             {% endfor %}
