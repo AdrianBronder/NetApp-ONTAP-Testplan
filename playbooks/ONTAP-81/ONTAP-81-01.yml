@@ -38,14 +38,14 @@
     - name: Create volume
       netapp.ontap.na_ontap_volume:
         state:                         present
-        name:                          "{{ item.2 }}"
+        name:                          "{{ item.1 }}"
         aggregate_name:                "{{ storage_aggregates[0].name }}"
         size:                          1024
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
-        junction_path:                 "/{{ item.2 }}"
-        vserver:                       "{{ item.1 }}"
+        junction_path:                 "/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
         volume_security_style:         "ntfs"
       loop:
         "{{ ontap_80_svms | product(ontap_81_volumes) | list }}"
@@ -53,8 +53,8 @@
     - name: Set default quota rule on volumes
       netapp.ontap.na_ontap_quotas:
         state:                         present
-        vserver:                       "{{ item.1 }}"
-        volume:                        "{{ item.2 }}"
+        vserver:                       "{{ item.0 }}"
+        volume:                        "{{ item.1 }}"
         quota_target:                  ""
         type:                          tree
         set_quota_status:              True
