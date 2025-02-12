@@ -55,9 +55,13 @@
             {% for department in departments %}
                 <tr>
                     <td>{{ department.name | replace('ontap_81_', '') }}</td>
-                    <td>{{ department.snapshot_policy.name }}</td>
+                    {% if department.snapshot_policy.name == "none" %}
+                    <td>disabled</td>
+                    {% else %}
+                    <td>enabled</td>
+                    {% endif %}
                     <td>unknown</td>
-                    <td>{{ department.snapshot_policy.name }}</td>
+                    <td>{{ department.anti_ransomware.state }}</td>
                     <td>unknown</td>
                 </tr>
             {% endfor %}
