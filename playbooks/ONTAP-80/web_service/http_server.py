@@ -169,7 +169,7 @@ def service_overview():
     # Get SnapMirror information
     try:
         config.CONNECTION = conn_secondary
-        snapmirrorList = list(snapmirror_relationship.get_collection(
+        snapmirrorList = list(SnapmirrorRelationship.get_collection(
             fields='*',
             **{'destination.svm.name': secondary_svm}))
     except NetAppRestError as error:
