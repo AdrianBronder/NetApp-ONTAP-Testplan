@@ -289,7 +289,7 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is the default NAS backup \
                                    location"
     enabled:                      true
-  - name:                         "bluecorp-backup"
+  - name:                         "blue-backup"
     svm:
       name:                       "{{ svm_svms[2].name }}"
     ad_domain:
@@ -298,7 +298,7 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is the default bluecorp backup \
                                    location"
     enabled:                      true
-  - name:                         "astrainc-backup"
+  - name:                         "astra-backup"
     svm:
       name:                       "{{ svm_svms[3].name }}"
     ad_domain:
@@ -307,7 +307,7 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is the default astrainc backup \
                                    location"
     enabled:                      true
-  - name:                         "polarisltd-backup"
+  - name:                         "polaris-backup"
     svm:
       name:                       "{{ svm_svms[4].name }}"
     ad_domain:
