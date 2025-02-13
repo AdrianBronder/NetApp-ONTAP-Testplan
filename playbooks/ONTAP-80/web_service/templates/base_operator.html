@@ -143,7 +143,7 @@
 
     {% block sidebar %}
     <div class="sidebar">
-        <a href="{{ url_for('ransomware_events_operator') }}" class="{% if request.endpoint == 'ransomware_events_operator' %}active{% endif %}">Operator View</a>
+        <a href="{{ url_for('ransomware_events_operator') }}" class="{% if request.endpoint == 'ransomware_events_operator' %}active{% endif %}">Ransomware</a>
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
     {% endblock %}

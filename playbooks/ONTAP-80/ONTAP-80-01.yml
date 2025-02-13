@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-20-04 - SVM Data Protocol Setup
+# Title:        ONTAP-80-01 - Base Deployment
 # Author:       NetApp Inc. (badrian)
 # Initial 
-# Create Date:  2023-08-22
-# Description:  Basic Data SVM Setup
-#               - SVM Protocol Setup
+# Create Date:  2025-02-13
+# Description:  Advanced - Service Provider Customization
+#               - Base Deployment
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,25 +16,157 @@
 ################################################################################
 
 - hosts:                               "ontap"
-  name:                                "ONTAP-20-04 - SVM Data Protocol Setup"
+  name:                                "ONTAP-80-01 - Base Deployment"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
   tasks:
+    - name: Create SVMs for testing"
+      netapp.ontap.na_ontap_svm:
+        state:                         present
+        name:                          "{{ item.name }}"
+        services:
+          cifs:
+            allowed:                   "{{ item.cifs.allowed | default(omit) }}"
+          ndmp:
+            allowed:                   "{{ item.ndmp.allowed | default(omit) }}"
+          nfs:
+            allowed:                   "{{ item.nfs.allowed | default(omit) }}"
+          fcp:
+            allowed:                   "{{ item.fcp.allowed | default(omit) }}"
+          iscsi:
+            allowed:                   "{{ item.iscsi.allowed | default(omit) }}"
+          nvme:
+            allowed:                   "{{ item.nvme.allowed | default(omit) }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
+  
+    - name: Patch additional SVM parameters - auto_enable_analytics
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'vserver'
+        verb:                          'PATCH'
+        params: 
+          vserver:                     "{{ item.name }}"
+        body:
+          auto_enable_analytics:       "{{ item.auto_enable_analytics }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - item.auto_enable_analytics is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
+  
+    - name: Patch additional SVM parameters - auto_enable_activity_tracking
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'vserver'
+        verb:                          'PATCH'
+        params:
+          vserver:                     "{{ item.name }}"
+        body:
+          auto_enable_activity_tracking:
+                                       "{{ item.auto_enable_activity_tracking }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - item.auto_enable_activity_tracking is defined
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
+
+    - name: Create network interfaces on test SVMs
+      netapp.ontap.na_ontap_interface:
+        state:                         present
+        vserver:                       "{{ item.svm.name }}"
+        interface_name:                "{{ item.name }}"
+        home_node:                     "{{ item.location.home_node.name }}"
+        home_port:                     "{{ item.location.home_port.name }}"
+        address:                       "{{ item.ip.address }}"
+        netmask:                       "{{ item.ip.netmask }}"
+        service_policy:                "{{ item.service_policy.name | default(omit) }}"
+        is_auto_revert:                "{{ item.location.auto_revert | default(omit) }}"
+        <<: *input
+      loop:
+        "{{ network_ip_interfaces }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - network_ip_interfaces | length > 0
+        - item.svm.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+        - item.scope == "svm"
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name 
+
+    - name: Configure default route on test SVMs
+      netapp.ontap.na_ontap_net_routes:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        destination:                   "0.0.0.0/0"
+        gateway:                       "{{ all_default_gateway }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
+
+    - name: Configure DNS on test SVMs
+      netapp.ontap.na_ontap_dns:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        domains:                       "{{ item.dns.domains }}"
+        nameservers:                   "{{ item.dns.servers }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
+
     - name: Configure NFS service on SVMs
       netapp.ontap.na_ontap_nfs:
         state:                         present
@@ -52,7 +184,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
@@ -72,7 +204,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - item.protocol.v3_64bit_identifiers_enabled is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
@@ -93,7 +225,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - item.protocol.v4_64bit_identifiers_enabled is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
@@ -111,7 +243,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined 
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
@@ -134,7 +266,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
@@ -152,7 +284,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
@@ -169,7 +301,7 @@
         label: "{{ item.0.key }}"
       when:
         - protocols_active_directory | list | length > 0
-        - item.0.key is regex('^ntap-svm.*')
+        - item.0.key is regex('^sp-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.0.key
   
@@ -191,7 +323,7 @@
       when:
         - protocols_cifs_services | length > 0
         - item.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
@@ -211,9 +343,53 @@
       when:
         - protocols_cifs_services | length > 0
         - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+        - item.svm.name is regex('^sp-svm.*')
         - item.comment is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+  post_tasks:
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-52-01 - SVM Peering"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create SVM Peerings
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        peer_vserver:                  "{{ item.name }}-backup"
+        peer_cluster:                  "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
+        <<: *input
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
 
   post_tasks:

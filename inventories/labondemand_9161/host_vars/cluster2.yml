@@ -137,10 +137,109 @@ svm_svms:
       allowed:                    true
     language:                     "utf8mb4"
     comment:                      "This is the primary backup SVM for testing"
+  - name:                         "sp-svm-bluecorp-backup"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+      enabled:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    true
+    fcp:
+      allowed:                    true
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    true
+    language:                     "utf8mb4"
+    comment:                      "This is the backup SVM for Blue Corp"
+  - name:                         "sp-svm-astrainc-backup"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+      enabled:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    true
+    fcp:
+      allowed:                    true
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    true
+    language:                     "utf8mb4"
+    comment:                      "This is the backup SVM for Blue Corp"
+  - name:                         "sp-svm-polarisltd-backup"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+      enabled:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    true
+    fcp:
+      allowed:                    true
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    true
+    language:                     "utf8mb4"
+    comment:                      "This is the backup SVM for Blue Corp"
 
 protocols_nfs_services:
   - svm:
       name:                       "ntap-svm03-backup"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                false
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "sp-svm-bluecorp-backup"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                false
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "sp-svm-astrainc-backup"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                false
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "sp-svm-polarisltd-backup"
     enabled:                      true
     protocol:
       v3_enabled:                 true
@@ -156,6 +255,18 @@ protocols_active_directory:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
   ntap-svm03-backup:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  sp-svm-bluecorp-backup:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  sp-svm-astrainc-backup:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  sp-svm-polarisltd-backup:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
@@ -176,6 +287,33 @@ protocols_cifs_services:
       fqdn:                       "{{ all_ad_domain }}"
       organizational_unit:        "{{ all_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is the default NAS backup \
+                                   location"
+    enabled:                      true
+  - name:                         "bluecorp-backup"
+    svm:
+      name:                       "{{ svm_svms[2].name }}"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is the default bluecorp backup \
+                                   location"
+    enabled:                      true
+  - name:                         "astrainc-backup"
+    svm:
+      name:                       "{{ svm_svms[3].name }}"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is the default astrainc backup \
+                                   location"
+    enabled:                      true
+  - name:                         "polarisltd-backup"
+    svm:
+      name:                       "{{ svm_svms[4].name }}"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is the default polarisltd backup \
                                    location"
     enabled:                      true
 
@@ -217,6 +355,54 @@ network_ip_interfaces:
     location:
       home_node:
         name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "{{ svm_svms[2].name }}"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[2].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.241"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[1].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "{{ svm_svms[3].name }}"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[3].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.242"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[1].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "{{ svm_svms[3].name }}"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[3].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.243"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[1].name }}"
       home_port:
         name:                     "e0c"
       auto_revert:                true

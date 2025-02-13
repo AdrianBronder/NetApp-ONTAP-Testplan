@@ -158,7 +158,7 @@ svm_svms:
       allowed:                    true
     language:                     "utf8mb4"
     comment:                      "This is the second SVM for SAN testing"
-  - name:                         "ntap_svm_bluecorp"
+  - name:                         "sp-svm-bluecorp"
     dns:
       domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
@@ -180,7 +180,7 @@ svm_svms:
       allowed:                    false
     language:                     "utf8mb4"
     comment:                      "This is the BlueCorp's SVM for multi-tenancy testing"
-  - name:                         "ntap_svm_polarisltd"
+  - name:                         "sp-svm-polarisltd"
     dns:
       domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
@@ -202,7 +202,7 @@ svm_svms:
       allowed:                    false
     language:                     "utf8mb4"
     comment:                      "This is the PolarisLtd's SVM for multi-tenancy testing"
-  - name:                         "ntap_svm_astrainc"
+  - name:                         "sp-svm-astrainc"
     dns:
       domains:                    "{{ all_dns_domains }}"
       servers:                    "{{ all_dns_nameservers }}"
@@ -276,15 +276,15 @@ protocols_active_directory:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
-  ntap_svm_bluecorp:
+  sp-svm-bluecorp:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
-  ntap_svm_astrainc:
+  sp-svm-astrainc:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
-  ntap_svm_polarisltd:
+  sp-svm-polarisltd:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"

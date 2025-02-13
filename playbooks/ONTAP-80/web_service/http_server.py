@@ -7,7 +7,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Qtree,QuotaRule,Volume,QuotaReport,CifsShare
+from netapp_ontap.resources import Volume,QuotaReport,snapmirror_relationship
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultLib, VaultSecret
@@ -122,37 +122,58 @@ def service_overview():
     # Determine what data to show based on group membership
     if 'bluecorp' in session['groups']:
         company_name = "Blue Corp"
-        primary_svm = "ntap_svm_bluecorp"
+        primary_svm = "sp-svm-bluecorp"
+        secondary_svm = "sp-svm-bluecorp-backup"
     elif 'astrainc' in session['groups']:
         company_name = "Astra Inc"
-        primary_svm = "ntap_svm_astrainc"
+        primary_svm = "sp-svm-astrainc"
+        secondary_svm = "sp-svm-astrainc-backup"
     elif 'polarisltd' in session['groups']:
         company_name = "Polaris Ltd"
-        primary_svm = "ntap_svm_polarisltd"
-    # Establish connection to storage cluster
-    config.CONNECTION = HostConnection(
+        primary_svm = "sp-svm-polarisltd"
+        secondary_svm = "sp-svm-polarisltd-backup"
+    # Establish connection to storage clusters
+    conn_primary = HostConnection(
         primary_cluster + '.demo.netapp.com',
+        username=ontap_group_data['ontap_admin_user'],
+        password=ontap_group_data['ontap_admin_password'],
+        verify=False
+    )
+    conn_secondary = HostConnection(
+        secondary_cluster + '.demo.netapp.com',
         username=ontap_group_data['ontap_admin_user'],
         password=ontap_group_data['ontap_admin_password'],
         verify=False
     )
     # Get volume information
     try:
+        config.CONNECTION = conn_primary
         volumeList = list(Volume.get_collection(
             fields='*',
             **{'svm.name': primary_svm}))
     except NetAppRestError as error:
-        quotaReport = []
+        volumeList = []
         print("Exception caught :" + str(error))
 
     # Get quota information
     try:
+        config.CONNECTION = conn_primary
         quotaReport = list(QuotaReport.get_collection(
             fields='*',
             type='tree',
             **{'svm.name': primary_svm}))
     except NetAppRestError as error:
         quotaReport = []
+        print("Exception caught :" + str(error))
+
+    # Get SnapMirror information
+    try:
+        config.CONNECTION = conn_secondary
+        snapmirrorList = list(snapmirror_relationship.get_collection(
+            fields='*',
+            **{'svm.name': secondary_svm}))
+    except NetAppRestError as error:
+        snapmirrorList = []
         print("Exception caught :" + str(error))
 
     # Initialize lists and dictionaries
@@ -247,7 +268,7 @@ def ransomware_events_operator():
                            },
                            detailed_summary=detailed_summary)
 
-@app.route('/ntap_svm_bluecorp', methods=['POST'])
+@app.route('/sp-svm-bluecorp', methods=['POST'])
 def receive_data_bluecorp():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
@@ -280,7 +301,7 @@ def receive_data_bluecorp():
     else:
         return jsonify(error="Unsupported Media Type"), 415
 
-@app.route('/ntap_svm_astrainc', methods=['POST'])
+@app.route('/sp-svm-astrainc', methods=['POST'])
 def receive_data_astrainc():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data
@@ -313,7 +334,7 @@ def receive_data_astrainc():
     else:
         return jsonify(error="Unsupported Media Type"), 415
     
-@app.route('/ntap_svm_polarisltd', methods=['POST'])
+@app.route('/sp-svm-polarisltd', methods=['POST'])
 def receive_data_polarisltd():
     if request.headers['Content-Type'] == 'application/xml':
         xml_data = request.data  # Get the raw XML data

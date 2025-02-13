@@ -157,9 +157,9 @@ ontap_80_group_members_attr:      "member"
 ontap_80_secret_key:              "{{ vault_ontap_80_secret_key }}"
 
 ontap_80_svms:
-  - "ntap_svm_bluecorp"
-  - "ntap_svm_astrainc"
-  - "ntap_svm_polarisltd"
+  - "sp-svm-bluecorp"
+  - "sp-svm-astrainc"
+  - "sp-svm-polarisltd"
 
 # ONTAP-81 - Advanced - CIFS Self-Service
 ontap_81_volumes:                 
@@ -186,9 +186,9 @@ ontap_82_operator_user:           "DEMO\\operator"
 ontap_82_operator_user_pw:        "{{ vault_ontap_82_operator_user_pw }}"
 
 ontap_82_tenant_list:                 
-  - "ntap_svm_bluecorp"
-  - "ntap_svm_astrainc"
-  - "ntap_svm_polarisltd"
+  - "sp-svm-bluecorp"
+  - "sp-svm-astrainc"
+  - "sp-svm-polarisltd"
 ontap_82_policy_name:             "ontap_82_policy"
 ontap_82_volumes:                 
   - "ontap_82_board"
