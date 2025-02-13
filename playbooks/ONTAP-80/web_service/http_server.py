@@ -171,7 +171,7 @@ def service_overview():
         config.CONNECTION = conn_secondary
         snapmirrorList = list(snapmirror_relationship.get_collection(
             fields='*',
-            **{'svm.name': secondary_svm}))
+            **{'destination.svm.name': secondary_svm}))
     except NetAppRestError as error:
         snapmirrorList = []
         print("Exception caught :" + str(error))
