@@ -52,7 +52,6 @@
             allowed:                   "{{ item.iscsi.allowed | default(omit) }}"
           nvme:
             allowed:                   "{{ item.nvme.allowed | default(omit) }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -72,7 +71,6 @@
           vserver:                     "{{ item.name }}"
         body:
           auto_enable_analytics:       "{{ item.auto_enable_analytics }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -94,7 +92,6 @@
         body:
           auto_enable_activity_tracking:
                                        "{{ item.auto_enable_activity_tracking }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -118,7 +115,6 @@
         netmask:                       "{{ item.ip.netmask }}"
         service_policy:                "{{ item.service_policy.name | default(omit) }}"
         is_auto_revert:                "{{ item.location.auto_revert | default(omit) }}"
-        <<: *input
       loop:
         "{{ network_ip_interfaces }}"
       loop_control:
@@ -137,7 +133,6 @@
         vserver:                       "{{ item.name }}"
         destination:                   "0.0.0.0/0"
         gateway:                       "{{ all_default_gateway }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -155,7 +150,6 @@
         vserver:                       "{{ item.name }}"
         domains:                       "{{ item.dns.domains }}"
         nameservers:                   "{{ item.dns.servers }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -176,7 +170,6 @@
         nfsv4:                         "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
         nfsv41:                        "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
         showmount:                     "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -196,7 +189,6 @@
           vserver:                     "{{ item.svm.name }}"
         body:
           v3-64bit-identifiers:        "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -217,7 +209,6 @@
           vserver:                     "{{ item.svm.name }}"
         body:
           v4-64bit-identifiers:        "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -235,7 +226,6 @@
         state:                         present
         name:                          "ro_{{ item.svm.name }}"
         vserver:                       "{{ item.svm.name }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -258,7 +248,6 @@
         protocol:                      "nfs"
         super_user_security:           "none"
         allow_suid:                    false
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -276,7 +265,6 @@
         name:                          "{{ item.svm.name.replace('-','_') }}_root"
         vserver:                       "{{ item.svm.name }}"
         export_policy:                 "ro_{{ item.svm.name }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -294,7 +282,6 @@
         vserver:                       "{{ item.0.key }}"
         fqdn:                          "{{ item.1.fqdn }}"
         server_ip:                     "{{ item.1.ip }}"
-        <<: *input
       loop:
         "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
       loop_control:
@@ -315,7 +302,6 @@
         ou:                            "{{ item.ad_domain.organizational_unit }}"
         admin_user_name:               "{{ all_ad_join_user }}"
         admin_password:                "{{ all_ad_join_password }}"
-        <<: *input
       loop:
         "{{ protocols_cifs_services }}"
       loop_control:
@@ -335,7 +321,6 @@
           vserver:                     "{{ item.svm.name }}"
         body:
           comment:                     "{{ item.comment }}"
-        <<: *input
       loop:
         "{{ protocols_cifs_services }}"
       loop_control:
@@ -380,7 +365,6 @@
           - "snapmirror"
         peer_options:
           hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
