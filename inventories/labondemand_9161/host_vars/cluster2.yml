@@ -392,10 +392,10 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-data-files"
-  - name:                         "{{ svm_svms[3].name }}"
+  - name:                         "{{ svm_svms[4].name }}"
     scope:                        "svm"
     svm:
-      name:                       "{{ svm_svms[3].name }}"
+      name:                       "{{ svm_svms[4].name }}"
     ip:
       netmask:                    "24"
       address:                    "192.168.0.243"
