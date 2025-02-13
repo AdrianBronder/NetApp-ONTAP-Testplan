@@ -7,7 +7,7 @@ from datetime import datetime
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 from netapp_ontap import config, HostConnection, NetAppRestError
-from netapp_ontap.resources import Volume,QuotaReport,snapmirror_relationship
+from netapp_ontap.resources import Volume,QuotaReport,SnapmirrorRelationship
 from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultLib, VaultSecret
