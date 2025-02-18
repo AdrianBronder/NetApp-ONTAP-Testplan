@@ -19,7 +19,7 @@
             {% for department in departments %}
             {% if not '_root' in department.name %}
                 <tr>
-                    <td>{{ department.name | replace('ontap_81_', '') }}</td>
+                    <td>{{ department.name | replace('ontap_80_', '') }}</td>
                     {% if department.snapshot_policy.name == "none" %}
                     <td>disabled</td>
                     {% else %}
