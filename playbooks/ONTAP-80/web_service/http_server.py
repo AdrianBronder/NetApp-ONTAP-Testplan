@@ -241,6 +241,7 @@ def share_order():
         departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in volumeList]
     except NetAppRestError as error:
         volumeList = []
+        departments = []
         print("Exception caught :" + str(error))
 
     message = None
