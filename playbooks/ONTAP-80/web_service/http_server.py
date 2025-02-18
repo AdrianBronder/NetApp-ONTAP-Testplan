@@ -205,16 +205,43 @@ def service_overview():
 
 @app.route('/share_order', methods=['GET', 'POST'])
 def share_order():
-    # Fetch departments for drop down selection
-    url = ('https://' +
-          cluster +
-          '.demo.netapp.com/api/storage/volumes?svm.name=' +
-          svm +
-          '&name=ontap_81_*')
-    auth = (ontap_group_data['ontap_admin_user'], ontap_group_data['ontap_admin_password'])
-    response = requests.get(url, auth=auth, verify=False)
-    data = response.json()
-    departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in data['records']]
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    elif 'operators' in session['groups']:
+        return redirect(url_for('ransomware_events_operator'))
+
+    company_name = "Unknown"
+    pirmary_svm = ""
+
+    # Determine what data to show based on group membership
+    if 'bluecorp' in session['groups']:
+        company_name = "Blue Corp"
+        primary_svm = "sp-svm-bluecorp"
+    elif 'astrainc' in session['groups']:
+        company_name = "Astra Inc"
+        primary_svm = "sp-svm-astrainc"
+    elif 'polarisltd' in session['groups']:
+        company_name = "Polaris Ltd"
+        primary_svm = "sp-svm-polarisltd"
+    # Establish connection to storage clusters
+    conn_primary = HostConnection(
+        primary_cluster + '.demo.netapp.com',
+        username=ontap_group_data['ontap_admin_user'],
+        password=ontap_group_data['ontap_admin_password'],
+        verify=False
+    )
+
+    # Fetch departments/volumes for drop down selection
+    try:
+        config.CONNECTION = conn_primary
+        volumeList = list(Volume.get_collection(
+            fields='*',
+            **{'svm.name': primary_svm,
+               'name': 'ontap_80_*'}))
+        departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in volumeList]
+    except NetAppRestError as error:
+        volumeList = []
+        print("Exception caught :" + str(error))
 
     message = None
 
@@ -227,25 +254,17 @@ def share_order():
 
         # Convert data
         share_size_bytes = share_size_gib * 1024**3
-        department_name = vol_name.replace('ontap_81_','')
-
-        # Establish connection to storage cluster
-        config.CONNECTION = HostConnection(
-            cluster+'.demo.netapp.com',
-            username=ontap_group_data['ontap_admin_user'],
-            password=ontap_group_data['ontap_admin_password'],
-            verify=False
-        )
+        department_name = vol_name.replace('ontap_80_','')
 
         # Define Qtree object
         qtreeobj                       = {}
-        qtreeobj['svm']                = {'name': svm}
+        qtreeobj['svm']                = {'name': primary_svm}
         qtreeobj['volume']             = {'name': vol_name}
         qtreeobj['name']               = share_name
         qtreeobj['security_style']     = 'ntfs'
         # Define Quota object
         quotaobj                       = {}
-        quotaobj['svm']                = {'name': svm}
+        quotaobj['svm']                = {'name': primary_svm}
         quotaobj['volume']             = {'name': vol_name}
         quotaobj['qtree']              = {'name': share_name}
         quotaobj['type']               = "tree"
@@ -253,7 +272,7 @@ def share_order():
                                           "soft_limit": share_size_bytes * 4 // 5}
         # Define Share object
         shareobj                       = {}
-        shareobj['svm']                = {'name': svm}
+        shareobj['svm']                = {'name': primary_svm}
         shareobj['name']               = department_name + '_' + share_name
         shareobj['path']               = '/'+ vol_name +'/'+share_name
         shareobj['show_snapshot']      = True

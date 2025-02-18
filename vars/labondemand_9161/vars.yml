@@ -184,20 +184,7 @@ ontap_80_polarisltd_user:         "DEMO\\polarisltd_user"
 ontap_80_polarisltd_user_pw:      "{{ vault_ontap_82_polarisltd_user_pw }}"
 ontap_80_operator_user:           "DEMO\\operator"
 ontap_80_operator_user_pw:        "{{ vault_ontap_82_operator_user_pw }}"
-
-ontap_80_tenant_list:                 
-  - "sp-svm-bluecorp"
-  - "sp-svm-astrainc"
-  - "sp-svm-polarisltd"
 ontap_82_policy_name:             "ontap_82_policy"
-ontap_82_volumes:                 
-  - "ontap_82_board"
-  - "ontap_82_research"
-  - "ontap_82_hr"
-  - "ontap_82_legal"
-  - "ontap_82_it"
-  - "ontap_82_finance"
-  - "ontap_82_sales"
 ontap_82_qtrees:
   - "ontap_82_qt1"
   - "ontap_82_qt2"
