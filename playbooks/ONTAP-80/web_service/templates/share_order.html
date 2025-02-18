@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container form-container">
     <h1 class="my-4 text-center">Request a new Share</h1>
-    <form method="POST">
+    <form method="POST" class="form-content">
         <div class="form-group">
             <label for="volName">Select your department:</label>
             <select name="volName" id="volName" class="form-control">
@@ -22,7 +22,9 @@
             <label for="shareSize">Select requested size (GiB):</label>
             <input type="number" name="shareSize" id="shareSize" class="form-control" placeholder="Enter size in GiB">
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
     </form>
     {% if message %}
         <div class="alert alert-info mt-4">
@@ -39,49 +41,35 @@
         margin: 50px auto;
         background-color: #2e2e2e;
         color: #cfcfcf;
-        padding: 20px;
+        padding: 40px; /* Increased padding for more space inside the box */
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
-    .form-group {
-        margin-bottom: 20px;
-        text-align: center;
+    .form-content .form-group {
+        margin-bottom: 20px; /* Increased margin between form groups */
     }
-    .form-group label {
-        color: #cfcfcf;
-        margin-bottom: 10px;
-        display: block;
-    }
-    .form-control {
+    .form-content .form-control {
         background-color: #3e3e3e;
         color: #cfcfcf;
         border: 1px solid #555;
-        border-radius: 4px;
-        padding: 10px;
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
+        padding: 10px; /* Increased padding for input fields */
     }
-    .form-control::placeholder {
+    .form-content .form-control::placeholder {
         color: #999;
     }
-    .btn-primary {
-        background-color: #2196F3;
-        border-color: #2196F3;
-        border-radius: 4px;
-        padding: 10px;
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
-    }
-    .btn-primary:hover {
-        background-color: #1976D2;
-        border-color: #1976D2;
-    }
-    .alert-info {
-        background-color: #3e3e3e;
+    .form-content .form-group label {
         color: #cfcfcf;
-        border: 1px solid #555;
+        margin-bottom: 5px; /* Ensure label has some spacing from the input field */
+    }
+    .form-content .btn-primary {
+        background-color: #2196F3;
+        border: none;
+        padding: 10px 20px; /* Increased padding for the submit button */
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .form-content .btn-primary:hover {
+        background-color: #1976D2;
     }
 </style>
 {% endblock %}
