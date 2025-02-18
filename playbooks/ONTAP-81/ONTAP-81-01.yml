@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-81-01 - Volumes
+# Title:        ONTAP-81-01 - Shares & Qtrees
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-02-09
 # Description:  Advanced - Service Provider Customization
-#               - Volumes
+#               - Shares & Qtrees
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-81-01 - Volumes"
+  name:                                "ONTAP-81-01 - Shares & Qtrees"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -35,30 +35,39 @@
   pre_tasks:
 
   tasks:
-    - name: Create volume
-      netapp.ontap.na_ontap_volume:
+    - name: Create qtrees
+      netapp.ontap.na_ontap_qtree:
         state:                         present
         name:                          "{{ item.1 }}"
-        aggregate_name:                "{{ storage_aggregates[0].name }}"
-        size:                          1024
-        size_unit:                     gb
-        space_guarantee:               none
-        tiering_policy:                auto
-        junction_path:                 "/{{ item.1 }}"
+        flexvol_name:                  "{{ ontap_80_volumes[0] }}"
+        security_style:                "ntfs"
         vserver:                       "{{ item.0 }}"
-        volume_security_style:         "ntfs"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
-  
-    - name: Set default quota rule on volumes
+        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
+
+    - name: Set quota (1GiB)
       netapp.ontap.na_ontap_quotas:
         state:                         present
         vserver:                       "{{ item.0 }}"
-        volume:                        "{{ item.1 }}"
-        quota_target:                  ""
-        type:                          tree
+        volume:                        "{{ ontap_80_volumes[0] }}"
+        quota_target:                  "{{ item.1 }}"
+        type:                          "tree"
+        disk_limit:                    1048576
         set_quota_status:              True
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
+
+    - name: Create CIFS share
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ (ontap_80_volumes[0] | replace('ontap_81_','')) }}_{{ item.1 }}"
+        path:                          "/{{ ontap_80_volumes[0] }}/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        comment:                       "Test share created as part of test frame ONTAP-81"
+      loop:
+        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
 
   post_tasks:

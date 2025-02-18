@@ -333,6 +333,32 @@
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
+    - name: Create volumes
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ item.1 }}"
+        aggregate_name:                "{{ storage_aggregates[0].name }}"
+        size:                          1024
+        size_unit:                     gb
+        space_guarantee:               none
+        tiering_policy:                auto
+        junction_path:                 "/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        volume_security_style:         "ntfs"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+  
+    - name: Set default quota rule on volumes
+      netapp.ontap.na_ontap_quotas:
+        state:                         present
+        vserver:                       "{{ item.0 }}"
+        volume:                        "{{ item.1 }}"
+        quota_target:                  ""
+        type:                          tree
+        set_quota_status:              True
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+
   post_tasks:
 
 - hosts:                               "primary_storage_clusters"
