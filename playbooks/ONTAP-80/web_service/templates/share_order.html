@@ -3,7 +3,7 @@
 {% block title %}Request a new Share{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container form-container">
     <h1 class="my-4">Request a new Share</h1>
     <form method="POST">
         <div class="form-group">
@@ -35,7 +35,7 @@
 {% block styles %}
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 <style>
-    .container {
+    .form-container {
         max-width: 600px;
         margin-top: 50px;
         background-color: #2e2e2e;
@@ -44,24 +44,29 @@
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
-    .form-control {
+    .form-container .form-control {
         background-color: #3e3e3e;
         color: #cfcfcf;
         border: 1px solid #555;
     }
-    .form-control::placeholder {
+    .form-container .form-control::placeholder {
         color: #999;
     }
-    .form-group label {
+    .form-container .form-group label {
         color: #cfcfcf;
     }
-    .btn-primary {
+    .form-container .btn-primary {
         background-color: #2196F3;
         border-color: #2196F3;
     }
-    .btn-primary:hover {
+    .form-container .btn-primary:hover {
         background-color: #1976D2;
         border-color: #1976D2;
+    }
+    .alert-info {
+        background-color: #3e3e3e;
+        color: #cfcfcf;
+        border: 1px solid #555;
     }
 </style>
 {% endblock %}
