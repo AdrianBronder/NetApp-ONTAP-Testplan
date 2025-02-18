@@ -43,7 +43,7 @@
         destination:                   "{{ ontap_82_ems_dest_destination }}{{ item }}"
         <<: *input
       loop:
-        "{{ ontap_82_tenant_list }}"
+        "{{ ontap_80_svms }}"
 
     - name: Remove EMS filters 
       netapp.ontap.na_ontap_ems_filter:
@@ -51,7 +51,7 @@
         name:                          "ems_{{ item }}"
         <<: *input
       loop:
-        "{{ ontap_82_tenant_list }}"
+        "{{ ontap_80_svms }}"
     
     - name: Get all SnapMirror relations to be deleted
       netapp.ontap.na_ontap_rest_info:
