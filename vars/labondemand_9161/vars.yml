@@ -190,5 +190,5 @@ ontap_82_qtrees:
   - "arp_qt2"
   - "arp_qt3"
 ontap_82_ems_dest_type:           "rest_api"
-ontap_82_ems_dest_destination:    "http://192.168.0.61:5000/"
+ontap_82_ems_dest_destination:    "http://192.168.0.61/"
 linux_82_mount_dir:               "{{ linux_default_mount_dir }}/82"
