@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container form-container">
     <h1 class="my-4 text-center">Request a new Share</h1>
-    <form method="POST">
+    <form method="POST" class="form-content">
         <div class="form-group">
             <label for="volName">Select your department:</label>
             <select name="volName" id="volName" class="form-control">
@@ -22,7 +22,9 @@
             <label for="shareSize">Select requested size (GiB):</label>
             <input type="number" name="shareSize" id="shareSize" class="form-control" placeholder="Enter size in GiB">
         </div>
-        <button type="submit" class="btn btn-primary btn-block">Submit</button>
+        <div class="form-group text-center">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
     </form>
     {% if message %}
         <div class="alert alert-info mt-4">
@@ -43,50 +45,42 @@
         border-radius: 8px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     }
+    .form-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
     .form-group {
-        margin-bottom: 20px;
-        text-align: center;
+        width: 100%;
+        margin-bottom: 15px;
     }
     .form-group label {
+        margin-bottom: 5px;
         color: #cfcfcf;
-        margin-bottom: 10px;
-        display: block;
     }
-    .form-control {
-        background-color: #3e3e3e;
-        color: #cfcfcf;
+    .form-group .form-control {
+        width: 100%;
+        padding: 10px;
         border: 1px solid #555;
         border-radius: 4px;
-        padding: 10px;
-        width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
+        background-color: #3e3e3e;
+        color: #cfcfcf;
     }
-    .form-control::placeholder {
+    .form-group .form-control::placeholder {
         color: #999;
     }
     .btn-primary {
-        background-color: #2196F3;
-        border-color: #2196F3;
-        border-radius: 4px;
-        padding: 10px;
         width: 100%;
-        max-width: 400px;
-        margin: 0 auto;
+        padding: 10px;
+        border: none;
+        border-radius: 4px;
+        background-color: #2196F3;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
     }
     .btn-primary:hover {
         background-color: #1976D2;
-        border-color: #1976D2;
-    }
-    .alert-info {
-        background-color: #3e3e3e;
-        color: #cfcfcf;
-        border: 1px solid #555;
     }
 </style>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 {% endblock %}
