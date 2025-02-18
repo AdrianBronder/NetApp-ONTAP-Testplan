@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-82-03 - Dry-run Anti-ransomware"
   gather_facts:                        false
-  vars:
-    input01: &input01
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -71,19 +71,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-82-03 - Activate Anti-ransomware"
   gather_facts:                        false
-  vars:
-    input02: &input02
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -96,7 +96,6 @@
         body:
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
-        <<: *input02
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
       ignore_errors:                   true
@@ -113,6 +112,5 @@
                                        true
           is-enabled-on-snapshot-copy-creation:
                                        true
-        <<: *input01
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"

@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-82-01 - Filesystems for Tenants - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -40,7 +40,6 @@
         state:                         present
         name:                          "{{ ontap_82_policy_name }}"
         vserver:                       "{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms }}"
   
@@ -55,7 +54,6 @@
         protocol:                      "nfs"
         super_user_security:           "any"
         allow_suid:                    true
-        <<: *input
       loop:
         "{{ ontap_80_svms }}"
 
@@ -72,7 +70,6 @@
         junction_path:                 "/{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
         volume_security_style:         "unix"
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
   
@@ -85,7 +82,6 @@
         security_style:                "unix"
         unix_permissions:              0777
         vserver:                       "{{ item.0 }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes, ontap_82_qtrees) | list }}"
 
@@ -110,7 +106,6 @@
         browsable:                     true
         oplocks:                       true
         show_snapshot:                 true
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes, ontap_82_qtrees) | list }}"
 
@@ -123,10 +118,8 @@
         browsable:                     true
         oplocks:                       true
         show_snapshot:                 true
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
-
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
@@ -135,9 +128,9 @@
         vserver:                       "{{ item.0 }}"
         user_or_group:                 "Everyone"
         permission:                    "read"
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes, ontap_82_qtrees) | list }}"
+
 
 - hosts:                               "linux"
   name:                                "ONTAP-82-01 - Filesystems for Tenants - Linux"
