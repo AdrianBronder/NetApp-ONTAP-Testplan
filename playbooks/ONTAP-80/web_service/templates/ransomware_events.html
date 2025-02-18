@@ -6,54 +6,58 @@
 <h1>Events for {{ company }}</h1>
 
 <!-- Volume Summary Section -->
-<h2>Volume Summary</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Volume Name</th>
-            <th>Event Count</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for volume, count in summary.items() %}
+<div class="container mt-0">
+    <h2>Volume Summary</h2>
+    <table>
+        <thead>
             <tr>
-                <td>{{ volume }}</td>
-                <td>{{ count }}</td>
+                <th>Volume Name</th>
+                <th>Event Count</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for volume, count in summary.items() %}
+                <tr>
+                    <td>{{ volume }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 
 <!-- Event Details Section -->
-<h2>Event Details</h2>
-<table>
-    <thead>
-        <tr>
-            <th>Timestamp</th>
-            <th>Sequence Number</th>
-            <th>Node</th>
-            <th>Vserver</th>
-            <th>Volume</th>
-            <th>Message Name</th>
-            <th>Event Detail</th>
-            <th>Access Path</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for event in data %}
+<div class="container mt-0">
+    <h2>Event Details</h2>
+    <table>
+        <thead>
             <tr>
-                <td>{{ event.timestamp }}</td>
-                <td>{{ event.seq_num }}</td>
-                <td>{{ event.node }}</td>
-                <td>{{ event.vserver_name }}</td>
-                <td>{{ event.volume_name }}</td>
-                <td>{{ event.message_name }}</td>
-                <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
-                <td><a href="#" class="event-link" data-event="\\{{ event.vserver_name }}\{{ event.volume_name }}">View Path</a></td>
+                <th>Timestamp</th>
+                <th>Sequence Number</th>
+                <th>Node</th>
+                <th>Vserver</th>
+                <th>Volume</th>
+                <th>Message Name</th>
+                <th>Event Detail</th>
+                <th>Access Path</th>
             </tr>
-        {% endfor %}
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            {% for event in data %}
+                <tr>
+                    <td>{{ event.timestamp }}</td>
+                    <td>{{ event.seq_num }}</td>
+                    <td>{{ event.node }}</td>
+                    <td>{{ event.vserver_name }}</td>
+                    <td>{{ event.volume_name }}</td>
+                    <td>{{ event.message_name }}</td>
+                    <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
+                    <td><a href="#" class="event-link" data-event="\\{{ event.vserver_name }}\{{ event.volume_name }}">View Path</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
 
 {% block scripts %}
