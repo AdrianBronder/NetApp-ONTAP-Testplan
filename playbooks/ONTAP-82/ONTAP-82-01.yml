@@ -89,6 +89,18 @@
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes, ontap_82_qtrees) | list }}"
 
+    - name: Set quota (1GiB)
+      netapp.ontap.na_ontap_quotas:
+        state:                         present
+        vserver:                       "{{ item.0 }}"
+        volume:                        "{{ item.1 }}"
+        quota_target:                  "{{ item.2 }}"
+        type:                          "tree"
+        disk_limit:                    1048576
+        set_quota_status:              True
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_82_qtrees) | list }}"
+
     - name: Create Qtree shares
       netapp.ontap.na_ontap_cifs:
         state:                         present
