@@ -117,7 +117,7 @@ def service_overview():
         return redirect(url_for('ransomware_events_operator'))
 
     company_name = "Unknown"
-    pirmary_svm = ""
+    primary_svm = ""
 
     # Determine what data to show based on group membership
     if 'bluecorp' in session['groups']:
@@ -159,7 +159,7 @@ def service_overview():
     try:
         config.CONNECTION = conn_primary
         quotaReport = list(QuotaReport.get_collection(
-            fields='*',
+            fields='*,anti_ransomware',
             type='tree',
             **{'svm.name': primary_svm}))
     except NetAppRestError as error:
