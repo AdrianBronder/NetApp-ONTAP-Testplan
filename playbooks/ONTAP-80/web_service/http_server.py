@@ -289,7 +289,7 @@ def share_order():
                     share = CifsShare.from_dict(shareobj)
                     if share.post(poll=True):
                         message = ("Share created Successfully! Access via: \r\n" + 
-                                   "\\\\" + svm + ".demo.netapp.com" + "\\" + share.name)
+                                   "\\\\" + primary_svm + ".demo.netapp.com" + "\\" + share.name)
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
        
