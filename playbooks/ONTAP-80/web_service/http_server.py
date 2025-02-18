@@ -149,7 +149,7 @@ def service_overview():
     try:
         config.CONNECTION = conn_primary
         volumeList = list(Volume.get_collection(
-            fields='*',
+            fields='*,anti_ransomware',
             **{'svm.name': primary_svm}))
     except NetAppRestError as error:
         volumeList = []
@@ -159,7 +159,7 @@ def service_overview():
     try:
         config.CONNECTION = conn_primary
         quotaReport = list(QuotaReport.get_collection(
-            fields='*,anti_ransomware',
+            fields='*',
             type='tree',
             **{'svm.name': primary_svm}))
     except NetAppRestError as error:
