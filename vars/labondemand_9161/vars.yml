@@ -160,32 +160,32 @@ ontap_80_svms:
   - "sp-svm-bluecorp"
   - "sp-svm-astrainc"
   - "sp-svm-polarisltd"
+ontap_80_volumes:                 
+  - "ontap_80_board"
+  - "ontap_80_research"
+  - "ontap_80_hr"
+  - "ontap_80_legal"
+  - "ontap_80_it"
+  - "ontap_80_finance"
+  - "ontap_80_sales"
 
 # ONTAP-81 - Advanced - CIFS Self-Service
-ontap_81_volumes:                 
-  - "ontap_81_board"
-  - "ontap_81_research"
-  - "ontap_81_hr"
-  - "ontap_81_legal"
-  - "ontap_81_it"
-  - "ontap_81_finance"
-  - "ontap_81_sales"
 ontap_81_qtrees:
   - "abc"
   - "def"
   - "ghi"
 
 # ONTAP-82 - Advanced - Anti-Ransomware
-ontap_82_bluecorp_user:           "DEMO\\bluecorp_user"
-ontap_82_bluecorp_user_pw:        "{{ vault_ontap_82_bluecorp_user_pw }}"
-ontap_82_astrainc_user:           "DEMO\\astrainc_user"
-ontap_82_astrainc_user_pw:        "{{ vault_ontap_82_astrainc_user_pw }}"
-ontap_82_polarisltd_user:         "DEMO\\polarisltd_user"
-ontap_82_polarisltd_user_pw:      "{{ vault_ontap_82_polarisltd_user_pw }}"
-ontap_82_operator_user:           "DEMO\\operator"
-ontap_82_operator_user_pw:        "{{ vault_ontap_82_operator_user_pw }}"
+ontap_80_bluecorp_user:           "DEMO\\bluecorp_user"
+ontap_80_bluecorp_user_pw:        "{{ vault_ontap_82_bluecorp_user_pw }}"
+ontap_80_astrainc_user:           "DEMO\\astrainc_user"
+ontap_80_astrainc_user_pw:        "{{ vault_ontap_82_astrainc_user_pw }}"
+ontap_80_polarisltd_user:         "DEMO\\polarisltd_user"
+ontap_80_polarisltd_user_pw:      "{{ vault_ontap_82_polarisltd_user_pw }}"
+ontap_80_operator_user:           "DEMO\\operator"
+ontap_80_operator_user_pw:        "{{ vault_ontap_82_operator_user_pw }}"
 
-ontap_82_tenant_list:                 
+ontap_80_tenant_list:                 
   - "sp-svm-bluecorp"
   - "sp-svm-astrainc"
   - "sp-svm-polarisltd"

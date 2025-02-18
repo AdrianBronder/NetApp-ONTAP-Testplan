@@ -42,7 +42,7 @@
         rules:                         []
         <<: *input
       loop:
-        "{{ ontap_82_tenant_list }}"
+        "{{ ontap_80_svms }}"
 
     - name: Add EMS filter to match tenant only
       netapp.ontap.na_ontap_rest_cli:
@@ -60,7 +60,7 @@
             - "vserverName={{ item }}"
         <<: *input
       loop:
-        "{{ ontap_82_tenant_list }}"
+        "{{ ontap_80_svms }}"
 
     - name: Configure REST EMS destination for every tenant
       netapp.ontap.na_ontap_ems_destination:
@@ -71,6 +71,6 @@
         destination:                   "{{ ontap_82_ems_dest_destination }}{{ item }}"
         <<: *input
       loop:
-        "{{ ontap_82_tenant_list }}"
+        "{{ ontap_80_svms }}"
 
   post_tasks:

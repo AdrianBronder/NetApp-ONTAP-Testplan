@@ -203,6 +203,79 @@ def service_overview():
                            company=company_name,
                            colors=colors)
 
+@app.route('/share_order', methods=['GET', 'POST'])
+def share_order():
+    # Fetch departments for drop down selection
+    url = ('https://' +
+          cluster +
+          '.demo.netapp.com/api/storage/volumes?svm.name=' +
+          svm +
+          '&name=ontap_81_*')
+    auth = (ontap_group_data['ontap_admin_user'], ontap_group_data['ontap_admin_password'])
+    response = requests.get(url, auth=auth, verify=False)
+    data = response.json()
+    departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in data['records']]
+
+    message = None
+
+    # Process a request
+    if request.method == 'POST':
+        # Get forms data
+        vol_name = request.form.get('volName')
+        share_name = request.form.get('shareName')
+        share_size_gib = int(request.form.get('shareSize'))
+
+        # Convert data
+        share_size_bytes = share_size_gib * 1024**3
+        department_name = vol_name.replace('ontap_81_','')
+
+        # Establish connection to storage cluster
+        config.CONNECTION = HostConnection(
+            cluster+'.demo.netapp.com',
+            username=ontap_group_data['ontap_admin_user'],
+            password=ontap_group_data['ontap_admin_password'],
+            verify=False
+        )
+
+        # Define Qtree object
+        qtreeobj                       = {}
+        qtreeobj['svm']                = {'name': svm}
+        qtreeobj['volume']             = {'name': vol_name}
+        qtreeobj['name']               = share_name
+        qtreeobj['security_style']     = 'ntfs'
+        # Define Quota object
+        quotaobj                       = {}
+        quotaobj['svm']                = {'name': svm}
+        quotaobj['volume']             = {'name': vol_name}
+        quotaobj['qtree']              = {'name': share_name}
+        quotaobj['type']               = "tree"
+        quotaobj['space']              = {"hard_limit": share_size_bytes,
+                                          "soft_limit": share_size_bytes * 4 // 5}
+        # Define Share object
+        shareobj                       = {}
+        shareobj['svm']                = {'name': svm}
+        shareobj['name']               = department_name + '_' + share_name
+        shareobj['path']               = '/'+ vol_name +'/'+share_name
+        shareobj['show_snapshot']      = True
+        shareobj['change_notify']      = True
+        shareobj['oplocks']            = True
+        shareobj['unix_symlink']       = "local"
+
+        # Execute the API calls
+        try:
+            qtree = Qtree.from_dict(qtreeobj)
+            if qtree.post(poll=True):
+                quota = QuotaRule.from_dict(quotaobj)
+                if quota.post(poll=True):
+                    share = CifsShare.from_dict(shareobj)
+                    if share.post(poll=True):
+                        message = ("Share created Successfully! Access via: \r\n" + 
+                                   "\\\\" + svm + ".demo.netapp.com" + "\\" + share.name)
+        except NetAppRestError as error:
+            message = "Exception caught :" + str(error)
+       
+    return render_template('index.html', departments=departments, message=message)
+
 @app.route('/ransomware_events')
 def ransomware_events():
     if 'username' not in session:

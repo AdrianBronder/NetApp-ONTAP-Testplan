@@ -143,8 +143,9 @@
 
     {% block sidebar %}
     <div class="sidebar">
-        <a href="{{ url_for('service_overview') }}" class="{% if request.endpoint == 'service_overview' %}active{% endif %}">Services</a>
-        <a href="{{ url_for('ransomware_events') }}" class="{% if request.endpoint == 'ransomware_events' %}active{% endif %}">Ransomware</a>
+        <a href="{{ url_for('service_overview') }}" class="{% if request.endpoint == 'service_overview' %}active{% endif %}">Service Overview</a>
+        <a href="{{ url_for('share_order') }}" class="{% if request.endpoint == 'service_overview' %}active{% endif %}">Share Order</a>
+        <a href="{{ url_for('ransomware_events') }}" class="{% if request.endpoint == 'ransomware_events' %}active{% endif %}">Ransomware State</a>
         <a href="{{ url_for('logout') }}">Logout</a>
     </div>
     {% endblock %}

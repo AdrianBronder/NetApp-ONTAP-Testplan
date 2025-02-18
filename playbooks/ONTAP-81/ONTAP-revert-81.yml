@@ -49,8 +49,8 @@
         fields:
           - "*"
         parameters:
-          svm.name:               "{{ global_primary_nas_svm }}"
-          path:                   "/ontap_81_*"
+          svm.name:               "sp-svm*"
+          path:                   "/ontap_80_*"
         use_python_keys:          true
       register: cifs_share_info
   
@@ -73,6 +73,6 @@
         name:                          "{{ item }}"
         vserver:                       "{{ global_primary_nas_svm }}"
       loop:
-        "{{ ontap_81_volumes }}"
+        "{{ ontap_80_volumes }}"
 
   post_tasks:
