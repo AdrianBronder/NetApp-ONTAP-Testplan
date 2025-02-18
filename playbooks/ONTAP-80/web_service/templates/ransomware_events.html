@@ -11,14 +11,14 @@
     <table>
         <thead>
             <tr>
-                <th>Volume Name</th>
+                <th>Department</th>
                 <th>Event Count</th>
             </tr>
         </thead>
         <tbody>
             {% for volume, count in summary.items() %}
                 <tr>
-                    <td>{{ volume }}</td>
+                    <td>{{ volume | replace('ontap_80_', '') }}</td>
                     <td>{{ count }}</td>
                 </tr>
             {% endfor %}
