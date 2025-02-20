@@ -177,9 +177,12 @@ ontap_80_volumes:
   - "ontap_80_it"
   - "ontap_80_finance"
   - "ontap_80_sales"
-ontap_80_snap_policy_standard:   "ontap_80_snap_standard"
-ontap_80_snap_policy_premium:    "ontap_80_snap_premium"
-ontap_80_snap_policy_ultimate:   "ontap_80_snap_ultimate"
+
+ontap_80_policy_name:             "ontap_80_policy"
+
+ontap_80_snap_policy_standard:    "ontap_80_snap_standard"
+ontap_80_snap_policy_premium:     "ontap_80_snap_premium"
+ontap_80_snap_policy_ultimate:    "ontap_80_snap_ultimate"
 ontap_80_snapm_policy_standard:   "ontap_80_snapm_standard"
 ontap_80_snapm_policy_premium:    "ontap_80_snapm_premium"
 ontap_80_snapm_policy_ultimate:   "ontap_80_snapm_ultimate"
@@ -190,7 +193,6 @@ ontap_81_qtrees:
   - "ontap_81_request_demo_02"
 
 # ONTAP-83 - Advanced - Anti-Ransomware
-ontap_83_policy_name:             "ontap_83_policy"
 ontap_83_qtrees:
   - "ontap_83_arp_demo_qt1"
   - "ontap_83_arp_demo_qt2"

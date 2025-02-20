@@ -557,19 +557,42 @@
         - item.name is defined
         - item.name is regex('^sp-svm.*')
 
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "{{ ontap_80_policy_name }}"
+        vserver:                       "{{ item }}"
+      loop:
+        "{{ ontap_80_svms }}"
+  
+    - name: Create read-write export policy rules for data volumes
+      netapp.ontap.na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "{{ ontap_80_policy_name }}"
+        vserver:                       "{{ item }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
+      loop:
+        "{{ ontap_80_svms }}"
+
     - name: Create volumes
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ item.1 }}"
         aggregate_name:                "{{ storage_aggregates[0].name }}"
-        size:                          1024
+        size:                          "{{ ontap_default_vol_size_gb }}"
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
         snapshot_policy:               "{{ ontap_80_snap_policy_standard }}"
+        export_policy:                 "ro_{{ item.0 }}"
         junction_path:                 "/{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
-        volume_security_style:         "ntfs"
+        volume_security_style:         "unix"
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
   
