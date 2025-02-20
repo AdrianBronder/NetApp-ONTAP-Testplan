@@ -25,11 +25,14 @@
                     {% else %}
                     <td>enabled</td>
                     {% endif %}
-                    {% if department.name in (snapmirrorList | json_query('$[*].source.path')) %}
+                    {% for relationship in snapmirrorList %}
+                    {% if department is regex('^sp-svm.*' + relationship.source.path) %}
                     <td>enabled</td>
+                        {% break %}
                     {% else %}
                     <td>disabled</td>
                     {% endif %}
+                    {% endfor %}
                     {% if department.anti_ransomware is defined %}
                     <td>{{ department.anti_ransomware.state }}</td>
                     {% else %}
