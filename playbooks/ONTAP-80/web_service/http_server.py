@@ -199,7 +199,7 @@ def service_overview():
                 custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_80_snap_', '')
             # Check, if backup protection (SnapMirror) is in use
             for snapmirrorRelation in snapmirrorList:
-                if snapmirrorRelation.source.path.endswith(volume):
+                if snapmirrorRelation.source.path.endswith(volume.name):
                     custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
                     break
                 
