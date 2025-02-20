@@ -481,7 +481,7 @@
         label: "{{ item.name }}"
       when:
         - item.name is defined
-        - item.svm.name is regex('^sp-svm.*')
+        - item.name is regex('^sp-svm.*')
 
     - name: Create snapshot policy - Premium
       netapp.ontap.na_ontap_snapshot_policy:
@@ -515,7 +515,7 @@
         label: "{{ item.name }}"
       when:
         - item.name is defined
-        - item.svm.name is regex('^sp-svm.*')
+        - item.name is regex('^sp-svm.*')
 
     - name: Create snapshot policy - Ultimate
       netapp.ontap.na_ontap_snapshot_policy:
@@ -548,8 +548,9 @@
       loop_control:
         label: "{{ item.name }}"
       when:
+        - svm_svms | length > 0
         - item.name is defined
-        - item.svm.name is regex('^sp-svm.*')
+        - item.name is regex('^sp-svm.*')
 
     - name: Create volumes
       netapp.ontap.na_ontap_volume:
@@ -596,7 +597,5 @@
         - svm_svms | length > 0
         - item.name is defined
         - item.name is regex('^sp-svm.*')
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.name
 
   post_tasks:
