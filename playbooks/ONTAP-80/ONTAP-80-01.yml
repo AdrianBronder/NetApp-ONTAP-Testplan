@@ -376,8 +376,9 @@
       loop_control:
         label: "{{ item.name }}"
       when:
+        - svm_svms | length > 0
         - item.name is defined
-        - item.svm.name is regex('^sp-svm.*')
+        - item.name is regex('^sp-svm.*')
 
     - name: Create protection policy - Premium
       netapp.ontap.na_ontap_snapmirror_policy:
@@ -400,8 +401,9 @@
       loop_control:
         label: "{{ item.name }}"
       when:
+        - svm_svms | length > 0
         - item.name is defined
-        - item.svm.name is regex('^sp-svm.*')
+        - item.name is regex('^sp-svm.*')
 
     - name: Create protection policy - Ultimate
       netapp.ontap.na_ontap_snapmirror_policy:
@@ -424,8 +426,9 @@
       loop_control:
         label: "{{ item.name }}"
       when:
+        - svm_svms | length > 0
         - item.name is defined
-        - item.svm.name is regex('^sp-svm.*')
+        - item.name is regex('^sp-svm.*')
 
   post_tasks:
 
@@ -480,6 +483,7 @@
       loop_control:
         label: "{{ item.name }}"
       when:
+        - svm_svms | length > 0
         - item.name is defined
         - item.name is regex('^sp-svm.*')
 
@@ -514,6 +518,7 @@
       loop_control:
         label: "{{ item.name }}"
       when:
+        - svm_svms | length > 0
         - item.name is defined
         - item.name is regex('^sp-svm.*')
 
