@@ -19,10 +19,18 @@
             {% for department in departmentConsumedServices %}
                 <tr>
                     <td>{{ department.name }}</td>
-                    <td>{{ department.local_versioning }}</td>
-                    <td>{{ department.backup }}</td>
-                    <td>{{ department.ransomware_protection }}</td>
-                    <td>{{ department.data_pipeline }}</td>
+                    <li class="{% if department.local_versioning != 'disabled' %}bold-green{% endif %}">
+                        <td>{{ department.local_versioning }}</td>
+                    </li>
+                    <li class="{% if department.backup != 'disabled' %}bold-green{% endif %}">
+                        <td>{{ department.backup }}</td>
+                    </li>
+                    <li class="{% if department.ransomware_protection != 'disabled' %}bold-green{% endif %}">
+                        <td>{{ department.ransomware_protection }}</td>
+                    </li>
+                    <li class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
+                        <td>{{ department.data_pipeline }}</td>
+                    </li>
                 </tr>
             {% endfor %}
         </tbody>
