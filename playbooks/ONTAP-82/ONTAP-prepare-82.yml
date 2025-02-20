@@ -17,5 +17,3 @@
 - ansible.builtin.import_playbook: ../ONTAP-80/ONTAP-prepare-80.yml
 
 - ansible.builtin.import_playbook: ../ONTAP-80/ONTAP-80-01.yml
-
-- ansible.builtin.import_playbook: ../ONTAP-81/ONTAP-81-01.yml
