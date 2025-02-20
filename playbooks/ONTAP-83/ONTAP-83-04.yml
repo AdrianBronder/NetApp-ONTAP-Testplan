@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-82-04 - Simulate Attack
+# Title:        ONTAP-83-04 - Simulate Attack
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-11-04
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "linux"
-  name:                                "ONTAP-82-04 - Simulate Attack"
+  name:                                "ONTAP-83-04 - Simulate Attack"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -29,8 +29,8 @@
 
   tasks:
     - name: Encrypt and rename files
-      ansible.builtin.script: ./scripts/ONTAP-82-04.sh "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+      ansible.builtin.script: ./scripts/ONTAP-83-04.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_82_qtrees) | list }}"
+        "{{ ontap_80_svms | product(ontap_80_volumes[:3], ontap_83_qtrees[0]) | list }}"
   
   post_tasks:

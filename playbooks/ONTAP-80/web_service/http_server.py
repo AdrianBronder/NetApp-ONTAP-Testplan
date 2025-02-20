@@ -199,6 +199,7 @@ def service_overview():
                            quotaReport=quotaReport_sanitized,
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
+                           snapmirrorList=snapmirrorList,
                            departments=volumeList,
                            company=company_name,
                            colors=colors)

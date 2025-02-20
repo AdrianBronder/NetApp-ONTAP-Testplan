@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-82-02 - Configure Events
+# Title:        ONTAP-83-02 - Configure Events
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-11-04
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-82-02 - Configure Events"
+  name:                                "ONTAP-83-02 - Configure Events"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -64,9 +64,9 @@
       netapp.ontap.na_ontap_ems_destination:
         state:                         "present"
         name:                          "dest_{{ item }}"
-        type:                          "{{ ontap_82_ems_dest_type }}"
+        type:                          "{{ ontap_83_ems_dest_type }}"
         filters:                       "ems_{{ item }}"
-        destination:                   "{{ ontap_82_ems_dest_destination }}{{ item }}"
+        destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
       loop:
         "{{ ontap_80_svms }}"
 

@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-82-03 - Activate and train Anti-ransomware
+# Title:        ONTAP-83-03 - Activate and train Anti-ransomware
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-11-04
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-82-03 - Dry-run Anti-ransomware"
+  name:                                "ONTAP-83-03 - Dry-run Anti-ransomware"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -45,11 +45,11 @@
 #          volume:                      "{{ item.1 }}"
 #        <<: *input01
 #      loop:
-#        "{{ ontap_80_svms | product(ontap_82_volumes) | list }}"
+#        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
 #      ignore_errors:                   true
 
 - hosts:                               "linux"
-  name:                                "ONTAP-82-03 - Write Data"
+  name:                                "ONTAP-83-03 - Write Data"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -62,9 +62,9 @@
 
   tasks:
     - name: Create test files on exports
-      ansible.builtin.script: ./scripts/ONTAP-82-03.sh "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
+      ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_82_qtrees) | list }}"
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
   
   post_tasks:
 

@@ -25,7 +25,11 @@
                     {% else %}
                     <td>enabled</td>
                     {% endif %}
-                    <td>unknown</td>
+                    {% if department.name in (snapmirrorList | jsonpath_query('$[*].')) %}
+                    <td>enabled</td>
+                    {% else %}
+                    <td>disabled</td>
+                    {% endif %}
                     {% if department.anti_ransomware is defined %}
                     <td>{{ department.anti_ransomware.state }}</td>
                     {% else %}

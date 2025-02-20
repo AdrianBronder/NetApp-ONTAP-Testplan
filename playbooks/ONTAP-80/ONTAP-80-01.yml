@@ -335,6 +335,100 @@
 
   post_tasks:
 
+- hosts:                               "secondary_storage_clusters"
+  name:                                "ONTAP-80-01 - Base Deployment - secondary only"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create protection policy - Standard
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        policy_name:                   "{{ ontap_80_snapm_policy_standard }}"
+        policy_type:                   "mirror_vault"
+        snapmirror_label:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        keep:
+          - 3
+          - 5
+          - 5
+          - 2
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+
+    - name: Create protection policy - Premium
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        policy_name:                   "{{ ontap_80_snapm_policy_premium }}"
+        policy_type:                   "mirror_vault"
+        snapmirror_label:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        keep:
+          - 3
+          - 10
+          - 10
+          - 4
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+
+    - name: Create protection policy - Ultimate
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        policy_name:                   "{{ ontap_80_snapm_policy_ultimate }}"
+        policy_type:                   "mirror_vault"
+        snapmirror_label:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        keep:
+          - 3
+          - 20
+          - 14
+          - 12
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+
+  post_tasks:
+
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-80-01 - Base Deployment - primary only"
   gather_facts:                        false
@@ -355,6 +449,108 @@
   pre_tasks:
 
   tasks:
+    - name: Create snapshot policy - Standard
+      netapp.ontap.na_ontap_snapshot_policy:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        name:                          "{{ ontap_80_snap_policy_standard }}"
+        schedule:                      
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        prefix:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        snapmirror_label:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        count:
+          - 3
+          - 5
+          - 2
+          - 1
+        enabled:                       True
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+
+    - name: Create snapshot policy - Premium
+      netapp.ontap.na_ontap_snapshot_policy:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        name:                          "{{ ontap_80_snap_policy_premium }}"
+        schedule:                      
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        prefix:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        snapmirror_label:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        count:
+          - 6
+          - 12
+          - 4
+          - 1
+        enabled:                       True
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+
+    - name: Create snapshot policy - Ultimate
+      netapp.ontap.na_ontap_snapshot_policy:
+        state:                         present
+        vserver:                       "{{ item.name }}"
+        name:                          "{{ ontap_80_snap_policy_ultimate }}"
+        schedule:                      
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        prefix:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        snapmirror_label:
+          - "5min"
+          - "hourly"
+          - "daily"
+          - "weekly"
+        count:
+          - 12
+          - 24
+          - 7
+          - 1
+        enabled:                       True
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - item.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+
     - name: Create volumes
       netapp.ontap.na_ontap_volume:
         state:                         present
@@ -364,6 +560,7 @@
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
+        snapshot_policy:               "{{ ontap_80_snap_policy_standard }}"
         junction_path:                 "/{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
         volume_security_style:         "ntfs"

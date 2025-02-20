@@ -141,7 +141,7 @@ ontap_52_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
 ontap_52_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_52_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
-# ONTAP-80 - Advanced
+# ONTAP-80 - Advanced - Service-Provider Demo
 ontap_80_ldap_host:               "ldap://dc1.demo.netapp.com"
 ontap_80_base_dn:                 "dc=demo,dc=netapp,dc=com"
 ontap_80_user_dn:                 "cn=Users"
@@ -156,6 +156,15 @@ ontap_80_group_search_scope:      "SUBTREE"
 ontap_80_group_members_attr:      "member"
 ontap_80_secret_key:              "{{ vault_ontap_80_secret_key }}"
 
+ontap_80_bluecorp_user:           "DEMO\\bluecorp_user"
+ontap_80_bluecorp_user_pw:        "{{ vault_ontap_80_bluecorp_user_pw }}"
+ontap_80_astrainc_user:           "DEMO\\astrainc_user"
+ontap_80_astrainc_user_pw:        "{{ vault_ontap_80_astrainc_user_pw }}"
+ontap_80_polarisltd_user:         "DEMO\\polarisltd_user"
+ontap_80_polarisltd_user_pw:      "{{ vault_ontap_80_polarisltd_user_pw }}"
+ontap_80_operator_user:           "DEMO\\operator"
+ontap_80_operator_user_pw:        "{{ vault_ontap_80_operator_user_pw }}"
+
 ontap_80_svms:
   - "sp-svm-bluecorp"
   - "sp-svm-astrainc"
@@ -168,27 +177,23 @@ ontap_80_volumes:
   - "ontap_80_it"
   - "ontap_80_finance"
   - "ontap_80_sales"
+ontap_80_snap_policy_standard:   "ontap_80_snap_standard"
+ontap_80_snap_policy_premium:    "ontap_80_snap_premium"
+ontap_80_snap_policy_ultimate:   "ontap_80_snap_ultimate"
+ontap_80_snapm_policy_standard:   "ontap_80_snapm_standard"
+ontap_80_snapm_policy_premium:    "ontap_80_snapm_premium"
+ontap_80_snapm_policy_ultimate:   "ontap_80_snapm_ultimate"
 
 # ONTAP-81 - Advanced - CIFS Self-Service
 ontap_81_qtrees:
-  - "abc"
-  - "def"
-  - "ghi"
+  - "ontap_81_request_demo_01"
+  - "ontap_81_request_demo_02"
 
-# ONTAP-82 - Advanced - Anti-Ransomware
-ontap_80_bluecorp_user:           "DEMO\\bluecorp_user"
-ontap_80_bluecorp_user_pw:        "{{ vault_ontap_82_bluecorp_user_pw }}"
-ontap_80_astrainc_user:           "DEMO\\astrainc_user"
-ontap_80_astrainc_user_pw:        "{{ vault_ontap_82_astrainc_user_pw }}"
-ontap_80_polarisltd_user:         "DEMO\\polarisltd_user"
-ontap_80_polarisltd_user_pw:      "{{ vault_ontap_82_polarisltd_user_pw }}"
-ontap_80_operator_user:           "DEMO\\operator"
-ontap_80_operator_user_pw:        "{{ vault_ontap_82_operator_user_pw }}"
-ontap_82_policy_name:             "ontap_82_policy"
-ontap_82_qtrees:
-  - "arp_qt1"
-  - "arp_qt2"
-  - "arp_qt3"
-ontap_82_ems_dest_type:           "rest_api"
-ontap_82_ems_dest_destination:    "http://192.168.0.61/"
-linux_82_mount_dir:               "{{ linux_default_mount_dir }}/82"
+# ONTAP-83 - Advanced - Anti-Ransomware
+ontap_83_policy_name:             "ontap_83_policy"
+ontap_83_qtrees:
+  - "ontap_83_arp_demo_qt1"
+  - "ontap_83_arp_demo_qt2"
+ontap_83_ems_dest_type:           "rest_api"
+ontap_83_ems_dest_destination:    "http://192.168.0.61/"
+linux_83_mount_dir:               "{{ linux_default_mount_dir }}/83"

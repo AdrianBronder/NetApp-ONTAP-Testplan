@@ -1,10 +1,10 @@
 ################################################################################
 #
-# Title:        ONTAP-prepare-82 - MSP - Backup
+# Title:        ONTAP-prepare-83 - Advanced - Anti-ransomware
 # Author:       NetApp Inc. (badrian)
 # Initial 
-# Create Date:  2024-02-09
-# Description:  Execute all pre-steps for running test frame 81
+# Create Date:  2024-04-11
+# Description:  Execute all pre-steps for running test frame 83
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -17,5 +17,3 @@
 - ansible.builtin.import_playbook: ../ONTAP-80/ONTAP-prepare-80.yml
 
 - ansible.builtin.import_playbook: ../ONTAP-80/ONTAP-80-01.yml
-
-- ansible.builtin.import_playbook: ../ONTAP-81/ONTAP-81-01.yml
