@@ -186,7 +186,7 @@ def service_overview():
     # 
     for volume in volumeList:
         if not volume.name.endswith('_root'):
-            department_name = volume["name"].replace('ontap_80_', '')
+            department_name = volume.name.replace('ontap_80_', '')
             custom_state_info = {
                 'name': department_name,
                 'local_versioning': 'disabled',
@@ -196,7 +196,7 @@ def service_overview():
             }
             # Check, if local versioning (Snapshots) are in use
             if volume.snapshot_policy != "none":
-                custom_state_info['local_versioning'] = volume.snapshot_policy.replace('ontap_80_snap_', '')
+                custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_80_snap_', '')
             # Check, if backup protection (SnapMirror) is in use
             for snapmirrorRelation in snapmirrorList:
                 if snapmirrorRelation.source.path.endswith(volume):
