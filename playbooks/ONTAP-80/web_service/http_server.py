@@ -203,7 +203,7 @@ def service_overview():
                     custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
                     break
                 
-            departmentConsumedServices[department_name] = custom_state_info
+            departmentConsumedServices.append(custom_state_info)
 
     # Filter on qtrees only with quota set
     for quota in quotaReport:
