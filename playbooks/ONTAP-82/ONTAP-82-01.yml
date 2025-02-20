@@ -47,7 +47,7 @@
         create_destination:
           enabled:                     true
         policy:                        "{{ ontap_80_snapm_policy_standard }}"
-        schedule:                      "15min"
+        schedule:                      "10min"
         update:                        false
         initialize:                    false
       loop:
