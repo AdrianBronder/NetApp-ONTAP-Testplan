@@ -40,7 +40,7 @@
         state:                         present
         name:                          "{{ item.2 }}"
         flexvol_name:                  "{{ item.1 }}"
-        export_policy:                 "{{ ontap_82_policy_name }}"
+        export_policy:                 "{{ ontap_80_policy_name }}"
         security_style:                "unix"
         unix_permissions:              0777
         vserver:                       "{{ item.0 }}"
@@ -95,7 +95,7 @@
 
 
 - hosts:                               "linux"
-  name:                                "ONTAP-82-01 - Filesystems for Tenants - Linux"
+  name:                                "ONTAP-83-01 - Filesystems for Tenants - Linux"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -112,7 +112,7 @@
         state:                         "absent"
         src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
                                         {{ item.1 }}/{{ item.2 }}"
-        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
@@ -120,7 +120,7 @@
   
     - name: Create mount directories
       ansible.builtin.file:
-        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
         state:                         "directory"
         mode:                          "0755"
       loop:
@@ -131,7 +131,7 @@
         state:                         "mounted"
         src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
                                         {{ item.1 }}/{{ item.2 }}"
-        path:                          "{{ linux_82_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
