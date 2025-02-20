@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import logging, os, re, yaml, random, jmespath
+import logging, os, re, yaml, random, re
 from flask import Flask, request, redirect, url_for, render_template, session, jsonify
 from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 #from ldap3 import Server, Connection, ALL
@@ -180,6 +180,30 @@ def service_overview():
     quota_distribution_count = defaultdict(int)
     quota_distribution_space = defaultdict(int)
     quotaReport_sanitized = []
+    departmentConsumedServices = []
+    custom_state_info = {}
+
+    # 
+    for volume in volumeList:
+        if not volume.endswith('_root')
+            department_name = volume["name"].replace('ontap_80_', '')
+            custom_state_info = {
+                'name': department_name,
+                'local_versioning': 'disabled',
+                'backup': 'disabled',
+                'ransomware_protection': 'disabled',
+                'data_pipeline': 'disabled'
+            }
+            # Check, if local versioning (Snapshots) are in use
+            if volume.snapshot_policy != "none"
+                custom_state_info['local_versioning'] = volume.snapshot_policy.replace('ontap_80_snap_', '')
+            # Check, if backup protection (SnapMirror) is in use
+            for snapmirrorRelation in snapmirrorList
+                if snapmirrorRelation.source.path.endswith(volume)
+                    custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
+                    break
+                
+            departmentConsumedServices[department_name] = custom_state_info
 
     # Filter on qtrees only with quota set
     for quota in quotaReport:
@@ -200,7 +224,7 @@ def service_overview():
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
                            snapmirrorList=snapmirrorList,
-                           departments=volumeList,
+                           departmentConsumedServices=departmentConsumedServices,
                            company=company_name,
                            colors=colors)
 
@@ -212,7 +236,7 @@ def share_order():
         return redirect(url_for('ransomware_events_operator'))
 
     company_name = "Unknown"
-    pirmary_svm = ""
+    primary_svm = ""
 
     # Determine what data to show based on group membership
     if 'bluecorp' in session['groups']:

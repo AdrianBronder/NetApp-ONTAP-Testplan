@@ -16,31 +16,14 @@
             </tr>
         </thead>
         <tbody>
-            {% for department in departments %}
-            {% if not '_root' in department.name %}
+            {% for department in departmentConsumedServices %}
                 <tr>
-                    <td>{{ department.name | replace('ontap_80_', '') }}</td>
-                    {% if department.snapshot_policy.name == "none" %}
-                    <td>disabled</td>
-                    {% else %}
-                    <td>enabled</td>
-                    {% endif %}
-                    {% for relationship in snapmirrorList %}
-                    {% if department is regex('^sp-svm.*' + relationship.source.path) %}
-                    <td>enabled</td>
-                        {% break %}
-                    {% else %}
-                    <td>disabled</td>
-                    {% endif %}
-                    {% endfor %}
-                    {% if department.anti_ransomware is defined %}
-                    <td>{{ department.anti_ransomware.state }}</td>
-                    {% else %}
-                    <td>disabled</td>
-                    {% endif %}
-                    <td>unknown</td>
+                    <td>{{ department.name }}</td>
+                    <td>{{ department.local_versioning }}</td>
+                    <td>{{ department.backup }}</td>
+                    <td>{{ department.ransomware_protection }}</td>
+                    <td>{{ department.data_pipeline }}</td>
                 </tr>
-            {% endif %}
             {% endfor %}
         </tbody>
     </table>
