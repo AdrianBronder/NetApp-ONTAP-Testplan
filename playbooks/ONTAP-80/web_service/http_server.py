@@ -185,7 +185,7 @@ def service_overview():
 
     # 
     for volume in volumeList:
-        if not volume.endswith('_root'):
+        if not volume.name.endswith('_root'):
             department_name = volume["name"].replace('ontap_80_', '')
             custom_state_info = {
                 'name': department_name,
