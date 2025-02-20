@@ -25,7 +25,7 @@
                     {% else %}
                     <td>enabled</td>
                     {% endif %}
-                    {% if department.name in (snapmirrorList | jsonpath_query('$[*].')) %}
+                    {% if department.name in jmespath.search('$[*].source.path', snapmirrorList) %}
                     <td>enabled</td>
                     {% else %}
                     <td>disabled</td>

@@ -109,7 +109,7 @@ python3 -m pip install --upgrade pip
 echo ""
 echo ""
 echo "--> Installing additional Python libs"
-python3 -m pip install --upgrade requests six netapp_lib flask Flask-LDAP3-Login selinux netapp_ontap
+python3 -m pip install --upgrade requests six netapp_lib flask Flask-LDAP3-Login selinux jmespath netapp_ontap
 python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 
 echo ""
