@@ -320,7 +320,10 @@ def share_order():
         except NetAppRestError as error:
             message = "Exception caught :" + str(error)
        
-    return render_template('share_order.html', departments=departments, message=message)
+    return render_template('share_order.html',
+                           departments=departments,
+                           company=company_name,
+                           message=message)
 
 @app.route('/ransomware_events')
 def ransomware_events():
