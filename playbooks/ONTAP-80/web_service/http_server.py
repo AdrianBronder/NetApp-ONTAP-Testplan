@@ -202,7 +202,8 @@ def service_overview():
                 if snapmirrorRelation.source.path.endswith(volume.name):
                     custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
                     break
-                
+            if volume.anti_ransomware.state != "disabled":
+                custom_state_info['ransomware_protection'] = volume.anti_ransomware.state
             departmentConsumedServices.append(custom_state_info)
 
     # Filter on qtrees only with quota set
