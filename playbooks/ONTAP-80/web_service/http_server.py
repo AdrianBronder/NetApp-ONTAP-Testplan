@@ -224,9 +224,114 @@ def service_overview():
                            quotaReport=quotaReport_sanitized,
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
-                           snapmirrorList=snapmirrorList,
                            departmentConsumedServices=departmentConsumedServices,
                            company=company_name,
+                           colors=colors)
+
+@app.route('/service_overview_operator', methods=['GET'])
+def service_overview():
+    if 'username' not in session:
+        return redirect(url_for('login'))
+    if not 'operators' in session['groups']:
+        return redirect(url_for('service_overview'))
+
+    company_name = "Unknown"
+    primary_svm = ""
+
+    # Establish connection to storage clusters
+    conn_primary = HostConnection(
+        primary_cluster + '.demo.netapp.com',
+        username=ontap_group_data['ontap_admin_user'],
+        password=ontap_group_data['ontap_admin_password'],
+        verify=False
+    )
+    conn_secondary = HostConnection(
+        secondary_cluster + '.demo.netapp.com',
+        username=ontap_group_data['ontap_admin_user'],
+        password=ontap_group_data['ontap_admin_password'],
+        verify=False
+    )
+    # Get volume information
+    try:
+        config.CONNECTION = conn_primary
+        volumeList = list(Volume.get_collection(
+            fields='*,anti_ransomware',
+            **{'svm.name': 'sp-svm-*'}))
+    except NetAppRestError as error:
+        volumeList = []
+        print("Exception caught :" + str(error))
+
+    # Get quota information
+    try:
+        config.CONNECTION = conn_primary
+        quotaReport = list(QuotaReport.get_collection(
+            fields='*',
+            type='tree',
+            **{'svm.name': 'sp-svm-*'}))
+    except NetAppRestError as error:
+        quotaReport = []
+        print("Exception caught :" + str(error))
+
+    # Get SnapMirror information
+    try:
+        config.CONNECTION = conn_secondary
+        snapmirrorList = list(SnapmirrorRelationship.get_collection(
+            fields='*',
+            **{'destination.svm.name': 'sp-svm-*'}))
+    except NetAppRestError as error:
+        snapmirrorList = []
+        print("Exception caught :" + str(error))
+
+    # Initialize lists and dictionaries
+    quota_distribution_count = defaultdict(int)
+    quota_distribution_space = defaultdict(int)
+    quotaReport_sanitized = []
+    departmentConsumedServices = []
+    custom_state_info = {}
+
+    # 
+    for volume in volumeList:
+        if not volume.name.endswith('_root'):
+            department_name = volume.name.replace('ontap_80_', '')
+            custom_state_info = {
+                'company_name': volume.svm.name.replace('sp-svm-', ''),
+                'name': department_name,
+                'local_versioning': 'disabled',
+                'backup': 'disabled',
+                'ransomware_protection': 'disabled',
+                'data_pipeline': 'disabled'
+            }
+            # Check, if local versioning (Snapshots) are in use
+            if volume.snapshot_policy != "none":
+                custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_80_snap_', '')
+            # Check, if backup protection (SnapMirror) is in use
+            for snapmirrorRelation in snapmirrorList:
+                if snapmirrorRelation.source.path.endswith(volume.name):
+                    custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
+                    break
+            if volume.anti_ransomware.state != "disabled":
+                custom_state_info['ransomware_protection'] = volume.anti_ransomware.state
+            departmentConsumedServices.append(custom_state_info)
+
+    # Filter on qtrees only with quota set
+    for quota in quotaReport:
+        hard_limit = getattr(quota.space, 'hard_limit', None)
+        if hard_limit is not None:
+            quotaReport_sanitized.append(quota)
+            quota_distribution_count[quota.volume.name.replace('ontap_80_','')] += 1
+            quota_distribution_space[quota.volume.name.replace('ontap_80_','')] += quota.space.hard_limit / 1024**3
+    quota_distribution_count = sorted(quota_distribution_count.items())
+    quota_distribution_space = sorted(quota_distribution_space.items())
+
+    # Generate a list of random RGB colors
+    colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution_count))]
+
+    # Build page with quota data
+    return render_template('service_overview.html',
+                           quotaReport=quotaReport_sanitized,
+                           quota_distribution_space=quota_distribution_space,
+                           quota_distribution_count=quota_distribution_count,
+                           departmentConsumedServices=departmentConsumedServices,
                            colors=colors)
 
 @app.route('/share_order', methods=['GET', 'POST'])
