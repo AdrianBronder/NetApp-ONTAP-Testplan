@@ -229,7 +229,7 @@ def service_overview():
                            colors=colors)
 
 @app.route('/service_overview_operator', methods=['GET'])
-def service_overview():
+def service_overview_operator():
     if 'username' not in session:
         return redirect(url_for('login'))
     if not 'operators' in session['groups']:
