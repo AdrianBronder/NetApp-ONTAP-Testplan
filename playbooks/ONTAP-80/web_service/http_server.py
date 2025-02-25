@@ -301,9 +301,9 @@ def service_overview_operator():
                 'backup': 'disabled',
                 'ransomware_protection': 'disabled',
                 'data_pipeline': 'disabled',
-                'total_ordered': 0,
-                'base_price': 0,
-                'total_billed': 0
+                'total_ordered': 0.00,
+                'base_price': 0.00,
+                'total_billed': 0.00
             }
             # Check, if local versioning (Snapshots) are in use
             if volume.snapshot_policy != "none":
