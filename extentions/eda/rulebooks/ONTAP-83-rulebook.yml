@@ -15,7 +15,6 @@
       condition:
         all:
           - event.payload.netapp['ems-message-info'].message-name == "arp.snapshot.created"
-          - event.payload.netapp['ems-message-info'].parameters == "sp-svm-astrainc"
 
   ## Define the action we should take should the condition be met
 
@@ -23,4 +22,7 @@
         run_playbook:
           name: playbooks/ONTAP-83/ONTAP-83-05.yml
           extra_vars:
-             svm_name: "sp-svm-astrainc"
+             svm_name: "{{ event.payload.netapp['ems-message-info'].parameters.parameter | 
+                           selectattr('name', 'match', 'vserverName') | 
+                           map(attribute='value') | 
+                           first}}"

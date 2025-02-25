@@ -36,7 +36,7 @@
   pre_tasks:
 
   tasks:
-    - name: Create network interfaces on test SVMs
+    - name: Take network interfaces down on {{ svm_name }}
       netapp.ontap.na_ontap_interface:
         state:                         present
         vserver:                       "{{ item.svm.name }}"
@@ -49,7 +49,6 @@
       when:
         - network_ip_interfaces | length > 0
         - item.svm.name == svm_name
-        - item.svm.name is regex('^ntap-svm.*')
         - item.scope == "svm"
 
   post_tasks:
