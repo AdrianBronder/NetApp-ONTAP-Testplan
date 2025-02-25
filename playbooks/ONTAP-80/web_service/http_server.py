@@ -299,8 +299,8 @@ def service_overview_operator():
                 'local_versioning': 'disabled',
                 'backup': 'disabled',
                 'ransomware_protection': 'disabled',
-                'data_pipeline': 'disabled'
-                'total_ordered': 0
+                'data_pipeline': 'disabled',
+                'total_ordered': 0,
                 'total_billed': 0
             }
             # Check, if local versioning (Snapshots) are in use
