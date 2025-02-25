@@ -16,6 +16,6 @@
           name: playbooks/ONTAP-83/ONTAP-83-05.yml
           extra_vars:
              svm_name: "{{ event.payload.netapp['ems-message-info'].parameters.parameter | 
-                           selectattr('name', 'match', 'vserverName') | 
+                           selectattr('name', 'eq', 'vserverName') | 
                            map(attribute='value') | 
                            first}}"
