@@ -8,15 +8,15 @@
 
   rules:
     - name: ARP Snapshot Event from Primary Cluster
-      condition: event.payload.netapp['ems-message-info'].message-name is defined 
+      condition:
+        all:
+          - event.payload.netapp['ems-message-info']['message-name'] == "arw.snapshot.created" 
 
       action:
-        debug:
-          msg: "{{ event.payload.netapp['ems-message-info'].message-name }}"
-#        run_playbook:
-#          name: playbooks/ONTAP-83/ONTAP-83-05.yml
-#          extra_vars:
-#             svm_name: "{{ event.payload.netapp['ems-message-info'].parameters.parameter | 
-#                           selectattr('name', 'eq', 'vserverName') | 
-#                           map(attribute='value') | 
-#                           first}}"
+        run_playbook:
+          name: playbooks/ONTAP-83/ONTAP-83-05.yml
+          extra_vars:
+             svm_name: "{{ event.payload.netapp['ems-message-info'].parameters.parameter | 
+                           selectattr('name', 'eq', 'vserverName') | 
+                           map(attribute='value') | 
+                           first}}"
