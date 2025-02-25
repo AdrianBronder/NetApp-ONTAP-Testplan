@@ -11,9 +11,9 @@
       condition:
         all:
           - event.payload.netapp['ems-message-info']['message-name'] == "arw.snapshot.created"
-          - (event.payload.netapp['ems-message-info'].parameters.parameter | 
-             selectattr('name', 'eq', 'vserverName') | 
-             map(attribute='value') | 
+          - (event.payload.netapp['ems-message-info'].parameters.parameter | \
+             selectattr('name', 'eq', 'vserverName') | \
+             map(attribute='value') | \
              first) == "sp-svmd-astrainc"
       action:
         run_playbook:
