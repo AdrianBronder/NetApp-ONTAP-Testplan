@@ -317,6 +317,7 @@ def service_overview_operator():
     for quota in quotaReport:
         hard_limit = getattr(quota.space, 'hard_limit', None)
         if hard_limit is not None:
+            quota.svm.name = quota.svm.name.replace('sp-svm-','')
             quotaReport_sanitized.append(quota)
             quota_distribution_count[quota.svm.name.replace('sp-svm-','')] += 1
             quota_distribution_space[quota.svm.name.replace('sp_svm-','')] += quota.space.hard_limit / 1024**3
