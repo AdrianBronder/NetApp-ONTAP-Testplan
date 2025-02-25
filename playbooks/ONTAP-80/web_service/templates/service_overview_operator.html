@@ -36,9 +36,9 @@
                     <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
                         {{ department.data_pipeline }}
                     </td>
-                    <td>{{ department.total_ordered }}</td>
-                    <td>{{ department.base_price }}</td>
-                    <td>{{ department.total_billed }}</td>
+                    <td>{{ '{:0.2f}'.format(department.total_ordered) }}</td>
+                    <td>{{ '{:0.2f}'.format(department.base_price) }}</td>
+                    <td>{{ '{:0.2f}'.format(department.total_billed) }}</td>
                 </tr>
             {% endfor %}
         </tbody>
