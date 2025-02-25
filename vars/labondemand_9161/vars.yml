@@ -198,4 +198,5 @@ ontap_83_qtrees:
   - "ontap_83_arp_demo_qt2"
 ontap_83_ems_dest_type:           "rest_api"
 ontap_83_ems_dest_destination:    "http://192.168.0.61/"
+ontap_83_ems_eda_dest_destination: "http://192.168.0.61:5000/"
 linux_83_mount_dir:               "{{ linux_default_mount_dir }}/83"

@@ -65,7 +65,8 @@ async def ontap_webhook(request: web.Request) -> web.Response:
     except (json.JSONDecodeError, xmltodict.expat.ExpatError) as exc:
         logger.warning("Wrong body request: failed to decode payload: %s", exc)
         raise web.HTTPBadRequest(text="Invalid payload") from None
-
+    
+    logger.info(payload)
     endpoint = request.match_info["endpoint"]
     headers = dict(request.headers)
     headers.pop("Authorization", None)
