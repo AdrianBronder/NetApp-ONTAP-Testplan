@@ -300,6 +300,8 @@ def service_overview_operator():
                 'backup': 'disabled',
                 'ransomware_protection': 'disabled',
                 'data_pipeline': 'disabled'
+                'total_ordered': 0
+                'total_billed': 0
             }
             # Check, if local versioning (Snapshots) are in use
             if volume.snapshot_policy != "none":
@@ -312,6 +314,12 @@ def service_overview_operator():
             if volume.anti_ransomware.state != "disabled":
                 custom_state_info['ransomware_protection'] = volume.anti_ransomware.state
             departmentConsumedServices.append(custom_state_info)
+            for quota in quotaReport:
+                hard_limit = getattr(quota.space, 'hard_limit', None)
+                if (hard_limit is not None and
+                    quota.svm.name == volume.svm.name and
+                    quota.volume.name == volume.name):
+                    custom_state_info['total_ordered'] += quota.space.hard_limit / 1024**3
 
     # Filter on qtrees only with quota set
     for quota in quotaReport:

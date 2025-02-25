@@ -14,6 +14,7 @@
                 <th>Backup</th>
                 <th>Ransom-ware Protected</th>
                 <th>Data Pipeline</th>
+                <th>GB Ordered</th>
             </tr>
         </thead>
         <tbody>
@@ -33,6 +34,7 @@
                     <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
                         {{ department.data_pipeline }}
                     </td>
+                    <td>{{ department.total_ordered }}</td>
                 </tr>
             {% endfor %}
         </tbody>
