@@ -99,8 +99,9 @@ modprobe nvme_tcp
 
 echo ""
 echo ""
-echo "--> Copying default ansible config"
+echo "--> Ansible config"
 cp $SCRIPTPATH/ansible.cfg ~/ansible.cfg
+echo 'export ANSIBLE_VAULT_PASSWORD_FILE=~/NetApp-ONTAP-Testplan/init/init_helper/vaultfile.txt' >> ~/.bashrc
 
 echo ""
 echo ""
