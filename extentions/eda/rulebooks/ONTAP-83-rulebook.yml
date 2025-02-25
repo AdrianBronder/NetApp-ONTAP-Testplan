@@ -8,9 +8,8 @@
 
   rules:
     - name: ARP Snapshot Event from Primary Cluster
-      condition: event.payload is defined
-      #event.payload.netapp['ems-message-info'].message-name == "arw.snapshot.created"
-
+      condition: event.payload.netapp['ems-message-info'].message-name == 'arw.snapshot.created'
+      
       action:
         run_playbook:
           name: playbooks/ONTAP-83/ONTAP-83-05.yml

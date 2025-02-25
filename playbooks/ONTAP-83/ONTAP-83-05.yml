@@ -16,7 +16,7 @@
 # 
 ################################################################################
 
-- hosts:                               "ontap"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-83-05 - React to attack"
   gather_facts:                        false
   vars_files:
@@ -48,7 +48,8 @@
         label: "{{ item.name }}"
       when:
         - network_ip_interfaces | length > 0
-        - item.svm.name == svm_name
         - item.scope == "svm"
+        - item.svm.name is defined
+        - item.svm.name == svm_name
 
   post_tasks:
