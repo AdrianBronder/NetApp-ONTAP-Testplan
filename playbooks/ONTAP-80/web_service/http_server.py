@@ -292,6 +292,7 @@ def service_overview_operator():
     # 
     for volume in volumeList:
         if not volume.name.endswith('_root'):
+            billing_base = 0.10 # monthly GB price
             department_name = volume.name.replace('ontap_80_', '')
             custom_state_info = {
                 'company_name': volume.svm.name.replace('sp-svm-', ''),
@@ -301,25 +302,43 @@ def service_overview_operator():
                 'ransomware_protection': 'disabled',
                 'data_pipeline': 'disabled',
                 'total_ordered': 0,
+                'base_price': 0,
                 'total_billed': 0
             }
             # Check, if local versioning (Snapshots) are in use
             if volume.snapshot_policy != "none":
                 custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_80_snap_', '')
+                match custom_state_info['local_versioning']:
+                    case 'standard':
+                        billing_base += 0.01
+                    case 'premium':
+                        billing_base += 0.02
+                    case 'ultimate':
+                        billing_base += 0.03
             # Check, if backup protection (SnapMirror) is in use
             for snapmirrorRelation in snapmirrorList:
                 if snapmirrorRelation.source.path.endswith(volume.name):
                     custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
-                    break
+                    match custom_state_info['backup']:
+                        case 'standard':
+                            billing_base += 0.04
+                        case 'premium':
+                            billing_base += 0.05
+                        case 'ultimate':
+                            billing_base += 0.06
+                        break
             if volume.anti_ransomware.state != "disabled":
                 custom_state_info['ransomware_protection'] = volume.anti_ransomware.state
-            departmentConsumedServices.append(custom_state_info)
+                billing_base += 0.02
             for quota in quotaReport:
                 hard_limit = getattr(quota.space, 'hard_limit', None)
                 if (hard_limit is not None and
                     quota.svm.name == volume.svm.name and
                     quota.volume.name == volume.name):
                     custom_state_info['total_ordered'] += quota.space.hard_limit / 1024**3
+            custom_state_info['base_price'] = billing_base
+            custom_state_info['total_billed'] = billing_base * custom_state_info['total_ordered']
+            departmentConsumedServices.append(custom_state_info)
 
     # Filter on qtrees only with quota set
     for quota in quotaReport:
