@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:                               "ontap"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-80 - Advanced - Service Provider Customization"
   gather_facts:                        false
   vars:
@@ -87,10 +87,55 @@
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
-    - name: Create SVMs for testing"
+    - name: Remove SVMs
       netapp.ontap.na_ontap_svm:
         state:                         absent
         name:                          "{{ item.name }}"
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
+
+  post_tasks:
+
+- hosts:                               "secondary_storage_clusters"
+  name:                                "ONTAP-revert-80 - Advanced - Service Provider Customization"
+  gather_facts:                        false
+  vars:
+    input: &input
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Remove SVMs
+      netapp.ontap.na_ontap_svm:
+        state:                         absent
+        name:                          "{{ item.name }}-backup"
       loop:
         "{{ svm_svms }}"
       loop_control:
