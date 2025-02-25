@@ -95,6 +95,16 @@
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
 
+    - name: Remove qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                         absent
+        name:                          "{{ item.2 }}"
+        flexvol_name:                  "{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        <<: *input
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+
     - name: Remove volume shares
       netapp.ontap.na_ontap_cifs:
         state:                         absent
