@@ -99,7 +99,7 @@ def login():
             logger.info(f"User {username} authenticated successfully with groups: {user_groups_list}")
             
             if 'operators' in session['groups']:
-                return redirect(url_for('ransomware_events_operator'))
+                return redirect(url_for('service_overview_operator'))
             else:
                 return redirect(url_for('service_overview'))
         else:
@@ -327,7 +327,7 @@ def service_overview_operator():
     colors = ['#%06X' % random.randint(0, 0xFFFFFF) for _ in range(len(quota_distribution_count))]
 
     # Build page with quota data
-    return render_template('service_overview.html',
+    return render_template('service_overview_operator.html',
                            quotaReport=quotaReport_sanitized,
                            quota_distribution_space=quota_distribution_space,
                            quota_distribution_count=quota_distribution_count,
