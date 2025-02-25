@@ -97,7 +97,7 @@
         state:                         "present"
         name:                          "dest_eda_{{ ontap_80_svms[1] }}"
         type:                          "{{ ontap_83_ems_dest_type }}"
-        filters:                       "ems_{{ item }}"
+        filters:                       "ems_arp_eda_{{ ontap_80_svms[1] }}"
         destination:                   "{{ ontap_83_ems_eda_dest_destination }}{{ item }}"
 
   post_tasks:
