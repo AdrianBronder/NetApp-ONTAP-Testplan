@@ -103,15 +103,6 @@
         <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
-
-    - name: Remove volume
-      netapp.ontap.na_ontap_volume:
-        state:                         "absent"
-        name:                          "{{ item.1 }}"
-        vserver:                       "{{ item.0 }}"
-        <<: *input
-      loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
   
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:

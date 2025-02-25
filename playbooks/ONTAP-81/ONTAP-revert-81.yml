@@ -67,12 +67,12 @@
       - cifs_share_info.ontap_info.protocols_cifs_shares.num_records|int > 0
       - item.name is defined
 
-    - name: Remove volumes
-      netapp.ontap.na_ontap_volume:
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
         state:                         absent
-        name:                          "{{ item }}"
-        vserver:                       "{{ global_primary_nas_svm }}"
+        name:                          "{{ ontap_81_policy_name }}"
+        vserver:                       "{{ item }}"
       loop:
-        "{{ ontap_80_volumes }}"
+        "{{ ontap_80_svms }}"
 
   post_tasks:
