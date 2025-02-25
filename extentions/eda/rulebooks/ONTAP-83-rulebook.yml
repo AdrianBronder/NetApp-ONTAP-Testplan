@@ -21,4 +21,6 @@
 
       action:
         run_playbook:
-          name: playbooks/ONTAP-01/ONTAP-01-04.yml
+          name: playbooks/ONTAP-83/ONTAP-83-05.yml
+          extra_vars:
+             svm_name: "sp-svm-astrainc"

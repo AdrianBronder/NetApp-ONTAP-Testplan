@@ -1,0 +1,41 @@
+- hosts:                               "ontap"
+  name:                                "ONTAP-83-05 - React to attack"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  vars:
+    netapp:
+      ems-message-info:
+        node: "cluster1-01"
+        message-name: "arw.snapshot.created"
+        parameters:
+          parameter:
+            - name: "volumeName"
+              value: "ontap_80_research(1)"
+            - name: "vserverName"
+              value: "sp-svm-astrainc"
+            - name: "reason"
+              value: "High entropy writes detected"
+        seq-num: "86304"
+        severity: "notice"
+        event: 'arw.snapshot.created: ARP snapshot created on volume "ontap_80_research(1)" (UUID: "22171fdb-f370-11ef-aab4-00505685e194") in SVM "sp-svm-astrainc" (UUID: "e4d3c2e4-f36f-11ef-aab4-00505685e194") at "2025-02-25_0717". Reason: "High entropy writes detected".'
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create network interfaces on test SVMs
+      debug:
+        msg: "{{ netapp['ems-message-info'].parameters.parameter | selectattr('name', 'match', 'vserverName') | map(attribute='value') }}"
+
+  post_tasks:
