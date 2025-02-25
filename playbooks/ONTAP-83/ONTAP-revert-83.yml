@@ -67,6 +67,18 @@
     - netapp.ontap
 
   tasks:
+    - name: De-activate ARP on volumes
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/disable'
+        verb:                          'POST'
+        params:
+        body:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+      ignore_errors:                   true
+
     - name: Remove REST EMS destination for every tenant
       netapp.ontap.na_ontap_ems_destination:
         state:                         "absent"
