@@ -191,11 +191,13 @@ ontap_80_snapm_policy_ultimate:   "ontap_80_snapm_ultimate"
 ontap_81_qtrees:
   - "ontap_81_request_demo_01"
   - "ontap_81_request_demo_02"
+ontap_81_policy_name:             "ontap_81_policy"
 
 # ONTAP-83 - Advanced - Anti-Ransomware
 ontap_83_qtrees:
   - "ontap_83_arp_demo_qt1"
   - "ontap_83_arp_demo_qt2"
+ontap_83_policy_name:             "ontap_83_policy"
 ontap_83_ems_dest_type:           "rest_api"
 ontap_83_ems_dest_destination:    "http://192.168.0.61/"
 ontap_83_ems_eda_dest_destination: "http://192.168.0.61:5000/"

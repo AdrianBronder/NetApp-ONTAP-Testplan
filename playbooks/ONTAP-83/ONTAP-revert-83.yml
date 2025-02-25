@@ -116,7 +116,7 @@
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         absent
-        name:                          "{{ ontap_80_policy_name }}"
+        name:                          "{{ ontap_83_policy_name }}"
         vserver:                       "{{ item }}"
         <<: *input
       loop:
