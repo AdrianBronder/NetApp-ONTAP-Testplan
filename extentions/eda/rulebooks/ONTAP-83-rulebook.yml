@@ -12,9 +12,7 @@
 
   rules:
     - name: ARP Snapshot Event from Primary Cluster
-      condition:
-        all:
-          - event.payload.netapp['ems-message-info'].message-name == "arp.snapshot.created"
+      condition: event.payload.netapp['ems-message-info'].message-name == "arw.snapshot.created"
 
   ## Define the action we should take should the condition be met
 
