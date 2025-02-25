@@ -8,10 +8,7 @@
 
   rules:
     - name: ARP Snapshot Event from Primary Cluster
-      condition:
-        all:
-          - event.payload.netapp['ems-message-info']['message-name'] == "arw.snapshot.created"
-          - event.payload.netapp['ems-message-info'].parameters.parameter | selectattr('name', 'eq', 'vserverName') | map(attribute='value') | first == "sp-svm-astrainc"
+      condition: event.payload.netapp['ems-message-info']['message-name'] == "arw.snapshot.created"
 
       action:
         run_playbook:
