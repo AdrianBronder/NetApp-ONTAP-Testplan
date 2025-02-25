@@ -1,20 +1,15 @@
-- name: Listen for events on a webhook
+- name: Listen for events on an ONTAP webhook
   hosts: all
-
-  ## Define our source for events
 
   sources:
     - ontap_webhook:
         host: 0.0.0.0
         port: 5000
 
-  ## Define the conditions we are looking for
-
   rules:
     - name: ARP Snapshot Event from Primary Cluster
-      condition: event.payload.netapp['ems-message-info'].message-name == "arw.snapshot.created"
-
-  ## Define the action we should take should the condition be met
+      condition: true
+      #event.payload.netapp['ems-message-info'].message-name == "arw.snapshot.created"
 
       action:
         run_playbook:

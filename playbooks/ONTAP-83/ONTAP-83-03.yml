@@ -64,7 +64,7 @@
     - name: Create test files on exports
       ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_80_svms | product(ontap_80_volumes[:2], ontap_83_qtrees) | list }}"
   
   post_tasks:
 
@@ -88,7 +88,7 @@
   pre_tasks:
 
   tasks:
-    - name: Start  Anti-ransomware dry-run on volumes
+    - name: Activate ARP on volumes
       netapp.ontap.na_ontap_rest_cli:
         command:                       'security/anti-ransomware/volume/enable'
         verb:                          'POST'
