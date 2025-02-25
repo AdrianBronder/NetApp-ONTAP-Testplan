@@ -74,7 +74,7 @@
     - name: Configure EMS filters for EDA on {{ ontap_80_svms[1] }}
       netapp.ontap.na_ontap_ems_filter:
         state:                         "present"
-        name:                          "ems_{{ ontap_80_svms[1] }}"
+        name:                          "ems_arp_eda_{{ ontap_80_svms[1] }}"
         rules:                         []
 
     - name: Add EMS filter to match {{ ontap_80_svms[1] }} and ARP Snapshot Create only
@@ -83,7 +83,7 @@
         verb:                          'POST'
         params:
         body:
-          filter-name:                 "ems_arp_snap_{{ ontap_80_svms[1] }}"
+          filter-name:                 "ems_arp_eda_{{ ontap_80_svms[1] }}"
           type:                        "include"
           position:                    1
           message-name:                "arw.snapshot.created"
