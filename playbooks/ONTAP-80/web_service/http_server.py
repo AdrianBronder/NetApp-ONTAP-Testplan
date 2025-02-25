@@ -318,8 +318,8 @@ def service_overview_operator():
         hard_limit = getattr(quota.space, 'hard_limit', None)
         if hard_limit is not None:
             quotaReport_sanitized.append(quota)
-            quota_distribution_count[quota.volume.name.replace('ontap_80_','')] += 1
-            quota_distribution_space[quota.volume.name.replace('ontap_80_','')] += quota.space.hard_limit / 1024**3
+            quota_distribution_count[quota.svm.name.replace('sp-svm-','')] += 1
+            quota_distribution_space[quota.svm.name.replace('sp_svm-','')] += quota.space.hard_limit / 1024**3
     quota_distribution_count = sorted(quota_distribution_count.items())
     quota_distribution_space = sorted(quota_distribution_space.items())
 

@@ -51,6 +51,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Company</th>
                 <th>Department</th>
                 <th>Share Name</th>
                 <th>Requested Size (GiB)</th>
@@ -60,6 +61,7 @@
         <tbody>
             {% for quota in quotaReport %}
                 <tr>
+                    <td>{{ quota.svm.name | replace('sp-svm-', '') }}</td>
                     <td>{{ quota.volume.name | replace('ontap_80_', '') }}</td>
                     <td>{{ quota.qtree.name }}</td>
                     <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
