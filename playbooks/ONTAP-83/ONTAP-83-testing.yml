@@ -36,6 +36,6 @@
   tasks:
     - name: Create network interfaces on test SVMs
       debug:
-        msg: "{{ netapp['ems-message-info'].parameters.parameter | selectattr('name', 'match', 'vserverName') | map(attribute='value') }}"
+        msg: "{{ netapp['ems-message-info'].parameters.parameter | selectattr('name', 'match', 'vserverName') | map(attribute='value') | first}}"
 
   post_tasks:
