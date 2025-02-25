@@ -326,7 +326,7 @@ def service_overview_operator():
                             billing_base += 0.05
                         case 'ultimate':
                             billing_base += 0.06
-                        break
+                    break
             if volume.anti_ransomware.state != "disabled":
                 custom_state_info['ransomware_protection'] = volume.anti_ransomware.state
                 billing_base += 0.02
