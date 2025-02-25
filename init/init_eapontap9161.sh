@@ -54,6 +54,7 @@ echo "--> Setting alternative JAVA to 21 as default"
 alternatives --install /usr/bin/java java /usr/lib/jvm/java-1.8.0-openjdk-1.8.0.412.b08-2.el8.x86_64/jre/bin/java 1
 alternatives --install /usr/bin/java java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java 2
 update-alternatives --set java /usr/lib/jvm/java-21-openjdk-21.0.3.0.9-1.el8.x86_64/bin/java
+echo 'export JAVA_HOME=/usr/lib/jvm/java-21-openjdk-21.0.6.0.7-1.el8.x86_64/' >> ~/.bashrc
 
 echo ""
 echo ""
