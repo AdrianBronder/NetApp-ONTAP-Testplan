@@ -44,8 +44,8 @@
 <!-- Modal for modifying service options -->
 <div class="modal fade" id="modifyServiceModal" tabindex="-1" role="dialog" aria-labelledby="modifyServiceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content text-center">
-            <form id="modifyServiceForm">
+        <div class="modal-content">
+            <form id="modifyServiceForm" class="text-center">
                 <div class="modal-header">
                     <h5 class="modal-title w-100" id="modifyServiceModalLabel">Modify Service</h5>
                 </div>
@@ -124,37 +124,6 @@
         </tbody>
     </table>
 </div>
-{% endblock %}
-
-{% block styles %}
-<style>
-    .charts-container {
-        display: flex;
-        justify-content: space-around;
-        margin-bottom: 20px;
-    }
-    .chart-container {
-        width: 300px;
-        height: 300px;
-    }
-    .chart-container canvas {
-        width: 100% !important;
-        height: 100% !important;
-    }
-    .container.mt-0 {
-        margin-top: 0 !important;
-    }
-    .bold-green {
-        font-weight: bold;
-        color: green;
-    }
-    .table-striped tbody tr:nth-of-type(odd) {
-        background-color: rgba(0,0,0,.05);
-    }
-    .table-striped tbody tr:hover {
-        background-color: rgba(0,0,0,.1);
-    }
-</style>
 {% endblock %}
 
 {% block scripts %}

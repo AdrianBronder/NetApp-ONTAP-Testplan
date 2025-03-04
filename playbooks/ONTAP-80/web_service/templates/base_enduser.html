@@ -103,34 +103,37 @@
             text-decoration: underline;
         }
         /* Modal Styles */
-        .modal-dialog-centered {
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
         }
         .modal-content {
-            background-color: #2e2e2e;
+            background-color: #333;
             color: #cfcfcf;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 50%;
+            max-width: 500px;
             border-radius: 8px;
-        }
-        .modal-header, .modal-footer {
-            border: none;
-            text-align: center;
-        }
-        .modal-title {
-            color: #2196F3;
-            font-weight: bold;
-            font-size: 1.5em;
-            width: 100%;
             text-align: center;
         }
         .form-control {
-            background-color: #1e1e1e;
+            background-color: #444;
             color: #cfcfcf;
             border: 1px solid #555;
+            margin-bottom: 10px;
         }
         .form-control:focus {
-            background-color: #1e1e1e;
+            background-color: #444;
             color: #cfcfcf;
         }
         .btn-primary {
@@ -141,15 +144,27 @@
             background-color: #555;
             border-color: #555;
         }
-        .modal-content.text-center .modal-body {
+        .charts-container {
             display: flex;
-            flex-direction: column;
-            align-items: center;
+            justify-content: space-around;
+            margin-bottom: 20px;
         }
-        .modal-content.text-center .modal-body .form-group {
-            width: 100%;
-            text-align: center;
-            align-items: center;
+        .chart-container {
+            width: 300px;
+            height: 300px;
+        }
+        .chart-container canvas {
+            width: 100% !important;
+            height: 100% !important;
+        }
+        .container.mt-0 {
+            margin-top: 0 !important;
+        }
+        .table-striped tbody tr:nth-of-type(odd) {
+            background-color: rgba(0,0,0,.05);
+        }
+        .table-striped tbody tr:hover {
+            background-color: rgba(0,0,0,.1);
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
