@@ -56,7 +56,7 @@
                     <input type="hidden" id="departmentName" name="departmentName">
                     <div class="form-group">
                         <label for="localVersioning">Local Versioning</label>
-                        <select class="form-control text-center" id="localVersioning" name="localVersioning">
+                        <select class="form-control" id="localVersioning" name="localVersioning">
                             <option value="disabled">Disabled</option>
                             <option value="standard">Standard</option>
                             <option value="premium">Premium</option>
@@ -65,7 +65,7 @@
                     </div>
                     <div class="form-group">
                         <label for="backup">Backup</label>
-                        <select class="form-control text-center" id="backup" name="backup">
+                        <select class="form-control" id="backup" name="backup">
                             <option value="disabled">Disabled</option>
                             <option value="standard">Standard</option>
                             <option value="premium">Premium</option>
@@ -74,14 +74,14 @@
                     </div>
                     <div class="form-group">
                         <label for="ransomware">Ransom-ware Protection</label>
-                        <select class="form-control text-center" id="ransomware" name="ransomware">
+                        <select class="form-control" id="ransomware" name="ransomware">
                             <option value="disabled">Disabled</option>
                             <option value="enabled">Enabled</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="dataPipeline">Data Pipeline</label>
-                        <select class="form-control text-center" id="dataPipeline" name="dataPipeline">
+                        <select class="form-control" id="dataPipeline" name="dataPipeline">
                             <option value="disabled">Disabled</option>
                             <option value="enabled">Enabled</option>
                         </select>
@@ -96,32 +96,221 @@
     </div>
 </div>
 
+<div class="container">
+    <h1 class="my-4">Storage Units</h1>
+    <div class="charts-container">
+        <div class="chart-container">
+            <canvas id="quotaSizePieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="quotaCountPieChart"></canvas>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Share Name</th>
+                <th>Requested Size (GiB)</th>
+                <th>Used Size (GiB)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quota in quotaReport %}
+                <tr>
+                    <td>{{ quota.volume.name | replace('ontap_80_', '') }}</td>
+                    <td>{{ quota.qtree.name }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .charts-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+    }
+    .chart-container {
+        width: 300px;
+        height: 300px;
+    }
+    .chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .container.mt-0 {
+        margin-top: 0 !important;
+    }
+    .bold-green {
+        font-weight: bold;
+        color: green;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05);
+    }
+    .table-striped tbody tr:hover {
+        background-color: rgba(0,0,0,.1);
+    }
+    /* Custom Modal Styles */
+    .modal-dialog-centered {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal-content {
+        background-color: #ffffff;
+        color: #000000;
+        border-radius: 8px;
+    }
+    .modal-header, .modal-footer {
+        border: none;
+        text-align: center;
+    }
+    .modal-title {
+        color: #2196F3;
+        width: 100%;
+        text-align: center;
+    }
+    .form-control {
+        background-color: #ffffff;
+        color: #000000;
+        border: 1px solid #555;
+    }
+    .form-control:focus {
+        background-color: #ffffff;
+        color: #000000;
+    }
+    .btn-primary {
+        background-color: #2196F3;
+        border-color: #2196F3;
+    }
+    .btn-secondary {
+        background-color: #555;
+        border-color: #555;
+    }
+    .modal-content.text-center .modal-body {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+    }
+    .modal-content.text-center .modal-body .form-group {
+        width: 100%;
+        text-align: center;
+        align-items: center;
+    }
+</style>
 {% endblock %}
 
 {% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
-        var modifyServiceModal = document.getElementById('modifyServiceModal');
-        var modifyServiceForm = document.getElementById('modifyServiceForm');
-        
-        modifyServiceButtons.forEach(function (button) {
-            button.addEventListener('click', function () {
-                var departmentName = button.getAttribute('data-department');
-                var localVersioning = button.getAttribute('data-local-versioning');
-                var backup = button.getAttribute('data-backup');
-                var ransomware = button.getAttribute('data-ransomware');
-                var pipeline = button.getAttribute('data-pipeline');
+{% if quota_distribution_space %}
+var ctx = document.getElementById('quotaSizePieChart').getContext('2d');
+var quotaSizePieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_space|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_space|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Share Distribution (Size - GiB) per Department'
+            }
+        }
+    }
+});
+{% endif %}
+</script>
+<script>
+{% if quota_distribution_count %}
+var ctx = document.getElementById('quotaCountPieChart').getContext('2d');
+var quotaCountPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Share Distribution (Count) per Department'
+            }
+        }
+    }
+});
+{% endif %}
 
-                modifyServiceForm.departmentName.value = departmentName;
-                modifyServiceForm.localVersioning.value = localVersioning;
-                modifyServiceForm.backup.value = backup;
-                modifyServiceForm.ransomware.value = ransomware;
-                modifyServiceForm.dataPipeline.value = pipeline;
+document.addEventListener('DOMContentLoaded', function() {
+    var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
+    modifyServiceButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var departmentName = this.getAttribute('data-department');
+            var localVersioning = this.getAttribute('data-local-versioning');
+            var backup = this.getAttribute('data-backup');
+            var ransomware = this.getAttribute('data-ransomware');
+            var pipeline = this.getAttribute('data-pipeline');
 
-                $(modifyServiceModal).modal('show');
-            });
+            document.getElementById('departmentName').value = departmentName;
+            document.getElementById('localVersioning').value = localVersioning;
+            document.getElementById('backup').value = backup;
+            document.getElementById('ransomware').value = ransomware;
+            document.getElementById('dataPipeline').value = pipeline;
+
+            $('#modifyServiceModal').modal('show');
         });
     });
+
+    document.getElementById('modifyServiceForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+
+        fetch('/modify_service', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Service modified successfully!');
+                location.reload();
+            } else {
+                alert('Failed to modify service: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while modifying the service.');
+        });
+    });
+});
 </script>
 {% endblock %}
