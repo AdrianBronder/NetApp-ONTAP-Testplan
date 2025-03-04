@@ -13,6 +13,7 @@
                 <th>Backup</th>
                 <th>Ransom-ware Protected</th>
                 <th>Data Pipeline</th>
+                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -30,6 +31,9 @@
                     </td>
                     <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
                         {{ department.data_pipeline }}
+                    </td>
+                    <td>
+                        <button class="btn btn-primary modify-service-btn" data-department="{{ department.name }}" data-local-versioning="{{ department.local_versioning }}" data-backup="{{ department.backup }}" data-ransomware="{{ department.ransomware_protection }}" data-pipeline="{{ department.data_pipeline }}">Modify Service</button>
                     </td>
                 </tr>
             {% endfor %}
@@ -66,6 +70,60 @@
             {% endfor %}
         </tbody>
     </table>
+</div>
+
+<div class="modal fade" id="modifyServiceModal" tabindex="-1" role="dialog" aria-labelledby="modifyServiceModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form id="modifyServiceForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modifyServiceModalLabel">Modify Service</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="departmentName" name="departmentName">
+                    <div class="form-group">
+                        <label for="localVersioning">Local Versioning</label>
+                        <select class="form-control" id="localVersioning" name="localVersioning">
+                            <option value="disabled">Disabled</option>
+                            <option value="standard">Standard</option>
+                            <option value="premium">Premium</option>
+                            <option value="ultimate">Ultimate</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="backup">Backup</label>
+                        <select class="form-control" id="backup" name="backup">
+                            <option value="disabled">Disabled</option>
+                            <option value="standard">Standard</option>
+                            <option value="premium">Premium</option>
+                            <option value="ultimate">Ultimate</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="ransomware">Ransom-ware Protection</label>
+                        <select class="form-control" id="ransomware" name="ransomware">
+                            <option value="disabled">Disabled</option>
+                            <option value="enabled">Enabled</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="dataPipeline">Data Pipeline</label>
+                        <select class="form-control" id="dataPipeline" name="dataPipeline">
+                            <option value="disabled">Disabled</option>
+                            <option value="enabled">Enabled</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -147,30 +205,48 @@ var quotaCountPieChart = new Chart(ctx, {
 });
 </script>
 <script>
-var ctx = document.getElementById('addonQuotaCountPieChart').getContext('2d');
-var addonQuotaCountPieChart = new Chart(ctx, {
-    type: 'pie',
-    data: {
-        labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
-        datasets: [{
-            data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
-            backgroundColor: {{ colors|tojson }},
-            borderColor: {{ colors|tojson }},
-            borderWidth: 1
-        }]
-    },
-    options: {
-        responsive: true,
-        plugins: {
-            legend: {
-                position: 'top',
-            },
-            title: {
-                display: true,
-                text: 'Add-on Service Distribution (Count) per Department'
+document.addEventListener('DOMContentLoaded', function() {
+    var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
+    modifyServiceButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var departmentName = this.getAttribute('data-department');
+            var localVersioning = this.getAttribute('data-local-versioning');
+            var backup = this.getAttribute('data-backup');
+            var ransomware = this.getAttribute('data-ransomware');
+            var pipeline = this.getAttribute('data-pipeline');
+
+            document.getElementById('departmentName').value = departmentName;
+            document.getElementById('localVersioning').value = localVersioning;
+            document.getElementById('backup').value = backup;
+            document.getElementById('ransomware').value = ransomware;
+            document.getElementById('dataPipeline').value = pipeline;
+
+            $('#modifyServiceModal').modal('show');
+        });
+    });
+
+    document.getElementById('modifyServiceForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var formData = new FormData(this);
+
+        fetch('/modify_service', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Service modified successfully!');
+                location.reload();
+            } else {
+                alert('Failed to modify service: ' + data.error);
             }
-        }
-    }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while modifying the service.');
+        });
+    });
 });
 </script>
 {% endblock %}
