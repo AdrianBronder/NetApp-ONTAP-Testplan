@@ -40,38 +40,8 @@
         </tbody>
     </table>
 </div>
-<div class="container">
-    <h1 class="my-4">Storage Units</h1>
-    <div class="charts-container">
-        <div class="chart-container">
-            <canvas id="quotaSizePieChart"></canvas>
-        </div>
-        <div class="chart-container">
-            <canvas id="quotaCountPieChart"></canvas>
-        </div>
-    </div>
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Department</th>
-                <th>Share Name</th>
-                <th>Requested Size (GiB)</th>
-                <th>Used Size (GiB)</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for quota in quotaReport %}
-                <tr>
-                    <td>{{ quota.volume.name | replace('ontap_80_', '') }}</td>
-                    <td>{{ quota.qtree.name }}</td>
-                    <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
-                    <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
 
+<!-- Modal for modifying service options -->
 <div class="modal fade" id="modifyServiceModal" tabindex="-1" role="dialog" aria-labelledby="modifyServiceModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
@@ -125,6 +95,38 @@
         </div>
     </div>
 </div>
+
+<div class="container">
+    <h1 class="my-4">Storage Units</h1>
+    <div class="charts-container">
+        <div class="chart-container">
+            <canvas id="quotaSizePieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="quotaCountPieChart"></canvas>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Share Name</th>
+                <th>Requested Size (GiB)</th>
+                <th>Used Size (GiB)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quota in quotaReport %}
+                <tr>
+                    <td>{{ quota.volume.name | replace('ontap_80_', '') }}</td>
+                    <td>{{ quota.qtree.name }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
 {% endblock %}
 
 {% block styles %}
@@ -145,12 +147,23 @@
     .container.mt-0 {
         margin-top: 0 !important;
     }
+    .bold-green {
+        font-weight: bold;
+        color: green;
+    }
+    .table-striped tbody tr:nth-of-type(odd) {
+        background-color: rgba(0,0,0,.05);
+    }
+    .table-striped tbody tr:hover {
+        background-color: rgba(0,0,0,.1);
+    }
 </style>
 {% endblock %}
 
 {% block scripts %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+{% if quota_distribution_space %}
 var ctx = document.getElementById('quotaSizePieChart').getContext('2d');
 var quotaSizePieChart = new Chart(ctx, {
     type: 'pie',
@@ -176,8 +189,10 @@ var quotaSizePieChart = new Chart(ctx, {
         }
     }
 });
+{% endif %}
 </script>
 <script>
+{% if quota_distribution_count %}
 var ctx = document.getElementById('quotaCountPieChart').getContext('2d');
 var quotaCountPieChart = new Chart(ctx, {
     type: 'pie',
@@ -203,8 +218,9 @@ var quotaCountPieChart = new Chart(ctx, {
         }
     }
 });
-</script>
-<script>
+{% endif %}
+
+// JavaScript to handle the Modify Service button click and form submission
 document.addEventListener('DOMContentLoaded', function() {
     var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
     modifyServiceButtons.forEach(function(button) {
