@@ -43,7 +43,7 @@
 
 <!-- Modal for modifying service options -->
 <div class="modal fade" id="modifyServiceModal" tabindex="-1" role="dialog" aria-labelledby="modifyServiceModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-right" role="document">
+    <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <form id="modifyServiceForm">
                 <div class="modal-header">
@@ -158,27 +158,18 @@
         background-color: rgba(0,0,0,.1);
     }
     /* Custom Modal Styles */
-    .modal-dialog-right {
+    .modal-dialog-centered {
         display: flex;
-        justify-content: flex-end;
-        margin: 0;
-        position: absolute;
-        right: 0;
-        top: 0;
-        bottom: 0;
+        align-items: center;
+        justify-content: center;
     }
     .modal-content {
         background-color: #2e2e2e;
         color: #cfcfcf;
         border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
     }
     .modal-header, .modal-footer {
         border: none;
-        width: 100%;
         text-align: center;
     }
     .modal-title {
