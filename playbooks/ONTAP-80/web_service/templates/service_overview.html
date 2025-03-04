@@ -157,6 +157,38 @@
     .table-striped tbody tr:hover {
         background-color: rgba(0,0,0,.1);
     }
+    /* Custom Modal Styles */
+    .modal-content {
+        background-color: #2e2e2e;
+        color: #cfcfcf;
+        border-radius: 8px;
+    }
+    .modal-header {
+        border-bottom: 1px solid #555;
+    }
+    .modal-footer {
+        border-top: 1px solid #555;
+    }
+    .modal-title {
+        color: #2196F3;
+    }
+    .form-control {
+        background-color: #3e3e3e;
+        color: #cfcfcf;
+        border: 1px solid #555;
+    }
+    .form-control:focus {
+        background-color: #3e3e3e;
+        color: #cfcfcf;
+    }
+    .btn-primary {
+        background-color: #2196F3;
+        border-color: #2196F3;
+    }
+    .btn-secondary {
+        background-color: #555;
+        border-color: #555;
+    }
 </style>
 {% endblock %}
 
@@ -222,7 +254,6 @@ var quotaCountPieChart = new Chart(ctx, {
 });
 {% endif %}
 
-// JavaScript to handle the Modify Service button click and form submission
 document.addEventListener('DOMContentLoaded', function() {
     var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
     modifyServiceButtons.forEach(function(button) {
