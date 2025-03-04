@@ -96,7 +96,6 @@
     </div>
 </div>
 
-<!-- Include the second block with pie charts and the list of shares and quota details -->
 <div class="container">
     <h1 class="my-4">Storage Units</h1>
     <div class="charts-container">
@@ -148,6 +147,7 @@
     .container.mt-0 {
         margin-top: 0 !important;
     }
+    /* Modal Custom Styles */
     .modal-content {
         background-color: #2e2e2e;
         color: #cfcfcf;
@@ -166,50 +166,54 @@
     .form-control:focus {
         background-color: #3e3e3e;
         color: #cfcfcf;
-        border: 1px solid #2196F3;
     }
 </style>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    $(document).ready(function() {
-        $('.modify-service-btn').on('click', function() {
-            var department = $(this).data('department');
-            var localVersioning = $(this).data('local-versioning');
-            var backup = $(this).data('backup');
-            var ransomware = $(this).data('ransomware');
-            var pipeline = $(this).data('pipeline');
+$(document).ready(function() {
+    // Handle Modify Service button click
+    $('.modify-service-btn').on('click', function() {
+        var department = $(this).data('department');
+        var localVersioning = $(this).data('local-versioning');
+        var backup = $(this).data('backup');
+        var ransomware = $(this).data('ransomware');
+        var pipeline = $(this).data('pipeline');
 
-            $('#departmentName').val(department);
-            $('#localVersioning').val(localVersioning);
-            $('#backup').val(backup);
-            $('#ransomwareProtection').val(ransomware);
-            $('#dataPipeline').val(pipeline);
+        // Set modal fields
+        $('#departmentName').val(department);
+        $('#localVersioning').val(localVersioning);
+        $('#backup').val(backup);
+        $('#ransomwareProtection').val(ransomware);
+        $('#dataPipeline').val(pipeline);
 
-            $('#modifyServiceModal').modal('show');
-        });
-
-        $('#modifyServiceForm').on('submit', function(event) {
-            event.preventDefault();
-            var formData = $(this).serialize();
-            // Make an AJAX request to update the service options
-            $.ajax({
-                type: 'POST',
-                url: '/modify_service',  // Define this route in your Flask app
-                data: formData,
-                success: function(response) {
-                    // Handle success response
-                    alert('Service options updated successfully!');
-                    $('#modifyServiceModal').modal('hide');
-                    location.reload();  // Reload the page to reflect changes
-                },
-                error: function(response) {
-                    // Handle error response
-                    alert('Failed to update service options.');
-                }
-            });
-        });
+        // Show the modal
+        $('#modifyServiceModal').modal('show');
     });
+
+    // Handle form submission
+    $('#modifyServiceForm').on('submit', function(e) {
+        e.preventDefault();
+        // Add your AJAX form submission code here
+        // Example:
+        /*
+        $.ajax({
+            type: 'POST',
+            url: '/modify_service',
+            data: $(this).serialize(),
+            success: function(response) {
+                // Handle success response
+                $('#modifyServiceModal').modal('hide');
+                location.reload(); // Reload the page to see changes
+            },
+            error: function(error) {
+                // Handle error response
+                console.error('Error:', error);
+            }
+        });
+        */
+    });
+});
 </script>
 {% endblock %}
