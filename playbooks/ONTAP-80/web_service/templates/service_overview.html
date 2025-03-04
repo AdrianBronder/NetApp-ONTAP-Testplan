@@ -44,10 +44,10 @@
 <!-- Modal for modifying service options -->
 <div class="modal fade" id="modifyServiceModal" tabindex="-1" role="dialog" aria-labelledby="modifyServiceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content text-center">
             <form id="modifyServiceForm">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="modifyServiceModalLabel">Modify Service</h5>
+                    <h5 class="modal-title w-100" id="modifyServiceModalLabel">Modify Service</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -193,6 +193,14 @@
     .btn-secondary {
         background-color: #555;
         border-color: #555;
+    }
+    .modal-content.text-center .modal-body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .modal-content.text-center .modal-body .form-group {
+        width: 100%;
     }
 </style>
 {% endblock %}
