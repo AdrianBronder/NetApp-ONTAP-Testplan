@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import logging, os, re, yaml, random, re
+import logging, os, re, yaml, random, re, ansible_runner
 from flask import Flask, request, redirect, url_for, render_template, session, jsonify
 from flask_ldap3_login import LDAP3LoginManager, AuthenticationResponseStatus
 #from ldap3 import Server, Connection, ALL
@@ -12,7 +12,6 @@ from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultLib, VaultSecret
 from ansible.vars.manager import VariableManager
-from ansible.playbook import PlayBook
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -372,8 +371,13 @@ def modify_service():
 
     logger.info(f"Company {company} - Department {department} - Service Type {service_type} - Service Value {service_value}")
 
-    pb = PlayBook(playbook=project_root_path+'/playbooks/ONTAP-01/ONTAP-01-04.yml')
-    pb.run()
+    r = ansible_runner.run(
+        playbook=project_root_path+'/playbooks/ONTAP-01/ONTAP-01-04.yml',
+        inventory=inventory_path
+    if r.rc == 0:
+        logger.info(f"Playbook executed successfully.")
+    else:
+        logger.info(f"Playbook execution failed.")
 
     return jsonify(success=True)
 
