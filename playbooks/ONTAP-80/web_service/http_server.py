@@ -373,9 +373,10 @@ def modify_service():
 
     r = ansible_runner.run(
         playbook=project_root_path+'/playbooks/ONTAP-01/ONTAP-01-04.yml',
-        inventory=inventory_path
+        inventory=inventory_path,
+        cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
     )
-    
+
     if r.rc == 0:
         logger.info(f"Playbook executed successfully.")
     else:
