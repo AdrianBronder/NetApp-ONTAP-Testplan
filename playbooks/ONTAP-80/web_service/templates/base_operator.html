@@ -28,10 +28,10 @@
             padding: 20px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
             border-radius: 8px;
-            position: fixed; /* Fix the sidebar position */
-            right: 0; /* Position it to the right */
-            top: 0; /* Align it to the top */
-            height: 100%; /* Make it span the full height of the page */
+            position: fixed;
+            right: 0;
+            top: 0;
+            height: 100%;
         }
         .sidebar a {
             display: block;
@@ -57,16 +57,16 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 20px;
-            table-layout: fixed; /* Ensure table fits within the container */
+            table-layout: fixed;
         }
         table, th, td {
             border: 1px solid #555;
         }
         th, td {
-            padding: 8px; /* Reduce padding to fit more content */
+            padding: 8px;
             text-align: left;
-            font-size: 0.9em; /* Reduce font size for better fit */
-            word-wrap: break-word; /* Ensure long text wraps within the cell */
+            font-size: 0.9em;
+            word-wrap: break-word;
         }
         .bold-green {
             font-weight: bold;
@@ -92,18 +92,16 @@
         .event-name {
             color: #2196F3;
         }
-        /* Link Styles */
         a {
             color: white;
             text-decoration: none;
         }
         a:visited {
-            color: white; /* Ensure the link remains white after being clicked */
+            color: white;
         }
         a:hover {
-            text-decoration: underline; /* Optional: Add underline on hover */
+            text-decoration: underline;
         }
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -113,17 +111,24 @@
             width: 100%;
             height: 100%;
             overflow: auto;
-            background-color: rgb(0,0,0);
             background-color: rgba(0,0,0,0.4);
             padding-top: 60px;
         }
+        .modal-title {
+            font-size: 1em;
+            color: #2196F3;
+            font-weight: bold;
+        }
         .modal-content {
-            background-color: #fefefe;
+            background-color: #333;
+            color: #cfcfcf;
             margin: 5% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 80%;
-            color: black; /* Change font color to black for readability */
+            width: 50%;
+            max-width: 500px;
+            border-radius: 8px;
+            text-align: center;
         }
         .close {
             color: #aaa;

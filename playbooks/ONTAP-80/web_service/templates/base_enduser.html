@@ -102,7 +102,6 @@
         a:hover {
             text-decoration: underline;
         }
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -131,15 +130,40 @@
             border-radius: 8px;
             text-align: center;
         }
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background-color: #2e2e2e;
+            color: #cfcfcf;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        .form-group {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-group label {
+            color: #cfcfcf;
+            margin-bottom: 10px;
+            display: block;
+        }
         .form-control {
-            background-color: #444;
+            background-color: #3e3e3e;
             color: #cfcfcf;
             border: 1px solid #555;
-            margin-bottom: 10px;
+            border-radius: 4px;
+            padding: 10px;
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto;
         }
         .form-control:focus {
             background-color: #444;
             color: #cfcfcf;
+        }
+        .form-control::placeholder {
+            color: #999;
         }
         .btn-primary {
             background-color: #2196F3;
@@ -183,37 +207,6 @@
         }
         .table-striped tbody tr:hover {
             background-color: rgba(0,0,0,.1);
-        }
-        .form-container {
-            max-width: 600px;
-            margin: 50px auto;
-            background-color: #2e2e2e;
-            color: #cfcfcf;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-        }
-        .form-group {
-            margin-bottom: 20px;
-            text-align: center;
-        }
-        .form-group label {
-            color: #cfcfcf;
-            margin-bottom: 10px;
-            display: block;
-        }
-        .form-control {
-            background-color: #3e3e3e;
-            color: #cfcfcf;
-            border: 1px solid #555;
-            border-radius: 4px;
-            padding: 10px;
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-        }
-        .form-control::placeholder {
-            color: #999;
         }
         .alert-info {
             background-color: #3e3e3e;
