@@ -13,7 +13,6 @@
                 <th>Backup</th>
                 <th>Ransom-ware Protected</th>
                 <th>Data Pipeline</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody>
@@ -21,22 +20,16 @@
                 <tr>
                     <td>{{ department.name }}</td>
                     <td class="{% if department.local_versioning != 'disabled' %}bold-green{% endif %}">
-                        {{ department.local_versioning }}
-                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-local-versioning="{{ department.local_versioning }}">change</button>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="local_versioning" data-service-value="{{ department.local_versioning }}">{{ department.local_versioning }}</a>
                     </td>
                     <td class="{% if department.backup != 'disabled' %}bold-green{% endif %}">
-                        {{ department.backup }}
-                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-backup="{{ department.backup }}">change</button>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="backup" data-service-value="{{ department.backup }}">{{ department.backup }}</a>
                     </td>
                     <td class="{% if department.ransomware_protection != 'disabled' %}bold-green{% endif %}">
-                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-ransomware="{{ department.ransomware_protection }}">{{ department.ransomware_protection }}</button></a>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="ransomware" data-service-value="{{ department.ransomware_protection }}">{{ department.ransomware_protection }}</a>
                     </td>
                     <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
-                        {{ department.data_pipeline }}
-                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-pipeline="{{ department.data_pipeline }}">change</button>
-                    </td>
-                    <td>
-                        <button class="btn btn-primary modify-all-btn" data-department="{{ department.name }}" data-local-versioning="{{ department.local_versioning }}" data-backup="{{ department.backup }}" data-ransomware="{{ department.ransomware_protection }}" data-pipeline="{{ department.data_pipeline }}">Modify Service</button>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="data_pipeline" data-service-value="{{ department.data_pipeline }}">{{ department.data_pipeline }}</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -48,50 +41,25 @@
 <div class="modal fade" id="modifyServiceModal" tabindex="-1" role="dialog" aria-labelledby="modifyServiceModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <form id="modifyServiceForm" class="form-container text-center">
+            <form id="modifyServiceForm" class="text-center">
                 <div class="modal-header">
                     <h5 class="modal-title w-100" id="modifyServiceModalLabel">Modify Service</h5>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="serviceType" name="serviceType">
                     <input type="hidden" id="departmentName" name="departmentName">
+                    <input type="hidden" id="companyName" name="companyName">
                     <div class="form-group">
-                        <label for="localVersioning">Local Versioning</label>
-                        <select class="form-control" id="localVersioning" name="localVersioning">
-                            <option value="disabled">Disabled</option>
-                            <option value="standard">Standard</option>
-                            <option value="premium">Premium</option>
-                            <option value="ultimate">Ultimate</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="backup">Backup</label>
-                        <select class="form-control" id="backup" name="backup">
-                            <option value="disabled">Disabled</option>
-                            <option value="standard">Standard</option>
-                            <option value="premium">Premium</option>
-                            <option value="ultimate">Ultimate</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="ransomware">Ransom-ware Protection</label>
-                        <select class="form-control" id="ransomware" name="ransomware">
-                            <option value="disabled">Disabled</option>
-                            <option value="enabled">Enabled</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="dataPipeline">Data Pipeline</label>
-                        <select class="form-control" id="dataPipeline" name="dataPipeline">
-                            <option value="disabled">Disabled</option>
-                            <option value="enabled">Enabled</option>
+                        <label for="serviceValue">Service Value</label>
+                        <br>
+                        <select class="form-control" id="serviceValue" name="serviceValue">
+                            <!-- Options will be populated dynamically based on the service type -->
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Save changes</button>
-                    <br>
-                    <br>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save changes</button>
                 </div>
             </form>
         </div>
@@ -194,20 +162,45 @@ var quotaCountPieChart = new Chart(ctx, {
 {% endif %}
 
 document.addEventListener('DOMContentLoaded', function() {
-    var modifyServiceButtons = document.querySelectorAll('.modify-all-btn');
+    var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
     modifyServiceButtons.forEach(function(button) {
         button.addEventListener('click', function() {
+            var companyName = this.getAttribute('data-company');
             var departmentName = this.getAttribute('data-department');
-            var localVersioning = this.getAttribute('data-local-versioning');
-            var backup = this.getAttribute('data-backup');
-            var ransomware = this.getAttribute('data-ransomware');
-            var pipeline = this.getAttribute('data-pipeline');
+            var serviceType = this.getAttribute('data-service-type');
+            var serviceValue = this.getAttribute('data-service-value');
 
+            document.getElementById('companyName').value = companyName;
             document.getElementById('departmentName').value = departmentName;
-            document.getElementById('localVersioning').value = localVersioning;
-            document.getElementById('backup').value = backup;
-            document.getElementById('ransomware').value = ransomware;
-            document.getElementById('dataPipeline').value = pipeline;
+            document.getElementById('serviceType').value = serviceType;
+
+            var serviceValueSelect = document.getElementById('serviceValue');
+            serviceValueSelect.innerHTML = ''; // Clear existing options
+
+            var options = [];
+            if (serviceType === 'local_versioning' || serviceType === 'backup') {
+                options = [
+                    { value: 'disabled', text: 'Disabled' },
+                    { value: 'standard', text: 'Standard' },
+                    { value: 'premium', text: 'Premium' },
+                    { value: 'ultimate', text: 'Ultimate' }
+                ];
+            } else if (serviceType === 'ransomware' || serviceType === 'data_pipeline') {
+                options = [
+                    { value: 'disabled', text: 'Disabled' },
+                    { value: 'enabled', text: 'Enabled' }
+                ];
+            }
+
+            options.forEach(function(option) {
+                var optionElement = document.createElement('option');
+                optionElement.value = option.value;
+                optionElement.text = option.text;
+                if (option.value === serviceValue) {
+                    optionElement.selected = true;
+                }
+                serviceValueSelect.appendChild(optionElement);
+            });
 
             $('#modifyServiceModal').modal('show');
         });
