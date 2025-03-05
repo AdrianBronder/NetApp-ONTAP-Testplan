@@ -54,14 +54,10 @@
 <!-- Include Chart.js from CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<!-- The Modal -->
 <div id="eventModal" class="modal">
     <div class="modal-content">
-<!--
-        <span class="close">&times;</span>
--->
         <p id="eventDetail"></p>
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-secondary" id="closeModalButton">Close</button>
     </div>
 </div>
 
@@ -69,18 +65,18 @@
     // Get the modal
     var modal = document.getElementById("eventModal");
 
-    // Get the <span> element that closes the modal
-    var span = document.getElementsByClassName("close")[0];
+    // Get the close button
+    var closeModalButton = document.getElementById("closeModalButton");
 
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
+    // When the user clicks on the close button, close the modal
+    closeModalButton.onclick = function() {
         modal.style.display = "none";
     }
 
-    // When the user clicks anywhere outside of the modal, close it
+    // Prevent closing the modal when clicking outside of it
     window.onclick = function(event) {
         if (event.target == modal) {
-            modal.style.display = "none";
+            event.stopPropagation();
         }
     }
 
