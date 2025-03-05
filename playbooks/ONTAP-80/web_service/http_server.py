@@ -362,6 +362,17 @@ def service_overview_operator():
                            departmentConsumedServices=departmentConsumedServices,
                            colors=colors)
 
+@app.route('/modify_service', methods=['POST'])
+def modify_service():
+    company = request.form.get('companyName')
+    department = request.form.get('departmentName')
+    service_type = request.form.get('serviceType')
+    service_value = request.form.get('serviceValue')
+
+    logger.info(f"Company {company} - Department {department} - Service Type {service_type} - Service Value {service_value}")
+
+    return jsonify(success=True)
+
 @app.route('/share_order', methods=['GET', 'POST'])
 def share_order():
     if 'username' not in session:

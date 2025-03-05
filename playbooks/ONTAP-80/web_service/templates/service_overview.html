@@ -193,7 +193,6 @@ document.addEventListener('DOMContentLoaded', function() {
         form.addEventListener('submit', function(event) {
             event.preventDefault();
             var formData = new FormData(this);
-            var serviceType = formData.get('serviceType');
             var url = '/modify_service';
 
             fetch(url, {
