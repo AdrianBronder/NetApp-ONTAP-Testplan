@@ -372,7 +372,7 @@ def modify_service():
 
     logger.info(f"Company {company} - Department {department} - Service Type {service_type} - Service Value {service_value}")
 
-    pb = PlayBook(playbook=project_root_path+'/playbooks/ONTAP-01/ONTAP-01-04.yml)
+    pb = PlayBook(playbook=project_root_path+'/playbooks/ONTAP-01/ONTAP-01-04.yml')
     pb.run()
 
     return jsonify(success=True)
