@@ -29,8 +29,7 @@
                         <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-backup="{{ department.backup }}">change</button>
                     </td>
                     <td class="{% if department.ransomware_protection != 'disabled' %}bold-green{% endif %}">
-                        {{ department.ransomware_protection }}
-                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-ransomware="{{ department.ransomware_protection }}">change</button>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-ransomware="{{ department.ransomware_protection }}">{{ department.ransomware_protection }}</button></a>
                     </td>
                     <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
                         {{ department.data_pipeline }}
