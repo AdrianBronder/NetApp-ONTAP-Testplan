@@ -11,7 +11,7 @@
                 <th>Department</th>
                 <th>Local Versioning</th>
                 <th>Backup</th>
-                <th>Ransom-ware Protected</th>
+                <th>Ransomware Protection</th>
                 <th>Data Pipeline</th>
             </tr>
         </thead>
@@ -183,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById(serviceType + 'CompanyName').value = companyName;
             document.getElementById(serviceType + 'DepartmentName').value = departmentName;
             document.getElementById(serviceType + 'ServiceType').value = serviceType;
+            document.getElementById(serviceType + 'ServiceValue').value = serviceValue;
 
             $('#modify' + serviceType.charAt(0).toUpperCase() + serviceType.slice(1) + 'Modal').modal('show');
         });

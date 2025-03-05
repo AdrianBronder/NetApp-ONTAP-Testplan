@@ -12,6 +12,7 @@ from ansible.inventory.manager import InventoryManager
 from ansible.parsing.dataloader import DataLoader
 from ansible.parsing.vault import VaultLib, VaultSecret
 from ansible.vars.manager import VariableManager
+from ansible.playbook import PlayBook
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -370,6 +371,9 @@ def modify_service():
     service_value = request.form.get('serviceValue')
 
     logger.info(f"Company {company} - Department {department} - Service Type {service_type} - Service Value {service_value}")
+
+    pb = PlayBook(playbook=project_root_path+'/playbooks/ONTAP-01/ONTAP-01-04.yml)
+    pb.run()
 
     return jsonify(success=True)
 
