@@ -20,16 +20,16 @@
                 <tr>
                     <td>{{ department.name }}</td>
                     <td class="{% if department.local_versioning != 'disabled' %}bold-green{% endif %}">
-                        <a href="#" class="btn btn-secondary modify-versioning-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="local_versioning" data-service-value="{{ department.local_versioning }}">{{ department.local_versioning }}</a>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="local_versioning" data-service-value="{{ department.local_versioning }}">{{ department.local_versioning }}</a>
                     </td>
                     <td class="{% if department.backup != 'disabled' %}bold-green{% endif %}">
-                        <a href="#" class="btn btn-secondary modify-backup-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="backup" data-service-value="{{ department.backup }}">{{ department.backup }}</a>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="backup" data-service-value="{{ department.backup }}">{{ department.backup }}</a>
                     </td>
                     <td class="{% if department.ransomware_protection != 'disabled' %}bold-green{% endif %}">
-                        <a href="#" class="btn btn-secondary modify-ransomware-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="ransomware" data-service-value="{{ department.ransomware_protection }}">{{ department.ransomware_protection }}</a>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="ransomware" data-service-value="{{ department.ransomware_protection }}">{{ department.ransomware_protection }}</a>
                     </td>
                     <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
-                        <a href="#" class="btn btn-secondary modify-pipeline-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="data_pipeline" data-service-value="{{ department.data_pipeline }}">{{ department.data_pipeline }}</a>
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="data_pipeline" data-service-value="{{ department.data_pipeline }}">{{ department.data_pipeline }}</a>
                     </td>
                 </tr>
             {% endfor %}
@@ -37,125 +37,43 @@
     </table>
 </div>
 
-<div class="modal fade" id="modifyVersioningModal" tabindex="-1" role="dialog" aria-labelledby="modifyVersioningModalLabel" aria-hidden="true">
+<!-- Modals for modifying services -->
+{% for service in ['local_versioning', 'backup', 'ransomware', 'data_pipeline'] %}
+<div class="modal fade" id="modify{{ service|capitalize }}Modal" tabindex="-1" role="dialog" aria-labelledby="modify{{ service|capitalize }}ModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
-            <form id="modifyServiceForm" class="text-center">
+            <form id="modify{{ service|capitalize }}Form" class="text-center">
                 <div class="modal-header">
-                    <h5 class="modal-title w-100" id="modifyVersioningModalLabel">Modify Local Versioning</h5>
+                    <h5 class="modal-title w-100" id="modify{{ service|capitalize }}ModalLabel">Modify {{ service|replace('_', ' ')|capitalize }}</h5>
                 </div>
                 <div class="modal-body">
-                    <input type="hidden" id="serviceType" name="serviceType">
-                    <input type="hidden" id="departmentName" name="departmentName">
-                    <input type="hidden" id="companyName" name="companyName">
+                    <input type="hidden" id="{{ service }}ServiceType" name="serviceType">
+                    <input type="hidden" id="{{ service }}DepartmentName" name="departmentName">
+                    <input type="hidden" id="{{ service }}CompanyName" name="companyName">
                     <div class="form-group">
-                        <label for="versioning">Change to:</label>
-                        <select class="form-control" id="versioning" name="versioning">
-                            <option value="disabled">Disabled</option>
-                            <option value="standard">Standard</option>
-                            <option value="premium">Premium</option>
-                            <option value="ultimate">Ultimate</option>
+                        <label for="{{ service }}">{{ service|replace('_', ' ')|capitalize }}:</label>
+                        <select class="form-control" id="{{ service }}" name="{{ service }}">
+                            {% if service == 'ransomware' or service == 'data_pipeline' %}
+                                <option value="disabled">Disabled</option>
+                                <option value="enabled">Enabled</option>
+                            {% else %}
+                                <option value="disabled">Disabled</option>
+                                <option value="standard">Standard</option>
+                                <option value="premium">Premium</option>
+                                <option value="ultimate">Ultimate</option>
+                            {% endif %}
                         </select>
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Submit</button>
-                    <br>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
-
-<div class="modal fade" id="modifyBackupModal" tabindex="-1" role="dialog" aria-labelledby="modifyBackupModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <form id="modifyServiceForm" class="text-center">
-                <div class="modal-header">
-                    <h5 class="modal-title w-100" id="modifyBackupModalLabel">Modify Backup</h5>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="serviceType" name="serviceType">
-                    <input type="hidden" id="departmentName" name="departmentName">
-                    <input type="hidden" id="companyName" name="companyName">
-                    <div class="form-group">
-                        <label for="backup">Change to:</label>
-                        <select class="form-control" id="backup" name="backup">
-                            <option value="disabled">Disabled</option>
-                            <option value="standard">Standard</option>
-                            <option value="premium">Premium</option>
-                            <option value="ultimate">Ultimate</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <br>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modifyRansomwareModal" tabindex="-1" role="dialog" aria-labelledby="modifyRansomwareModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <form id="modifyServiceForm" class="text-center">
-                <div class="modal-header">
-                    <h5 class="modal-title w-100" id="modifyRansomwareModalLabel">Modify Ransomware Protection</h5>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="serviceType" name="serviceType">
-                    <input type="hidden" id="departmentName" name="departmentName">
-                    <input type="hidden" id="companyName" name="companyName">
-                    <div class="form-group">
-                        <label for="ransomware">Change to:</label>
-                        <select class="form-control" id="ransomware" name="ransomware">
-                            <option value="disabled">Disabled</option>
-                            <option value="enabled">Enabled</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <br>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="modifyPipelineModal" tabindex="-1" role="dialog" aria-labelledby="modifyPipelineModal" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <form id="modifyServiceForm" class="text-center">
-                <div class="modal-header">
-                    <h5 class="modal-title w-100" id="modifyPipelineModal">Modify Ransomware Protection</h5>
-                </div>
-                <div class="modal-body">
-                    <input type="hidden" id="serviceType" name="serviceType">
-                    <input type="hidden" id="departmentName" name="departmentName">
-                    <input type="hidden" id="companyName" name="companyName">
-                    <div class="form-group">
-                        <label for="pipeline">Change to:</label>
-                        <select class="form-control" id="pipeline" name="pipeline">
-                            <option value="disabled">Disabled</option>
-                            <option value="enabled">Enabled</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Submit</button>
-                    <br>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
+{% endfor %}
 
 <div class="container">
     <h1 class="my-4">Storage Units</h1>
@@ -261,71 +179,57 @@ document.addEventListener('DOMContentLoaded', function() {
             var serviceType = this.getAttribute('data-service-type');
             var serviceValue = this.getAttribute('data-service-value');
 
-            document.getElementById('companyName').value = companyName;
-            document.getElementById('departmentName').value = departmentName;
-            document.getElementById('serviceType').value = serviceType;
-            document.getElementById('serviceValue').value = serviceValue;
+            document.getElementById(serviceType + 'CompanyName').value = companyName;
+            document.getElementById(serviceType + 'DepartmentName').value = departmentName;
+            document.getElementById(serviceType + 'ServiceType').value = serviceType;
 
-            switch (serviceType) {
-            case 'local_versioning':
-                $('#modifyVersioningModal').modal('show');
-                break;
-            case 'backup':
-                $('#modifyBackupModal').modal('show');
-                break;
-            case 'ransomware':
-                $('#modifyRansomwareModal').modal('show');
-                break;
-            case 'data_pipeline':
-                $('#modifyPipelineModal').modal('show');
-                break;
-            default:
-                alert('Unknown service type.');
-                return;
-            }
+            $('#modify' + serviceType.charAt(0).toUpperCase() + serviceType.slice(1) + 'Modal').modal('show');
         });
     });
 
-    document.getElementById('modifyServiceForm').addEventListener('submit', function(event) {
-        event.preventDefault();
-        var formData = new FormData(this);
-        var serviceType = formData.get('serviceType');
-        var url = '';
+    var forms = document.querySelectorAll('form[id^="modify"]');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            var serviceType = formData.get('serviceType');
+            var url = '';
 
-        switch (serviceType) {
-            case 'local_versioning':
-                url = '/modify_local_versioning';
-                break;
-            case 'backup':
-                url = '/modify_backup';
-                break;
-            case 'ransomware':
-                url = '/modify_ransomware';
-                break;
-            case 'data_pipeline':
-                url = '/modify_data_pipeline';
-                break;
-            default:
-                alert('Unknown service type.');
-                return;
-        }
-
-        fetch(url, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert('Service modified successfully!');
-                location.reload();
-            } else {
-                alert('Failed to modify service: ' + data.error);
+            switch (serviceType) {
+                case 'local_versioning':
+                    url = '/modify_local_versioning';
+                    break;
+                case 'backup':
+                    url = '/modify_backup';
+                    break;
+                case 'ransomware':
+                    url = '/modify_ransomware';
+                    break;
+                case 'data_pipeline':
+                    url = '/modify_data_pipeline';
+                    break;
+                default:
+                    alert('Unknown service type.');
+                    return;
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while modifying the service.');
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Service modified successfully!');
+                    location.reload();
+                } else {
+                    alert('Failed to modify service: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while modifying the service.');
+            });
         });
     });
 });
