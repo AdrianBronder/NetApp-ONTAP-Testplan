@@ -22,18 +22,22 @@
                     <td>{{ department.name }}</td>
                     <td class="{% if department.local_versioning != 'disabled' %}bold-green{% endif %}">
                         {{ department.local_versioning }}
+                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-local-versioning="{{ department.local_versioning }}">change</button>
                     </td>
                     <td class="{% if department.backup != 'disabled' %}bold-green{% endif %}">
                         {{ department.backup }}
+                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-backup="{{ department.backup }}">change</button>
                     </td>
                     <td class="{% if department.ransomware_protection != 'disabled' %}bold-green{% endif %}">
                         {{ department.ransomware_protection }}
+                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-ransomware="{{ department.ransomware_protection }}">change</button>
                     </td>
                     <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
                         {{ department.data_pipeline }}
+                        <button class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-pipeline="{{ department.data_pipeline }}">change</button>
                     </td>
                     <td>
-                        <button class="btn btn-primary modify-service-btn" data-department="{{ department.name }}" data-local-versioning="{{ department.local_versioning }}" data-backup="{{ department.backup }}" data-ransomware="{{ department.ransomware_protection }}" data-pipeline="{{ department.data_pipeline }}">Modify Service</button>
+                        <button class="btn btn-primary modify-all-btn" data-department="{{ department.name }}" data-local-versioning="{{ department.local_versioning }}" data-backup="{{ department.backup }}" data-ransomware="{{ department.ransomware_protection }}" data-pipeline="{{ department.data_pipeline }}">Modify Service</button>
                     </td>
                 </tr>
             {% endfor %}
@@ -191,7 +195,7 @@ var quotaCountPieChart = new Chart(ctx, {
 {% endif %}
 
 document.addEventListener('DOMContentLoaded', function() {
-    var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
+    var modifyServiceButtons = document.querySelectorAll('.modify-all-btn');
     modifyServiceButtons.forEach(function(button) {
         button.addEventListener('click', function() {
             var departmentName = this.getAttribute('data-department');
