@@ -51,7 +51,7 @@
                     <input type="hidden" id="{{ service }}DepartmentName" name="departmentName">
                     <input type="hidden" id="{{ service }}CompanyName" name="companyName">
                     <div class="form-group">
-                        <label for="{{ service }}">{{ service|replace('_', ' ')|capitalize }}:</label>
+                        <label for="{{ service }}">Change to:</label>
                         <select class="form-control" id="{{ service }}" name="{{ service }}">
                             {% if service == 'ransomware' or service == 'data_pipeline' %}
                                 <option value="disabled">Disabled</option>
@@ -67,6 +67,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-primary">Submit</button>
+                    <br>
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                 </div>
             </form>
@@ -193,25 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
             event.preventDefault();
             var formData = new FormData(this);
             var serviceType = formData.get('serviceType');
-            var url = '';
-
-            switch (serviceType) {
-                case 'local_versioning':
-                    url = '/modify_local_versioning';
-                    break;
-                case 'backup':
-                    url = '/modify_backup';
-                    break;
-                case 'ransomware':
-                    url = '/modify_ransomware';
-                    break;
-                case 'data_pipeline':
-                    url = '/modify_data_pipeline';
-                    break;
-                default:
-                    alert('Unknown service type.');
-                    return;
-            }
+            var url = '/modify_service';
 
             fetch(url, {
                 method: 'POST',
