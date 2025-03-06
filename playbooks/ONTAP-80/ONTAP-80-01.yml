@@ -41,7 +41,6 @@
         state:                         present
         name:                          "{{ request_volume }}"
         snapshot_policy:               "{{ service_value }}"
-        junction_path:                 "/{{ item.1 }}"
         vserver:                       "{{ request_svm }}"
 
   post_tasks:
