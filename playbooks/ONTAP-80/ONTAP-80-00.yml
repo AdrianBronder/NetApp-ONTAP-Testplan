@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-    - name: Create SVMs for testing"
+    - name: Create SVMs for testing
       netapp.ontap.na_ontap_svm:
         state:                         present
         name:                          "{{ item.name }}"

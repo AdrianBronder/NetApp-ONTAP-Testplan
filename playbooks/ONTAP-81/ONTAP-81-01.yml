@@ -35,7 +35,6 @@
   pre_tasks:
 
   tasks:
-
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         present

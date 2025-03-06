@@ -431,7 +431,7 @@ def modify_service():
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
             )
-            
+
     if r.rc == 0:
         logger.info(f"Playbook executed successfully.")
     else:
@@ -498,7 +498,8 @@ def share_order():
         qtreeobj['svm']                = {'name': primary_svm}
         qtreeobj['volume']             = {'name': vol_name}
         qtreeobj['name']               = share_name
-        qtreeobj['security_style']     = 'ntfs'
+        qtreeobj['security_style']     = 'ntfs
+        '
         # Define Quota object
         quotaobj                       = {}
         quotaobj['svm']                = {'name': primary_svm}
