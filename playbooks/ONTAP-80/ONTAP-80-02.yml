@@ -36,6 +36,18 @@
   pre_tasks:
 
   tasks:
+    - name: Make sure destination volume is present
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ request_volume + '_dst' }}"
+        aggregate_name:                "{{ storage_aggregates[0].name }}"
+        type:                          "DP"
+        snapshot_policy:               "none"
+        vserver:                       "{{ request_svm + '-backup:' }}"
+        volume_security_style:         "unix"
+      when:
+        - request_service_value != "none"
+
     - name: Modify Backup Relationship
       netapp.ontap.na_ontap_snapmirror:
         state:                         "{{ 'absent' if request_service_value == 'none' else 'present' }}"
@@ -46,7 +58,7 @@
           cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ request_svm + '-backup:' + request_volume + '_dst' }}"
         create_destination:
-          enabled:                     true
+          enabled:                     false
         policy:                        "{{ request_service_value }}"
         schedule:                      "10min"
         update:                        false
