@@ -78,4 +78,12 @@
       when:
         - request_service_value != "none"
 
+    - name: Remove volume, if backup is disabled
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ request_volume + '_dst' }}"
+        vserver:                       "{{ request_svm + '-backup' }}"
+      when:
+        - request_service_value == "none"
+
   post_tasks:
