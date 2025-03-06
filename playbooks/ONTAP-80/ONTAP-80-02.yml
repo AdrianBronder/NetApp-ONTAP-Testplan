@@ -43,7 +43,7 @@
         aggregate_name:                "{{ storage_aggregates[0].name }}"
         type:                          "DP"
         snapshot_policy:               "none"
-        vserver:                       "{{ request_svm + '-backup:' }}"
+        vserver:                       "{{ request_svm + '-backup' }}"
         volume_security_style:         "unix"
       when:
         - request_service_value != "none"
