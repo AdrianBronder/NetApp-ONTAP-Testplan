@@ -36,15 +36,11 @@
   pre_tasks:
 
   tasks:
-    - name: Debug
-      ansible.builtin.debug:
-        msg: "{{ env }}"
-        
     - name: Modify volume snapshot policy
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ request_volume }}"
-        snapshot_policy:               "{{ service_value }}"
+        snapshot_policy:               "{{ request_service_value }}"
         vserver:                       "{{ request_svm }}"
 
   post_tasks:
