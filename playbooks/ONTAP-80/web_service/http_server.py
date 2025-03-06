@@ -434,10 +434,10 @@ def modify_service():
 
     if r.rc == 0:
         logger.info(f"Playbook executed successfully.")
+        return jsonify(success=True)
     else:
         logger.info(f"Playbook execution failed.")
-
-    return jsonify(success=True)
+        return jsonify(success=False)
 
 @app.route('/share_order', methods=['GET', 'POST'])
 def share_order():
@@ -499,7 +499,7 @@ def share_order():
         qtreeobj['volume']             = {'name': vol_name}
         qtreeobj['name']               = share_name
         qtreeobj['security_style']     = 'ntfs'
-        
+
         # Define Quota object
         quotaobj                       = {}
         quotaobj['svm']                = {'name': primary_svm}
