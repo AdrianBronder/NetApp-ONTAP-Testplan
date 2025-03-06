@@ -52,7 +52,7 @@
                     <input type="hidden" id="{{ service }}CompanyName" name="companyName">
                     <div class="form-group">
                         <label for="{{ service }}">Change to:</label>
-                        <select class="form-control" id="{{ service }}" name="{{ service }}">
+                        <select class="form-control" id="{{ service }}ServiceValue" name="serviceValue">
                             {% if service == 'ransomware' or service == 'data_pipeline' %}
                                 <option value="disabled">Disabled</option>
                                 <option value="enabled">Enabled</option>
