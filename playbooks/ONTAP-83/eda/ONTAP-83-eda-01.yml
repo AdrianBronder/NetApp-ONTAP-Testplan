@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-83-05 - React to attack
+# Title:        ONTAP-83-eda-01 - React to attack
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2025-02-25
@@ -17,7 +17,7 @@
 ################################################################################
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-83-05 - React to attack"
+  name:                                "ONTAP-83-eda-01 - React to attack"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml

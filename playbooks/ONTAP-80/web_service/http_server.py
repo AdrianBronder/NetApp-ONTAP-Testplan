@@ -364,19 +364,74 @@ def service_overview_operator():
 
 @app.route('/modify_service', methods=['POST'])
 def modify_service():
+    request_form_data = {
+        "request_svm": "",
+        "request_volume": "",
+        "request_service_type": "",
+        "request_service_value": ""
+    }
+
     company = request.form.get('companyName')
     department = request.form.get('departmentName')
     service_type = request.form.get('serviceType')
     service_value = request.form.get('serviceValue')
 
+    match company:
+        case 'Blue Corp':
+            request_form_data['request_svm'] = "sp-svm-bluecorp"
+        case 'Astra Inc':
+            request_form_data['request_svm'] = "sp-svm-astrainc"
+        case 'Polaris Ltd':
+            request_form_data['request_svm'] = "sp-svm-polarisltd"
+    request_form_data['request_volume'] = "ontap_80_" + department
+    request_form_data['request_service_type'] = service_type
+    match service_type:
+        case 'local_versioning':
+            if service_value == "disabled":
+                request_form_data['request_service_value'] = "none"
+            else:
+                request_form_data['request_service_value'] = "ontap_80_snap_" + service_value
+        case 'backup':
+            if service_value == "disabled":
+                request_form_data['request_service_value'] = "none"
+            else:
+                request_form_data['request_service_value'] = "ontap_80_snapm_" + service_value
+        case 'ransomware' | 'data_pipeline':
+            request_form_data['request_service_value'] = service_value
+        
+ 
     logger.info(f"Company {company} - Department {department} - Service Type {service_type} - Service Value {service_value}")
 
-    r = ansible_runner.run(
-        playbook=project_root_path+'/playbooks/ONTAP-01/ONTAP-01-04.yml',
-        inventory=inventory_path,
-        cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
-    )
-
+    match request_form_data['request_service_type']:
+        case 'local_versioning':
+            r = ansible_runner.run(
+                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-80-01.yml',
+                inventory=inventory_path,
+                extravars=request_form_data,
+                cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
+            )
+        case 'backup':
+            r = ansible_runner.run(
+                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-80-02.yml',
+                inventory=inventory_path,
+                extravars=request_form_data,
+                cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
+            )
+        case 'ransomware':
+            r = ansible_runner.run(
+                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-80-03.yml',
+                inventory=inventory_path,
+                extravars=request_form_data,
+                cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
+            )
+        case 'data_pipeline':
+            r = ansible_runner.run(
+                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-80-04.yml',
+                inventory=inventory_path,
+                extravars=request_form_data,
+                cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
+            )
+            
     if r.rc == 0:
         logger.info(f"Playbook executed successfully.")
     else:
