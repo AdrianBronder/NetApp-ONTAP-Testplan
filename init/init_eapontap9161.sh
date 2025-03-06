@@ -20,7 +20,7 @@ echo "--> Setting variables & paths"
 source ~/.bashrc
 #OPENSSLVERS="1.1.1u" #"1.1.1u"
 #PYTHON3VERS="3.9.18"
-ANSIBLEVERS="2.15.2"
+ANSIBLEVERS="2.15.13"
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 #DOWNLOADPATH="/tmp/downloads"
 #OPENSSLPATH="/usr/local/openssl"
