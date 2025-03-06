@@ -31,6 +31,6 @@
     - name: Encrypt and rename files
       ansible.builtin.script: ./scripts/ONTAP-83-04.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:1], ontap_83_qtrees) | list }}"
+        "{{ ontap_80_svms | product(ontap_80_volumes[:3], ontap_83_qtrees[:1]) | list }}"
   
   post_tasks:

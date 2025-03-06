@@ -17,7 +17,7 @@
 
 
 - hosts:                               "secondary_storage_clusters"
-  name:                                "ONTAP-80-01 - Modify Backup"
+  name:                                "ONTAP-80-02 - Modify Backup"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml

@@ -97,7 +97,7 @@
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
       ignore_errors:                   true
 
     - name: Activate additional notifications for ransomware events
@@ -113,4 +113,4 @@
           is-enabled-on-snapshot-copy-creation:
                                        true
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
