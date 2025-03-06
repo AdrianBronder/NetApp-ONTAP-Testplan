@@ -16,7 +16,7 @@
 ################################################################################
 
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-80-02 - Modify Backup"
   gather_facts:                        false
   vars_files:
