@@ -9,7 +9,7 @@ rhel1 ansible_host=rhel1.demo.netapp.com
 
 [windows_hosts]
 jumphost win_hostname=jumphost.demo.netapp.com
-win1 win_hostname=win1.demo.netapp.com
+#win1 win_hostname=win1.demo.netapp.com
 
 [windows_domain_controllers]
 dc1 win_hostname=dc1.demo.netapp.com
