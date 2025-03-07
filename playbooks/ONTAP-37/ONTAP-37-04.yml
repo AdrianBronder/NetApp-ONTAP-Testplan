@@ -60,7 +60,7 @@
         - ansible_distribution == "CentOS" and
           ansible_distribution_version == "7.9"
 
-    - name: Build filesystem on namespaces (RHEL 8.9)
+    - name: Build filesystem on namespaces (RHEL 8.9 or 8.10)
       community.general.filesystem:
         fstype:                        "ext4"
         dev:                           "/dev/mapper/\
@@ -72,7 +72,7 @@
         "{{ ontap_37_lin_namespaces }}"
       when:
         - ansible_distribution == "RedHat" and
-          ansible_distribution_version == "8.9"
+          ansible_distribution_version in ["8.9","8.10"]
 
     - name: Create mount directory  
       ansible.builtin.file:
@@ -98,7 +98,7 @@
         - ansible_distribution == "CentOS" and
           ansible_distribution_version == "7.9"
 
-    - name: Mount namespaces (RHEL 8.9)
+    - name: Mount namespaces (RHEL 8.9 or 8.10)
       ansible.posix.mount:
         state:                         "mounted"
         src:                           "/dev/mapper/\
@@ -113,7 +113,7 @@
         "{{ ontap_37_lin_namespaces }}"
       when:
         - ansible_distribution == "RedHat" and
-          ansible_distribution_version == "8.9"
+          ansible_distribution_version in ["8.9","8.10"]
   
     - name: Create test file on Namespace
       community.general.filesize:
