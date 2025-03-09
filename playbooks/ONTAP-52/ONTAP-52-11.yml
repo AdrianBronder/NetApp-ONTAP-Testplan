@@ -17,7 +17,7 @@
 
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-52-11 - Bulk Protect Volumes - ONTAP Primary"
-   gather_facts:                        false
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
