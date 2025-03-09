@@ -85,19 +85,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-51 - Local Versioning (Snapshots) - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove CIFS share
@@ -105,25 +105,21 @@
         state:                         absent
         name:                          "{{ ontap_51_win_qtree_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
 
     - name: Remove source volume
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ ontap_51_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
 
     - name: Remove custom snapshot policy
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         absent
         vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_51_snap_policy_name }}"
-        <<: *input
 
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         absent
         name:                          "{{ ontap_51_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input

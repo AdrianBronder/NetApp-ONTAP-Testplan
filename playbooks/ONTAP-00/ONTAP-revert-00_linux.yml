@@ -18,19 +18,19 @@
 - hosts:                               "{{ groups['primary_storage_clusters'][0] }}"
   name:                                "ONTAP-revert-00 - Return to Day0 - Linux - ONTAP (read)"
   gather_facts:                        false
-  vars:
-    input_read: &input_read
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -45,7 +45,6 @@
         parameters:
           svm.name:               "{{ global_primary_san_svm }}"
         use_python_keys:          true
-        <<: *input_read
       register: iscsi_info
 
     - name: Get LUNs from "{{ ansible_host }}"
@@ -57,7 +56,6 @@
           - "location"
           - "serial_number"
         use_python_keys:          true
-        <<: *input_read
       register: lun_info
 
     - name: Get NVMe subsystems from "{{ ansible_host }}"
@@ -65,7 +63,6 @@
         gather_subset:
           - "protocols/nvme/subsystems"
         use_python_keys:          true
-        <<: *input_read
       register: nvme_subsys_info
 
     - name: Get all NVMe namespaces from "{{ ansible_host }}"
@@ -75,7 +72,6 @@
         fields:
           - "svm"
         use_python_keys:            true
-        <<: *input_read
       register: nvme_ns_info
 
   post_tasks:

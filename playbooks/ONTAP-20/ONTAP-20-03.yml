@@ -18,19 +18,19 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-20-03 - SVM Network Services"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -41,7 +41,6 @@
         vserver:                       "{{ item.name }}"
         domains:                       "{{ item.dns.domains }}"
         nameservers:                   "{{ item.dns.servers }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:

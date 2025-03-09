@@ -18,19 +18,19 @@
 - hosts:                               "secondary_storage_clusters"
   name:                                "ONTAP-52-05 - Access Backup (read-only) - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -42,14 +42,12 @@
         vserver:                       "{{ global_primary_backup_svm }}"
         export_policy:                 "ro_{{ global_primary_backup_svm }}"
         junction_path:                 "/{{ ontap_52_vol_name }}_dst"
-        <<: *input
 
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         present
         name:                          "{{ ontap_52_policy_name }}"
         vserver:                       "{{ global_primary_backup_svm }}"
-        <<: *input
 
     - name: Create read-write export policy rules
       na_ontap_export_policy_rule:
@@ -62,7 +60,6 @@
         protocol:                      "nfs"
         super_user_security:           "any"
         allow_suid:                    true
-        <<: *input
 
     - name: Apply read-write export policy to UNIX qtree
       netapp.ontap.na_ontap_qtree:
@@ -71,7 +68,6 @@
         flexvol_name:                  "{{ ontap_52_vol_name }}_dst"
         export_policy:                 "{{ ontap_52_policy_name }}"
         vserver:                       "{{ global_primary_backup_svm }}"
-        <<: *input
 
     - name: Create share
       netapp.ontap.na_ontap_cifs:
@@ -83,7 +79,6 @@
         oplocks:                       true
         show_snapshot:                 true
         comment:                       "Test share created as part of test frame ONTAP-52"
-        <<: *input
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
@@ -92,7 +87,6 @@
         vserver:                       "{{ global_primary_backup_svm }}"
         user_or_group:                 "Everyone"
         permission:                    "full_control"
-        <<: *input
 
     - name: Create ACL on test share (admins - read-only)
       netapp.ontap.na_ontap_cifs_acl:
@@ -101,7 +95,6 @@
         vserver:                       "{{ global_primary_backup_svm }}"
         user_or_group:                 "{{ ontap_52_ad_admin_group }}"
         permission:                    "read"
-        <<: *input
 
   post_tasks:
 

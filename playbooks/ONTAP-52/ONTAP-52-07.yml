@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-52-07 - Incremental Backup - ONTAP Primary"
   gather_facts:                        false
-  vars:
-    input_01: &input_01
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -43,26 +43,25 @@
         volume:                        "{{ ontap_52_vol_name }}"
         snapmirror_label:              "{{ ontap_52_snapm_adhoc_label }}"
         comment:                       "ONTAP Test 52"
-        <<: *input_01
 
   post_tasks:
 
 - hosts:                               "secondary_storage_clusters"
   name:                                "ONTAP-52-07 - Incremental Backup - ONTAP Secondary"
   gather_facts:                        false
-  vars:
-    input_02: &input_02
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -77,7 +76,6 @@
           cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         update:                        true
-        <<: *input_02
       retries: 30
       delay: 10
 

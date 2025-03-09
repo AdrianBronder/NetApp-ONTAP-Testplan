@@ -18,19 +18,19 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-12-05 - Administrative Domain Group"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -42,7 +42,6 @@
         application_dicts:             "{{ item.applications }}"
         set_password:                  "{{ vault_security_accounts[item.name].password | default(omit) }}"
         role_name:                     "{{ item.role.name }}"
-        <<: *input
       loop:
         "{{ security_accounts }}"
       loop_control:

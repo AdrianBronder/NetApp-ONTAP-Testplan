@@ -18,20 +18,20 @@
 
 - hosts:                               "ontap"
   name:                                "ONTAP-revert-00 - Return to Day0 - ONTAP"
-  gather_facts:                        false
-  vars:            
-    input: &input            
+  gather_facts:                        false        
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove REST EMS destination for every tenant
@@ -41,7 +41,6 @@
         type:                          "{{ ontap_83_ems_dest_type }}"
         filters:                       "ems_{{ item }}"
         destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms }}"
 
@@ -49,7 +48,6 @@
       netapp.ontap.na_ontap_ems_filter:
         state:                         "absent"
         name:                          "ems_{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms }}"
     
@@ -61,7 +59,6 @@
           - "source"
           - "destination"
         use_python_keys:               true
-        <<: *input
       register: snapmirror_info
   
     - name: Remove all volume protections
@@ -72,7 +69,6 @@
           path:                        "{{ item.source.path }}"
         destination_endpoint:
           path:                        "{{ item.destination.path }}"
-        <<: *input
       loop:
         "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
       loop_control:
@@ -89,7 +85,6 @@
           - "svm"
           - "peer"
         use_python_keys:               true
-        <<: *input
       register: svm_peer_info
 
     - name: Remove SVM peerings
@@ -102,7 +97,6 @@
           - "snapmirror"
         peer_options:
           hostname: "{{ hostvars[item.peer.cluster.name].ansible_host }}"
-        <<: *input
       when:
         - svm_peer_info.ontap_info.svm_peers.num_records|int > 0
         - item.name is defined
@@ -119,7 +113,6 @@
         parameters:
           scope:                       "svm"
         use_python_keys:               true
-        <<: *input
       register: snapm_policy_info
 
     - name: Remove custom SnapMirror policies
@@ -127,7 +120,6 @@
         state:                         absent
         vserver:                       "{{ item.svm.name }}"
         policy_name:                   "{{ item.name }}"
-        <<: *input
       when:
         - snapm_policy_info.ontap_info.snapmirror_policies.num_records|int > 0
         - item.name is defined
@@ -140,7 +132,6 @@
         gather_subset:
           - "protocols/nvme/subsystems"
         use_python_keys:            true
-        <<: *input
       register: nvme_subsys_info
 
     - name: Remove all subsystems from clusters
@@ -150,7 +141,6 @@
         subsystem:                "{{ item.name }}"
         skip_mapped_check:        true
         skip_host_check:          true
-        <<: *input
       when:
         - nvme_subsys_info.ontap_info.protocols_nvme_subsystems.num_records|int > 0
         - item.name is defined
@@ -164,7 +154,6 @@
         fields:
           - "svm"
         use_python_keys:            true
-        <<: *input
       register: nvme_ns_info
 
     - name: Remove all namespaces from clusters
@@ -172,7 +161,6 @@
         state:                    absent
         vserver:                  "{{ item.svm.name }}"
         path:                     "{{ item.name }}"
-        <<: *input
       when:
         - nvme_ns_info.ontap_info.storage_namespaces.num_records|int > 0
         - item.name is defined
@@ -184,7 +172,6 @@
         gather_subset:
           - "protocols/san/lun-maps"
         use_python_keys:            true
-        <<: *input
       register: lun_map_info
 
     - name: Remove all LUN mappings from clusters
@@ -193,7 +180,6 @@
         vserver:                  "{{ item.svm.name }}"
         initiator_group_name:     "{{ item.igroup.name }}"
         path:                     "{{ item.lun.name }}"
-        <<: *input
       when:
         - lun_map_info.ontap_info.protocols_san_lun_maps.num_records|int > 0
         - item.svm.name is defined
@@ -207,7 +193,6 @@
         fields:
          - "svm"
         use_python_keys:          true
-        <<: *input
       register: lun_info
 
     - name: Remove all LUNs from clusters
@@ -216,7 +201,6 @@
         vserver:                  "{{ item.svm.name }}"
         name:                     "{{ item.name.split('/')[-1] }}"
         flexvol_name:             "{{ item.name.split('/')[-2] }}"
-        <<: *input
       when:
         - lun_info.ontap_info.storage_luns.num_records|int > 0
         - item.name is defined
@@ -228,7 +212,6 @@
         gather_subset:
           - "protocols/san/igroups"
         use_python_keys:          true
-        <<: *input
       register: igroup_info
 
     - name: Remove all iGroups from clusters
@@ -236,7 +219,6 @@
         state:                    absent
         vserver:                  "{{ item.svm.name }}"
         name:                     "{{ item.name }}"
-        <<: *input
       when:
         - igroup_info.ontap_info.protocols_san_igroups.num_records|int > 0
         - item.name is defined
@@ -253,7 +235,6 @@
         parameters:
           is_svm_root:            false
         use_python_keys:          true
-        <<: *input
       register: vol_info
 
     - name: Delete all volume clones from clusters
@@ -262,7 +243,6 @@
         name:                     "{{ item.name }}"
         vserver:                  "{{ item.svm.name }}" 
         wait_for_completion:      true
-        <<: *input
       when:
         - vol_info.ontap_info.storage_volumes.num_records|int > 0
         - item.name is defined
@@ -277,7 +257,6 @@
         name:                     "{{ item.name }}"
         vserver:                  "{{ item.svm.name }}" 
         wait_for_completion:      true
-        <<: *input
       when:
         - vol_info.ontap_info.storage_volumes.num_records|int > 0
         - item.name is defined
@@ -291,7 +270,6 @@
         fields:
           - "*"
         use_python_keys:          true
-        <<: *input
       register: cifs_service_info
   
     - name: Delete all SVM CIFS servers
@@ -303,7 +281,6 @@
         ou:                       "{{ item.ad_domain.organizational_unit }}"
         admin_user_name:          "{{ all_ad_join_user }}"
         admin_password:           "{{ all_ad_join_password }}"
-        <<: *input
       loop:
         "{{ cifs_service_info.ontap_info.protocols_cifs_services.records }}"
       loop_control:
@@ -323,7 +300,6 @@
         parameters:
           scope:                  "svm"
         use_python_keys:          true
-        <<: *input
       register: svm_ip_int_info
   
     - name: Delete all SVM interfaces from clusters
@@ -331,7 +307,6 @@
         state:                    absent
         interface_name:           "{{ item.name }}"
         vserver:                  "{{ item.svm.name }}"
-        <<: *input
       loop:
         "{{ svm_ip_int_info.ontap_info.network_ip_interfaces.records }}"
       loop_control:
@@ -349,7 +324,6 @@
           - "name"
           - "remote"
         use_python_keys:               true
-        <<: *input
       register: cluster_peer_info
 
     - name: Remove cluster peerings
@@ -359,7 +333,6 @@
         dest_cluster_name:             "{{ item.remote.name }}"
         peer_options:
           hostname: "{{ hostvars[item.name].ansible_host }}"
-        <<: *input
       when:
         - cluster_peer_info.ontap_info.cluster_peers.num_records|int > 0
         - item.name is defined
@@ -379,7 +352,6 @@
           scope:                  "cluster"
           service_policy.name:    "default-intercluster"
         use_python_keys:          true
-        <<: *input
       register: cluster_ip_int_info
   
     - name: Delete intercluster interfaces from clusters
@@ -387,7 +359,6 @@
         state:                    absent
         interface_name:           "{{ item.name }}"
 #        hostname:                 "{{ ansible_host }}"
-        <<: *input
       loop:
         "{{ cluster_ip_int_info.ontap_info.network_ip_interfaces.records }}"
       loop_control:
@@ -403,14 +374,12 @@
         gather_subset:
           - "svm/svms"
         use_python_keys:          true
-        <<: *input
       register: svm_info
   
     - name: Remove all SVMs
       netapp.ontap.na_ontap_svm:
         state:                    absent
         name:                     "{{ item.name }}"
-        <<: *input
       loop:
         "{{ svm_info.ontap_info.svm_svms.records }}"
       loop_control:
@@ -426,14 +395,12 @@
         fields:
           - "scope"
         use_python_keys:          true
-        <<: *input
       register: accounts_info
   
     - name: Remove all additional users from cluster
       netapp.ontap.na_ontap_user:
         state:                    absent
         name:                     "{{ item.name }}"
-        <<: *input
       loop:
         "{{ accounts_info.ontap_info.security_accounts.records }}"
       loop_control:
@@ -450,14 +417,12 @@
         gather_subset:
           - "storage/aggregates"
         use_python_keys:          true
-        <<: *input
       register: aggr_info
   
     - name: Remove all non-root aggregates from clusters
       netapp.ontap.na_ontap_aggregate:
         state:                    absent
         name:                     "{{ item.name }}"
-        <<: *input
       when:
         - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
         - item.name is defined
@@ -469,21 +434,18 @@
         state:                    absent
         vserver:                  "{{ inventory_hostname }}"
         use_rest:                 "never"
-        <<: *input
   
     - name: Get all NTP servers from cluster
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "cluster/ntp/servers"
         use_python_keys:          true
-        <<: *input
       register: ntp_servers_info
   
     - name: Remove NTP servers from cluster
       netapp.ontap.na_ontap_ntp:
         state:                    absent
         server_name:              "{{ item.server }}"
-        <<: *input
       when:
         - ntp_servers_info.ontap_info.cluster_ntp_servers.num_records|int > 0
         - item.server is defined
@@ -495,7 +457,6 @@
         state:                    present
         timezone:
           name:                   "Etc/UTC"
-        <<: *input
   
     - name: Remove event configuration
       netapp.ontap.na_ontap_ems_destination:
@@ -504,14 +465,12 @@
         type:                          "{{ item.type }}"
         filters:                       "{{ item.filters }}"
         destination:                   "{{ item.destination }}"
-        <<: *input
       loop:
         "{{ support.ems.destinations }}"
 
     - name: Remove onboard key manager configuration
       netapp.ontap.na_ontap_security_key_manager:
         state:                    absent
-        <<: *input
   
     - name: Get interface groups and VLANs from cluster
       netapp.ontap.na_ontap_rest_info:
@@ -522,7 +481,6 @@
         parameters:
           type:                   "lag|vlan"
         use_python_keys:          true
-        <<: *input
       register: ifgrp_info
   
     - name: Remove VLANs from cluster
@@ -531,7 +489,6 @@
         node:                     "{{ item.vlan.base_port.node.name }}"
         parent_interface:         "{{ item.vlan.base_port.name }}"
         vlanid:                   "{{ item.vlan.tag }}"
-        <<: *input
       loop:
         "{{ ifgrp_info.ontap_info.network_ethernet_ports.records }}"
       loop_control:
@@ -546,7 +503,6 @@
         state:                    absent
         node:                     "{{ item.node.name }}"
         ports:                    "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
-        <<: *input
       loop:
         "{{ ifgrp_info.ontap_info.network_ethernet_ports.records }}"
       loop_control:
@@ -563,7 +519,6 @@
         fields:
           - "ipspace"
         use_python_keys:          true
-        <<: *input
       register: bc_domain_info
   
     - name: Remove broadcast domains from cluster
@@ -571,7 +526,6 @@
         state:                    absent
         name:                     "{{ item.name }}"
         ipspace:                  "{{ item.ipspace.name }}"
-        <<: *input
       loop:
         "{{ bc_domain_info.ontap_info.network_ethernet_broadcast_domains.records }}"
       loop_control:
@@ -587,4 +541,3 @@
         banner:                   ""
         motd_message:             ""
         show_cluster_motd:        false
-        <<: *input

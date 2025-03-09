@@ -57,19 +57,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-32 - CIFS - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove shares
@@ -77,7 +77,6 @@
         state:                         absent
         name:                          "{{ item }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names +
             ontap_32_fg_qtree_names }}"
@@ -87,11 +86,9 @@
         state:                         absent
         name:                          "{{ ontap_32_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
   
     - name: Remove FlexGroup
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ ontap_32_fg_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input

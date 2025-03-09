@@ -52,19 +52,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-83 - Anti-ransomware - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: De-activate ARP on volumes
@@ -75,7 +75,6 @@
         body:
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
       ignore_errors:                   true
@@ -87,7 +86,6 @@
         type:                          "{{ ontap_83_ems_dest_type }}"
         filters:                       "ems_{{ item }}"
         destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms }}"
 
@@ -95,7 +93,6 @@
       netapp.ontap.na_ontap_ems_filter:
         state:                         "absent"
         name:                          "ems_{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms }}"
 
@@ -104,7 +101,6 @@
         state:                         absent
         name:                          "{{ item.1 }}_{{ item.2 }}"
         vserver:                       "{{ item.0 }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
 
@@ -114,7 +110,6 @@
         name:                          "{{ item.2 }}"
         flexvol_name:                  "{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
 
@@ -123,7 +118,6 @@
         state:                         absent
         name:                          "{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
   
@@ -132,6 +126,5 @@
         state:                         absent
         name:                          "{{ ontap_83_policy_name }}"
         vserver:                       "{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_80_svms }}"

@@ -104,19 +104,19 @@
 - hosts:                               "secondary_storage_clusters"
   name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Secondary"
   gather_facts:                        false
-  vars:
-    input_01: &input_01
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Get all SnapMirror relations to be deleted
@@ -129,7 +129,6 @@
         parameters:
           source.svm.name:             "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
         use_python_keys:               true
-        <<: *input_01
       register: snapmirror_info
   
     - name: Remove all volume protections in parallel
@@ -140,7 +139,6 @@
           path:                        "{{ item.source.path }}"
         destination_endpoint:
           path:                        "{{ item.destination.path }}"
-        <<: *input_01
       loop:
         "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
       loop_control:
@@ -176,7 +174,6 @@
           - "snapmirror"
         peer_options:
           hostname: "{{ hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
-        <<: *input_01
       loop:
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"
@@ -186,21 +183,18 @@
         state:                         absent
         name:                          "{{ ontap_52_win_qtree_name }}_dst"
         vserver:                       "{{ global_primary_backup_svm }}"
-        <<: *input_01
 
     - name: Remove destination volume
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ ontap_52_vol_name }}_dst"
         vserver:                       "{{ global_primary_backup_svm }}"
-        <<: *input_01
 
     - name: Remove destination volumes (bulk test)
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ item.destination.path | split(':') | last }}"
         vserver:                       "{{ item.destination.svm.name }}"
-        <<: *input_01
       loop:
         "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
       loop_control:
@@ -214,33 +208,31 @@
         state:                         absent
         vserver:                       "{{ global_primary_backup_svm }}"
         policy_name:                   "{{ ontap_52_snapm_policy_name }}"
-        <<: *input_01
 
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         absent
         name:                          "{{ ontap_52_policy_name }}"
         vserver:                       "{{ global_primary_backup_svm }}"
-        <<: *input_01
 
   post_tasks:
 
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Primary"
   gather_facts:                        false
-  vars:
-    input_02: &input_02
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove CIFS share
@@ -248,25 +240,21 @@
         state:                         absent
         name:                          "{{ ontap_52_win_qtree_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input_02
 
     - name: Remove source volume
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ ontap_52_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input_02
 
     - name: Remove custom snapshot policy
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         absent
         vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_52_snap_policy_name }}"
-        <<: *input_02
 
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         absent
         name:                          "{{ ontap_52_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input_02

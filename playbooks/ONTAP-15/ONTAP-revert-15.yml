@@ -17,19 +17,19 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-revert-15 - Cluster Peering"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove cluster peerings
@@ -45,7 +45,6 @@
           hostname:                    "{{ hostvars['secondary_storage_cluster'].ansible_host
                                            if hostvars[groups['primary_storage_clusters'][0]].cluster.name == cluster.name
                                            else hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
-        <<: *input
       ignore_errors: true
   
     - name: Remove peering interfaces
@@ -53,7 +52,6 @@
         state:                         absent
         interface_name:                "{{ item.name }}"
         ipspace:                       "{{ item.ipspace.name }}"
-        <<: *input
       loop:
         "{{ network_ip_interfaces }}"
       loop_control:
@@ -70,7 +68,6 @@
         broadcast_domain:              "{{ item.broadcast_domain.name }}"
         ipspace:                       "{{ item.broadcast_domain.ipspace.name }}"
         ports:                         "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
-        <<: *input
       loop:
         "{{ network_ethernet_ports }}"
       loop_control:
@@ -85,7 +82,6 @@
         state:                         absent
         name:                          "{{ item.name }}"
         ipspace:                       "{{ item.ipspace.name }}"
-        <<: *input
       loop:
         "{{ network_ethernet_broadcast_domains }}"
       loop_control:
@@ -98,7 +94,6 @@
       netapp.ontap.na_ontap_ipspace:
         state:                         absent
         name:                          "{{ item.name }}"
-        <<: *input
       loop:
         "{{ network_ipspaces }}"
       loop_control:

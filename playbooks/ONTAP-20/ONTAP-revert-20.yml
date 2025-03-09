@@ -17,19 +17,19 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-revert-20 - Storage Virtual Machines (SVMs)"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove CIFS server on SVMs
@@ -41,7 +41,6 @@
         ou:                            "{{ item.ad_domain.organizational_unit }}"
         admin_user_name:               "{{ all_ad_join_user }}"
         admin_password:                "{{ all_ad_join_password }}"
-        <<: *input
       loop:
         "{{ protocols_cifs_services }}"
       loop_control:
@@ -56,7 +55,6 @@
       netapp.ontap.na_ontap_svm:
         state:                         absent
         name:                          "{{ item.name }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:

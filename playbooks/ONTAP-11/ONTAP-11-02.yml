@@ -22,19 +22,19 @@
   #  - name:                            all_ad_join_password
   #    prompt:                          "Please enter password for user domain join user: {{ all_ad_join_user }}"
   #    private:                         true
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
     - name: Check if any domain tunnel exists
@@ -42,7 +42,6 @@
         gather_subset:
           - security/authentication/cluster/ad-proxy
         use_python_keys:               true
-        <<: *input
       register: pre_ontap
       ignore_errors: true
   
@@ -69,7 +68,6 @@
             allowed:                   "{{ item.iscsi.allowed | default(omit) }}"
           nvme:
             allowed:                   "{{ item.nvme.allowed | default(omit) }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       when:
@@ -89,7 +87,6 @@
         netmask:                       "{{ item.ip.netmask }}"
         service_policy:                "{{ item.service_policy.name | default(omit) }}"
         is_auto_revert:                "{{ item.location.auto_revert | default(omit) }}"
-        <<: *input
       loop:
         "{{ network_ip_interfaces }}"
       when:
@@ -104,7 +101,6 @@
         vserver:                       "{{ item.name }}"
         destination:                   "0.0.0.0/0"
         gateway:                       "{{ all_default_gateway }}"
-        <<: *input
       loop:
         "{{ ontap_svms }}"
       when:
@@ -119,7 +115,6 @@
         vserver:                       "{{ item.name }}"
         domains:                       "{{ item.dns.domains }}"
         nameservers:                   "{{ item.dns.servers }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       when:
@@ -134,7 +129,6 @@
         vserver:                       "{{ item.0.key }}"
         fqdn:                          "{{ item.1.fqdn }}"
         server_ip:                     "{{ item.1.ip }}"
-        <<: *input
       loop:
         "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
       loop_control:
@@ -154,7 +148,6 @@
         ou:                            "{{ item.ad_domain.organizational_unit }}"
         admin_user_name:               "{{ all_ad_join_user }}"
         admin_password:                "{{ all_ad_join_password }}"
-        <<: *input
       loop:
         "{{ protocols_cifs_services }}"
       when:
@@ -171,7 +164,6 @@
           vserver:                     "{{ item.svm.name }}"
         body:
           comment:                     "{{ item.comment }}"
-        <<: *input
       loop:
         "{{ protocols_cifs_services }}"
       loop_control:
@@ -187,7 +179,6 @@
       netapp.ontap.na_ontap_domain_tunnel:
         state:                         present
         vserver:                       "{{ security_authentication_cluster_ad_proxy.svm.name }}"
-        <<: *input
       when:
         - security_authentication_cluster_ad_proxy.svm.name is defined
 
@@ -197,7 +188,6 @@
         gather_subset:
           - security/authentication/cluster/ad-proxy
         use_python_keys:               true
-        <<: *input
       register: ontap
   
     - name: Show all domain tunnel svms

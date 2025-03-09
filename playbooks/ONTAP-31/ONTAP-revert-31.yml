@@ -62,19 +62,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-31 - NFS - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove volume
@@ -82,18 +82,15 @@
         state:                         absent
         name:                          "{{ ontap_31_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
   
     - name: Remove FlexGroup
       netapp.ontap.na_ontap_volume:
         state:                         absent
         name:                          "{{ ontap_31_fg_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
   
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         absent
         name:                          "{{ ontap_31_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input

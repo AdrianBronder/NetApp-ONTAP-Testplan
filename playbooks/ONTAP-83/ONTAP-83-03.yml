@@ -43,7 +43,6 @@
 #        body:
 #          vserver:                     "{{ item.0 }}"
 #          volume:                      "{{ item.1 }}"
-#        <<: *input01
 #      loop:
 #        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
 #      ignore_errors:                   true

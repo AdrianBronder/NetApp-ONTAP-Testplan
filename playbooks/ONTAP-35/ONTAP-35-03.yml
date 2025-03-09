@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-35-03 - LUNs & Mappings"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -48,7 +48,6 @@
                                            default(omit) }}"
         space_reserve:                 true
         space_allocation:              true
-        <<: *input
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"
@@ -61,7 +60,6 @@
                                            ontap_35_win_igroup_name if 'win' in (item | split('/'))[3] else
                                            default(omit) }}"
         path:                          "{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"
