@@ -18,7 +18,7 @@
   name:                                "ONTAP-revert-51 - Local Versioning (Snapshots) - Windows"
   gather_facts:                        false
   vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/ vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
   collections:
     - ansible.windows
