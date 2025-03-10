@@ -30,7 +30,7 @@
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
-      use_rest:                        "always"
+      use_rest:                        "never"
 
   pre_tasks:
 
