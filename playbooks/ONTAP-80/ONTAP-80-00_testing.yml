@@ -40,14 +40,10 @@
         state:                         present
         vserver:                       "{{ item.name }}"
         name:                          "{{ ontap_80_snap_policy_standard }}"
-        schedule:                      
-          - "5min"
-        prefix:
-          - "5min"
-        snapmirror_label:
-          - "5min"
-        count:
-          - 3
+        schedule: "5min"
+        prefix: "5min"
+        snapmirror_label: "5min"
+        count: 3
         enabled:                       True
       loop:
         "{{ svm_svms }}"
