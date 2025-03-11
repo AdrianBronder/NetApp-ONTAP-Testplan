@@ -41,7 +41,7 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_51_snap_policy_name }}"
         schedule:                      "10min"
-        prefix:                        "10min_"
+        prefix:                        "10min"
         count:                         6
         enabled:                       True
 
