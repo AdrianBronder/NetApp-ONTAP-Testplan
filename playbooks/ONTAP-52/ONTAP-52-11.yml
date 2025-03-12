@@ -71,8 +71,14 @@
 
   tasks:
     - name: Create backup volumes
-      ansible.builtin.debug:
-        msg: "{{ item }}"
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ item.name }} + '_dst'"
+        size:                          "{{ item.space.size }}"
+        size_unit:                     b
+        space_guarantee:               none
+        type:                          "DP"
+        vserver:                       "{{ global_primary_backup_svm }}"
       loop:
         "{{ hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
       loop_control:
@@ -92,7 +98,7 @@
           cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         create_destination:
-          enabled:                     true
+          enabled:                     false
         update:                        false
         initialize:                    false
       loop:
