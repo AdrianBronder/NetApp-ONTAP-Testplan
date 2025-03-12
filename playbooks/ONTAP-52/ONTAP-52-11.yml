@@ -79,7 +79,8 @@
         size:                          "{{ item.space.size }}"
         size_unit:                     b
         space_guarantee:               none
-        type:                          "DP"
+        type:                          "RW"
+        wait_for_completion:           True
         vserver:                       "{{ global_primary_backup_svm }}"
       loop:
         "{{ hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
