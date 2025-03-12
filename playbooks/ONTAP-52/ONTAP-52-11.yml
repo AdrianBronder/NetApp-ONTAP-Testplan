@@ -71,27 +71,25 @@
   pre_tasks:
 
   tasks:
-    - name: Create backup volumes
-      netapp.ontap.na_ontap_volume:
-        state:                         present
-        name:                          "{{ item.name }}_dst"
-        auto_provision_as:             "{{ omit if item.style != 'flexgroup' else 'flexgroup' }}"
-        size:                          "{{ item.space.size }}"
-        size_unit:                     b
-#        space_guarantee:               "none"
-        space_slo:                     "none"
-        type:                          "DP"
-        wait_for_completion:           True
-        vserver:                       "{{ global_primary_backup_svm }}"
-        user_rest:                     "never"
-      loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
-      loop_control:
-        label: "{{ item.svm.name + ':' + item.name }}"
-      when:
-        - hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records | length > 0
-        - item.name is defined
-        - item.svm.name is defined
+#    - name: Create backup volumes
+#      netapp.ontap.na_ontap_volume:
+#        state:                         present
+#        name:                          "{{ item.name }}_dst"
+#        auto_provision_as:             "{{ omit if item.style != 'flexgroup' else 'flexgroup' }}"
+#        size:                          "{{ item.space.size }}"
+#        size_unit:                     b
+#        space_slo:                     "none"
+#        type:                          "DP"
+#        wait_for_completion:           True
+#        vserver:                       "{{ global_primary_backup_svm }}"
+#      loop:
+#        "{{ hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
+#      loop_control:
+#        label: "{{ item.svm.name + ':' + item.name }}"
+#      when:
+#        - hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records | length > 0
+#        - item.name is defined
+#        - item.svm.name is defined
 
     - name: Setup volume protection
       netapp.ontap.na_ontap_snapmirror:
@@ -103,7 +101,7 @@
           cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + item.name + '_dst' }}"
         create_destination:
-          enabled:                     false
+          enabled:                     true
         update:                        false
         initialize:                    false
       loop:

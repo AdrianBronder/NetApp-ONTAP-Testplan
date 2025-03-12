@@ -4,8 +4,8 @@ global_primary_san_svm:           "ntap-svm02-san"
 global_primary_backup_svm:        "ntap-svm03-backup"
 ontap_default_vol_size_gb:        10
 ontap_default_vol_size_increment_gb: 2
-ontap_default_fg_size_gb:         102400
-ontap_default_fg_size_increment_gb: 1024
+ontap_default_fg_size_gb:         1024
+ontap_default_fg_size_increment_gb: 10
 ontap_default_fg_multiplier:      8
 ontap_default_lun_size_gb:        5
 ontap_default_ns_size_gb:         5
