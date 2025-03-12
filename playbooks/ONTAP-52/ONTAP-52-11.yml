@@ -41,6 +41,7 @@
           - "storage/volumes"
         fields:
           - "svm"
+          - "space"
         parameters:
           is_svm_root:                 false
           svm.name:                    "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
