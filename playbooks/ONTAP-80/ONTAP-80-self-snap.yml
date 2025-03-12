@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-80-01 - Modify Local Versioning
+# Title:        ONTAP-80-self-snap - Modify Local Versioning
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2025-03-06
@@ -17,7 +17,7 @@
 
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-80-01 - Modify Local Versioning"
+  name:                                "ONTAP-80-self-snap - Modify Local Versioning"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
