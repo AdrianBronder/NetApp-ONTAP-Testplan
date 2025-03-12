@@ -78,7 +78,7 @@
         auto_provision_as:             "{{ omit if item.style != 'flexgroup' else 'flexgroup' }}"
         size:                          "{{ item.space.size }}"
         size_unit:                     b
-        space_guarantee:               "none"
+#        space_guarantee:               "none"
         space_slo:                     "none"
         type:                          "DP"
         wait_for_completion:           True
