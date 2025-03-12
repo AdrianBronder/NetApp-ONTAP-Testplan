@@ -78,8 +78,9 @@
         auto_provision_as:             "{{ omit if item.style != 'flexgroup' else 'flexgroup' }}"
         size:                          "{{ item.space.size }}"
         size_unit:                     b
-        space_guarantee:               none
-        type:                          "RW"
+        space_guarantee:               "none"
+        space_slo:                     "none"
+        type:                          "DP"
         wait_for_completion:           True
         vserver:                       "{{ global_primary_backup_svm }}"
       loop:
