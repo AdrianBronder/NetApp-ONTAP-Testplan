@@ -50,7 +50,7 @@
   post_tasks:
 
 - hosts:                               "secondary_storage_clusters"
-  name:                                "ONTAP-52-02 - Protect Volumes - ONTAP Secondary"
+  name:                                "ONTAP-52-11 - Protect Volumes - ONTAP Secondary"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -69,6 +69,18 @@
   pre_tasks:
 
   tasks:
+    - name: Create backup volumes
+      ansible.builtin.debug:
+        msg: "{{ item }}"
+      loop:
+        "{{ hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records }}"
+      loop_control:
+        label: "{{ item.svm.name + ':' + item.name }}"
+      when:
+        - hostvars[groups['primary_storage_clusters'][0]].vol_info.ontap_info.storage_volumes.records | length > 0
+        - item.name is defined
+        - item.svm.name is defined
+
     - name: Setup volume protection
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
