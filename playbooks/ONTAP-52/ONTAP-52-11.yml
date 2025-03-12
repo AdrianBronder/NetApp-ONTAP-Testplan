@@ -73,7 +73,7 @@
     - name: Create backup volumes
       netapp.ontap.na_ontap_volume:
         state:                         present
-        name:                          "{{ item.name }} + '_dst'"
+        name:                          "{{ item.name }}_dst"
         size:                          "{{ item.space.size }}"
         size_unit:                     b
         space_guarantee:               none
