@@ -42,6 +42,7 @@
         fields:
           - "svm"
           - "space"
+          - "style"
         parameters:
           is_svm_root:                 false
           svm.name:                    "{{ global_primary_nas_svm }}|{{ global_primary_san_svm }}"
@@ -74,6 +75,7 @@
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ item.name }}_dst"
+        auto_provision_as:             "{{ 'flexgroup' if item.style == 'flexgroup' | default(omit) }}"
         size:                          "{{ item.space.size }}"
         size_unit:                     b
         space_guarantee:               none
