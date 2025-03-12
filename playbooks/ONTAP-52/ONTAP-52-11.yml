@@ -75,7 +75,7 @@
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ item.name }}_dst"
-        auto_provision_as:             "{{ 'flexgroup' if item.style == 'flexgroup' | default(omit) }}"
+        auto_provision_as:             "{{ omit if item.style != 'flexgroup' else 'flexgroup' }}"
         size:                          "{{ item.space.size }}"
         size_unit:                     b
         space_guarantee:               none
