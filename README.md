@@ -41,7 +41,7 @@ For NetApp internal, partner, and customer use - ready to go in less than 15 min
    ```
    # based on ONTAP (lab) version: ./inventories/labondemand_<ontapversion>
    # e.g.
-   ansible-playbook -i ./inventories/labondemand_9161 ./playbooks/ONTAP-01/ONTAP-01-04.yml
+   ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-01/ONTAP-01-04.yml
 
    
    ```
@@ -51,27 +51,27 @@ For NetApp internal, partner, and customer use - ready to go in less than 15 min
 (keep in mind: based on ONTAP (lab) version: ./inventories/labondemand_< ontapversion >)
 - Execute a single test step (e.g. ONTAP-10-02 - Physical Network):
   ```
-  ansible-playbook -i ./inventories/labondemand_9161 ./playbooks/ONTAP-10/ONTAP-10-02.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-10/ONTAP-10-02.yml
 
   ```
 - Execute an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
-  ansible-playbook -i ./inventories/labondemand_9161 ./playbooks/ONTAP-10/ONTAP-10-*.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-10/ONTAP-10-*.yml
 
   ```
 - Revert configuration changed and objects created during a test frame:
   ```
-  ansible-playbook -i ./inventories/labondemand_9161 ./playbooks/ONTAP-31/ONTAP-revert-31.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-31/ONTAP-revert-31.yml
 
   ```
 - Execute ALL tests with a single command (and track the execution time)
   ```
-  time ansible-playbook -i ./inventories/labondemand_9161 ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
+  time ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
 
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
-  ansible-playbook -i ./inventories/labondemand_9161 ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
 
   ```
 
