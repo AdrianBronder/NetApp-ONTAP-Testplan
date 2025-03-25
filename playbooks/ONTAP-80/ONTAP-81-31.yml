@@ -1,0 +1,350 @@
+################################################################################
+#
+# Title:        ONTAP-81-31 - Ransomware Demo Roll-out
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-11-04
+# Description:  Advanced - Self-service
+#               - Ransomware Demo Roll-out
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Qtrees"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "{{ ontap_83_policy_name }}"
+        vserver:                       "{{ item }}"
+      loop:
+        "{{ ontap_80_svms }}"
+  
+    - name: Create read-write export policy rules for data volumes
+      netapp.ontap.na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "{{ ontap_83_policy_name }}"
+        vserver:                       "{{ item }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
+      loop:
+        "{{ ontap_80_svms }}"
+
+    - name: Create qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                         present
+        name:                          "{{ item.2 }}"
+        flexvol_name:                  "{{ item.1 }}"
+        export_policy:                 "{{ ontap_83_policy_name }}"
+        security_style:                "unix"
+        unix_permissions:              0777
+        vserver:                       "{{ item.0 }}"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+
+    - name: Set quota (1GiB)
+      netapp.ontap.na_ontap_quotas:
+        state:                         present
+        vserver:                       "{{ item.0 }}"
+        volume:                        "{{ item.1 }}"
+        quota_target:                  "{{ item.2 }}"
+        type:                          "tree"
+        disk_limit:                    1048576
+        set_quota_status:              True
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+
+    - name: Create Qtree shares
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ item.1 }}_{{ item.2 }}"
+        path:                          "/{{ item.1 }}/{{ item.2 }}"
+        vserver:                       "{{ item.0 }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+
+    - name: Create volume shares
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ item.1 }}"
+        path:                          "/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+
+    - name: Remove "Full Control" for "Everyone"
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         present
+        share_name:                    "{{ item.1 }}_{{ item.2 }}"
+        vserver:                       "{{ item.0 }}"
+        user_or_group:                 "Everyone"
+        permission:                    "read"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+
+
+- hosts:                               "linux"
+  name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Ensure stale mounts are removed before proceding (in case a mount exists)
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
+                                        {{ item.1 }}/{{ item.2 }}"
+        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+  
+    - name: Create mount directories
+      ansible.builtin.file:
+        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        state:                         "directory"
+        mode:                          "0755"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+  
+    - name: Mount NFS export on Linux host
+      ansible.posix.mount:
+        state:                         "mounted"
+        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
+                                        {{ item.1 }}/{{ item.2 }}"
+        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+
+  post_tasks:
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Events"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Configure EMS filters for every tenant
+      netapp.ontap.na_ontap_ems_filter:
+        state:                         "present"
+        name:                          "ems_{{ item }}"
+        rules:                         []
+      loop:
+        "{{ ontap_80_svms }}"
+
+    - name: Add EMS filter to match tenant only
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'event/filter/rule/add'
+        verb:                          'POST'
+        params:
+        body:
+          filter-name:                 "ems_{{ item }}"
+          type:                        "include"
+          position:                    1
+          message-name:                "arw.*"
+          severity:
+            - "*"
+          parameter-criteria:
+            - "vserverName={{ item }}"
+      loop:
+        "{{ ontap_80_svms }}"
+
+    - name: Configure REST EMS destination for every tenant
+      netapp.ontap.na_ontap_ems_destination:
+        state:                         "present"
+        name:                          "dest_{{ item }}"
+        type:                          "{{ ontap_83_ems_dest_type }}"
+        filters:                       "ems_{{ item }}"
+        destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
+      loop:
+        "{{ ontap_80_svms }}"
+
+      # Add special webhook for event driven Ansible on one SVM
+    - name: Configure EMS filters for EDA on {{ ontap_80_svms[1] }}
+      netapp.ontap.na_ontap_ems_filter:
+        state:                         "present"
+        name:                          "ems_arp_eda_{{ ontap_80_svms[1] }}"
+        rules:                         []
+
+    - name: Add EMS filter to match {{ ontap_80_svms[1] }} and ARP Snapshot Create only
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'event/filter/rule/add'
+        verb:                          'POST'
+        params:
+        body:
+          filter-name:                 "ems_arp_eda_{{ ontap_80_svms[1] }}"
+          type:                        "include"
+          position:                    1
+          message-name:                "arw.snapshot.created"
+          severity:
+            - "*"
+          parameter-criteria:
+            - "vserverName={{ ontap_80_svms[1] }}"
+
+    - name: Configure REST EMS destination for EDA on {{ ontap_80_svms[1] }}
+      netapp.ontap.na_ontap_ems_destination:
+        state:                         "present"
+        name:                          "dest_eda_{{ ontap_80_svms[1] }}"
+        type:                          "{{ ontap_83_ems_dest_type }}"
+        filters:                       "ems_arp_eda_{{ ontap_80_svms[1] }}"
+        destination:                   "{{ ontap_83_ems_eda_dest_destination }}{{ ontap_80_svms[1] }}"
+
+  post_tasks:
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Dry-run ARP"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+#    - name: Start  Anti-ransomware dry-run on volumes
+#      netapp.ontap.na_ontap_rest_cli:
+#        command:                       'security/anti-ransomware/volume/dry-run'
+#        verb:                          'POST'
+#        params:
+#        body:
+#          vserver:                     "{{ item.0 }}"
+#          volume:                      "{{ item.1 }}"
+#      loop:
+#        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+#      ignore_errors:                   true
+
+- hosts:                               "linux"
+  name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - Linux Write Files"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Create test files on exports
+      ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+  
+  post_tasks:
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Activate ARP"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Activate ARP on volumes
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/enable'
+        verb:                          'POST'
+        params:
+        body:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+      ignore_errors:                   true
+
+    - name: Activate additional notifications for ransomware events
+      netapp.ontap.na_ontap_rest_cli:
+        command:                       'security/anti-ransomware/volume/event-log'
+        verb:                          'PATCH'
+        params:
+          vserver:                     "{{ item.0 }}"
+          volume:                      "{{ item.1 }}"
+        body:
+          is-enabled-on-new-file-extension-seen:
+                                       true
+          is-enabled-on-snapshot-copy-creation:
+                                       true
+      loop:
+        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+
+  post_tasks:

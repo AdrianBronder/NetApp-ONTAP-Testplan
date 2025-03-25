@@ -4,7 +4,7 @@
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-02-09
-# Description:  Advanced - Service Provider Customization
+# Description:  Advanced - Self-service
 #               - Shares & Qtrees
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-81-01 - Shares & Qtrees"
+  name:                                "ONTAP-81-11 - Shares & Qtrees"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml

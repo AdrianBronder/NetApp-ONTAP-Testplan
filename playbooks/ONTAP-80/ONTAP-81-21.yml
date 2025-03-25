@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-82-01 - Backup Replications
+# Title:        ONTAP-81-21 - Backup Demo Roll-out
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2025-02-19
-# Description:  Advanced - Service Provider Customization
-#               - Backup Replications
+# Description:  Advanced - Self-service
+#               - Backup Demo Roll-out
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "secondary_storage_clusters"
-  name:                                "ONTAP-82-01 - Backup Replications"
+  name:                                "ONTAP-81-21 - Backup Demo Roll-out"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
