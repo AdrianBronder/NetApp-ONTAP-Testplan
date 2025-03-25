@@ -405,28 +405,28 @@ def modify_service():
     match request_form_data['request_service_type']:
         case 'local_versioning':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-snap-81.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/self_service_templates/ONTAP-self-snap-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
             )
         case 'backup':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-backup-81.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/self_service_templates/ONTAP-self-backup-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
             )
         case 'ransomware':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-arp-81.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/self_service_templates/ONTAP-self-arp-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
             )
         case 'data_pipeline':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-pipeline-81.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/self_service_templates/ONTAP-self-pipeline-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"

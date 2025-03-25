@@ -38,7 +38,7 @@
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         present
-        name:                          "{{ ontap_83_policy_name }}"
+        name:                          "{{ ontap_81_policy_name }}"
         vserver:                       "{{ item }}"
       loop:
         "{{ ontap_81_svms }}"
@@ -46,7 +46,7 @@
     - name: Create read-write export policy rules for data volumes
       netapp.ontap.na_ontap_export_policy_rule:
         state:                         present
-        name:                          "{{ ontap_83_policy_name }}"
+        name:                          "{{ ontap_81_policy_name }}"
         vserver:                       "{{ item }}"
         client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                       "any"
@@ -62,7 +62,7 @@
         state:                         present
         name:                          "{{ item.2 }}"
         flexvol_name:                  "{{ item.1 }}"
-        export_policy:                 "{{ ontap_83_policy_name }}"
+        export_policy:                 "{{ ontap_81_policy_name }}"
         security_style:                "unix"
         unix_permissions:              0777
         vserver:                       "{{ item.0 }}"
@@ -210,9 +210,9 @@
       netapp.ontap.na_ontap_ems_destination:
         state:                         "present"
         name:                          "dest_{{ item }}"
-        type:                          "{{ ontap_83_ems_dest_type }}"
+        type:                          "{{ ontap_81_ems_dest_type }}"
         filters:                       "ems_{{ item }}"
-        destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
+        destination:                   "{{ ontap_81_ems_dest_destination }}{{ item }}"
       loop:
         "{{ ontap_81_svms }}"
 
@@ -242,9 +242,9 @@
       netapp.ontap.na_ontap_ems_destination:
         state:                         "present"
         name:                          "dest_eda_{{ ontap_81_svms[1] }}"
-        type:                          "{{ ontap_83_ems_dest_type }}"
+        type:                          "{{ ontap_81_ems_dest_type }}"
         filters:                       "ems_arp_eda_{{ ontap_81_svms[1] }}"
-        destination:                   "{{ ontap_83_ems_eda_dest_destination }}{{ ontap_81_svms[1] }}"
+        destination:                   "{{ ontap_81_ems_eda_dest_destination }}{{ ontap_81_svms[1] }}"
 
   post_tasks:
 
@@ -294,7 +294,7 @@
 
   tasks:
     - name: Create test files on exports
-      ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
+      ansible.builtin.script: ./scripts/ONTAP-write_files-81.sh "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
       loop:
         "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
   
