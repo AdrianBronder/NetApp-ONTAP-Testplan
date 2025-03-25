@@ -41,7 +41,7 @@
         name:                          "{{ ontap_83_policy_name }}"
         vserver:                       "{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
   
     - name: Create read-write export policy rules for data volumes
       netapp.ontap.na_ontap_export_policy_rule:
@@ -55,7 +55,7 @@
         super_user_security:           "any"
         allow_suid:                    true
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Create qtrees
       netapp.ontap.na_ontap_qtree:
@@ -67,7 +67,7 @@
         unix_permissions:              0777
         vserver:                       "{{ item.0 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
     - name: Set quota (1GiB)
       netapp.ontap.na_ontap_quotas:
@@ -79,7 +79,7 @@
         disk_limit:                    1048576
         set_quota_status:              True
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
     - name: Create Qtree shares
       netapp.ontap.na_ontap_cifs:
@@ -91,7 +91,7 @@
         oplocks:                       true
         show_snapshot:                 true
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
     - name: Create volume shares
       netapp.ontap.na_ontap_cifs:
@@ -103,7 +103,7 @@
         oplocks:                       true
         show_snapshot:                 true
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
 
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
@@ -113,7 +113,7 @@
         user_or_group:                 "Everyone"
         permission:                    "read"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
 
 - hosts:                               "linux"
@@ -134,30 +134,30 @@
         state:                         "absent"
         src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
                                         {{ item.1 }}/{{ item.2 }}"
-        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
   
     - name: Create mount directories
       ansible.builtin.file:
-        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
         state:                         "directory"
         mode:                          "0755"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
   
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
         state:                         "mounted"
         src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
                                         {{ item.1 }}/{{ item.2 }}"
-        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
   post_tasks:
 
@@ -187,7 +187,7 @@
         name:                          "ems_{{ item }}"
         rules:                         []
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Add EMS filter to match tenant only
       netapp.ontap.na_ontap_rest_cli:
@@ -204,7 +204,7 @@
           parameter-criteria:
             - "vserverName={{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Configure REST EMS destination for every tenant
       netapp.ontap.na_ontap_ems_destination:
@@ -214,37 +214,37 @@
         filters:                       "ems_{{ item }}"
         destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
       # Add special webhook for event driven Ansible on one SVM
-    - name: Configure EMS filters for EDA on {{ ontap_80_svms[1] }}
+    - name: Configure EMS filters for EDA on {{ ontap_81_svms[1] }}
       netapp.ontap.na_ontap_ems_filter:
         state:                         "present"
-        name:                          "ems_arp_eda_{{ ontap_80_svms[1] }}"
+        name:                          "ems_arp_eda_{{ ontap_81_svms[1] }}"
         rules:                         []
 
-    - name: Add EMS filter to match {{ ontap_80_svms[1] }} and ARP Snapshot Create only
+    - name: Add EMS filter to match {{ ontap_81_svms[1] }} and ARP Snapshot Create only
       netapp.ontap.na_ontap_rest_cli:
         command:                       'event/filter/rule/add'
         verb:                          'POST'
         params:
         body:
-          filter-name:                 "ems_arp_eda_{{ ontap_80_svms[1] }}"
+          filter-name:                 "ems_arp_eda_{{ ontap_81_svms[1] }}"
           type:                        "include"
           position:                    1
           message-name:                "arw.snapshot.created"
           severity:
             - "*"
           parameter-criteria:
-            - "vserverName={{ ontap_80_svms[1] }}"
+            - "vserverName={{ ontap_81_svms[1] }}"
 
-    - name: Configure REST EMS destination for EDA on {{ ontap_80_svms[1] }}
+    - name: Configure REST EMS destination for EDA on {{ ontap_81_svms[1] }}
       netapp.ontap.na_ontap_ems_destination:
         state:                         "present"
-        name:                          "dest_eda_{{ ontap_80_svms[1] }}"
+        name:                          "dest_eda_{{ ontap_81_svms[1] }}"
         type:                          "{{ ontap_83_ems_dest_type }}"
-        filters:                       "ems_arp_eda_{{ ontap_80_svms[1] }}"
-        destination:                   "{{ ontap_83_ems_eda_dest_destination }}{{ ontap_80_svms[1] }}"
+        filters:                       "ems_arp_eda_{{ ontap_81_svms[1] }}"
+        destination:                   "{{ ontap_83_ems_eda_dest_destination }}{{ ontap_81_svms[1] }}"
 
   post_tasks:
 
@@ -277,7 +277,7 @@
 #          vserver:                     "{{ item.0 }}"
 #          volume:                      "{{ item.1 }}"
 #      loop:
-#        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+#        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
 #      ignore_errors:                   true
 
 - hosts:                               "linux"
@@ -294,9 +294,9 @@
 
   tasks:
     - name: Create test files on exports
-      ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
+      ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
   
   post_tasks:
 
@@ -329,7 +329,7 @@
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:2]) | list }}"
       ignore_errors:                   true
 
     - name: Activate additional notifications for ransomware events
@@ -345,6 +345,6 @@
           is-enabled-on-snapshot-copy-creation:
                                        true
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:2]) | list }}"
 
   post_tasks:

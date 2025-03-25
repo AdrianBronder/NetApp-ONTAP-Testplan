@@ -41,7 +41,7 @@
         name:                          "{{ ontap_81_policy_name }}"
         vserver:                       "{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
   
     - name: Create read-write export policy rules for data volumes
       netapp.ontap.na_ontap_export_policy_rule:
@@ -55,41 +55,41 @@
         super_user_security:           "any"
         allow_suid:                    true
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
         
     - name: Create qtrees
       netapp.ontap.na_ontap_qtree:
         state:                         present
         name:                          "{{ item.1 }}"
-        flexvol_name:                  "{{ ontap_80_volumes[0] }}"
+        flexvol_name:                  "{{ ontap_81_volumes[0] }}"
         security_style:                "ntfs"
         vserver:                       "{{ item.0 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_qtrees) | list }}"
 
     - name: Set quota (1GiB)
       netapp.ontap.na_ontap_quotas:
         state:                         present
         vserver:                       "{{ item.0 }}"
-        volume:                        "{{ ontap_80_volumes[0] }}"
+        volume:                        "{{ ontap_81_volumes[0] }}"
         quota_target:                  "{{ item.1 }}"
         type:                          "tree"
         disk_limit:                    1048576
         set_quota_status:              True
       loop:
-        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_qtrees) | list }}"
 
     - name: Create CIFS share
       netapp.ontap.na_ontap_cifs:
         state:                         present
-        name:                          "{{ (ontap_80_volumes[0] | replace('ontap_81_','')) }}_{{ item.1 }}"
-        path:                          "/{{ ontap_80_volumes[0] }}/{{ item.1 }}"
+        name:                          "{{ (ontap_81_volumes[0] | replace('ontap_81_','')) }}_{{ item.1 }}"
+        path:                          "/{{ ontap_81_volumes[0] }}/{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
         browsable:                     true
         oplocks:                       true
         show_snapshot:                 true
         comment:                       "Test share created as part of test frame ONTAP-81"
       loop:
-        "{{ ontap_80_svms | product(ontap_81_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_qtrees) | list }}"
 
   post_tasks:

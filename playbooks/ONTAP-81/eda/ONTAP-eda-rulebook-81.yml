@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-83-eda-rulebook - React to attack
+# Title:        ONTAP-81-eda-rulebook - React to attack
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2025-02-25
@@ -31,7 +31,7 @@
 
       action:
         run_playbook:
-          name: playbooks/ONTAP-83/eda/ONTAP-83-eda-01.yml
+          name: playbooks/ONTAP-81/eda/ONTAP-81-eda-01.yml
           extra_vars:
              svm_name: "{{ event.payload.netapp['ems-message-info'].parameters.parameter | 
                            selectattr('name', 'eq', 'vserverName') | 

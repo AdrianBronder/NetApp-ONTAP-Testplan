@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-prepare-80 - Advanced - Service Provider Customization
+# Title:        ONTAP-prepare-81 - MSP - CIFS Self-service
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-02-09
@@ -14,7 +14,6 @@
 # 
 ################################################################################
 
-- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-prepare-20.yml
+- ansible.builtin.import_playbook: ../ONTAP-80/ONTAP-prepare-80.yml
 
-- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
-- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-80/ONTAP-80-01.yml

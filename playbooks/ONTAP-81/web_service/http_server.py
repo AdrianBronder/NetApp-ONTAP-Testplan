@@ -51,19 +51,19 @@ def load_vars_from_files(vars_path, dataloader):
 ansible_file_vars = load_vars_from_files(vars_path, dataloader)
 
 # Configuration for LDAP
-app.config['LDAP_HOST']                = ansible_file_vars['ontap_80_ldap_host']
-app.config['LDAP_BASE_DN']             = ansible_file_vars['ontap_80_base_dn']
-app.config['LDAP_USER_DN']             = ansible_file_vars['ontap_80_user_dn']
-app.config['LDAP_USER_RDN_ATTR']       = ansible_file_vars['ontap_80_user_rdn_attr']
-app.config['LDAP_USER_LOGIN_ATTR']     = ansible_file_vars['ontap_80_user_login_attr']
-app.config['LDAP_BIND_USER_DN']        = ansible_file_vars['ontap_80_bind_user_dn']
-app.config['LDAP_BIND_USER_PASSWORD']  = ansible_file_vars['vault_ontap_80_bind_user_pw']
-app.config['LDAP_USER_SEARCH_SCOPE']   = ansible_file_vars['ontap_80_user_search_scope']
-app.config['LDAP_GROUP_SEARCH_BASE']   = ansible_file_vars['ontap_80_group_search_base']
-app.config['LDAP_GROUP_SEARCH_FILTER'] = ansible_file_vars['ontap_80_group_search_filter']
-app.config['LDAP_GROUP_SEARCH_SCOPE']  = ansible_file_vars['ontap_80_group_search_scope']
-app.config['LDAP_GROUP_MEMBERS_ATTR']  = ansible_file_vars['ontap_80_group_members_attr']
-app.config['SECRET_KEY']               = ansible_file_vars['vault_ontap_80_secret_key']
+app.config['LDAP_HOST']                = ansible_file_vars['ontap_81_ldap_host']
+app.config['LDAP_BASE_DN']             = ansible_file_vars['ontap_81_base_dn']
+app.config['LDAP_USER_DN']             = ansible_file_vars['ontap_81_user_dn']
+app.config['LDAP_USER_RDN_ATTR']       = ansible_file_vars['ontap_81_user_rdn_attr']
+app.config['LDAP_USER_LOGIN_ATTR']     = ansible_file_vars['ontap_81_user_login_attr']
+app.config['LDAP_BIND_USER_DN']        = ansible_file_vars['ontap_81_bind_user_dn']
+app.config['LDAP_BIND_USER_PASSWORD']  = ansible_file_vars['vault_ontap_81_bind_user_pw']
+app.config['LDAP_USER_SEARCH_SCOPE']   = ansible_file_vars['ontap_81_user_search_scope']
+app.config['LDAP_GROUP_SEARCH_BASE']   = ansible_file_vars['ontap_81_group_search_base']
+app.config['LDAP_GROUP_SEARCH_FILTER'] = ansible_file_vars['ontap_81_group_search_filter']
+app.config['LDAP_GROUP_SEARCH_SCOPE']  = ansible_file_vars['ontap_81_group_search_scope']
+app.config['LDAP_GROUP_MEMBERS_ATTR']  = ansible_file_vars['ontap_81_group_members_attr']
+app.config['SECRET_KEY']               = ansible_file_vars['vault_ontap_81_secret_key']
 
 # Initialize the LDAP3 Login Manager
 ldap_manager = LDAP3LoginManager(app)
@@ -186,7 +186,7 @@ def service_overview():
     # 
     for volume in volumeList:
         if not volume.name.endswith('_root'):
-            department_name = volume.name.replace('ontap_80_', '')
+            department_name = volume.name.replace('ontap_81_', '')
             custom_state_info = {
                 'name': department_name,
                 'local_versioning': 'disabled',
@@ -196,11 +196,11 @@ def service_overview():
             }
             # Check, if local versioning (Snapshots) are in use
             if volume.snapshot_policy != "none":
-                custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_80_snap_', '')
+                custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_81_snap_', '')
             # Check, if backup protection (SnapMirror) is in use
             for snapmirrorRelation in snapmirrorList:
                 if snapmirrorRelation.source.path.endswith(volume.name):
-                    custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
+                    custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_81_snapm_', '')
                     break
             if volume.anti_ransomware.state != "disabled":
                 custom_state_info['ransomware_protection'] = volume.anti_ransomware.state
@@ -211,8 +211,8 @@ def service_overview():
         hard_limit = getattr(quota.space, 'hard_limit', None)
         if hard_limit is not None:
             quotaReport_sanitized.append(quota)
-            quota_distribution_count[quota.volume.name.replace('ontap_80_','')] += 1
-            quota_distribution_space[quota.volume.name.replace('ontap_80_','')] += quota.space.hard_limit / 1024**3
+            quota_distribution_count[quota.volume.name.replace('ontap_81_','')] += 1
+            quota_distribution_space[quota.volume.name.replace('ontap_81_','')] += quota.space.hard_limit / 1024**3
     quota_distribution_count = sorted(quota_distribution_count.items())
     quota_distribution_space = sorted(quota_distribution_space.items())
 
@@ -293,7 +293,7 @@ def service_overview_operator():
     for volume in volumeList:
         if not volume.name.endswith('_root'):
             billing_base = 0.10 # monthly GB price
-            department_name = volume.name.replace('ontap_80_', '')
+            department_name = volume.name.replace('ontap_81_', '')
             custom_state_info = {
                 'company_name': volume.svm.name.replace('sp-svm-', ''),
                 'name': department_name,
@@ -307,7 +307,7 @@ def service_overview_operator():
             }
             # Check, if local versioning (Snapshots) are in use
             if volume.snapshot_policy != "none":
-                custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_80_snap_', '')
+                custom_state_info['local_versioning'] = volume.snapshot_policy.name.replace('ontap_81_snap_', '')
                 match custom_state_info['local_versioning']:
                     case 'standard':
                         billing_base += 0.01
@@ -318,7 +318,7 @@ def service_overview_operator():
             # Check, if backup protection (SnapMirror) is in use
             for snapmirrorRelation in snapmirrorList:
                 if snapmirrorRelation.source.path.endswith(volume.name):
-                    custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_80_snapm_', '')
+                    custom_state_info['backup'] = snapmirrorRelation.policy.name.replace('ontap_81_snapm_', '')
                     match custom_state_info['backup']:
                         case 'standard':
                             billing_base += 0.04
@@ -383,19 +383,19 @@ def modify_service():
             request_form_data['request_svm'] = "sp-svm-astrainc"
         case 'Polaris Ltd':
             request_form_data['request_svm'] = "sp-svm-polarisltd"
-    request_form_data['request_volume'] = "ontap_80_" + department
+    request_form_data['request_volume'] = "ontap_81_" + department
     request_form_data['request_service_type'] = service_type
     match service_type:
         case 'local_versioning':
             if service_value == "disabled":
                 request_form_data['request_service_value'] = "none"
             else:
-                request_form_data['request_service_value'] = "ontap_80_snap_" + service_value
+                request_form_data['request_service_value'] = "ontap_81_snap_" + service_value
         case 'backup':
             if service_value == "disabled":
                 request_form_data['request_service_value'] = "none"
             else:
-                request_form_data['request_service_value'] = "ontap_80_snapm_" + service_value
+                request_form_data['request_service_value'] = "ontap_81_snapm_" + service_value
         case 'ransomware' | 'data_pipeline':
             request_form_data['request_service_value'] = service_value
         
@@ -405,28 +405,28 @@ def modify_service():
     match request_form_data['request_service_type']:
         case 'local_versioning':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-self-snap.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-snap-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
             )
         case 'backup':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-self-backup.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-backup-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
             )
         case 'ransomware':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-self-arp.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-arp-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
             )
         case 'data_pipeline':
             r = ansible_runner.run(
-                playbook=project_root_path+'/playbooks/ONTAP-80/ONTAP-80-04.yml',
+                playbook=project_root_path+'/playbooks/ONTAP-81/ONTAP-self-pipeline-81.yml',
                 inventory=inventory_path,
                 extravars=request_form_data,
                 cmdline=f"--vault-password-file {project_root_path+'/init/init_helper/vaultfile.txt'}"
@@ -473,7 +473,7 @@ def share_order():
         volumeList = list(Volume.get_collection(
             fields='*',
             **{'svm.name': primary_svm,
-               'name': 'ontap_80_*'}))
+               'name': 'ontap_81_*'}))
         departments = [{'name': volume['name'], 'uuid': volume['uuid']} for volume in volumeList]
     except NetAppRestError as error:
         volumeList = []
@@ -491,7 +491,7 @@ def share_order():
 
         # Convert data
         share_size_bytes = share_size_gib * 1024**3
-        department_name = vol_name.replace('ontap_80_','')
+        department_name = vol_name.replace('ontap_81_','')
 
         # Define Qtree object
         qtreeobj                       = {}

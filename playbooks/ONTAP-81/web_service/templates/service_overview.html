@@ -98,7 +98,7 @@
         <tbody>
             {% for quota in quotaReport %}
                 <tr>
-                    <td>{{ quota.volume.name | replace('ontap_80_', '') }}</td>
+                    <td>{{ quota.volume.name | replace('ontap_81_', '') }}</td>
                     <td>{{ quota.qtree.name }}</td>
                     <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
                     <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>

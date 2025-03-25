@@ -46,12 +46,12 @@
           path:                        "{{ item.0 + '-backup:' + item.1 + '_dst' }}"
         create_destination:
           enabled:                     true
-        policy:                        "{{ ontap_80_snapm_policy_standard }}"
+        policy:                        "{{ ontap_81_snapm_policy_standard }}"
         schedule:                      "10min"
         update:                        false
         initialize:                    false
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:2]) | list }}"
 
     - name: Initialize backup
       netapp.ontap.na_ontap_snapmirror:
@@ -65,6 +65,6 @@
         update:                        false
         initialize:                    true
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:2]) | list }}"
 
   post_tasks:

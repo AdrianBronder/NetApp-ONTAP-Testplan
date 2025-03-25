@@ -1,0 +1,70 @@
+################################################################################
+#
+# Title:        ONTAP-prepare-81 - MSP - Self-Service
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-02-09
+# Description:  Revert all steps performed in test frame 81
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-revert-81 - Advanced - Self-Service"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Get all CIFS shares for test frame 81
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/cifs/shares"
+        fields:
+          - "*"
+        parameters:
+          svm.name:               "sp-svm*"
+          path:                   "/ontap_81_*"
+        use_python_keys:          true
+      register: cifs_share_info
+  
+    - name: Delete all CIFS shares
+      netapp.ontap.na_ontap_cifs:
+        state:                    absent
+        name:                     "{{ item.name }}"                  
+        vserver:                  "{{ item.svm.name }}"
+      loop:
+        "{{ cifs_share_info.ontap_info.protocols_cifs_shares.records }}"
+      loop_control:
+        label: "{{ item.svm.name }} - {{ item.name }}"
+      when:
+      - cifs_share_info.ontap_info.protocols_cifs_shares.num_records|int > 0
+      - item.name is defined
+
+    - name: Remove read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         absent
+        name:                          "{{ ontap_81_policy_name }}"
+        vserver:                       "{{ item }}"
+      loop:
+        "{{ ontap_81_svms }}"
+
+  post_tasks:

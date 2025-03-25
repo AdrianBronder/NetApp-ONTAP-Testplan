@@ -336,7 +336,7 @@
   post_tasks:
 
 - hosts:                               "secondary_storage_clusters"
-  name:                                "ONTAP-80-00 - Base Deployment - secondary only"
+  name:                                "ONTAP-81-01 - Base Deployment - secondary only"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -359,7 +359,7 @@
       netapp.ontap.na_ontap_snapmirror_policy:
         state:                         present
         vserver:                       "{{ item.name }}"
-        policy_name:                   "{{ ontap_80_snapm_policy_standard }}"
+        policy_name:                   "{{ ontap_81_snapm_policy_standard }}"
         policy_type:                   "mirror_vault"
         snapmirror_label:
           - "5min"
@@ -384,7 +384,7 @@
       netapp.ontap.na_ontap_snapmirror_policy:
         state:                         present
         vserver:                       "{{ item.name }}"
-        policy_name:                   "{{ ontap_80_snapm_policy_premium }}"
+        policy_name:                   "{{ ontap_81_snapm_policy_premium }}"
         policy_type:                   "mirror_vault"
         snapmirror_label:
           - "5min"
@@ -409,7 +409,7 @@
       netapp.ontap.na_ontap_snapmirror_policy:
         state:                         present
         vserver:                       "{{ item.name }}"
-        policy_name:                   "{{ ontap_80_snapm_policy_ultimate }}"
+        policy_name:                   "{{ ontap_81_snapm_policy_ultimate }}"
         policy_type:                   "mirror_vault"
         snapmirror_label:
           - "5min"
@@ -433,7 +433,7 @@
   post_tasks:
 
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-80-00 - Base Deployment - primary only"
+  name:                                "ONTAP-81-01 - Base Deployment - primary only"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -456,7 +456,7 @@
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         present
         vserver:                       "{{ item.name }}"
-        name:                          "{{ ontap_80_snap_policy_standard }}"
+        name:                          "{{ ontap_81_snap_policy_standard }}"
         schedule:                      
           - "5min"
           - "hourly"
@@ -491,7 +491,7 @@
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         present
         vserver:                       "{{ item.name }}"
-        name:                          "{{ ontap_80_snap_policy_premium }}"
+        name:                          "{{ ontap_81_snap_policy_premium }}"
         schedule:                      
           - "5min"
           - "hourly"
@@ -526,7 +526,7 @@
       netapp.ontap.na_ontap_snapshot_policy:
         state:                         present
         vserver:                       "{{ item.name }}"
-        name:                          "{{ ontap_80_snap_policy_ultimate }}"
+        name:                          "{{ ontap_81_snap_policy_ultimate }}"
         schedule:                      
           - "5min"
           - "hourly"
@@ -566,13 +566,13 @@
         size_unit:                     gb
         space_guarantee:               none
         tiering_policy:                auto
-        snapshot_policy:               "{{ ontap_80_snap_policy_standard }}"
+        snapshot_policy:               "{{ ontap_81_snap_policy_standard }}"
         export_policy:                 "ro_{{ item.0 }}"
         junction_path:                 "/{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
         volume_security_style:         "unix"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
   
     - name: Set default quota rule on volumes
       netapp.ontap.na_ontap_quotas:
@@ -583,7 +583,7 @@
         type:                          tree
         set_quota_status:              True
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
 
     - name: Create SVM Peerings
       netapp.ontap.na_ontap_vserver_peer:

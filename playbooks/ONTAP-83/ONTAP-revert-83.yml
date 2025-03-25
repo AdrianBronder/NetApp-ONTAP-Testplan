@@ -29,23 +29,23 @@
         state:                         "absent"
         src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
                                         {{ item.1 }}/{{ item.2 }}"
-        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
   
     - name: Remove mount directories
       ansible.builtin.file:
         state:                         "absent"
-        path:                          "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+        path:                          "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
         mode:                          "0755"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
     - name: Remove default parent mount directory
       ansible.builtin.file:
-        path:                          "{{ linux_83_mount_dir }}"
+        path:                          "{{ linux_81_mount_dir }}"
         state:                         "absent"
         mode:                          "0755"
 
@@ -76,25 +76,25 @@
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
       ignore_errors:                   true
 
     - name: Remove REST EMS destination for every tenant
       netapp.ontap.na_ontap_ems_destination:
         state:                         "absent"
         name:                          "dest_{{ item }}"
-        type:                          "{{ ontap_83_ems_dest_type }}"
+        type:                          "{{ ontap_81_ems_dest_type }}"
         filters:                       "ems_{{ item }}"
-        destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
+        destination:                   "{{ ontap_81_ems_dest_destination }}{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Remove EMS filters 
       netapp.ontap.na_ontap_ems_filter:
         state:                         "absent"
         name:                          "ems_{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Remove qtree shares
       netapp.ontap.na_ontap_cifs:
@@ -102,7 +102,7 @@
         name:                          "{{ item.1 }}_{{ item.2 }}"
         vserver:                       "{{ item.0 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
     - name: Remove qtrees
       netapp.ontap.na_ontap_qtree:
@@ -111,7 +111,7 @@
         flexvol_name:                  "{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
 
     - name: Remove volume shares
       netapp.ontap.na_ontap_cifs:
@@ -119,12 +119,12 @@
         name:                          "{{ item.1 }}"
         vserver:                       "{{ item.0 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
   
     - name: Remove read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         absent
-        name:                          "{{ ontap_83_policy_name }}"
+        name:                          "{{ ontap_81_policy_name }}"
         vserver:                       "{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"

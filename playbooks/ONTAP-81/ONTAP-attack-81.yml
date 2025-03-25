@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-83-04 - Simulate Attack
+# Title:        ONTAP-attack-81 - Siumlate Ransomware Attack
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-11-04
-# Description:  Advanced - Anti-Ransomware
-#               - Simulate Attack
+# Description:  Advanced - Self-service
+#               - Siumlate Ransomware Attack
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "linux"
-  name:                                "ONTAP-83-04 - Simulate Attack"
+  name:                                "ONTAP-attack-81 - Siumlate Ransomware Attack"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -29,8 +29,8 @@
 
   tasks:
     - name: Encrypt and rename files
-      ansible.builtin.script: ./scripts/ONTAP-83-04.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+      ansible.builtin.script: ./scripts/ONTAP-83-04.sh "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:3], ontap_83_qtrees[:1]) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees[:1]) | list }}"
   
   post_tasks:
