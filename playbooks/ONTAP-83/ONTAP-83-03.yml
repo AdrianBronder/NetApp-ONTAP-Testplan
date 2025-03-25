@@ -44,7 +44,7 @@
 #          vserver:                     "{{ item.0 }}"
 #          volume:                      "{{ item.1 }}"
 #      loop:
-#        "{{ ontap_80_svms | product(ontap_80_volumes) | list }}"
+#        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
 #      ignore_errors:                   true
 
 - hosts:                               "linux"
@@ -61,9 +61,9 @@
 
   tasks:
     - name: Create test files on exports
-      ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_83_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
+      ansible.builtin.script: ./scripts/ONTAP-83-03.sh "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes, ontap_83_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_83_qtrees) | list }}"
   
   post_tasks:
 
@@ -96,7 +96,7 @@
           vserver:                     "{{ item.0 }}"
           volume:                      "{{ item.1 }}"
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:2]) | list }}"
       ignore_errors:                   true
 
     - name: Activate additional notifications for ransomware events
@@ -112,6 +112,6 @@
           is-enabled-on-snapshot-copy-creation:
                                        true
       loop:
-        "{{ ontap_80_svms | product(ontap_80_volumes[:2]) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:2]) | list }}"
 
   post_tasks:

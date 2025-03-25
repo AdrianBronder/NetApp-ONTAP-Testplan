@@ -41,7 +41,7 @@
         name:                          "ems_{{ item }}"
         rules:                         []
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Add EMS filter to match tenant only
       netapp.ontap.na_ontap_rest_cli:
@@ -58,7 +58,7 @@
           parameter-criteria:
             - "vserverName={{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Configure REST EMS destination for every tenant
       netapp.ontap.na_ontap_ems_destination:
@@ -68,36 +68,36 @@
         filters:                       "ems_{{ item }}"
         destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
       # Add special webhook for event driven Ansible on one SVM
-    - name: Configure EMS filters for EDA on {{ ontap_80_svms[1] }}
+    - name: Configure EMS filters for EDA on {{ ontap_81_svms[1] }}
       netapp.ontap.na_ontap_ems_filter:
         state:                         "present"
-        name:                          "ems_arp_eda_{{ ontap_80_svms[1] }}"
+        name:                          "ems_arp_eda_{{ ontap_81_svms[1] }}"
         rules:                         []
 
-    - name: Add EMS filter to match {{ ontap_80_svms[1] }} and ARP Snapshot Create only
+    - name: Add EMS filter to match {{ ontap_81_svms[1] }} and ARP Snapshot Create only
       netapp.ontap.na_ontap_rest_cli:
         command:                       'event/filter/rule/add'
         verb:                          'POST'
         params:
         body:
-          filter-name:                 "ems_arp_eda_{{ ontap_80_svms[1] }}"
+          filter-name:                 "ems_arp_eda_{{ ontap_81_svms[1] }}"
           type:                        "include"
           position:                    1
           message-name:                "arw.snapshot.created"
           severity:
             - "*"
           parameter-criteria:
-            - "vserverName={{ ontap_80_svms[1] }}"
+            - "vserverName={{ ontap_81_svms[1] }}"
 
-    - name: Configure REST EMS destination for EDA on {{ ontap_80_svms[1] }}
+    - name: Configure REST EMS destination for EDA on {{ ontap_81_svms[1] }}
       netapp.ontap.na_ontap_ems_destination:
         state:                         "present"
-        name:                          "dest_eda_{{ ontap_80_svms[1] }}"
+        name:                          "dest_eda_{{ ontap_81_svms[1] }}"
         type:                          "{{ ontap_83_ems_dest_type }}"
-        filters:                       "ems_arp_eda_{{ ontap_80_svms[1] }}"
-        destination:                   "{{ ontap_83_ems_eda_dest_destination }}{{ ontap_80_svms[1] }}"
+        filters:                       "ems_arp_eda_{{ ontap_81_svms[1] }}"
+        destination:                   "{{ ontap_83_ems_eda_dest_destination }}{{ ontap_81_svms[1] }}"
 
   post_tasks:
