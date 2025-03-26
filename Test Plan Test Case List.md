@@ -75,7 +75,6 @@
 | 81-11 | Advanced - Self-service           | CIFS Demo Roll-out                    |
 | 81-21 | Advanced - Self-service           | Backup Demo Roll-out                  |
 | 81-31 | Advanced - Self-service	        | Ransomware Demo Roll-out              |
-| 81-32 | Advanced - Self-service	        | Ransomware Attack                     |
 ||
 | Prepare-15         | Prepare test frame 15 - Cluster Peering                    | |
 | Prepare-20         | Prepare test frame 20 - Storage Virtual Machines (SVMs)    | |
