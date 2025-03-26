@@ -65,13 +65,13 @@ python3 -m pip install --upgrade pip
 echo ""
 echo ""
 echo "--> Installing additional Python packages"
-python3 -m pip install --upgrade requests six netapp_lib selinux flask Flask-LDAP3-Login jmespath netapp_ontap
+python3 -m pip install --upgrade requests six netapp_lib selinux flask Flask-LDAP3-Login jmespath pyyaml netapp_ontap
 python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 
 echo ""
 echo ""
 echo "--> Installing Asnible"
-python3 -m pip install ansible-core==$ANSIBLEVERS ansible-rulebook
+python3 -m pip install ansible-core==$ANSIBLEVERS ansible-rulebook ansible_runner
 
 echo ""
 echo ""
