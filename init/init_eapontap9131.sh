@@ -19,7 +19,7 @@ echo ""
 echo "--> Setting variables & paths"
 source ~/.bashrc
 OPENSSLVERS="1.1.1u"
-PYTHON3VERS="3.9.18"
+PYTHON3VERS="3.10.16"
 ANSIBLEVERS="2.15.2"
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 PROJECTPATH=${SCRIPTPATH%/*}
