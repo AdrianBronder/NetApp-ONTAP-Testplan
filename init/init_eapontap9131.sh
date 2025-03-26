@@ -155,7 +155,7 @@ After=network.target
 User=root
 Group=root
 WorkingDirectory=$PROJECTPATH/playbooks/ONTAP-81/web_service/
-ExecStart=python3 $PROJECTPATH/playbooks/ONTAP-81/web_service/http_server.py
+ExecStart=/usr/bin/python3 $PROJECTPATH/playbooks/ONTAP-81/web_service/http_server.py
 
 [Install]
 WantedBy=multi-user.target
