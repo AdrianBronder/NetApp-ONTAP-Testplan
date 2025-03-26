@@ -42,6 +42,7 @@
           passphrase:                  "{{ security_key_managers.onboard.passphrase }}"
       when:
         security_key_managers.onboard is defined
+      ignore_errors: true # to work with ONTAP 9.13.1 lab
   
     - name: Get all non-root aggregates
       netapp.ontap.na_ontap_rest_info:
