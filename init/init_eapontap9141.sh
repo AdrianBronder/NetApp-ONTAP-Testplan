@@ -101,7 +101,7 @@ modprobe nvme_tcp
 echo ""
 echo ""
 echo "--> Copying default ansible config"
-cp $SCRIPTPATH/ansible.cfg ~/ansible.cfg
+cp $PROJECTPATH/ansible.cfg ~/ansible.cfg
 
 echo ""
 echo ""
