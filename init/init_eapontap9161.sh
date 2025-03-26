@@ -22,12 +22,14 @@ source ~/.bashrc
 #PYTHON3VERS="3.9.18"
 ANSIBLEVERS="2.15.13"
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+PROJECTPATH=${SCRIPTPATH%/*}
 #DOWNLOADPATH="/tmp/downloads"
 #OPENSSLPATH="/usr/local/openssl"
 #echo "OpenSSL version to be installed: $OPENSSLVERS"
 #echo "Python3 version to be installed: $PYTHON3VERS"
 echo "Ansible version to be installed: $ANSIBLEVERS"
-echo "Path to this script:  $SCRIPTPATH"
+echo "Path to this script:             $SCRIPTPATH"
+echo "Path to this project:            $PROJECTPATH"
 #echo "Download path:        $DOWNLOADPATH"
 #echo "OpenSSL path:         $OPENSSLPATH" 
 
@@ -100,15 +102,36 @@ modprobe nvme_tcp
 echo ""
 echo ""
 echo "--> Ansible config"
-cp $SCRIPTPATH/ansible.cfg ~/ansible.cfg
+cp $PROJECTPATH/ansible.cfg ~/ansible.cfg
 echo 'export ANSIBLE_VAULT_PASSWORD_FILE=~/NetApp-ONTAP-Testplan/init/init_helper/vaultfile.txt' >> ~/.bashrc
 
 echo ""
 echo ""
+echo "--> Run web-server for advanced demos as system service"
+cat << EOF >> /etc/systemd/system/netapp-self-service.service
+[Unit]
+Description=Demo Self-Service Portal
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=$PROJECTPATH/playbooks/ONTAP-81/web_service/
+ExecStart=python3 $PROJECTPATH/playbooks/ONTAP-81/web_service/http_server.py
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable netapp-self-service
+systemctl start netapp-self-service
+
+echo ""
+echo ""
 echo "--> Creating Users and groups in AD (dc1)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9161 $SCRIPTPATH/init_helper/init_ad.yml
+ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161 $SCRIPTPATH/init_helper/init_ad.yml
 
 echo ""
 echo ""
 echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
-ansible-playbook -i $SCRIPTPATH/../inventories/labondemand_9161 $SCRIPTPATH/../playbooks/ONTAP-00/ONTAP-revert-00.yml
+ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161 $PROJECTPATH/playbooks/ONTAP-00/ONTAP-revert-00.yml
