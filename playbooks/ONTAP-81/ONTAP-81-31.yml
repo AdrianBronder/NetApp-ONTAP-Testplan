@@ -67,7 +67,7 @@
         unix_permissions:              0777
         vserver:                       "{{ item.0 }}"
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
 
     - name: Set quota (1GiB)
       netapp.ontap.na_ontap_quotas:
@@ -79,7 +79,7 @@
         disk_limit:                    1048576
         set_quota_status:              True
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
 
     - name: Create Qtree shares
       netapp.ontap.na_ontap_cifs:
@@ -91,7 +91,7 @@
         oplocks:                       true
         show_snapshot:                 true
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
 
     - name: Create volume shares
       netapp.ontap.na_ontap_cifs:
@@ -113,7 +113,7 @@
         user_or_group:                 "Everyone"
         permission:                    "read"
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
 
 
 - hosts:                               "linux"
@@ -138,7 +138,7 @@
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
   
     - name: Create mount directories
       ansible.builtin.file:
@@ -146,7 +146,7 @@
         state:                         "directory"
         mode:                          "0755"
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
   
     - name: Mount NFS export on Linux host
       ansible.posix.mount:
@@ -157,7 +157,7 @@
 #        opts:                          "rw,sync,hard,vers=3"
         fstype:                        "nfs"
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
 
   post_tasks:
 

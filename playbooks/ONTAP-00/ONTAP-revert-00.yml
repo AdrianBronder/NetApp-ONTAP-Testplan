@@ -38,18 +38,18 @@
       netapp.ontap.na_ontap_ems_destination:
         state:                         "absent"
         name:                          "dest_{{ item }}"
-        type:                          "{{ ontap_83_ems_dest_type }}"
+        type:                          "{{ ontap_81_ems_dest_type }}"
         filters:                       "ems_{{ item }}"
-        destination:                   "{{ ontap_83_ems_dest_destination }}{{ item }}"
+        destination:                   "{{ ontap_81_ems_dest_destination }}{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
 
     - name: Remove EMS filters 
       netapp.ontap.na_ontap_ems_filter:
         state:                         "absent"
         name:                          "ems_{{ item }}"
       loop:
-        "{{ ontap_80_svms }}"
+        "{{ ontap_81_svms }}"
     
     - name: Get all SnapMirror relations to be deleted
       netapp.ontap.na_ontap_rest_info:

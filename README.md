@@ -116,31 +116,34 @@ The playbooks can be executed in any other non-production environments for demos
 
 
 # Additional References
-- Public documentation of NetApp Modules
-  - https://docs.ansible.com/ansible/latest/collections/netapp/ontap/
-- NetApp ONTAP Modules on Ansible Galaxy
-  - https://galaxy.ansible.com/netapp/ontap
-- Public GitHub for NetApp ONTAP Modules
-  - https://github.com/ansible-collections/netapp.ontap
+* NetApp ONTAP Modules & Documentation on Ansible Galaxy
+  * https://galaxy.ansible.com/netapp/ontap
+* Public GitHub for NetApp ONTAP Modules
+  * https://github.com/ansible-collections/netapp.ontap
 
 
 # Changelog
 ## v1.3
-- Adding support for ONTAP 9.16.1 lab
-- Adding ONTAP-82 - Anti-ransomware
+* Adding support for ONTAP 9.16.1 lab
+* Adding ONTAP-81 - Advanced Self-Service
+  * CIFS share request
+  * Local versioning request
+  * Backup request
+  * Ransomware protection request & alerting
+* Removing ONTAP-10-04 - Event Notification
 
 ## v1.2
-- Adding ONTAP-11-04  Event Config
-- Adding Ansible Drive Ansible
-- Adding support for ONTAP 9.14.1 lab
-- General Clean-up (comments, format...)
+* Adding ONTAP-11-04  Event Config
+* Adding Ansible Drive Ansible
+* Adding support for ONTAP 9.14.1 lab
+* General Clean-up (comments, format...)
 
 ## v1.1
-- Adding ONTAP-42 - Quality of Service
-- Adding ONTAP-51 - Local Versioning (Snapshots)
-- Adding ONTAP-52 - Backup (SnapMirror)
-- Adding "prepare" playbooks to run all pre-requesits for a particular test frame
-- Moving RO policy creation for NFS to “ONTAP-20 – Basic SVM Setup”
+* Adding ONTAP-42 - Quality of Service
+* Adding ONTAP-51 - Local Versioning (Snapshots)
+* Adding ONTAP-52 - Backup (SnapMirror)
+* Adding "prepare" playbooks to run all pre-requesits for a particular test frame
+* Moving RO policy creation for NFS to “ONTAP-20 – Basic SVM Setup”
 
 ## v1.0
-- Initial Release
+* Initial Release
