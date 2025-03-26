@@ -74,7 +74,7 @@ echo "Configuring Python3..."
 ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
 echo "Installing Python3..."
 make altinstall > /dev/null
-ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
+ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
 rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
 echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
 source ~/.bashrc
@@ -82,10 +82,10 @@ cd $SCRIPTPATH
 
 echo ""
 echo ""
-echo "--> Setting alternative Python to 3.9 as default"
-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
+echo "--> Setting alternative Python to 3.10 as default"
+alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.10 1
 alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
-update-alternatives --set python3 /usr/local/bin/python3.9
+update-alternatives --set python3 /usr/local/bin/python3.10
 
 echo ""
 echo ""
