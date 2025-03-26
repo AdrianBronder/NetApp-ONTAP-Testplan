@@ -296,7 +296,7 @@
     - name: Create test files on exports
       ansible.builtin.script: ./scripts/ONTAP-write_files-81.sh "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}" 20
       loop:
-        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_arp_qtrees) | list }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes[:3], ontap_81_arp_qtrees) | list }}"
   
   post_tasks:
 
