@@ -131,6 +131,7 @@ The playbooks can be executed in any other non-production environments for demos
   * Backup request
   * Ransomware protection request & alerting
 * Removing ONTAP-10-04 - Event Notification
+* Consistent use of module defaults vs. vars for default connection parameters
 
 ## v1.2
 * Adding ONTAP-11-04  Event Config
