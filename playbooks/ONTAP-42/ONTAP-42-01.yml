@@ -46,5 +46,4 @@
           min_throughput_iops:         100
           min_throughput_mbps:         1
           capacity_shared:             True
-
   post_tasks:
