@@ -3,7 +3,7 @@
 ################################################################################
 #
 # Title:        init_eapontap9131.sh
-# Author:       Adrian Bronder
+# Author:       NetApp Inc. (badrian)
 # Initial Date: 2023-08-16
 # Description:  Prepare linux host "centos1" in LoD lab 497
 #               --> "Early Adopter Lab for ONTAP 9.13.1"
@@ -19,15 +19,17 @@ echo ""
 echo "--> Setting variables & paths"
 source ~/.bashrc
 OPENSSLVERS="1.1.1u"
-PYTHON3VERS="3.9.18"
+PYTHON3VERS="3.10.16"
 ANSIBLEVERS="2.15.2"
 SCRIPTPATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+PROJECTPATH=${SCRIPTPATH%/*}
 DOWNLOADPATH="/tmp/downloads"
 OPENSSLPATH="/usr/local/openssl"
 echo "OpenSSL version to be installed: $OPENSSLVERS"
 echo "Python3 version to be installed: $PYTHON3VERS"
 echo "Ansible version to be installed: $ANSIBLEVERS"
 echo "Path to this script:  $SCRIPTPATH"
+echo "Path to this project: $PROJECTPATH"
 echo "Download path:        $DOWNLOADPATH"
 echo "OpenSSL path:         $OPENSSLPATH" 
 
@@ -72,7 +74,7 @@ echo "Configuring Python3..."
 ./configure --enable-optimizations --with-openssl="$OPENSSLPATH" > /dev/null
 echo "Installing Python3..."
 make altinstall > /dev/null
-ln -s /usr/local/bin/python3.9 /usr/bin/python3.9
+ln -s /usr/local/bin/python3.10 /usr/bin/python3.10
 rm $DOWNLOADPATH/Python-$PYTHON3VERS.tgz
 echo "export PATH=$PATH:~/.local/bin" >> ~/.bashrc
 source ~/.bashrc
@@ -80,10 +82,10 @@ cd $SCRIPTPATH
 
 echo ""
 echo ""
-echo "--> Setting alternative Python to 3.9 as default"
-alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.9 1
+echo "--> Setting alternative Python to 3.10 as default"
+alternatives --install /usr/bin/python3 python3 /usr/local/bin/python3.10 1
 alternatives --install /usr/bin/python3 python3 /usr/bin/python3.6 2
-update-alternatives --set python3 /usr/local/bin/python3.9
+update-alternatives --set python3 /usr/local/bin/python3.10
 
 echo ""
 echo ""
@@ -109,13 +111,13 @@ python3 -m pip install --upgrade pip
 echo ""
 echo ""
 echo "--> Installing additional Python libs"
-python3 -m pip install --upgrade requests six netapp_lib selinux
+python3 -m pip install --upgrade requests six netapp_lib flask Flask-LDAP3-Login selinux jmespath pyyaml netapp_ontap
 python3 -m pip install --upgrade "pywinrm[kerberos]>=0.3.0"
 
 echo ""
 echo ""
 echo "--> Installing Asnible"
-python3 -m pip install ansible-core==$ANSIBLEVERS ansible-rulebook
+python3 -m pip install ansible-core==$ANSIBLEVERS ansible-rulebook ansible_runner
 
 echo ""
 echo ""
@@ -139,7 +141,28 @@ systemctl restart multipathd.service
 echo ""
 echo ""
 echo "--> Copying default ansible config"
-cp $SCRIPTPATH/ansible.cfg ~/ansible.cfg
+cp $PROJECTPATH/ansible.cfg ~/ansible.cfg
+
+echo ""
+echo ""
+echo "--> Run web-server for advanced demos as system service"
+cat << EOF >> /etc/systemd/system/netapp-self-service.service
+[Unit]
+Description=Demo Self-Service Portal
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=$PROJECTPATH/playbooks/ONTAP-81/web_service/
+ExecStart=/usr/bin/python3 $PROJECTPATH/playbooks/ONTAP-81/web_service/http_server.py
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl enable netapp-self-service
+systemctl start netapp-self-service
 
 echo ""
 echo ""

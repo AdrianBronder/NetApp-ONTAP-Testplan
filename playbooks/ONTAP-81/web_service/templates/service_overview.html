@@ -1,100 +1,219 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Service Overview</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
-    <div class="container">
-        <a href="{{ url_for('request_services') }}">Request a new share</a>
-        <h1 class="my-4">Service Overview</h1>
-        <div class="row">
-            <div class="col-md-6">
-                <canvas id="quotaSizePieChart"></canvas>
-            </div>
-            <div class="col-md-6">
-                <canvas id="quotaCountPieChart"></canvas>
-            </div>
-        </div>
-        <table class="table">
-            <thead>
+{% extends "base_enduser.html" %}
+
+{% block title %}Service Overview{% endblock %}
+
+{% block content %}
+<div class="container mt-0">
+    <h1 class="my-4">Service Overview for {{ company }}</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Local Versioning</th>
+                <th>Backup</th>
+                <th>Ransomware Protection</th>
+                <th>Data Pipeline</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for department in departmentConsumedServices %}
                 <tr>
-                    <th>Department</th>
-                    <th>Share Name</th>
-                    <th>Requested Size (GiB)</th>
-                    <th>Used Size (GiB)</th>
+                    <td>{{ department.name }}</td>
+                    <td class="{% if department.local_versioning != 'disabled' %}bold-green{% endif %}">
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="local_versioning" data-service-value="{{ department.local_versioning }}">{{ department.local_versioning }}</a>
+                    </td>
+                    <td class="{% if department.backup != 'disabled' %}bold-green{% endif %}">
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="backup" data-service-value="{{ department.backup }}">{{ department.backup }}</a>
+                    </td>
+                    <td class="{% if department.ransomware_protection != 'disabled' %}bold-green{% endif %}">
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="ransomware" data-service-value="{{ department.ransomware_protection }}">{{ department.ransomware_protection }}</a>
+                    </td>
+                    <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
+                        <a href="#" class="btn btn-secondary modify-service-btn" data-company="{{ company }}" data-department="{{ department.name }}" data-service-type="data_pipeline" data-service-value="{{ department.data_pipeline }}">{{ department.data_pipeline }}</a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                {% for quota in quotaReport %}
-                    <tr>
-                        <td>{{ quota.volume.name | replace('ontap_81_', '') }}</td>
-                        <td>{{ quota.qtree.name }}</td>
-                        <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
-                        <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Modals for modifying services -->
+{% for service in ['local_versioning', 'backup', 'ransomware', 'data_pipeline'] %}
+<div class="modal fade" id="modify{{ service|capitalize }}Modal" tabindex="-1" role="dialog" aria-labelledby="modify{{ service|capitalize }}ModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="modify{{ service|capitalize }}Form" class="text-center">
+                <div class="modal-header">
+                    <h5 class="modal-title w-100" id="modify{{ service|capitalize }}ModalLabel">Modify {{ service|replace('_', ' ')|capitalize }}</h5>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" id="{{ service }}ServiceType" name="serviceType">
+                    <input type="hidden" id="{{ service }}DepartmentName" name="departmentName">
+                    <input type="hidden" id="{{ service }}CompanyName" name="companyName">
+                    <div class="form-group">
+                        <label for="{{ service }}">Change to:</label>
+                        <select class="form-control" id="{{ service }}ServiceValue" name="serviceValue">
+                            {% if service == 'ransomware' or service == 'data_pipeline' %}
+                                <option value="disabled">Disabled</option>
+                                <option value="enabled">Enabled</option>
+                            {% else %}
+                                <option value="disabled">Disabled</option>
+                                <option value="standard">Standard</option>
+                                <option value="premium">Premium</option>
+                                <option value="ultimate">Ultimate</option>
+                            {% endif %}
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                    <br>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </form>
+        </div>
     </div>
+</div>
+{% endfor %}
 
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
-    <script>
-    var ctx = document.getElementById('quotaSizePieChart').getContext('2d');
-    var chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: {{ quota_distribution_space|map(attribute='0')|list|tojson }},
-            datasets: [{
-                data: {{ quota_distribution_space|map(attribute='1')|list|tojson }},
-                backgroundColor: {{ colors|tojson }},
-                borderColor: {{ colors|tojson }},
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Share Distribution (Size - GiB) per Department'
-                }
+<div class="container">
+    <h1 class="my-4">Storage Units</h1>
+    <div class="charts-container">
+        <div class="chart-container">
+            <canvas id="quotaSizePieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="quotaCountPieChart"></canvas>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Share Name</th>
+                <th>Requested Size (GiB)</th>
+                <th>Used Size (GiB)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quota in quotaReport %}
+                <tr>
+                    <td>{{ quota.volume.name | replace('ontap_81_', '') }}</td>
+                    <td>{{ quota.qtree.name }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+{% if quota_distribution_space %}
+var ctx = document.getElementById('quotaSizePieChart').getContext('2d');
+var quotaSizePieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_space|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_space|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Share Distribution (Size - GiB) per Department'
             }
         }
-    });
-    </script>
-    <script>
-    var ctx = document.getElementById('quotaCountPieChart').getContext('2d');
-    var chart = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
-            datasets: [{
-                data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
-                backgroundColor: {{ colors|tojson }},
-                borderColor: {{ colors|tojson }},
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                },
-                title: {
-                    display: true,
-                    text: 'Share Distribution (Count) per Department'
-                }
+    }
+});
+{% endif %}
+</script>
+<script>
+{% if quota_distribution_count %}
+var ctx = document.getElementById('quotaCountPieChart').getContext('2d');
+var quotaCountPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Share Distribution (Count) per Department'
             }
         }
-    });
-    </script>
+    }
+});
+{% endif %}
 
-</body>
-</html>
+document.addEventListener('DOMContentLoaded', function() {
+    var modifyServiceButtons = document.querySelectorAll('.modify-service-btn');
+    modifyServiceButtons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            var companyName = this.getAttribute('data-company');
+            var departmentName = this.getAttribute('data-department');
+            var serviceType = this.getAttribute('data-service-type');
+            var serviceValue = this.getAttribute('data-service-value');
+
+            document.getElementById(serviceType + 'CompanyName').value = companyName;
+            document.getElementById(serviceType + 'DepartmentName').value = departmentName;
+            document.getElementById(serviceType + 'ServiceType').value = serviceType;
+
+            $('#modify' + serviceType.charAt(0).toUpperCase() + serviceType.slice(1) + 'Modal').modal('show');
+        });
+    });
+
+    var forms = document.querySelectorAll('form[id^="modify"]');
+    forms.forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            var formData = new FormData(this);
+            var url = '/modify_service';
+
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Service modified successfully!');
+                    location.reload();
+                } else {
+                    alert('Failed to modify service: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while modifying the service.');
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

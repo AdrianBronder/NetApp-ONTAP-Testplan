@@ -18,19 +18,19 @@
 - hosts:                               "secondary_storage_clusters"
   name:                                "ONTAP-52-04 - Protect Volume"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -50,7 +50,6 @@
         schedule:                      "5min"
         update:                        false
         initialize:                    false
-        <<: *input
 
     - name: Initialize backup
       netapp.ontap.na_ontap_snapmirror:
@@ -63,6 +62,5 @@
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         update:                        false
         initialize:                    true
-        <<: *input
 
   post_tasks:

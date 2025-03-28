@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-35-01 - iGroups"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -47,7 +47,6 @@
         initiator_names:               "{{ ontap_35_lin_igroup_iqns if 'lin' in item else
                                            ontap_35_win_igroup_iqns if 'win' in item else
                                            default(omit) }}"
-        <<: *input
       loop:
         - "{{ ontap_35_lin_igroup_name }}"
         - "{{ ontap_35_win_igroup_name }}"

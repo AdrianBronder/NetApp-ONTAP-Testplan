@@ -1,0 +1,87 @@
+################################################################################
+#
+# Title:        ONTAP-self-backup-81 - Modify Backup
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-03-06
+# Description:  Advanced - Self-Service
+#               - Modify Backup
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+
+- hosts:                               "secondary_storage_clusters"
+  name:                                "ONTAP-self-backup-81 - Modify Backup"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Make sure destination volume is present
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ request_volume + '_dst' }}"
+        aggregate_name:                "{{ storage_aggregates[0].name }}"
+        type:                          "DP"
+        vserver:                       "{{ request_svm + '-backup' }}"
+      when:
+        - request_service_value != "none"
+
+    - name: Modify Backup Relationship
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         "{{ 'absent' if request_service_value == 'none' else 'present' }}"
+        source_endpoint:
+          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+          path:                        "{{ request_svm + ':' + request_volume }}"
+        destination_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "{{ request_svm + '-backup:' + request_volume + '_dst' }}"
+        create_destination:
+          enabled:                     false
+        policy:                        "{{ request_service_value }}"
+        schedule:                      "10min"
+        update:                        false
+        initialize:                    false
+
+    - name: Initialize backup
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+          path:                        "{{ request_svm + ':' + request_volume }}"
+        destination_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "{{ request_svm + '-backup:' + request_volume + '_dst' }}"
+        update:                        false
+        initialize:                    true
+      when:
+        - request_service_value != "none"
+
+    - name: Remove volume, if backup is disabled
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ request_volume + '_dst' }}"
+        vserver:                       "{{ request_svm + '-backup' }}"
+      when:
+        - request_service_value == "none"
+
+  post_tasks:

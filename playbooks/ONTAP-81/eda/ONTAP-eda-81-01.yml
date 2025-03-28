@@ -1,0 +1,55 @@
+################################################################################
+#
+# Title:        ONTAP-81-eda-01 - React to attack
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-02-25
+# Description:  Advanced - Anti-Ransomware
+#               - React to attack - Take SVM Network down
+#                 with Event-driven Ansible
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-81-eda-01 - React to attack"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Take network interfaces down on {{ svm_name }}
+      netapp.ontap.na_ontap_interface:
+        state:                         present
+        vserver:                       "{{ item.svm.name }}"
+        interface_name:                "{{ item.name }}"
+        admin_status:                  "down"
+      loop:
+        "{{ network_ip_interfaces }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - network_ip_interfaces | length > 0
+        - item.scope == "svm"
+        - item.svm.name is defined
+        - item.svm.name == svm_name
+
+  post_tasks:

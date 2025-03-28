@@ -18,19 +18,19 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-20-04 - SVM Data Protocol Setup"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -44,7 +44,6 @@
         nfsv4:                         "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
         nfsv41:                        "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
         showmount:                     "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -52,6 +51,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
@@ -63,7 +63,6 @@
           vserver:                     "{{ item.svm.name }}"
         body:
           v3-64bit-identifiers:        "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -71,6 +70,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - item.protocol.v3_64bit_identifiers_enabled is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
@@ -83,7 +83,6 @@
           vserver:                     "{{ item.svm.name }}"
         body:
           v4-64bit-identifiers:        "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -91,6 +90,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - item.protocol.v4_64bit_identifiers_enabled is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
@@ -100,7 +100,6 @@
         state:                         present
         name:                          "ro_{{ item.svm.name }}"
         vserver:                       "{{ item.svm.name }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
@@ -108,6 +107,7 @@
       when:
         - protocols_nfs_services | length > 0
         - item.svm.name is defined 
+        - item.svm.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
@@ -122,14 +122,14 @@
         protocol:                      "nfs"
         super_user_security:           "none"
         allow_suid:                    false
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
         label: "{{ item.svm.name }}"
       when:
         - protocols_nfs_services | length > 0
-        - item.svm.name is defined 
+        - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
@@ -139,14 +139,14 @@
         name:                          "{{ item.svm.name.replace('-','_') }}_root"
         vserver:                       "{{ item.svm.name }}"
         export_policy:                 "ro_{{ item.svm.name }}"
-        <<: *input
       loop:
         "{{ protocols_nfs_services }}"
       loop_control:
         label: "{{ item.svm.name }}"
       when:
         - protocols_nfs_services | length > 0
-        - item.svm.name is defined 
+        - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
@@ -156,13 +156,13 @@
         vserver:                       "{{ item.0.key }}"
         fqdn:                          "{{ item.1.fqdn }}"
         server_ip:                     "{{ item.1.ip }}"
-        <<: *input
       loop:
         "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
       loop_control:
         label: "{{ item.0.key }}"
       when:
         - protocols_active_directory | list | length > 0
+        - item.0.key is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.0.key
   
@@ -176,14 +176,14 @@
         ou:                            "{{ item.ad_domain.organizational_unit }}"
         admin_user_name:               "{{ all_ad_join_user }}"
         admin_password:                "{{ all_ad_join_password }}"
-        <<: *input
       loop:
         "{{ protocols_cifs_services }}"
       loop_control:
         label: "{{ item.name }}"
       when:
         - protocols_cifs_services | length > 0
-        - item.name is defined 
+        - item.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
@@ -195,7 +195,6 @@
           vserver:                     "{{ item.svm.name }}"
         body:
           comment:                     "{{ item.comment }}"
-        <<: *input
       loop:
         "{{ protocols_cifs_services }}"
       loop_control:
@@ -203,6 +202,7 @@
       when:
         - protocols_cifs_services | length > 0
         - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - item.comment is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name

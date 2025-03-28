@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-31-02 - Volumes & Qtrees"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -48,7 +48,6 @@
         junction_path:                 "/{{ ontap_31_vol_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "unix"
-        <<: *input
   
     - name: Create qtrees
       netapp.ontap.na_ontap_qtree:
@@ -59,7 +58,6 @@
         security_style:                "unix"
         unix_permissions:              0777
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         "{{ ontap_31_vol_qtree_names }}"
   

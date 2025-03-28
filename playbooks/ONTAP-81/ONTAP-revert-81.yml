@@ -1,10 +1,10 @@
 ################################################################################
 #
-# Title:        ONTAP-revert-81 - Advanced - CIFS Self-Service
+# Title:        ONTAP-revert-81 - Advanced - Self-service
 # Author:       NetApp Inc. (badrian)
 # Initial 
-# Create Date:  2024-02-09
-# Description:  Revert all steps performed in test frame 81
+# Create Date:  2024-02-25
+# Description:  Revert all steps performed in test frame 80
 # 
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -14,17 +14,136 @@
 #
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-revert-81 - Advanced - CIFS Self-Service"
+- hosts:                               "linux"
+  name:                                "OTAP-revert-81 - Advanced - Self-service - Linux"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Unmount directories used for testing
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ item.0 }}.{{ all_default_dns_domain }}:/\
+                                        {{ item.1 }}/{{ item.2 }}"
+        path:                          "{{ linux_81_mount_dir }}/{{ item.0 }}/{{ item.1 }}_{{ item.2 }}"
+#        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
+      loop:
+        "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_qtrees+ontap_81_arp_qtrees) | list }}"
+
+- hosts:                               "secondary_storage_clusters"
+  name:                                "ONTAP-revert-81 - Advanced - Self-service - secondary only"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
+
+  tasks:
+    - name: Get all SnapMirror relations to be deleted
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "snapmirror/relationships"
+        fields:
+          - "source"
+          - "destination"
+        parameters:
+          source.svm.name:             "sp-svm-*"
+        use_python_keys:               true
+      register: snapmirror_info
+  
+    - name: Remove all volume protections
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         absent
+        source_endpoint:
+          cluster:                     "{{ item.source.cluster.name }}"
+          path:                        "{{ item.source.path }}"
+        destination_endpoint:
+          path:                        "{{ item.destination.path }}"
+      loop:
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
+      loop_control:
+        label: "{{ item.destination.path }}"
+      when:
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
+        - item.destination.path is defined
+    
+    - name: Get all SVM peerings from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "svm/peers"
+        fields:
+          - "svm"
+          - "peer"
+        parameters:
+          svm.name:                    "sp-svm-*"
+        use_python_keys:               true
+      register: svm_peer_info
+
+    - name: Remove SVM peerings
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "{{ item.svm.name }}"
+        peer_vserver:                  "{{ item.peer.svm.name }}"
+        peer_cluster:                  "{{ item.peer.cluster.name }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ hostvars[item.peer.cluster.name].ansible_host }}"
+      when:
+        - svm_peer_info.ontap_info.svm_peers.num_records|int > 0
+        - item.name is defined
+      loop:
+        "{{ svm_peer_info.ontap_info.svm_peers.records }}"
+      ignore_errors: true
+
+    - name: Remove protection policies
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         absent
+        vserver:                       "{{ item.0.name }}"
+        policy_name:                   "{{ item.1 }}"
+      loop:
+        "{{ svm_svms |
+            product([ontap_81_snapm_policy_standard,
+                     ontap_81_snapm_policy_premium,
+                     ontap_81_snapm_policy_ultimate]) |
+            list }}"
+      loop_control:
+        label: "{{ item.0.name }} - {{ item.1 }}"
+      when:
+        - svm_svms | length > 0
+        - item.0.name is defined
+        - item.0.name is regex('^sp-svm.*')
+
+    - name: Remove backup volumes
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ item.1 }}_dst"
+        vserver:                       "{{ item.0 }}-backup"
+      loop_control:
+        label:                         "{{ item.1 }}_dst"
+      loop:
+        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-revert-81 - Advanced - Self-service - primary only"
+  gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -42,37 +161,84 @@
   pre_tasks:
 
   tasks:
-    - name: Get all CIFS shares for test frame 81
-      netapp.ontap.na_ontap_rest_info:
-        gather_subset:
-          - "protocols/cifs/shares"
-        fields:
-          - "*"
-        parameters:
-          svm.name:               "{{ global_primary_nas_svm }}"
-          path:                   "/ontap_81_*"
-        use_python_keys:          true
-      register: cifs_share_info
-  
-    - name: Delete all CIFS shares
-      netapp.ontap.na_ontap_cifs:
-        state:                    absent
-        name:                     "{{ item.name }}"                  
-        vserver:                  "{{ item.svm.name }}"
+    - name: Remove REST EMS destination for every tenant
+      netapp.ontap.na_ontap_ems_destination:
+        state:                         "absent"
+        name:                          "dest_{{ item }}"
+        type:                          "{{ ontap_81_ems_dest_type }}"
+        filters:                       "ems_{{ item }}"
+        destination:                   "{{ ontap_81_ems_dest_destination }}{{ item }}"
       loop:
-        "{{ cifs_share_info.ontap_info.protocols_cifs_shares.records }}"
-      loop_control:
-        label: "{{ item.svm.name }} - {{ item.name }}"
-      when:
-      - cifs_share_info.ontap_info.protocols_cifs_shares.num_records|int > 0
-      - item.name is defined
+        "{{ ontap_81_svms }}"
+
+    - name: Remove EMS filters 
+      netapp.ontap.na_ontap_ems_filter:
+        state:                         "absent"
+        name:                          "ems_{{ item }}"
+      loop:
+        "{{ ontap_81_svms }}"
 
     - name: Remove volumes
       netapp.ontap.na_ontap_volume:
         state:                         absent
-        name:                          "{{ item }}"
-        vserver:                       "{{ global_primary_nas_svm }}"
+        name:                          "{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
       loop:
-        "{{ ontap_81_volumes }}"
+        "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
+
+  post_tasks:
+
+- hosts:                               "ontap"
+  name:                                "ONTAP-revert-81 - Advanced - Self-service"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+    - name: Delete CIFS server on SVMs
+      netapp.ontap.na_ontap_cifs_server:
+        state:                         absent
+        name:                          "{{ item.name }}"
+        vserver:                       "{{ item.svm.name }}"
+        domain:                        "{{ item.ad_domain.fqdn }}"
+        ou:                            "{{ item.ad_domain.organizational_unit }}"
+        admin_user_name:               "{{ all_ad_join_user }}"
+        admin_password:                "{{ all_ad_join_password }}"
+      loop:
+        "{{ protocols_cifs_services }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - protocols_cifs_services | length > 0
+        - item.name is defined
+        - item.svm.name is regex('^sp-svm.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+    - name: Remove SVMs
+      netapp.ontap.na_ontap_svm:
+        state:                         absent
+        name:                          "{{ item.name }}"
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^sp-svm.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
 
   post_tasks:

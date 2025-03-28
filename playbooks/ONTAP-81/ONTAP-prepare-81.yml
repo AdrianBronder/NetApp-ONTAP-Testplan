@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-prepare-81 - Advanced - CIFS Self-Service
+# Title:        ONTAP-prepare-81 - Advanced - Self-service
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2024-02-09
@@ -15,7 +15,6 @@
 ################################################################################
 
 - ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-prepare-20.yml
-- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-01.yml
-- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-02.yml
-- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-03.yml
-- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-04.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-02.yml

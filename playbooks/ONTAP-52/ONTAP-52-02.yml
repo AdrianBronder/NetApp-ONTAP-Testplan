@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-52-02 - Custom Policies"
   gather_facts:                        false
-  vars:
-    input_01: &input_01
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -41,30 +41,29 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_52_snap_policy_name }}"
         schedule:                      "5min"
-        prefix:                        "5min_"
+        prefix:                        "5min"
         snapmirror_label:              "{{ ontap_52_snapm_sched_label }}"
         count:                         6
         enabled:                       True
-        <<: *input_01
 
   post_tasks:
 
 - hosts:                               "secondary_storage_clusters"
   name:                                "ONTAP-52-02 - Custom Policies"
   gather_facts:                        false
-  vars:
-    input_02: &input_02
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -81,6 +80,5 @@
         keep:
           - 5
           - 36
-        <<: *input_02
 
   post_tasks:

@@ -1,0 +1,95 @@
+################################################################################
+#
+# Title:        ONTAP-81-11 - CIFS Demo Roll-out
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2024-02-09
+# Description:  Advanced - Self-service
+#               - Shares & Qtrees
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-81-11 - CIFS Demo Roll-out"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "{{ ontap_81_policy_name }}"
+        vserver:                       "{{ item }}"
+      loop:
+        "{{ ontap_81_svms }}"
+  
+    - name: Create read-write export policy rules for data volumes
+      netapp.ontap.na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "{{ ontap_81_policy_name }}"
+        vserver:                       "{{ item }}"
+        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
+      loop:
+        "{{ ontap_81_svms }}"
+        
+    - name: Create qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                         present
+        name:                          "{{ item.1 }}"
+        flexvol_name:                  "{{ ontap_81_volumes[0] }}"
+        security_style:                "ntfs"
+        vserver:                       "{{ item.0 }}"
+      loop:
+        "{{ ontap_81_svms | product(ontap_81_qtrees) | list }}"
+
+    - name: Set quota (1GiB)
+      netapp.ontap.na_ontap_quotas:
+        state:                         present
+        vserver:                       "{{ item.0 }}"
+        volume:                        "{{ ontap_81_volumes[0] }}"
+        quota_target:                  "{{ item.1 }}"
+        type:                          "tree"
+        disk_limit:                    1048576
+        set_quota_status:              True
+      loop:
+        "{{ ontap_81_svms | product(ontap_81_qtrees) | list }}"
+
+    - name: Create CIFS share
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ (ontap_81_volumes[0] | replace('ontap_81_','')) }}_{{ item.1 }}"
+        path:                          "/{{ ontap_81_volumes[0] }}/{{ item.1 }}"
+        vserver:                       "{{ item.0 }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        comment:                       "Test share created as part of test frame ONTAP-81"
+      loop:
+        "{{ ontap_81_svms | product(ontap_81_qtrees) | list }}"
+
+  post_tasks:

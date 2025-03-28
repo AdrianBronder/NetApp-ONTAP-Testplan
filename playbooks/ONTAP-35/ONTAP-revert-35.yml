@@ -17,19 +17,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-35 - iSCSI - ONTAP (read)"
   gather_facts:                        false
-  vars:
-    input_read: &input_read
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -44,8 +44,7 @@
           - "serial_number"
         parameters:
           svm.name:                    "{{ global_primary_san_svm }}"
-        use_python_keys:               true
-        <<: *input_read
+        use_python_keys:               true_read
       register: lun_info
 
   post_tasks:
@@ -185,19 +184,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-35 - iSCSI - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Unmap LUNs
@@ -208,7 +207,6 @@
                                            ontap_35_win_igroup_name if 'win' in (item | split('/'))[3] else
                                            default(omit) }}"
         path:                          "{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"
@@ -219,7 +217,6 @@
         vserver:                       "{{ global_primary_san_svm }}"
         name:                          "{{ (item | split('/'))[3] }}"
         flexvol_name:                  "{{ (item | split('/'))[2] }}"
-        <<: *input
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"
@@ -229,7 +226,6 @@
         state:                         absent
         vserver:                       "{{ global_primary_san_svm }}"
         name:                          "{{ item }}"
-        <<: *input
       loop:
         - "{{ ontap_35_lin_igroup_name }}"
         - "{{ ontap_35_win_igroup_name }}"
@@ -239,7 +235,6 @@
         state:                         absent
         vserver:                       "{{ global_primary_san_svm }}"
         name:                          "{{ (item | split('/'))[2] }}"
-        <<: *input
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"

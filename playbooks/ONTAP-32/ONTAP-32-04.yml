@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-32-04 - FlexGroups & Qtrees"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -49,7 +49,6 @@
         junction_path:                 "/{{ ontap_32_fg_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         wait_for_completion:           True
-        <<: *input
   
     - name: Create qtrees
       netapp.ontap.na_ontap_qtree:
@@ -58,7 +57,6 @@
         flexvol_name:                  "{{ ontap_32_fg_name }}"
         security_style:                "ntfs"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         "{{ ontap_32_fg_qtree_names }}"
   

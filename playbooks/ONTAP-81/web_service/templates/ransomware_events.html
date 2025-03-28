@@ -1,0 +1,103 @@
+{% extends "base_enduser.html" %}
+
+{% block title %}Events for {{ company }}{% endblock %}
+
+{% block content %}
+<h1>Events for {{ company }}</h1>
+
+<!-- Volume Summary Section -->
+<div class="container mt-0">
+    <h2>Volume Summary</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Department</th>
+                <th>Event Count</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for volume, count in summary.items() %}
+                <tr>
+                    <td>{{ volume | replace('ontap_81_', '') }}</td>
+                    <td>{{ count }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Event Details Section -->
+<div class="container mt-0">
+    <h2>Event Details</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Timestamp</th>
+                <th>Sequence Number</th>
+                <th>Node</th>
+                <th>Vserver</th>
+                <th>Volume</th>
+                <th>Message Name</th>
+                <th>Event Detail</th>
+                <th>Access Path</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for event in data %}
+                <tr>
+                    <td>{{ event.timestamp }}</td>
+                    <td>{{ event.seq_num }}</td>
+                    <td>{{ event.node }}</td>
+                    <td>{{ event.vserver_name }}</td>
+                    <td>{{ event.volume_name }}</td>
+                    <td>{{ event.message_name }}</td>
+                    <td><a href="#" class="event-link" data-event="{{ event.event }}">View Details</a></td>
+                    <td><a href="#" class="event-link" data-event="\\{{ event.vserver_name }}\{{ event.volume_name }}">View Path</a></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+
+<div id="eventModal" class="modal">
+    <div class="modal-content">
+        <p id="eventDetail"></p>
+        <button type="button" class="btn btn-secondary" id="closeModalButton">Close</button>
+    </div>
+</div>
+
+<script>
+    // Get the modal
+    var modal = document.getElementById("eventModal");
+
+    // Get the close button
+    var closeModalButton = document.getElementById("closeModalButton");
+
+    // When the user clicks on the close button, close the modal
+    closeModalButton.onclick = function() {
+        modal.style.display = "none";
+    }
+
+    // Prevent closing the modal when clicking outside of it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            event.stopPropagation();
+        }
+    }
+
+    // Get all event links
+    var eventLinks = document.getElementsByClassName("event-link");
+
+    // Add click event to each link
+    for (var i = 0; i < eventLinks.length; i++) {
+        eventLinks[i].onclick = function() {
+            var eventDetail = this.getAttribute("data-event");
+            document.getElementById("eventDetail").innerText = eventDetail;
+            modal.style.display = "block";
+        }
+    }
+</script>
+{% endblock %}

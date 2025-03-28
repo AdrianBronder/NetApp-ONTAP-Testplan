@@ -1,0 +1,186 @@
+{% extends "base_operator.html" %}
+
+{% block title %}Operator View - Storage Services{% endblock %}
+
+{% block content %}
+<div class="container mt-0">
+    <h1 class="my-4">Operator View - Storage Services</h1>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Department</th>
+                <th>Local Versioning</th>
+                <th>Backup</th>
+                <th>Ransom-ware Protected</th>
+                <th>Data Pipeline</th>
+                <th>GB Ordered</th>
+                <th>Base Price ($/month)</th>
+                <th>Total ($/month)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for department in departmentConsumedServices %}
+                <tr>
+                    <td>{{ department.company_name }}</td>
+                    <td>{{ department.name }}</td>
+                    <td class="{% if department.local_versioning != 'disabled' %}bold-green{% endif %}">
+                        {{ department.local_versioning }}
+                    </td>
+                    <td class="{% if department.backup != 'disabled' %}bold-green{% endif %}">
+                        {{ department.backup }}
+                    </td>
+                    <td class="{% if department.ransomware_protection != 'disabled' %}bold-green{% endif %}">
+                        {{ department.ransomware_protection }}
+                    </td>
+                    <td class="{% if department.data_pipeline != 'disabled' %}bold-green{% endif %}">
+                        {{ department.data_pipeline }}
+                    </td>
+                    <td>{{ '{:0.2f}'.format(department.total_ordered) }}</td>
+                    <td>{{ '{:0.2f}'.format(department.base_price) }}</td>
+                    <td>{{ '{:0.2f}'.format(department.total_billed) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="container">
+    <h1 class="my-4">Storage Units</h1>
+    <div class="charts-container">
+        <div class="chart-container">
+            <canvas id="quotaSizePieChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <canvas id="quotaCountPieChart"></canvas>
+        </div>
+    </div>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Company</th>
+                <th>Department</th>
+                <th>Share Name</th>
+                <th>Requested Size (GiB)</th>
+                <th>Used Size (GiB)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for quota in quotaReport %}
+                <tr>
+                    <td>{{ quota.svm.name | replace('sp-svm-', '') }}</td>
+                    <td>{{ quota.volume.name | replace('ontap_81_', '') }}</td>
+                    <td>{{ quota.qtree.name }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.hard_limit / 1024**3) }}</td>
+                    <td>{{ '{:0.2f}'.format(quota.space.used.total / 1024**3) }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .charts-container {
+        display: flex;
+        justify-content: space-around;
+        margin-bottom: 20px;
+    }
+    .chart-container {
+        width: 300px;
+        height: 300px;
+    }
+    .chart-container canvas {
+        width: 100% !important;
+        height: 100% !important;
+    }
+    .container.mt-0 {
+        margin-top: 0 !important;
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+var ctx = document.getElementById('quotaSizePieChart').getContext('2d');
+var quotaSizePieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_space|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_space|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Share Distribution (Size - GiB) per Company'
+            }
+        }
+    }
+});
+</script>
+<script>
+var ctx = document.getElementById('quotaCountPieChart').getContext('2d');
+var quotaCountPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Share Distribution (Count) per Company'
+            }
+        }
+    }
+});
+</script>
+<script>
+var ctx = document.getElementById('addonQuotaCountPieChart').getContext('2d');
+var addonQuotaCountPieChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: {{ quota_distribution_count|map(attribute='0')|list|tojson }},
+        datasets: [{
+            data: {{ quota_distribution_count|map(attribute='1')|list|tojson }},
+            backgroundColor: {{ colors|tojson }},
+            borderColor: {{ colors|tojson }},
+            borderWidth: 1
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'top',
+            },
+            title: {
+                display: true,
+                text: 'Add-on Service Distribution (Count) per Department'
+            }
+        }
+    }
+});
+</script>
+{% endblock %}

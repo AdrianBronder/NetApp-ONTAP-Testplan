@@ -18,19 +18,19 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-15-01 - Peering Network"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -39,7 +39,6 @@
       netapp.ontap.na_ontap_ipspace:
         state:                         present
         name:                          "{{ item.name }}"
-        <<: *input
       loop:
         "{{ network_ipspaces }}"
       loop_control:
@@ -53,7 +52,6 @@
         name:                          "{{ item.name }}"
         mtu:                           "{{ item.mtu }}"
         ipspace:                       "{{ item.ipspace.name }}"
-        <<: *input
       loop:
         "{{ network_ethernet_broadcast_domains }}"
       loop_control:
@@ -71,7 +69,6 @@
         ports:                         "{{ item.lag.member_ports | map(attribute='name') | flatten }}"
         distribution_function:         "{{ item.lag.distribution_policy }}"
         mode:                          "{{ item.lag.mode }}"
-        <<: *input
       loop:
         "{{ network_ethernet_ports }}"
       loop_control:
@@ -92,7 +89,6 @@
         netmask:                       "{{ item.ip.netmask }}"
         service_policy:                "{{ item.service_policy.name | default(omit) }}"
         is_auto_revert:                "{{ item.location.auto_revert | default(omit) }}"
-        <<: *input
       loop:
         "{{ network_ip_interfaces }}"
       loop_control:

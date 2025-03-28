@@ -74,19 +74,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-37 - NVMe/TCP - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove subsystem
@@ -96,14 +96,12 @@
         subsystem:                     "{{ ontap_37_lin_subsystem_name }}"
         skip_mapped_check:             true
         skip_host_check:               true
-        <<: *input
 
     - name: Remove namespaces
       netapp.ontap.na_ontap_nvme_namespace:
         state:                         absent
         vserver:                       "{{ global_primary_san_svm }}"
         path:                          "{{ item }}"
-        <<: *input
       loop:
         "{{ ontap_37_lin_namespaces }}"
 
@@ -112,6 +110,5 @@
         state:                         absent
         vserver:                       "{{ global_primary_san_svm }}"
         name:                          "{{ (item | split('/'))[2] }}"
-        <<: *input
       loop:
         "{{ ontap_37_lin_namespaces }}"

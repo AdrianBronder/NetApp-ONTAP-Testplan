@@ -18,19 +18,19 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-20-02 - SVM Logical Network"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -46,7 +46,6 @@
         netmask:                       "{{ item.ip.netmask }}"
         service_policy:                "{{ item.service_policy.name | default(omit) }}"
         is_auto_revert:                "{{ item.location.auto_revert | default(omit) }}"
-        <<: *input
       loop:
         "{{ network_ip_interfaces }}"
       loop_control:
@@ -54,6 +53,7 @@
       when:
         - network_ip_interfaces | length > 0
         - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - item.scope == "svm"
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name 
@@ -64,7 +64,6 @@
         vserver:                       "{{ item.name }}"
         destination:                   "0.0.0.0/0"
         gateway:                       "{{ all_default_gateway }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -72,6 +71,7 @@
       when:
         - svm_svms | length > 0
         - item.name is defined
+        - item.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.name
 

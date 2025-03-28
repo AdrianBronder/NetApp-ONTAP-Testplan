@@ -18,24 +18,24 @@
 - hosts:                               "ontap"
   name:                                "ONTAP-20-01 - Storage Virtual Machines (SVMs)"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
   tasks:
-    - name: Create all SVMs for testing"
+    - name: Create SVMs for testing"
       netapp.ontap.na_ontap_svm:
         state:                         present
         name:                          "{{ item.name }}"
@@ -52,14 +52,14 @@
             allowed:                   "{{ item.iscsi.allowed | default(omit) }}"
           nvme:
             allowed:                   "{{ item.nvme.allowed | default(omit) }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
         label: "{{ item.name }}"
       when:
         - svm_svms | length > 0
-        - item.name is defined 
+        - item.name is defined
+        - item.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.name
   
@@ -71,7 +71,6 @@
           vserver:                     "{{ item.name }}"
         body:
           auto_enable_analytics:       "{{ item.auto_enable_analytics }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -79,6 +78,7 @@
       when:
         - svm_svms | length > 0
         - item.name is defined
+        - item.name is regex('^ntap-svm.*')
         - item.auto_enable_analytics is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.name
@@ -92,7 +92,6 @@
         body:
           auto_enable_activity_tracking:
                                        "{{ item.auto_enable_activity_tracking }}"
-        <<: *input
       loop:
         "{{ svm_svms }}"
       loop_control:
@@ -100,6 +99,7 @@
       when:
         - svm_svms | length > 0
         - item.name is defined
+        - item.name is regex('^ntap-svm.*')
         - item.auto_enable_activity_tracking is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.name
@@ -109,14 +109,14 @@
         state:                         present
         service_state:                 "started"
         vserver:                       "{{ item.svm.name }}"
-        <<: *input
       loop:
         "{{ protocols_san_iscsi_services }}"
       loop_control:
         label: "{{ item.svm.name }}"
       when:
         - protocols_san_iscsi_services | length > 0
-        - item.svm.name is defined 
+        - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   
@@ -125,14 +125,14 @@
         state:                         present
         status_admin:                  true
         vserver:                       "{{ item.svm.name }}"
-        <<: *input
       loop:
         "{{ protocols_nvme_services }}"
       loop_control:
         label: "{{ item.svm.name }}"
       when:
         - protocols_nvme_services | length > 0
-        - item.svm.name is defined 
+        - item.svm.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
   

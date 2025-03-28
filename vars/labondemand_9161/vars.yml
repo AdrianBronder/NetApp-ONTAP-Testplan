@@ -1,0 +1,200 @@
+# General Defaults
+global_primary_nas_svm:           "ntap-svm01-nas"
+global_primary_san_svm:           "ntap-svm02-san"
+global_primary_backup_svm:        "ntap-svm03-backup"
+ontap_default_vol_size_gb:        10
+ontap_default_vol_size_increment_gb: 2
+ontap_default_fg_size_gb:         1024
+ontap_default_fg_size_increment_gb: 10
+ontap_default_fg_multiplier:      8
+ontap_default_lun_size_gb:        5
+ontap_default_ns_size_gb:         5
+ontap_iscsi_vendor_id:            "3600a0980"
+linux_default_mount_dir:          "/mnt/ontap_test"
+windows_default_mount_dir:        "C:\\Users\\Administrator.DEMO\\Desktop\\ontap_test"
+
+# ONTAP-12 - Cluster User Management
+ontap_12_local_ro:                "na_local_ro"
+ontap_12_local_admin:             "na_local_admin"
+ontap_12_test_svm01:              "svm_ontap_12_01"
+ontap_12_ad_ro_group:             "DEMO\\na_ad_ro_group"
+ontap_12_ad_ro_user:              "DEMO\\na_ad_ro_user"
+ontap_12_ad_ro_user_pw:           "{{ vault_ontap_12_ad_ro_user_pw }}"
+ontap_12_ad_admin_group:          "DEMO\\na_ad_admin_group"
+ontap_12_ad_admin_user:           "DEMO\\na_ad_admin_user"
+ontap_12_ad_admin_user_pw:        "{{ vault_ontap_12_ad_admin_user_pw }}"
+ontap_12_test_svm02:              "svm_ontap_12_02"
+
+# ONTAP-31 - NFS
+ontap_31_policy_name:             "ontap_31_policy"
+ontap_31_vol_name:                "ontap_31_nfs_vol01"
+ontap_31_vol_qtree_names:
+  - "ontap_31_vol_qt01"
+  - "ontap_31_vol_qt02"
+  - "ontap_31_vol_qt03"
+  - "ontap_31_vol_qt04"
+  - "ontap_31_vol_qt05"
+ontap_31_fg_name:                 "ontap_31_nfs_fg01"
+ontap_31_fg_qtree_names:
+  - "ontap_31_fg_qt01"
+  - "ontap_31_fg_qt02"
+  - "ontap_31_fg_qt03"
+  - "ontap_31_fg_qt04"
+  - "ontap_31_fg_qt05"
+linux_31_mount_dir:               "{{ linux_default_mount_dir }}/31"
+
+# ONTAP-32 - CIFS
+ontap_32_vol_name:                "ontap_32_cifs_vol01"
+ontap_32_vol_qtree_names:
+  - "ontap_32_vol_qt01"
+  - "ontap_32_vol_qt02"
+  - "ontap_32_vol_qt03"
+  - "ontap_32_vol_qt04"
+  - "ontap_32_vol_qt05"
+ontap_32_fg_name:                 "ontap_32_cifs_fg01"
+ontap_32_fg_qtree_names:
+  - "ontap_32_fg_qt01"
+  - "ontap_32_fg_qt02"
+  - "ontap_32_fg_qt03"
+  - "ontap_32_fg_qt04"
+  - "ontap_32_fg_qt05"
+ontap_32_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_32_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+windows_32_mount_dir:             "{{ windows_default_mount_dir }}\\32"
+ontap_32_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+
+# ONTAP-35 - iSCSI
+ontap_35_lin_igroup_name:         "ontap_35_lin_ig01"
+ontap_35_lin_igroup_iqns:         "{{ hostvars[groups['linux_hosts'][0]].iscsi.initiator_name }}"
+ontap_35_win_igroup_name:         "ontap_35_win_ig01"
+ontap_35_win_igroup_iqns:         "{{ hostvars[groups['windows_hosts'][0]].iscsi.initiator_name }}"
+ontap_35_lin_luns:
+  - "/vol/ontap_35_lin_vol01/ontap_35_lin_lun01"
+  - "/vol/ontap_35_lin_vol02/ontap_35_lin_lun02"
+  - "/vol/ontap_35_lin_vol03/ontap_35_lin_lun03"
+ontap_35_win_luns:
+  - "/vol/ontap_35_win_vol01/ontap_35_win_lun01"
+  - "/vol/ontap_35_win_vol02/ontap_35_win_lun02"
+  - "/vol/ontap_35_win_vol03/ontap_35_win_lun03"
+linux_35_mount_dir:               "{{ linux_default_mount_dir }}/35"
+windows_35_mount_dir:             "{{ windows_default_mount_dir }}\\35"
+
+# ONTAP-37 - NVMe/TCP
+ontap_37_lin_subsystem_name:      "ontap_37_lin_subs01"
+ontap_37_lin_namespaces:
+  - "/vol/ontap_37_lin_vol01/ontap_37_lin_ns01"
+  - "/vol/ontap_37_lin_vol02/ontap_37_lin_ns02"
+  - "/vol/ontap_37_lin_vol03/ontap_37_lin_ns03"
+linux_37_mount_dir:               "{{ linux_default_mount_dir }}/37"
+
+# ONTAP-41 - Cloning (NFS)
+ontap_41_policy_name:             "ontap_41_policy"
+ontap_41_vol_name:                "ontap_41_nfs_vol01"
+ontap_41_snapshot_name:           "software_source"
+ontap_41_clone_dir_name:          "clonedir"
+ontap_41_clone_vol_name:          "{{ ontap_41_snapshot_name }}"
+linux_41_mount_dir:               "{{ linux_default_mount_dir }}/41"
+
+# ONTAP-42 - Quality of Service
+ontap_42_policy_name:             "ontap_42_policy"
+ontap_42_qos_policy_name:         "ontap_42_qos_policy"
+ontap_42_vol_name:                "ontap_42_noqos_vol01"
+ontap_42_qos_vol_name:            "ontap_42_qos_vol01"
+ontap_42_nfs_suffix:              "_nfs_qt01"
+ontap_42_cifs_suffix:             "_cifs_qt01"
+linux_42_mount_dir:               "{{ linux_default_mount_dir }}/42"
+windows_42_mount_dir:             "{{ windows_default_mount_dir }}\\42"
+ontap_42_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_42_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+ontap_42_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_42_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+
+# ONTAP-51 - Local Versioning (Snapshots)
+ontap_51_policy_name:             "ontap_51_policy"
+ontap_51_vol_name:                "ontap_51_vol01"
+ontap_51_win_qtree_name:          "ontap_51_win_qt01"
+ontap_51_lin_qtree_name:          "ontap_51_lin_qt01"
+ontap_51_snapshot_name:           "ontap_51_snapshot"
+ontap_51_snap_policy_name:        "ontap_51_snap_policy"
+linux_51_mount_dir:               "{{ linux_default_mount_dir }}/51"
+windows_51_mount_dir:             "{{ windows_default_mount_dir }}\\51"
+ontap_51_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_51_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+ontap_51_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_51_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+
+# ONTAP-52 - Backup (SnapMirror)
+ontap_52_policy_name:             "ontap_52_policy"
+ontap_52_vol_name:                "ontap_52_vol01"
+ontap_52_win_qtree_name:          "ontap_52_win_qt01"
+ontap_52_lin_qtree_name:          "ontap_52_lin_qt01"
+ontap_52_snapshot_name:           "ontap_52_snapshot"
+ontap_52_snapm_sched_label:       "ontap_52_snapm_sched"
+ontap_52_snapm_adhoc_label:       "ontap_52_snapm_adhoc"
+ontap_52_snap_policy_name:        "ontap_52_snap_policy"
+ontap_52_snapm_policy_name:       "ontap_52_snapm_policy"
+linux_52_mount_dir:               "{{ linux_default_mount_dir }}/52"
+windows_52_mount_dir:             "{{ windows_default_mount_dir }}\\52"
+ontap_52_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_52_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+ontap_52_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_52_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+
+# ONTAP-81 - Advanced - Self-service
+ontap_81_ldap_host:               "ldap://dc1.demo.netapp.com"
+ontap_81_base_dn:                 "dc=demo,dc=netapp,dc=com"
+ontap_81_user_dn:                 "cn=Users"
+ontap_81_user_rdn_attr:           "cn"
+ontap_81_user_login_attr:         "sAMAccountName"
+ontap_81_bind_user_dn:            "Administrator@demo.netapp.com"
+ontap_81_bind_user_pw:            "{{ vault_ontap_81_bind_user_pw }}"
+ontap_81_user_search_scope:       "SUBTREE"
+ontap_81_group_search_base:       "dc=demo,dc=netapp,dc=com"
+ontap_81_group_search_filter:     "(objectclass=group)"
+ontap_81_group_search_scope:      "SUBTREE"
+ontap_81_group_members_attr:      "member"
+ontap_81_secret_key:              "{{ vault_ontap_81_secret_key }}"
+
+ontap_81_bluecorp_user:           "DEMO\\bluecorp_user"
+ontap_81_bluecorp_user_pw:        "{{ vault_ontap_81_bluecorp_user_pw }}"
+ontap_81_astrainc_user:           "DEMO\\astrainc_user"
+ontap_81_astrainc_user_pw:        "{{ vault_ontap_81_astrainc_user_pw }}"
+ontap_81_polarisltd_user:         "DEMO\\polarisltd_user"
+ontap_81_polarisltd_user_pw:      "{{ vault_ontap_81_polarisltd_user_pw }}"
+ontap_81_operator_user:           "DEMO\\operator"
+ontap_81_operator_user_pw:        "{{ vault_ontap_81_operator_user_pw }}"
+
+ontap_81_svms:
+  - "sp-svm-bluecorp"
+  - "sp-svm-astrainc"
+  - "sp-svm-polarisltd"
+ontap_81_volumes:                 
+  - "ontap_81_board"
+  - "ontap_81_research"
+  - "ontap_81_hr"
+  - "ontap_81_legal"
+  - "ontap_81_it"
+  - "ontap_81_finance"
+  - "ontap_81_sales"
+
+ontap_81_qtrees:
+  - "ontap_81_demo_01"
+  - "ontap_81_demo_02"
+ontap_81_arp_qtrees:
+  - "ontap_81_arp_demo_01"
+  - "ontap_81_arp_demo_02"
+
+ontap_81_policy_name:             "ontap_81_policy"
+
+ontap_81_snap_policy_standard:    "ontap_81_snap_standard"
+ontap_81_snap_policy_premium:     "ontap_81_snap_premium"
+ontap_81_snap_policy_ultimate:    "ontap_81_snap_ultimate"
+ontap_81_snapm_policy_standard:   "ontap_81_snapm_standard"
+ontap_81_snapm_policy_premium:    "ontap_81_snapm_premium"
+ontap_81_snapm_policy_ultimate:   "ontap_81_snapm_ultimate"
+
+ontap_81_ems_dest_type:           "rest_api"
+ontap_81_ems_dest_destination:    "http://192.168.0.61/"
+ontap_81_ems_eda_dest_destination: "http://192.168.0.61:5000/"
+linux_81_mount_dir:               "{{ linux_default_mount_dir }}/81"

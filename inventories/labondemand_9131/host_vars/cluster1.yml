@@ -158,10 +158,106 @@ svm_svms:
       allowed:                    true
     language:                     "utf8mb4"
     comment:                      "This is the second SVM for SAN testing"
+  - name:                         "sp-svm-bluecorp"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "This is the BlueCorp's SVM for multi-tenancy testing"
+  - name:                         "sp-svm-polarisltd"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "This is the PolarisLtd's SVM for multi-tenancy testing"
+  - name:                         "sp-svm-astrainc"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "This is the AstraInc's SVM for multi-tenancy testing"
 
 protocols_nfs_services:
   - svm:
       name:                       "{{ svm_svms[1].name }}"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                false
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "{{ svm_svms[3].name }}"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                false
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "{{ svm_svms[4].name }}"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                false
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "{{ svm_svms[5].name }}"
     enabled:                      true
     protocol:
       v3_enabled:                 true
@@ -177,6 +273,18 @@ protocols_active_directory:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
   ntap-svm01-nas:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  sp-svm-bluecorp:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  sp-svm-astrainc:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  sp-svm-polarisltd:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
@@ -205,6 +313,30 @@ protocols_cifs_services:
       fqdn:                       "{{ all_ad_domain }}"
       organizational_unit:        "{{ all_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is created for the primary SAN SVM"
+    enabled:                      true
+  - name:                         "svm-bluecorp"
+    svm:
+      name:                       "{{ svm_svms[3].name }}"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is created for the tenant BlueCorp"
+    enabled:                      true
+  - name:                         "svm-astrainc"
+    svm:
+      name:                       "{{ svm_svms[4].name }}"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is created for the tenant AstraInc"
+    enabled:                      true
+  - name:                         "svm-polarisltd"
+    svm:
+      name:                       "{{ svm_svms[5].name }}"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is created for the tenant PolarisLtd"
     enabled:                      true
 
 protocols_san_iscsi_services:
@@ -330,6 +462,54 @@ network_ip_interfaces:
       auto_revert:                false
     service_policy:
       name:                       "default-data-nvme-tcp"
+  - name:                         "{{ svm_svms[3].name }}"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[3].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.231"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "{{ svm_svms[4].name }}"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[4].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.232"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "{{ svm_svms[5].name }}"
+    scope:                        "svm"
+    svm:
+      name:                       "{{ svm_svms[5].name }}"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.233"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
   - name:                         "{{ cluster_nodes[0].name }}_ic01"
     scope:                        "cluster"
     ip:

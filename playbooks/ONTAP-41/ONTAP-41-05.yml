@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-41-05 - Clone Volume"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -41,7 +41,6 @@
         snapshot:                      "{{ ontap_41_snapshot_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume:                        "{{ ontap_41_vol_name }}"
-        <<: *input
 
     - name: Create minimum Clone Junction Path Mountpoint
       netapp.ontap.na_ontap_volume:
@@ -52,7 +51,6 @@
         junction_path:                 "/{{ ontap_41_clone_dir_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
         volume_security_style:         "unix"
-        <<: *input
 
     - name: Create Volume clone (Flexclone) - "{{ ontap_41_snapshot_name }}"
       netapp.ontap.na_ontap_volume_clone:
@@ -62,6 +60,5 @@
         name:                          "{{ ontap_41_clone_vol_name}}"
         parent_snapshot:               "{{ ontap_41_snapshot_name }}"
         junction_path:                 "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}"
-        <<: *input
   
   post_tasks:

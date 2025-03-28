@@ -54,19 +54,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-revert-42 - Quality of Service - ONTAP"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   tasks:
     - name: Remove CIFS share
@@ -74,7 +74,6 @@
         state:                         absent
         name:                          "{{ item }}{{ ontap_42_cifs_suffix }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
@@ -84,7 +83,6 @@
         state:                         absent
         name:                          "{{ item }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
@@ -94,4 +92,3 @@
         state:                         absent
         name:                          "{{ ontap_42_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input

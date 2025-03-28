@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-42-03 - Prepare Filesystem"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -40,7 +40,6 @@
         state:                         present
         name:                          "{{ ontap_42_policy_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
   
     - name: Create read-write export policy rules for data volumes
       na_ontap_export_policy_rule:
@@ -53,7 +52,6 @@
         protocol:                      "nfs"
         super_user_security:           "any"
         allow_suid:                    true
-        <<: *input
 
     - name: Create UNIX qtree
       netapp.ontap.na_ontap_qtree:
@@ -64,7 +62,6 @@
         security_style:                "unix"
         unix_permissions:              0777
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
@@ -76,7 +73,6 @@
         flexvol_name:                  "{{ item }}"
         security_style:                "ntfs"
         vserver:                       "{{ global_primary_nas_svm }}"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
@@ -91,7 +87,6 @@
         oplocks:                       true
         show_snapshot:                 true
         comment:                       "Test share created as part of test frame ONTAP-42"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
@@ -103,7 +98,6 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         user_or_group:                 "Everyone"
         permission:                    "full_control"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
@@ -115,7 +109,6 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         user_or_group:                 "{{ ontap_42_ad_admin_group }}"
         permission:                    "full_control"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"
@@ -127,7 +120,6 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         user_or_group:                 "{{ ontap_42_ad_ro_group }}"
         permission:                    "read"
-        <<: *input
       loop:
         - "{{ ontap_42_vol_name }}"
         - "{{ ontap_42_qos_vol_name }}"

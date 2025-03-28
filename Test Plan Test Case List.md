@@ -71,7 +71,11 @@
 | 52-08 | Backup (SnapMirror)               | Delete Files                          |
 | 52-09 | Backup (SnapMirror)               | Restore Backup                        |
 | 52-11 | Backup (SnapMirror)               | Bulk Protect Volumes                  |
-| ---   | ---                               | ---                                   |
+| 81-01 | Advanced - Self-service           | Base Deployment                       |
+| 81-11 | Advanced - Self-service           | CIFS Demo Roll-out                    |
+| 81-21 | Advanced - Self-service           | Backup Demo Roll-out                  |
+| 81-31 | Advanced - Self-service	        | Ransomware Demo Roll-out              |
+||
 | Prepare-15         | Prepare test frame 15 - Cluster Peering                    | |
 | Prepare-20         | Prepare test frame 20 - Storage Virtual Machines (SVMs)    | |
 | Prepare-31         | Prepare test frame 31 - NFS                                | |
@@ -82,16 +86,18 @@
 | Prepare-42         | Prepare test frame 42 - Quality of Service                 | |
 | Prepare-51         | Prepare test frame 51 - Local Versioning (Snapshots)       | |
 | Prepare-52         | Prepare test frame 52 - Backup (SnapMirror)                | |
-| ---   | ---                               | ---                                   |
-| Revert-00_linux   | Revert all systems to initial state - Linux                 | |
-| Revert-00_windows | Revert all systems to initial state - Windows               | |
-| Revert-00         | Revert all systems to initial state - ONTAP                 | |
-| Revert-20         | Revert test frame 20 - Storage Virtual Machines (SVMs)      | |
-| Revert-31         | Revert test frame 31 - NFS                                  | |
-| Revert-32         | Revert test frame 32 - CIFS                                 | |
-| Revert-35         | Revert test frame 35 - iSCSI                                | |
-| Revert-37         | Revert test frame 37 - NVMe/TCP                             | |
-| Revert-41         | Revert test frame 41 - Cloning (NFS)                        | |
-| Revert-42         | Revert test frame 42 - Quality of Service                   | |
-| Revert-51         | Revert test frame 51 - Local Versioning (Snapshots)         | |
-| Revert-52         | Revert test frame 52 - Backup (SnapMirror)                  | |
+| Prepare-81         | Prepare test frame 81 - Advanced - Self-service            | |
+||
+| Revert-00_linux    | Revert all systems to initial state - Linux                | |
+| Revert-00_windows  | Revert all systems to initial state - Windows              | |
+| Revert-00          | Revert all systems to initial state - ONTAP                | |
+| Revert-20          | Revert test frame 20 - Storage Virtual Machines (SVMs)     | |
+| Revert-31          | Revert test frame 31 - NFS                                 | |
+| Revert-32          | Revert test frame 32 - CIFS                                | |
+| Revert-35          | Revert test frame 35 - iSCSI                               | |
+| Revert-37          | Revert test frame 37 - NVMe/TCP                            | |
+| Revert-41          | Revert test frame 41 - Cloning (NFS)                       | |
+| Revert-42          | Revert test frame 42 - Quality of Service                  | |
+| Revert-51          | Revert test frame 51 - Local Versioning (Snapshots)        | |
+| Revert-52          | Revert test frame 52 - Backup (SnapMirror)                 | |
+| Revert-81          | Revert test frame 81 - Advanced - Self-service             | |

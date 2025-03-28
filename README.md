@@ -17,8 +17,9 @@ They can be used out of the box in Lab on Demand or - by adjusting variables - i
 # Quick Start with Lab on Demand
 For NetApp internal, partner, and customer use - ready to go in less than 15 minutes
 1. Please use one the early adopter virtual hands-on lab (log in with your NetApp support account):
-   - https://labondemand.netapp.com/lab/eapontap9131 (ONTAP 9.13.1)
+   - https://labondemand.netapp.com/lab/eapontap9161 (ONTAP 9.16.1)
    - https://labondemand.netapp.com/lab/eapontap9141 (ONTAP 9.14.1)
+   - https://labondemand.netapp.com/lab/eapontap9131 (ONTAP 9.13.1)
 2. Log into the Linux host (e.g. "centos1" or "RHEL1") and clone this repository:
    ```
    yum install -y git
@@ -32,7 +33,7 @@ For NetApp internal, partner, and customer use - ready to go in less than 15 min
    cd ./NetApp-ONTAP-Testplan
    # based on ONTAP (lab) version: ./init/init_eapontap<ontapversion>.sh
    # e.g.
-   ./init/init_eapontap9141.sh
+   ./init/init_eapontap9161.sh
 
    
    ```
@@ -40,7 +41,7 @@ For NetApp internal, partner, and customer use - ready to go in less than 15 min
    ```
    # based on ONTAP (lab) version: ./inventories/labondemand_<ontapversion>
    # e.g.
-   ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-01/ONTAP-01-04.yml
+   ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-01/ONTAP-01-04.yml
 
    
    ```
@@ -50,27 +51,27 @@ For NetApp internal, partner, and customer use - ready to go in less than 15 min
 (keep in mind: based on ONTAP (lab) version: ./inventories/labondemand_< ontapversion >)
 - Execute a single test step (e.g. ONTAP-10-02 - Physical Network):
   ```
-  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-02.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-10/ONTAP-10-02.yml
 
   ```
 - Execute an entire test frame (e.g. ONTAP-10 - Basic Cluster Configuration)
   ```
-  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-10/ONTAP-10-*.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-10/ONTAP-10-*.yml
 
   ```
 - Revert configuration changed and objects created during a test frame:
   ```
-  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-31/ONTAP-revert-31.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-31/ONTAP-revert-31.yml
 
   ```
 - Execute ALL tests with a single command (and track the execution time)
   ```
-  time ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
+  time ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-[1-9]*/ONTAP-[0-9]*.yml
 
   ```
 - Revert all test steps of the test plan (back to initial state)
   ```
-  ansible-playbook -i ./inventories/labondemand_9141 ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
+  ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-00/{ONTAP-revert-00_linux,ONTAP-revert-00_windows,ONTAP-revert-00}.yml
 
   ```
 
@@ -115,27 +116,35 @@ The playbooks can be executed in any other non-production environments for demos
 
 
 # Additional References
-- Public documentation of NetApp Modules
-  - https://docs.ansible.com/ansible/latest/collections/netapp/ontap/
-- NetApp ONTAP Modules on Ansible Galaxy
-  - https://galaxy.ansible.com/netapp/ontap
-- Public GitHub for NetApp ONTAP Modules
-  - https://github.com/ansible-collections/netapp.ontap
+* NetApp ONTAP Modules & Documentation on Ansible Galaxy
+  * https://galaxy.ansible.com/netapp/ontap
+* Public GitHub for NetApp ONTAP Modules
+  * https://github.com/ansible-collections/netapp.ontap
 
 
 # Changelog
+## v1.3
+* Adding support for ONTAP 9.16.1 lab
+* Adding ONTAP-81 - Advanced Self-Service
+  * CIFS share request
+  * Local versioning request
+  * Backup request
+  * Ransomware protection request & alerting
+* Removing ONTAP-10-04 - Event Notification
+* Consistent use of module defaults vs. vars for default connection parameters
+
 ## v1.2
-- Adding ONTAP-11-04  Event Config
-- Adding Ansible Drive Ansible
-- Adding support for ONTAP 9.14.1 lab
-- General Clean-up (comments, format...)
+* Adding ONTAP-11-04  Event Config
+* Adding Ansible Drive Ansible
+* Adding support for ONTAP 9.14.1 lab
+* General Clean-up (comments, format...)
 
 ## v1.1
-- Adding ONTAP-42 - Quality of Service
-- Adding ONTAP-51 - Local Versioning (Snapshots)
-- Adding ONTAP-52 - Backup (SnapMirror)
-- Adding "prepare" playbooks to run all pre-requesits for a particular test frame
-- Moving RO policy creation for NFS to “ONTAP-20 – Basic SVM Setup”
+* Adding ONTAP-42 - Quality of Service
+* Adding ONTAP-51 - Local Versioning (Snapshots)
+* Adding ONTAP-52 - Backup (SnapMirror)
+* Adding "prepare" playbooks to run all pre-requesits for a particular test frame
+* Moving RO policy creation for NFS to “ONTAP-20 – Basic SVM Setup”
 
 ## v1.0
-- Initial Release
+* Initial Release

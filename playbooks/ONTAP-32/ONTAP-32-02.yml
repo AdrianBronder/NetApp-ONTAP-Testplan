@@ -18,19 +18,19 @@
 - hosts:                               "primary_storage_clusters"
   name:                                "ONTAP-32-02 - Shares & ACLs (Volume)"
   gather_facts:                        false
-  vars:
-    input: &input
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
       hostname:                        "{{ ansible_host }}"
       username:                        "{{ ontap_admin_user }}"
       password:                        "{{ ontap_admin_password }}"
       https:                           true
       validate_certs:                  false
       use_rest:                        "always"
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
 
   pre_tasks:
 
@@ -45,7 +45,6 @@
         oplocks:                       true
         show_snapshot:                 true
         comment:                       "Test share created as part of test frame ONTAP-32"
-        <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
 
@@ -56,7 +55,6 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         user_or_group:                 "Everyone"
         permission:                    "full_control"
-        <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
 
@@ -67,7 +65,6 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         user_or_group:                 "{{ ontap_32_ad_admin_group }}"
         permission:                    "full_control"
-        <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
 
@@ -78,7 +75,6 @@
         vserver:                       "{{ global_primary_nas_svm }}"
         user_or_group:                 "{{ ontap_32_ad_ro_group }}"
         permission:                    "read"
-        <<: *input
       loop:
         "{{ ontap_32_vol_qtree_names }}"
   

@@ -27,12 +27,6 @@
     name:                              "{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
     parent_snapshot:                   "{{ ontap_41_snapshot_name }}"
     junction_path:                     "/{{ ontap_41_clone_dir_name }}/{{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
-    hostname:                          "{{ ansible_host }}"
-    username:                          "{{ ontap_admin_user }}"
-    password:                          "{{ ontap_admin_password }}"
-    https:                             true
-    validate_certs:                    false
-    use_rest:                          "always"
 
 - name: "Index: {{ item }} - Step: 2 Create mount directories - {{ ontap_41_clone_vol_name }}_{{ '%02x' | format(item) }}"
   ansible.builtin.file:
