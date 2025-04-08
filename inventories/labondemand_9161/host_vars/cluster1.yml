@@ -6,7 +6,9 @@
 # https://<ontap_cluster_mgmt>/docs/api
 cluster:
   name:                           "cluster1"
-
+  san_optimized:                  false
+  disaggregated:                  false
+  
 cluster_nodes:
   - name:                         "cluster1-01"
     location:                     "Virtual DC01 | Virtual Rack 01"

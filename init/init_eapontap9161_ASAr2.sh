@@ -4,11 +4,11 @@
 #
 # Title:        init_eapontap9161.sh
 # Author:       NetApp Inc. (badrian)
-# Initial Date: 2024-11-04
-# Description:  Prepare linux host "rhel1" in LoD lab 1078
+# Initial Date: 2025-04-07
+# Description:  Prepare linux host "rhel1" in LoD lab 1094
 #               --> "Early Access for Unified ONTAP 9.16.1"
 #
-# URLs:         https://labondemand.netapp.com/node/1078
+# URLs:         https://labondemand.netapp.com/node/1094
 #               https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
 #
@@ -129,9 +129,9 @@ systemctl start netapp-self-service
 echo ""
 echo ""
 echo "--> Creating Users and groups in AD (dc1)"
-ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161 $SCRIPTPATH/init_helper/init_ad.yml
+ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161_ASAr2 $SCRIPTPATH/init_helper/init_ad.yml
 
 echo ""
 echo ""
-echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
-ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161 $PROJECTPATH/playbooks/ONTAP-00/ONTAP-revert-00.yml
+echo "--> Prepare storage clusters in LoD (cluster1 )"
+ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161_ASAr2 $PROJECTPATH/playbooks/ONTAP-00/ONTAP-revert-00.yml

@@ -49,6 +49,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_nfs_services is defined
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')
@@ -68,6 +69,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_nfs_services is defined
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')
@@ -88,6 +90,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_nfs_services is defined
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')
@@ -105,6 +108,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_nfs_services is defined
         - protocols_nfs_services | length > 0
         - item.svm.name is defined 
         - item.svm.name is regex('^ntap-svm.*')
@@ -127,6 +131,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_nfs_services is defined
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')
@@ -144,6 +149,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_nfs_services is defined
         - protocols_nfs_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')
@@ -161,6 +167,7 @@
       loop_control:
         label: "{{ item.0.key }}"
       when:
+        - protocols_active_directory is defined
         - protocols_active_directory | list | length > 0
         - item.0.key is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
@@ -181,6 +188,7 @@
       loop_control:
         label: "{{ item.name }}"
       when:
+        - protocols_cifs_services is defined
         - protocols_cifs_services | length > 0
         - item.name is defined
         - item.svm.name is regex('^ntap-svm.*')
@@ -200,6 +208,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_cifs_services is defined
         - protocols_cifs_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')

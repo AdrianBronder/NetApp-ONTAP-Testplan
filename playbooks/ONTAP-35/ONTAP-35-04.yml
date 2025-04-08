@@ -88,13 +88,28 @@
             selectattr('service_policy.name', 'search', 'block') |
             list }}"
 
+    - name: Rescan LUNs on iSCSI targets
+      community.general.open_iscsi:
+        rescan:                        true
+        portal:                        "{{ item.ip.address }}"
+        target:                        "{{ (hostvars[groups['primary_storage_clusters'][0]].iscsi_info.ontap_info.protocols_san_iscsi_services.records |
+                                            first ).target.name }}"
+      loop_control:
+        label: "{{ item.ip.address }}"
+      loop:
+        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
+            selectattr('svm.name', 'defined') |
+            selectattr('svm.name', '==', global_primary_san_svm) |
+            selectattr('service_policy.name', 'search', 'block') |
+            list }}"
+
     - name: Build Filesystem on new LUN
       community.general.filesystem:
         fstype:                        "ext4"
         dev:                           "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
                                         {{ (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                            selectattr('name', 'defined') |
-                                           selectattr('name', '==', item ) |
+                                           selectattr('name', '==', (item | split('/') | last )) |
                                            first ).serial_hex }}"
       loop:
         "{{ ontap_35_lin_luns }}"
@@ -113,7 +128,7 @@
         src:                           "/dev/mapper/{{ ontap_iscsi_vendor_id }}\
                                         {{ (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                            selectattr('name', 'defined') |
-                                           selectattr('name', '==', item ) |
+                                           selectattr('name', '==', (item | split('/') | last )) |
                                            first ).serial_hex }}"
         path:                          "{{ linux_35_mount_dir }}/{{ item | split('/') | last }}"
         fstype:                        "ext4"

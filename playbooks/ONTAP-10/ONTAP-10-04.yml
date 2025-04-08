@@ -47,6 +47,7 @@
       loop_control:
         label: "{{ item.node.name }}:{{ item.name }}"
       when:
+        - not cluster.disaggregated
         - item.name is defined
 
   post_tasks:

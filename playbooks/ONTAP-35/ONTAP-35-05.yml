@@ -107,7 +107,7 @@
                                             selectattr('serial_number', 'defined') |
                                             selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
-                                                                               selectattr('name', '==', item ) |
+                                                                               selectattr('name', '==', (item | split('/') | last ) ) |
                                                                                first ).serial_number) |
                                             first ).number }}"
         online:                        true
@@ -124,7 +124,7 @@
                                             selectattr('serial_number', 'defined') |
                                             selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
-                                                                               selectattr('name', '==', item ) |
+                                                                               selectattr('name', '==', (item | split('/') | last ) ) |
                                                                                first ).serial_number) |
                                             first ).number }}"
       loop:
@@ -141,7 +141,7 @@
                                             selectattr('serial_number', 'defined') |
                                             selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
-                                                                               selectattr('name', '==', item ) |
+                                                                               selectattr('name', '==', (item | split('/') | last ) ) |
                                                                                first ).serial_number) |
                                             first ).partitions[1].volumes[0].path }}"
         new_label:                     "{{ item | split('/') | last }}"
@@ -171,7 +171,7 @@
                                             selectattr('serial_number', 'defined') |
                                             selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
-                                                                               selectattr('name', '==', item ) |
+                                                                               selectattr('name', '==', (item | split('/') | last ) ) |
                                                                                first ).serial_number) |
                                             first ).partitions[1].access_paths[0] }}"
       loop:
@@ -185,7 +185,7 @@
                                        selectattr('serial_number', 'defined') |
                                        selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                                                           selectattr('name', 'defined') |
-                                                                          selectattr('name', '==', item ) |
+                                                                          selectattr('name', '==', (item | split('/') | last ) ) |
                                                                           first ).serial_number) |
                                        first ).number }} \
            -PartitionNumber 2 \
@@ -203,7 +203,7 @@
                                             selectattr('serial_number', 'defined') |
                                             selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
-                                                                               selectattr('name', '==', item ) |
+                                                                               selectattr('name', '==', (item | split('/') | last ) ) |
                                                                                first ).serial_number) |
                                             first ).partitions[1].access_paths[0] }}"
       loop:

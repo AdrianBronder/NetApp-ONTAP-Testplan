@@ -195,17 +195,45 @@
         use_python_keys:          true
       register: lun_info
 
-    - name: Remove all LUNs from clusters
+    - name: Remove all LUNs from clusters - Unified ONTAP
       netapp.ontap.na_ontap_lun:
         state:                    absent
         vserver:                  "{{ item.svm.name }}"
         name:                     "{{ item.name.split('/')[-1] }}"
         flexvol_name:             "{{ item.name.split('/')[-2] }}"
-      when:
-        - lun_info.ontap_info.storage_luns.num_records|int > 0
-        - item.name is defined
       loop:
         "{{ lun_info.ontap_info.storage_luns.records }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - not cluster.disaggregated
+        - lun_info.ontap_info.storage_luns.num_records|int > 0
+        - item.name is defined
+
+    - name: Remove all LUNs from clusters - ASAr2
+      netapp.ontap.na_ontap_restit:
+        api:                           "storage/luns/{{ item.uuid }}"
+        method:                        "DELETE"
+#        body:
+#          svm:
+#            name:                      "{{ item.svm.name }}"
+#          name:                        "{{ item.name.split('/')[-1] }}"
+#          os_type:                     "{{ 'linux' if 'lin' in (item.name | split('/'))[-1] else
+#                                           'windows' if 'win' in (item.name | split('/'))[-1] else
+#                                           default(omit) }}"
+#          lun_maps:
+#            - igroup:
+#                name:                   "{{ ontap_35_lin_igroup_name if 'lin' in (item.name | split('/'))[-1] else
+#                                            ontap_35_win_igroup_name if 'win' in (item.name | split('/'))[-1] else
+#                                            default(omit) }}"
+      loop:
+        "{{ lun_info.ontap_info.storage_luns.records }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - cluster.disaggregated
+        - lun_info.ontap_info.storage_luns.num_records|int > 0
+        - item.name is defined
 
     - name: Get all iGroups from clusters
       netapp.ontap.na_ontap_rest_info:
@@ -219,11 +247,13 @@
         state:                    absent
         vserver:                  "{{ item.svm.name }}"
         name:                     "{{ item.name }}"
+      loop:
+        "{{ igroup_info.ontap_info.protocols_san_igroups.records }}"
+      loop_control:
+        label: "{{ item.name }}"
       when:
         - igroup_info.ontap_info.protocols_san_igroups.num_records|int > 0
         - item.name is defined
-      loop:
-        "{{ igroup_info.ontap_info.protocols_san_igroups.records }}"
 
     - name: Get all non-root volumes from clusters
       netapp.ontap.na_ontap_rest_info:
@@ -288,7 +318,19 @@
       when:
       - cifs_service_info.ontap_info.protocols_cifs_services.num_records|int > 0
       - item.name is defined
-  
+
+    - name: Remove cluster Active Directory domain authentication - ASAr2
+      netapp.ontap.na_ontap_restit:
+        api:                           'cluster'
+        method:                        'PATCH'
+        body:
+          active_directory:
+            name:                      
+            username:                  "{{ all_ad_join_user }}"
+            password:                  "{{ all_ad_join_password }}"
+      when:
+        - cluster.disaggregated
+
     - name: Get all SVM interfaces from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
@@ -417,6 +459,8 @@
         gather_subset:
           - "storage/aggregates"
         use_python_keys:          true
+      when:
+        - not cluster.disaggregated
       register: aggr_info
   
     - name: Remove all non-root aggregates from clusters
@@ -424,6 +468,7 @@
         state:                    absent
         name:                     "{{ item.name }}"
       when:
+        - not cluster.disaggregated
         - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
         - item.name is defined
       loop:
@@ -433,7 +478,7 @@
       netapp.ontap.na_ontap_dns:
         state:                    absent
         vserver:                  "{{ inventory_hostname }}"
-        use_rest:                 "never"
+        use_rest:                 "{{ 'never' if not cluster.disaggregated else omit }}"
   
     - name: Get all NTP servers from cluster
       netapp.ontap.na_ontap_rest_info:

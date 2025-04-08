@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-    - name: Create LUNs
+    - name: Create LUNs - Unified ONTAP
       netapp.ontap.na_ontap_lun:
         state:                         present
         vserver:                       "{{ global_primary_san_svm }}"
@@ -51,6 +51,8 @@
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"
+      when:
+        - not cluster.disaggregated
 
     - name: Map LUNs to iGroups
       netapp.ontap.na_ontap_lun_map:
@@ -63,5 +65,31 @@
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"
+      when:
+        - not cluster.disaggregated
+
+    - name: Create LUNs - ASAr2
+      netapp.ontap.na_ontap_restit:
+        api:                           'storage/luns'
+        method:                        'POST'
+        body:
+          svm:
+            name:                      "{{ global_primary_san_svm }}"
+          name:                        "{{ (item | split('/'))[-1] }}"
+          os_type:                     "{{ 'linux' if 'lin' in (item | split('/'))[-1] else
+                                           'windows' if 'win' in (item | split('/'))[-1] else
+                                           default(omit) }}"
+          space:
+            size:                       "{{ ontap_default_lun_size_gb * 1024 * 1024 * 1024 }}"
+          lun_maps:
+            - igroup:
+                name:                   "{{ ontap_35_lin_igroup_name if 'lin' in (item | split('/'))[-1] else
+                                            ontap_35_win_igroup_name if 'win' in (item | split('/'))[-1] else
+                                            default(omit) }}"
+      loop:
+        "{{ ontap_35_lin_luns +
+            ontap_35_win_luns }}"
+      when:
+        - cluster.disaggregated
 
   post_tasks:

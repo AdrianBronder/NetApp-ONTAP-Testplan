@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-    - name: Create volumes
+    - name: Create volumes - Unified ONTAP
       netapp.ontap.na_ontap_volume:
         state:                         present
         name:                          "{{ (item | split('/'))[2] }}"
@@ -48,5 +48,7 @@
       loop:
         "{{ ontap_35_lin_luns +
             ontap_35_win_luns }}"
+      when:
+        - not cluster.disaggregated
   
   post_tasks:

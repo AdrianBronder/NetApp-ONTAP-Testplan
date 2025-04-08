@@ -41,17 +41,17 @@
         name:                          "{{ item.name }}"
         services:
           cifs:
-            allowed:                   "{{ item.cifs.allowed | default(omit) }}"
+            allowed:                   "{{ item.cifs.allowed if not cluster.disaggregated else omit | default(omit)  }}"
           ndmp:
-            allowed:                   "{{ item.ndmp.allowed | default(omit) }}"
+            allowed:                   "{{ item.ndmp.allowed | default(omit)  }}"
           nfs:
-            allowed:                   "{{ item.nfs.allowed | default(omit) }}"
+            allowed:                   "{{ item.nfs.allowed if not cluster.disaggregated else omit | default(omit)  }}"
           fcp:
-            allowed:                   "{{ item.fcp.allowed | default(omit) }}"
+            allowed:                   "{{ item.fcp.allowed if not cluster.disaggregated else omit | default(omit)  }}"
           iscsi:
-            allowed:                   "{{ item.iscsi.allowed | default(omit) }}"
+            allowed:                   "{{ item.iscsi.allowed if not cluster.disaggregated else omit | default(omit)  }}"
           nvme:
-            allowed:                   "{{ item.nvme.allowed | default(omit) }}"
+            allowed:                   "{{ item.nvme.allowed if not cluster.disaggregated else omit | default(omit)  }}"
       loop:
         "{{ svm_svms }}"
       loop_control:

@@ -6,6 +6,8 @@
 # https://<ontap_cluster_mgmt>/docs/api
 cluster:
   name:                           "cluster2"
+  san_optimized:                  false
+  disaggregated:                  false
 
 cluster_nodes:
   - name:                         "cluster2-01"

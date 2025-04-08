@@ -41,7 +41,7 @@
         vserver:                       "{{ inventory_hostname }}"
         domains:                       "{{ all_dns_domains }}"
         nameservers:                   "{{ all_dns_nameservers }}"
-        use_rest:                      "never"
+        use_rest:                      "{{ 'never' if not cluster.disaggregated else omit }}"
   
     - name: Create NTP server on storage cluster
       netapp.ontap.na_ontap_ntp:
