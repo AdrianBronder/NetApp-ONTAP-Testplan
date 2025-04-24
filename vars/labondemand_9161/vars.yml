@@ -64,6 +64,14 @@ windows_32_mount_dir:             "{{ windows_default_mount_dir }}\\32"
 ontap_32_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
+# ONTAP-33  - S3
+ontap_33_s3_user_name:            "foo"
+ontap_33_s3_group_name:           "foo-group"
+ontap_33_s3_group_policy:         "FullAccess"
+ontap_33_s3_bucket_name:          "foo-test-bucket"
+ontap_33_s3_bucket_size:          107374182400
+
+
 # ONTAP-35 - iSCSI
 ontap_35_lin_igroup_name:         "ontap_35_lin_ig01"
 ontap_35_lin_igroup_iqns:         "{{ hostvars[groups['linux_hosts'][0]].iscsi.initiator_name }}"
