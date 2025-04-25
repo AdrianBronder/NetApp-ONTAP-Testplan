@@ -1,10 +1,12 @@
 ################################################################################
 #
-# Title:        ONTAP-20-05 - Create Certificates and S3 Service
+# Title:        ONTAP-20-05 - SVM Certificates and S3 Setup
 # Author:       NetApp Inc. (jont)
 # Initial
 # Create Date:  2025-04-08
-# Description:  Create and install a self-signed server security certificate
+# Description:  Basic Data SVM Setup
+#               - SVM Certificates and S3 Setup
+# Details:      Create and install a self-signed server security certificate
 #               - Create the root-ca
 #               - Generate a certificate signing request
 #               - Sign the request using the local root-ca
@@ -20,7 +22,7 @@
 ################################################################################
 
 - hosts:                               "ontap"
-  name:                                "ONTAP-20-05 - Create Certificates and S3 Service"
+  name:                                "ONTAP-20-05 - SVM Certificates and S3 Setup"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml

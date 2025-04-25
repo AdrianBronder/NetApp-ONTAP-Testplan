@@ -15,3 +15,5 @@ collections:
     version:  "10.4.0"
   - name:     "ansible.eda"
     version:  "2.5.0"
+  - name:     "amazon.aws"
+    version:  "9.4.0"

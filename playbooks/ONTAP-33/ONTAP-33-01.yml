@@ -1,10 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-33-01 - Create S3 User and Group
+# Title:        ONTAP-33-01 - User and Group
 # Author:       NetApp Inc. (jont)
 # Initial
 # Create Date:  2025-04-10
-# Description:  Create an S3 User and Group
+# Description:  S3
+#               - User and Group
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
@@ -15,11 +16,13 @@
 ################################################################################
 
 - hosts:                               "ontap"
-  name:                                "ONTAP-33-01 - Create S3 User and Group"
+  name:                                "ONTAP-33-01 - User and Group"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  vars:
+    s3_users: {}
   collections:
     - netapp.ontap
   module_defaults:
@@ -47,13 +50,13 @@
 
     - name: Create S3 Groups
       netapp.ontap.na_ontap_s3_groups:
-        state: present
-        name: "{{ ontap_33_s3_group_name }}"
-        vserver: "{{ item.svm.name }}"
+        state:                         present
+        name:                          "{{ ontap_33_s3_group_name }}"
+        vserver:                       "{{ item.svm.name }}"
         users:
-          - name: "{{ ontap_33_s3_user_name }}"
+          - name:                      "{{ ontap_33_s3_user_name }}"
         policies:
-          - name: "{{ ontap_33_s3_group_policy }}"
+          - name:                      "{{ ontap_33_s3_group_policy }}"
       loop:
        "{{ protocols_s3_services }}"
       loop_control:
@@ -62,5 +65,69 @@
         - protocols_s3_services | length > 0
         - item.name is defined
         - item.svm.name is regex('^ntap-svm.*')
+
+  post_tasks:
+
+- hosts:                               "linux_hosts"
+  name:                                "ONTAP-33-01 - User and Group - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Create directory for S3 credentials
+      ansible.builtin.file:
+        state:                         directory
+        path:                          ~/.ontap_test/s3_credentials/
+
+    - name: Create files
+      ansible.builtin.copy:
+        content:                       "{{ hostvars[item].s3_users | to_nice_json }}"
+        dest:                          "~/.ontap_test/s3_credentials/{{ item }}"
+      loop:
+        "{{ groups['ontap'] }}"
+
+  post_tasks:
+
+
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-33-01 - User and Group - Windows"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Create directory for S3 credentials
+      ansible.windows.win_file:
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials"
+        state:                         directory
+
+    - name: Remove existing credential files
+      ansible.windows.win_file:
+        state:                         absent
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.txt"
+      loop:
+        "{{ groups['ontap'] }}"
+
+    - name: Write credentials to files
+      community.windows.win_lineinfile:
+        state:                         present
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.txt"
+        create:                        true
+        line:                          "{{ hostvars[item].s3_users | to_nice_json }}"
+      loop:
+        "{{ groups['ontap'] }}"
 
   post_tasks:

@@ -1,0 +1,59 @@
+################################################################################
+#
+# Title:        ONTAP-33-03 - Objects
+# Author:       NetApp Inc. (badrian)
+# Initial
+# Create Date:  2025-04-25
+# Description:  S3
+#               - Objects
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc amazon.aws.<module_name>
+#
+################################################################################
+
+- hosts:                               "localhost"
+  name:                                "ONTAP-33-03 - Objects"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - amazon.aws
+
+  pre_tasks:
+
+  tasks:
+    - name: Get bucket content
+      amazon.aws.s3_object_info:
+        bucket_name:                   "foo-test-bucket"
+        endpoint_url:                  "https://ntap-svm01-nas.demo.netapp.com"
+        access_key:                    "DADPN511PP3I84Y9O5T3"
+        secret_key:                    "C2N3495q06rgV250sR125tdDZByDBjCj9_uUr_aQ"
+        validate_certs:                false
+      register: object_info
+
+    - name: List bucket content
+      ansible.builtin.debug:
+        msg: "{{ object_info }}"
+
+    - name: Simple PUT operation
+      amazon.aws.s3_object:
+        bucket:                        "foo-test-bucket"
+        object:                        "cluster1"
+        src:                           "/root/.ontap_test/s3_credentials/cluster1"
+        mode:                          put
+        endpoint_url:                  "https://ntap-svm01-nas.demo.netapp.com/"
+        access_key:                    "DADPN511PP3I84Y9O5T3"
+        secret_key:                    "C2N3495q06rgV250sR125tdDZByDBjCj9_uUr_aQ"
+        validate_bucket_name:          false
+        validate_certs:                false
+        encrypt:                       false
+        sig_v4:                        false
+        debug_botocore_endpoint_logs:  true
+
+  post_tasks:
+  
