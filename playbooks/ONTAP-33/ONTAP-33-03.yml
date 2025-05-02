@@ -31,8 +31,8 @@
       amazon.aws.s3_object_info:
         bucket_name:                   "foo-test-bucket"
         endpoint_url:                  "https://ntap-svm01-nas.demo.netapp.com"
-        access_key:                    "DADPN511PP3I84Y9O5T3"
-        secret_key:                    "C2N3495q06rgV250sR125tdDZByDBjCj9_uUr_aQ"
+        access_key:                    "76AAT511LAPKQGNEPWNF"
+        secret_key:                    "I6L2k92uL_N3rQ9_P4AyZYNeqFcTPhC0y04XVG2D"
         validate_certs:                false
       register: object_info
 
@@ -47,13 +47,9 @@
         src:                           "/root/.ontap_test/s3_credentials/cluster1"
         mode:                          put
         endpoint_url:                  "https://ntap-svm01-nas.demo.netapp.com/"
-        access_key:                    "DADPN511PP3I84Y9O5T3"
-        secret_key:                    "C2N3495q06rgV250sR125tdDZByDBjCj9_uUr_aQ"
-        validate_bucket_name:          false
+        access_key:                    "76AAT511LAPKQGNEPWNF"
+        secret_key:                    "I6L2k92uL_N3rQ9_P4AyZYNeqFcTPhC0y04XVG2D"
         validate_certs:                false
-        encrypt:                       false
-        sig_v4:                        false
-        debug_botocore_endpoint_logs:  true
 
   post_tasks:
   
