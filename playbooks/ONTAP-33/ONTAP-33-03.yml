@@ -19,26 +19,18 @@
   name:                                "ONTAP-33-03 - Objects"
   gather_facts:                        false
   vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+    - ../../vars/{{ ansible_inventory_sources[-1] | split('/') | last }}/vars.yml
+    - ../../vars/{{ ansible_inventory_sources[-1] | split('/') | last }}/vault.yml
   collections:
     - amazon.aws
 
   pre_tasks:
 
   tasks:
-    - name: Get bucket content
-      amazon.aws.s3_object_info:
-        bucket_name:                   "foo-test-bucket"
-        endpoint_url:                  "https://ntap-svm01-nas.demo.netapp.com"
-        access_key:                    "76AAT511LAPKQGNEPWNF"
-        secret_key:                    "I6L2k92uL_N3rQ9_P4AyZYNeqFcTPhC0y04XVG2D"
-        validate_certs:                false
-      register: object_info
-
-    - name: List bucket content
-      ansible.builtin.debug:
-        msg: "{{ object_info }}"
+    - name: Read S3 credentials
+      ansible.builtin.include_vars:
+        dir:                           "{{ linux_default_mount_dir }}/.s3_credentials"
+        name:                          s3_credentials
 
     - name: Simple PUT operation
       amazon.aws.s3_object:
@@ -46,10 +38,24 @@
         object:                        "cluster1"
         src:                           "/root/.ontap_test/s3_credentials/cluster1"
         mode:                          put
-        endpoint_url:                  "https://ntap-svm01-nas.demo.netapp.com/"
-        access_key:                    "76AAT511LAPKQGNEPWNF"
-        secret_key:                    "I6L2k92uL_N3rQ9_P4AyZYNeqFcTPhC0y04XVG2D"
+        permission:                    []
+        endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
+        access_key:                    "{{ s3_credentials['ntap-svm01-nas'].access_key }}"
+        secret_key:                    "{{ s3_credentials['ntap-svm01-nas'].secret_key }}"
         validate_certs:                false
+
+    - name: Get bucket content
+      amazon.aws.s3_object_info:
+        bucket_name:                   "foo-test-bucket"
+        endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
+        access_key:                    "{{ s3_credentials['ntap-svm01-nas'].access_key }}"
+        secret_key:                    "{{ s3_credentials['ntap-svm01-nas'].secret_key }}"
+        validate_certs:                false
+      register: object_info
+
+    - name: List bucket content
+      ansible.builtin.debug:
+        msg: "{{ object_info }}"
 
   post_tasks:
   

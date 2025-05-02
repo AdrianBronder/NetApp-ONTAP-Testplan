@@ -1,0 +1,114 @@
+################################################################################
+#
+# Title:        ONTAP-revert-33 - S3
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-05-02
+# Description:  Revert all steps performed in test frame 33
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "localhost"
+  name:                                "ONTAP-33-03 - Objects"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ ansible_inventory_sources[-1] | split('/') | last }}/vars.yml
+    - ../../vars/{{ ansible_inventory_sources[-1] | split('/') | last }}/vault.yml
+  collections:
+    - amazon.aws
+
+  pre_tasks:
+
+  tasks:
+    - name: Read S3 credentials
+      ansible.builtin.include_vars:
+        dir:                           "{{ linux_default_mount_dir }}/.s3_credentials"
+        name:                          s3_credentials
+
+    - name: Get bucket content
+      amazon.aws.s3_object_info:
+        bucket_name:                   "foo-test-bucket"
+        endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
+        access_key:                    "{{ s3_credentials['ntap-svm01-nas'].access_key }}"
+        secret_key:                    "{{ s3_credentials['ntap-svm01-nas'].secret_key }}"
+        validate_certs:                false
+      register: object_info
+
+    - name: Remove bucket contents
+      amazon.aws.s3_object:
+        bucket:                        "foo-test-bucket"
+        object:                        "{{ item }}"
+        mode:                          delobj
+        endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
+        access_key:                    "{{ s3_credentials['ntap-svm01-nas'].access_key }}"
+        secret_key:                    "{{ s3_credentials['ntap-svm01-nas'].secret_key }}"
+        validate_certs:                false
+      loop:
+        "{{ object_info.s3_keys }}"
+
+
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-revert-33 - S3 - Windows"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Remove mount directory
+      ansible.windows.win_file:
+        path:                          "{{ windows_default_mount_dir }}/s3_credentials/"
+        state:                         absent
+
+
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-33 - S3 - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+
+  tasks:
+    - name: Remove default parent mount directory
+      ansible.builtin.file:
+        path:                          "{{ linux_default_mount_dir }}/.s3_credentials/"
+        state:                         "absent"
+        mode:                          "0755"
+
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-revert-33 - S3 - ONTAP"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  tasks:
+    - name: Remove S3 buckets
+      netapp.ontap.na_ontap_s3_buckets:
+        state:                         absent
+        name:                          "{{ ontap_33_s3_bucket_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
