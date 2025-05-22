@@ -117,14 +117,14 @@
     - name: Remove existing credential files
       ansible.windows.win_file:
         state:                         absent
-        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.txt"
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.json"
       loop:
         "{{ groups['ontap'] }}"
 
     - name: Write credentials to files
       community.windows.win_lineinfile:
         state:                         present
-        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.txt"
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.json"
         create:                        true
         line:                          "{{ hostvars[item].s3_users | to_nice_json }}"
       loop:

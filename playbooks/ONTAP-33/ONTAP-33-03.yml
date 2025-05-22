@@ -36,7 +36,7 @@
       amazon.aws.s3_object:
         bucket:                        "foo-test-bucket"
         object:                        "cluster1"
-        src:                           "/root/.ontap_test/s3_credentials/cluster1"
+        src:                           "{{ linux_default_mount_dir }}/.s3_credentials/cluster1.json"
         mode:                          put
         permission:                    []
         endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
