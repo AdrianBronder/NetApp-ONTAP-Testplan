@@ -1,0 +1,105 @@
+################################################################################
+#
+# Title:        ONTAP-revert-53 - Backup (SnapMirror S3)
+# Author:       NetApp Inc. (jont)
+# Initial 
+# Create Date:  2025-04-24
+# Description:  Revert all steps performed in test frame 53
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+  
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-revert-53 - Backup (SnapMirror S3)"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Delete SnapMirror S3 relationship
+      netapp.ontap.na_ontap_rest_cli:
+        command: snapmirror
+        verb: DELETE
+        body:
+          source_path: "{{ global_primary_nas_svm }}:/bucket/{{ ontap_53_s3_bucket_name }}"
+          destination_path: "{{ global_primary_backup_svm }}:/bucket/{{ ontap_53_s3_bucket_name }}"
+
+    - name: Remove custom SnapMirror policy
+      netapp.ontap.na_ontap_snapmirror_policy:
+        state:                         absent
+        vserver:                       "{{ global_primary_nas_svm }}"
+        policy_name:                   "{{ ontap_53_policy_name }}"
+
+    - name: Remove SVM peering
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "{{ global_primary_nas_svm }}"
+        peer_vserver:                  "{{ global_primary_backup_svm }}"
+        peer_cluster:                  "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host | split('.') | first }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
+          
+  post_tasks:
+
+#  - name: Delete SnapMirror custom policy
+#    netapp.ontap.na_ontap_rest_cli:
+#      command: snapmirror/policy
+#      verb: DELETE
+#      body:
+#        vserver: "{{ global_primary_nas_svm }}"
+#        policy: "{{ ontap_53_policy_name }}"
+
+- hosts:                               "ontap"
+  name:                                "ONTAP-revert-53 - Backup (SnapMirror S3)"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Remove snapmirror object store configuration on the SVMs
+      netapp.ontap.na_ontap_rest_cli:
+        command: snapmirror/object-store/config
+        verb: DELETE
+        params:
+          vserver: "{{ item.svm.name }}"
+          object-store-name: "*"
+      ignore_errors: yes
+      loop:
+         "{{ protocols_s3_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
+
+  post_tasks:

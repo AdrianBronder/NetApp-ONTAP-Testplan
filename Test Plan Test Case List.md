@@ -74,6 +74,8 @@
 | 52-08 | Backup (SnapMirror)               | Delete Files                          |
 | 52-09 | Backup (SnapMirror)               | Restore Backup                        |
 | 52-11 | Backup (SnapMirror)               | Bulk Protect Volumes                  |
+| 53-01 | Backup (SnapMirror S3)            | SVM Peering                           |
+| 53-02 | Backup (SnapMirror S3)            | Protect Bucket                        |
 | 81-01 | Advanced - Self-service           | Base Deployment                       |
 | 81-11 | Advanced - Self-service           | CIFS Demo Roll-out                    |
 | 81-21 | Advanced - Self-service           | Backup Demo Roll-out                  |

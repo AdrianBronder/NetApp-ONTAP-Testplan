@@ -149,6 +149,11 @@ ontap_52_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
 ontap_52_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
 ontap_52_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 
+# ONTAP-53 - Backup (SnapMirror S3)
+ontap_53_policy_name:             "s3sync"
+ontap_53_policy_rpo:              0
+ontap_53_s3_bucket_name:          "foo-test-bucket"
+
 # ONTAP-81 - Advanced - Self-service
 ontap_81_ldap_host:               "ldap://dc1.demo.netapp.com"
 ontap_81_base_dn:                 "dc=demo,dc=netapp,dc=com"
