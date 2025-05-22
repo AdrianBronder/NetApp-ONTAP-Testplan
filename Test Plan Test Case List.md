@@ -24,6 +24,7 @@
 | 20-02 | Basic Data SVM Setup	            | SVM network interfaces (LIFs)         |
 | 20-03 | Basic Data SVM Setup	            | SVM Network Services                  |
 | 20-04 | Basic Data SVM Setup	            | SVM Protocol Setup                    |
+| 20-05 | Basic Data SVM Setup	            | SVM Certificates and S3 Setup         |
 | 31-01 | NFS	                            | Export Policies & Rules               |
 | 31-02 | NFS	                            | Volumes & Qtrees                      |
 | 31-03 | NFS	                            | Mount & Write (Volumes)               |
@@ -35,6 +36,18 @@
 | 32-04 | CIFS	                            | FlexGroup & qtrees                    |
 | 32-05 | CIFS	                            | Shares & ACLs (FlexGroup)             |
 | 32-06 | CIFS	                            | Mount & Write (FlexGroup)             |
+| 33-01 | S3                                | S3 User and Group                     |
+| 33-02 | S3                                | S3 Bucket                             |
+| 34-01 | Multiprotocol NAS                 | Export Policies & Rules               |
+| 34-02 | Multiprotocol NAS                 | FlexGroup & Qtrees                    |
+| 34-03 | Multiprotocol NAS                 | NFS & SMB Name Mapping                |
+| 34-04 | Multiprotocol NAS                 | NFS Mount & Write (Multiprotocol)     |
+| 34-05 | Multiprotocol NAS                 | Shares & ACLs                         |
+| 34-06 | Multiprotocol NAS                 | SMB Mount & Write (Multiprotocol)     |
+| 34-07 | Multiprotocol NAS                 | S3 User and Group                     |
+| 34-08 | Multiprotocol NAS                 | S3 Name Mapping                       |
+| 34-09 | Multiprotocol NAS                 | S3 Bucket                             |
+| 34-10 | Multiprotocol NAS                 | Objects                               |
 | 35-01 | iSCSI	                            | iGroups                               |
 | 35-02 | iSCSI	                            | Volumes                               |
 | 35-03 | iSCSI	                            | LUNs & Mappings                       |

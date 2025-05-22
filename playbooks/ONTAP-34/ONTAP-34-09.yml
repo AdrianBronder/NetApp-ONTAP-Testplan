@@ -1,0 +1,45 @@
+################################################################################
+#
+# Title:        ONTAP-34-09 - Create S3 NAS bucket
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-28
+# Description:  Create S3 NAS Bucket
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-34-09 - Create S3 NAS bucket"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create S3 NAS bucket
+      netapp.ontap.na_ontap_s3_buckets:
+        state: present
+        name: "{{ ontap_34_s3_bucket_name }}"
+        type: nas
+        nas_path: "/{{ ontap_34_fg_name }}"
+        vserver: "{{ global_primary_nas_svm }}"
+
+  post_tasks:

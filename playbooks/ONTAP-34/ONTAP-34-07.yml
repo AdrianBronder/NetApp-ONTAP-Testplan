@@ -1,0 +1,127 @@
+################################################################################
+#
+# Title:        ONTAP-34-07 - Create S3 user and group
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-05-05
+# Description:  Create S3 user and group
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-34-07 - Create S3 user and group"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  vars:
+    s3_users: {}
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+
+    - name: Create or regenerate the S3 user
+      netapp.ontap.na_ontap_s3_users:
+        state:                         present
+        name:                          "{{ ontap_34_s3_user_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        regenerate_keys:               true
+      register: s3_user
+
+    - name: Set global fact for s3_users
+      ansible.builtin.set_fact:
+        global_s3_user: "{{ s3_user }}"
+      delegate_facts: true
+      
+    - name: Debug information about the S3 user
+      debug:
+        var: global_s3_user
+        
+    - name: Create S3 groups
+      netapp.ontap.na_ontap_s3_groups:
+        state: present
+        name: "{{ ontap_34_s3_group_name }}"
+        vserver: "{{ global_primary_nas_svm }}"
+        users:
+          - name: "{{ ontap_34_s3_user_name }}"
+        policies:
+          - name: "{{ ontap_34_s3_group_policy }}"
+
+  post_tasks:
+
+- hosts:                               "linux_hosts"
+  name:                                "ONTAP-34-07 - User and Group - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:        
+    - name: Create directory for S3 credentials
+      ansible.builtin.file:
+        state:                         directory
+        path:                          "{{ linux_default_mount_dir }}/.s3_credentials/"
+
+    - name: Create files
+      ansible.builtin.copy:
+        content:                       "{{ hostvars[ontap_34_cluster].global_s3_user | to_nice_json }}"
+        dest:                          "{{ linux_default_mount_dir }}/.s3_credentials/{{ ontap_34_s3_user_name }}.json"
+
+  post_tasks:
+
+
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-34-07 - User and Group - Windows"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Create directory for S3 credentials
+      ansible.windows.win_file:
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials"
+        state:                         directory
+
+    - name: Remove existing credential files
+      ansible.windows.win_file:
+        state:                         absent
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ ontap_34_s3_user_name }}.txt"
+      loop:
+        "{{ groups['ontap'] }}"
+
+    - name: Write credentials to files
+      community.windows.win_lineinfile:
+        state:                         present
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ ontap_34_s3_user_name }}.txt"
+        create:                        true
+        line:                          "{{ hostvars[ontap_34_cluster].global_s3_user | to_nice_json }}"
+        
+  post_tasks:

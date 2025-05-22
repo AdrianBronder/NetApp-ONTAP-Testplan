@@ -1,0 +1,31 @@
+################################################################################
+#
+# Title:        Tasks-33-01 - Create or regenerate S3 Users
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-11
+# Description:  Create and install a self-signed server security certificate
+#               - Create the root-ca on an SVM
+#               - Generate a certificate signing request for the SVM
+#               - Sign the request using the local root-ca
+#               - install the resulting signed certificate
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+---
+  - name: Create or regenerate the S3 user foo
+    netapp.ontap.na_ontap_s3_users:
+      state: present
+      name: "{{ ontap_33_s3_user_name }}"
+      vserver: "{{ item.svm.name }}"
+      regenerate_keys: true
+    register: s3_user
+
+  - name: Debug information about the S3 user
+    debug:
+      var: s3_user

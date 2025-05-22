@@ -1,0 +1,59 @@
+################################################################################
+#
+# Title:        ONTAP-34-03 - Create NFS-SMB Name Mappings
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-28
+# Description:  Create NFS-SMB Name Mappings
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-34-03 - Create NFS-SMB Name Mappings"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - set_fact: 
+        admin_user: "{{ ontap_34_ad_admin_user | replace(match, replace) }}"
+      vars:
+        match: '\'
+        replace: '\\'
+
+    - name: Create Windows admin user -> UNIX root name mapping configuration
+      netapp.ontap.na_ontap_name_mappings:
+        direction:                     win_unix
+        index:                         1
+        pattern:                       "{{ admin_user }}"
+        replacement:                   "root"
+        vserver:                       "{{ global_primary_nas_svm }}"
+
+    - name: Create UNIX root -> Windows admin user name mapping configuration
+      netapp.ontap.na_ontap_name_mappings:
+        direction:                     unix_win
+        index:                         1
+        pattern:                       "root"
+        replacement:                   "{{ admin_user }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        
+  post_tasks:

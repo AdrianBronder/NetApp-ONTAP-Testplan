@@ -1,0 +1,96 @@
+################################################################################
+#
+# Title:        Tasks-20-05 - Generate Self-Signed Security Certificates
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-08
+# Description:  Create and install a self-signed server security certificate
+#               - Create the root-ca on an SVM
+#               - Generate a certificate signing request for the SVM
+#               - Sign the request using the local root-ca
+#               - install the resulting signed certificate
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+---
+- name: Create root-ca certificate on {{ item.name }}
+  netapp.ontap.na_ontap_security_certificates:
+    common_name: "{{ item.name }}"
+    name: "{{ item.name }}_ca"
+    type: root_ca
+    svm: "{{ item.name }}"
+    expiry_time: P365DT
+
+- name: Gather root-ca information
+  netapp.ontap.na_ontap_restit:
+    api: /security/certificates
+    method: GET
+    query:
+      svm.name: "{{ item.name }}"
+      type: "root-ca"
+      fields: "common_name"
+  register: root_ca_result
+
+- name: Store CA Names
+  set_fact:
+    ontap_cert_root_common_name: "{{ root_ca_result.response.records[0].common_name }}"
+    ontap_cert_root_name: "{{ root_ca_result.response.records[0].name }}"
+  when:
+    - root_ca_result.response is defined
+    - root_ca_result.response.records[0].common_name is defined
+    - root_ca_result.response.records[0].name is defined
+
+- name: Generate certificate signing request (CSR) on {{ item.name }}
+  netapp.ontap.na_ontap_restit:
+    api: /security/certificate-signing-request
+    method: POST
+    body:
+     subject_name: "CN={{ item.name }}.demo.netapp.com"
+  register: csr_result
+
+- name: Store CSR and private key certificates on {{ item.name }}
+  set_fact:
+    csr: "{{ csr_result.response.csr }}"
+    private_key: "{{ csr_result.response.generated_private_key }}"
+  when:
+    - csr_result.response is defined
+    - csr_result.response.csr is defined
+    - csr_result.response.generated_private_key is defined
+
+- name: Sign the certificate on {{ item.name }}
+  netapp.ontap.na_ontap_security_certificates:
+    name: "{{ ontap_cert_root_name }}"
+    svm: "{{ item.name }}"
+    signing_request: "{{ csr }}"
+    expiry_time: P180DT
+  register: signed_cert
+
+- name: Store signed certificate
+  set_fact:
+    public_certificate: "{{ signed_cert.ontap_info.public_certificate }}"
+  when:
+    - signed_cert.ontap_info.public_certificate is defined
+
+- name: Install certificate on {{ item.name }}
+  netapp.ontap.na_ontap_security_certificates:
+    common_name: "{{ ontap_cert_root_common_name }}"
+    name: "{{ ontap_cert_root_name }}"
+    public_certificate: "{{ public_certificate }}"
+    private_key: "{{ private_key }}"
+    type: server_ca
+    svm: "{{ item.name }}"
+
+- name: Gather server certificate information
+  netapp.ontap.na_ontap_restit:
+    api: /security/certificates
+    method: GET
+    query:
+      svm.name: "{{ item.name }}"
+      type: "server"
+  register: server_result
+  

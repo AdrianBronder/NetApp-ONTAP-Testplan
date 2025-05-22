@@ -1,0 +1,61 @@
+################################################################################
+#
+# Title:        ONTAP-34-04 - NFS Mount & Write (Multiprotocol)
+# Author:       NetApp Inc. (jont)
+# Initial 
+# Create Date:  2025-04-29
+# Description:  NFS
+#               - Mount & Write (Multiprotocol)
+# 
+################################################################################
+
+- hosts:                               "linux"
+  name:                                ONTAP-34-04 - NFS Mount & Write (Multiprotocol)
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Ensure stale mounts are removed before proceding (in case a mount exists)
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_34_fg_name }}/{{ item }}"
+        path:                          "{{ linux_34_mount_dir }}/{{ item }}"
+        fstype:                        "nfs"
+      loop:
+        "{{ ontap_34_fg_unix_qtree_names + ontap_34_fg_ntfs_qtree_names + ontap_34_fg_mixed_qtree_names }}"
+  
+    - name: Create mount directories
+      ansible.builtin.file:
+        path:                          "{{ linux_34_mount_dir }}/{{ item }}"
+        state:                         "directory"
+        mode:                          "0755"
+      loop:
+        "{{ ontap_34_fg_unix_qtree_names + ontap_34_fg_ntfs_qtree_names + ontap_34_fg_mixed_qtree_names }}"
+  
+    - name: Mount NFS export on Linux host
+      ansible.posix.mount:
+        state:                         "mounted"
+        src:                           "{{ global_primary_nas_svm }}.{{ all_default_dns_domain }}:/\
+                                        {{ ontap_34_fg_name }}/{{ item }}"
+        path:                          "{{ linux_34_mount_dir }}/{{ item }}"
+        opts:                          "rw,sync,hard,vers=3"
+        fstype:                        "nfs"
+      loop:
+        "{{ ontap_34_fg_unix_qtree_names + ontap_34_fg_ntfs_qtree_names + ontap_34_fg_mixed_qtree_names }}"
+  
+    - name: Create test file on each export
+      community.general.filesize:
+        path: "{{ linux_34_mount_dir }}/{{ item }}/{{ item }}_testfile_nfs"
+        size: 50MB
+      loop:
+        "{{ ontap_34_fg_unix_qtree_names + ontap_34_fg_ntfs_qtree_names + ontap_34_fg_mixed_qtree_names }}"
+
+  post_tasks:

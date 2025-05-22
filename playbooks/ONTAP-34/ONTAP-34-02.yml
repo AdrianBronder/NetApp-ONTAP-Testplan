@@ -1,0 +1,103 @@
+################################################################################
+#
+# Title:        ONTAP-34-02 - Create multiprotocol FlexGroup and qtrees
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-28
+# Description:  Create multiprotocol FlexGroup and qtrees
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-34-02 - Create multiprotocol FlexGroup and qtrees"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:        
+    - name: Create FlexGroup           
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ ontap_34_fg_name }}"
+        size:                          "{{ ontap_default_fg_size_gb }}"
+        volume_security_style:         "unix"
+        aggr_list:                     "{{ storage_aggregates | map(attribute='name') | flatten }}"
+        aggr_list_multiplier:          "{{ ontap_default_fg_multiplier }}"
+        size_unit:                     gb
+        space_guarantee:               "none"
+        tiering_policy:                "auto"
+        granular_data:                 True #### Results in Basic mode ####
+        export_policy:                 "{{ ontap_34_policy_name }}"
+        junction_path:                 "/{{ ontap_34_fg_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        wait_for_completion:           True
+
+    - name: Get FlexGroup UUID
+      netapp.ontap.na_ontap_restit:
+        api:                           /storage/volumes
+        method:                        GET
+        query:
+         name:                         "{{ ontap_34_fg_name }}"
+         svm.name:                     "{{ global_primary_nas_svm }}"        
+      register: flexgroup_info
+      
+    - name: Modify FlexGroup to activate advanced granular data support      
+      netapp.ontap.na_ontap_restit:
+        api:                           /storage/volumes/{{ flexgroup_info.response.records[0].uuid }}
+        method:                        PATCH
+        body:
+         granular_data:                True
+         granular_data_mode:           "advanced"
+
+    - name: Create UNIX qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                         present
+        name:                          "{{ item }}"
+        flexvol_name:                  "{{ ontap_34_fg_name }}"
+        export_policy:                 "{{ ontap_34_policy_name }}"
+        security_style:                "unix"
+        unix_permissions:              0777
+        vserver:                       "{{ global_primary_nas_svm }}"
+      loop:
+        "{{ ontap_34_fg_unix_qtree_names }}"
+
+    - name: Create NTFS qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                         present
+        name:                          "{{ item }}"
+        flexvol_name:                  "{{ ontap_34_fg_name }}"
+        security_style:                "ntfs"
+        vserver:                       "{{ global_primary_nas_svm }}"
+      loop:
+        "{{ ontap_34_fg_ntfs_qtree_names }}"
+
+    - name: Create Mixed qtrees
+      netapp.ontap.na_ontap_qtree:
+        state:                         present
+        name:                          "{{ item }}"
+        flexvol_name:                  "{{ ontap_34_fg_name }}"
+        security_style:                "mixed"
+        vserver:                       "{{ global_primary_nas_svm }}"
+      loop:
+        "{{ ontap_34_fg_mixed_qtree_names }}"
+
+  post_tasks:
