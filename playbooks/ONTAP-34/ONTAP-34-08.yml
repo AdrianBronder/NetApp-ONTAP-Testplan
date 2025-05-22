@@ -1,0 +1,60 @@
+################################################################################
+#
+# Title:        ONTAP-34-08 - Create S3 NAS user mapping
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-28
+# Description:  Create S3 NAS user mapping
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "primary_storage_clusters"
+  name:                                "ONTAP-34-08 - Create S3 NAS user mapping"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:        
+    - name: Create S3-UNIX name mapping configuration
+      netapp.ontap.na_ontap_name_mappings:
+        direction: s3_unix
+        index: 1
+        pattern: "{{ ontap_34_s3_user_name }}"
+        replacement: "root"
+        vserver: "{{ global_primary_nas_svm }}"
+
+    - set_fact: 
+        admin_user: "{{ ontap_34_ad_admin_user | replace(match, replace) }}"
+      vars:
+        match: '\'
+        replace: '\\'
+        
+    - name: Create S3-SMB name mapping configuration
+      netapp.ontap.na_ontap_name_mappings:
+        direction: s3_win
+        index: 2
+        pattern: "{{ ontap_34_s3_user_name }}"
+        ### TODO - mapping not working properly
+        replacement: "{{ admin_user }}"
+        vserver: "{{ global_primary_nas_svm }}"
+
+  post_tasks:

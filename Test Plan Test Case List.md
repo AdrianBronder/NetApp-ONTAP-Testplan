@@ -38,6 +38,16 @@
 | 32-06 | CIFS	                            | Mount & Write (FlexGroup)             |
 | 33-01 | S3                                | User and Group                        |
 | 33-02 | S3                                | Bucket                                |
+| 34-01 | Multiprotocol NAS                 | Export Policies & Rules               |
+| 34-02 | Multiprotocol NAS                 | FlexGroup & Qtrees                    |
+| 34-03 | Multiprotocol NAS                 | NFS & SMB Name Mapping                |
+| 34-04 | Multiprotocol NAS                 | NFS Mount & Write (Multiprotocol)     |
+| 34-05 | Multiprotocol NAS                 | Shares & ACLs                         |
+| 34-06 | Multiprotocol NAS                 | SMB Mount & Write (Multiprotocol)     |
+| 34-07 | Multiprotocol NAS                 | S3 User and Group                     |
+| 34-08 | Multiprotocol NAS                 | S3 Name Mapping                       |
+| 34-09 | Multiprotocol NAS                 | S3 Bucket                             |
+| 34-10 | Multiprotocol NAS                 | Objects                               |
 | 35-01 | iSCSI	                            | iGroups                               |
 | 35-02 | iSCSI	                            | Volumes                               |
 | 35-03 | iSCSI	                            | LUNs & Mappings                       |

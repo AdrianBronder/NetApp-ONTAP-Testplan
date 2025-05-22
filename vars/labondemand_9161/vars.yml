@@ -71,6 +71,26 @@ ontap_33_s3_group_policy:         "FullAccess"
 ontap_33_s3_bucket_name:          "foo-test-bucket"
 ontap_33_s3_bucket_size:          107374182400
 
+# ONTAP-34  - Multiprotocol NAS
+ontap_34_fg_name:                 "ontap_34_fg01"
+ontap_34_fg_unix_qtree_names:
+  - "ontap_34_fg_unix_qt01"
+ontap_34_fg_ntfs_qtree_names:
+  - "ontap_34_fg_ntfs_qt01"
+ontap_34_fg_mixed_qtree_names:
+  - "ontap_34_fg_mixed_qt01"
+ontap_34_policy_name:             "ontap_34_policy"
+linux_34_mount_dir:               "{{ linux_default_mount_dir }}/34"
+windows_34_mount_dir:             "{{ windows_default_mount_dir }}\\34"
+ontap_34_ad_ro_group:             "{{ ontap_12_ad_ro_group }}"
+ontap_34_ad_admin_group:          "{{ ontap_12_ad_admin_group }}"
+ontap_34_ad_admin_user:           "{{ ontap_12_ad_admin_user }}"
+ontap_34_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
+ontap_34_s3_user_name:            "s3user34"
+ontap_34_s3_group_name:           "s3group34"
+ontap_34_s3_group_policy:         "FullAccess"
+ontap_34_s3_bucket_name:          "ontap-34-bucket-01"
+ontap_34_cluster:                 "cluster1"
 
 # ONTAP-35 - iSCSI
 ontap_35_lin_igroup_name:         "ontap_35_lin_ig01"
