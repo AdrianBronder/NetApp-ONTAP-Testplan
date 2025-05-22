@@ -41,7 +41,7 @@ dnf -y update
 echo ""
 echo ""
 echo "--> Installing additional packages"
-dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11-kerberos krb5-workstation krb5-devel python3.11-pip python3.11-devel nfs-utils java-21-openjdk --skip-broken
+dnf install -y perl openssl-devel bzip2-devel zlib-devel sqlite-devel python3.11-kerberos krb5-workstation krb5-devel python3.11-pip python3.11-devel nfs-utils java-21-openjdk awscli --skip-broken
 
 echo ""
 echo ""

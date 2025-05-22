@@ -339,6 +339,13 @@ protocols_cifs_services:
     comment:                      "This CIFS Server is created for the tenant PolarisLtd"
     enabled:                      true
 
+protocols_s3_services:
+  - svm:
+      name:                       "{{ svm_svms[1].name }}"
+    name:                         "{{ svm_svms[1].name }}"
+    certificate:
+      name:                       "{{ svm_svms[1].name }}"
+  
 protocols_san_iscsi_services:
   - svm:
       name:                       "{{ svm_svms[2].name }}"
@@ -381,7 +388,7 @@ network_ip_interfaces:
         name:                     "e0c"
       auto_revert:                true
     service_policy:
-      name:                       "default-data-files"
+      name:                       "custom-data-s3"
   - name:                         "{{ svm_svms[2].name }}"
     scope:                        "svm"
     svm:

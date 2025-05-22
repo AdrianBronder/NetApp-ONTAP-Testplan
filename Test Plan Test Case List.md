@@ -24,6 +24,7 @@
 | 20-02 | Basic Data SVM Setup	            | SVM network interfaces (LIFs)         |
 | 20-03 | Basic Data SVM Setup	            | SVM Network Services                  |
 | 20-04 | Basic Data SVM Setup	            | SVM Protocol Setup                    |
+| 20-05 | Basic Data SVM Setup	            | SVM Certificates and S3 Setup         |
 | 31-01 | NFS	                            | Export Policies & Rules               |
 | 31-02 | NFS	                            | Volumes & Qtrees                      |
 | 31-03 | NFS	                            | Mount & Write (Volumes)               |
@@ -35,6 +36,8 @@
 | 32-04 | CIFS	                            | FlexGroup & qtrees                    |
 | 32-05 | CIFS	                            | Shares & ACLs (FlexGroup)             |
 | 32-06 | CIFS	                            | Mount & Write (FlexGroup)             |
+| 33-01 | S3                                | User and Group                        |
+| 33-02 | S3                                | Bucket                                |
 | 35-01 | iSCSI	                            | iGroups                               |
 | 35-02 | iSCSI	                            | Volumes                               |
 | 35-03 | iSCSI	                            | LUNs & Mappings                       |
@@ -71,6 +74,8 @@
 | 52-08 | Backup (SnapMirror)               | Delete Files                          |
 | 52-09 | Backup (SnapMirror)               | Restore Backup                        |
 | 52-11 | Backup (SnapMirror)               | Bulk Protect Volumes                  |
+| 53-01 | Backup (SnapMirror S3)            | SVM Peering                           |
+| 53-02 | Backup (SnapMirror S3)            | Protect Bucket                        |
 | 81-01 | Advanced - Self-service           | Base Deployment                       |
 | 81-11 | Advanced - Self-service           | CIFS Demo Roll-out                    |
 | 81-21 | Advanced - Self-service           | Backup Demo Roll-out                  |

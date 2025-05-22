@@ -1,0 +1,29 @@
+################################################################################
+#
+# Title:        ONTAP-prepare-53 - Backup (SnapMirror S3)
+# Author:       NetApp Inc. (jont)
+# Initial 
+# Create Date:  2025-04-14
+# Description:  Execute all pre-steps for running test frame 52
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-prepare-20.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-20-05.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-02.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-33/ONTAP-33-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-33/ONTAP-33-02.yml
+

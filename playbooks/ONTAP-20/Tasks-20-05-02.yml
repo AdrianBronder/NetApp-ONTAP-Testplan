@@ -1,0 +1,31 @@
+################################################################################
+#
+# Title:        Tasks-20-05-02 - Start S3 Services
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-08
+# Description:  Configure S3 server for HTTPS with self-signed certificate
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+---
+  - name: Look up server certificate name
+    netapp.ontap.na_ontap_restit:
+      api: security/certificates
+      query:
+        svm.name: "{{ item.svm.name }}"
+        type: "server"
+    register: certificate
+
+  - name: Configure S3 service
+    netapp.ontap.na_ontap_s3_services:
+      state:                         present
+      vserver:                       "{{ item.svm.name }}"
+      name:                          "{{ item.name }}"
+      enabled:                       true
+      certificate_name:              "{{ certificate.response.records[0].name }}"
