@@ -1,0 +1,108 @@
+################################################################################
+#
+# Title:        ONTAP-XX-01 - FabricPool - Install Certificates 
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-05-13
+# Description:  FabricPool
+#               - Certificate management
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "secondary_storage_clusters"
+  name:                                "ONTAP-21-01 - FabricPool - Install Certificates"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+  - name: Get secondary site server-ca certificate
+    netapp.ontap.na_ontap_restit:
+      api: /security/certificates
+      method: GET
+      query:
+        svm.name: "{{ global_primary_backup_svm }}"
+        type: "server-ca"
+        fields: "common_name,public_certificate"
+    register: secondary_certificate
+
+  - name: Set secondary site server-ca certificate fact
+    set_fact:
+      secondary_cert:
+        secondary_common_name: "{{ secondary_certificate.response.records[0].common_name }}"
+        secondary_name: "{{ secondary_certificate.response.records[0].name }}"
+        secondary_public_certificate: "{{ secondary_certificate.response.records[0].public_certificate }}"
+    when:
+      - secondary_certificate.response.records[0].public_certificate is defined
+    delegate_to: localhost
+    delegate_facts: true
+
+  post_tasks:
+
+- hosts: "primary_storage_clusters"
+  name:                                "ONTAP-21-01 - FabricPool - Install Certificates"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+
+  - name: Retrieve secondary site certificate facts from hostvars
+    set_fact:
+      secondary_common_name: "{{ hostvars['localhost']['secondary_cert']['secondary_common_name'] }}"
+      secondary_name: "{{ hostvars['localhost']['secondary_cert']['secondary_name'] }}"
+      secondary_public_certificate: "{{ hostvars['localhost']['secondary_cert']['secondary_public_certificate'] }}"
+
+# This only works for data vservers
+#  - name: Install secondary server-ca certificate on primary admin svm
+#    netapp.ontap.na_ontap_security_certificates:
+#      common_name: "{{ secondary_common_name }}"
+#      name: "{{ secondary_name }}"
+#      public_certificate: "{{ secondary_public_certificate }}"
+#      type: server_ca
+#      svm: "cluster1"
+
+  - name: Install secondary server-ca certificate on primary admin svm
+    netapp.ontap.na_ontap_restit:
+      api: /security/certificates
+      method: POST
+      body:
+        svm.name: "{{ ontap_21_primary_admin_svm }}"
+        common_name: "{{ secondary_common_name }}"
+        type: server_ca
+        public_certificate: "{{ secondary_public_certificate }}"
+        name: "{{ secondary_name }}"
+
+  post_tasks:

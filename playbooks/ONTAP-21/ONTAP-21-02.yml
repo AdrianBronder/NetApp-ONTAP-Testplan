@@ -1,0 +1,123 @@
+################################################################################
+#
+# Title:        ONTAP-21-02 - FabricPool - Create ONTAP S3 FabricPool
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-05-13
+# Description:  FabricPool
+#               - Create ONTAP S3 endpoint
+#               - Create FabricPool object-store configuration
+#               - Attach object-store to aggregates
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "secondary_storage_clusters"
+  name:                                "ONTAP-21-02 - FabricPool - Create ONTAP S3 FabricPool"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create or regenerate the S3 user
+      netapp.ontap.na_ontap_s3_users:
+        state: present
+        name: "{{ ontap_21_s3_user }}"
+        vserver: "{{ global_primary_backup_svm }}"
+        regenerate_keys: true
+      register: s3_user
+
+    - name: Debug information about the S3 user
+      debug:
+        var: s3_user
+
+    - name: Store secondary site certificate facts in hostvars
+      set_fact:
+        s3_creds:
+          access_key: "{{ s3_user.access_key }}"
+          secret_key: "{{ s3_user.secret_key }}"
+      delegate_to: localhost
+      delegate_facts: true
+
+    - name: Create the S3 group for FabricPool
+      netapp.ontap.na_ontap_s3_groups:
+        state: present
+        name: "{{ ontap_21_s3_group }}"
+        vserver: "{{ global_primary_backup_svm }}"
+        users:
+          - name: "{{ ontap_21_s3_user }}"
+        policies:
+          - name: "{{ ontap_21_s3_policy }}"
+
+    - name: Create S3 bucket for FabricPool
+      netapp.ontap.na_ontap_s3_buckets:
+        state: present
+        name: "{{ ontap_21_s3_bucket }}"
+        size: "{{ ontap_21_s3_bucket_size }}"
+        vserver: "{{ global_primary_backup_svm }}"
+
+  post_tasks:
+
+- hosts: "primary_storage_clusters"
+  name:                                "ONTAP-21-02 - FabricPool - Create ONTAP S3 FabricPool"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Retrieve primary site certificate facts from hostvars
+      set_fact:
+        s3_access_key: "{{ hostvars['localhost']['s3_creds']['access_key'] }}"
+        s3_secret_key: "{{ hostvars['localhost']['s3_creds']['secret_key'] }}"
+
+    - name: Create FabricPool config
+      netapp.ontap.na_ontap_object_store:
+        state: present
+        name: "{{ ontap_21_fp_config_name }}"
+        access_key: "{{ s3_access_key }}"
+        secret_password: "{{ s3_secret_key }}"
+        provider_type: ONTAP_S3
+        server: "{{ global_primary_backup_svm }}"
+        container: "{{ ontap_21_s3_bucket }}"
+        certificate_validation_enabled: false
+
+    - name: Attach Object Store to cluster1
+      netapp.ontap.na_ontap_aggregate:
+        state: present
+        name: "{{ item }}"
+        object_store_name: "{{ ontap_21_fp_config_name }}"
+        allow_flexgroups: true
+      loop: "{{ ontap_21_fp_aggregates }}"
+
+  post_tasks:
