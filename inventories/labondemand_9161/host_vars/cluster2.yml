@@ -206,6 +206,51 @@ svm_svms:
       allowed:                    true
     language:                     "utf8mb4"
     comment:                      "This is the backup SVM for Blue Corp"
+  - name:                         "gns-us-core"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "Global Namespace with FlexCache - USA / Core"
+  - name:                         "gns-eu-core"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "Global Namespace with FlexCache - Europe / Core"
+
 
 protocols_nfs_services:
   - svm:
@@ -248,6 +293,26 @@ protocols_nfs_services:
       v3_64bit_identifiers_enabled: true
       v4_64bit_identifiers_enabled: true
     showmount_enabled:            true
+  - svm:
+      name:                       "gns-us-core"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                true
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "gns-eu-core"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                true
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
 
 protocols_active_directory:
   cluster2_ad:
@@ -267,6 +332,14 @@ protocols_active_directory:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
   sp-svm-polarisltd-backup:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  gns-us-core:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  gns-eu-core:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
@@ -315,6 +388,22 @@ protocols_cifs_services:
       organizational_unit:        "{{ all_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is the default polarisltd backup \
                                    location"
+    enabled:                      true
+  - name:                         "gnsus"
+    svm:
+      name:                       "gns-us-core"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "CIFS Server Global Namespace USA / Core"
+    enabled:                      true
+  - name:                         "gnseu"
+    svm:
+      name:                       "gns-eu-core"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "CIFS Server Global Namespace Europe / Core"
     enabled:                      true
 
 protocols_san_iscsi_services:
@@ -440,6 +529,70 @@ network_ip_interfaces:
       name:                       "default-intercluster"
     ipspace:
       name:                       "Default"
+  - name:                         "gns-us-core"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-core"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.161"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-us-core-data"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-core"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.165"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "gns-eu-core"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-eu-core"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.162"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-eu-core-data"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-eu-core"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.166"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
 
 cluster_peers:
   - name:                         "cluster1"
@@ -458,3 +611,18 @@ cluster_peers:
       ip_addresses:
         - "192.168.0.121"
         - "192.168.0.122"
+  - name:                         "cluster3"
+    authentication:
+      generate_passphrase:        false
+      passphrase:                 "{{ vault_cluster_peers.passphrase }}"
+    encryption:
+      proposed:                   "tls_psk"
+    ipspace: 
+      name:                       "Default"
+    local_network:
+      interfaces:
+        - ip_address:             "192.168.0.123"
+        - ip_address:             "192.168.0.124"
+    remote:
+      ip_addresses:
+        - "192.168.0.125"
