@@ -1,0 +1,122 @@
+################################################################################
+#
+# Title:        ONTAP-82-03 - Replicate Origins
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-07-21
+# Description:  Advanced - Global Namespace
+#               - Replicate Origins
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "cluster2"
+  name:                                "ONTAP-82-04 - Replicate Origins"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Setup volume protection for Europe Origins
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-eu-core:{{ item.name | replace('-','_') }}_origin"
+        destination_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-us-core:{{ item.name | replace('-','_') }}_replica"
+        create_destination:
+          enabled:                     true
+        policy:                        "Asynchronous"
+        schedule:                      "10min"
+        update:                        false
+        initialize:                    false
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Setup volume protection for USA Origins
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-us-core:{{ item.name | replace('-','_') }}_origin"
+        destination_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-eu-core:{{ item.name | replace('-','_') }}_replica"
+        create_destination:
+          enabled:                     true
+        policy:                        "Asynchronous"
+        schedule:                      "10min"
+        update:                        false
+        initialize:                    false
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Initialize backup for Europe Origins
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-eu-core:{{ item.name | replace('-','_') }}_origin"
+        destination_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-us-core:{{ item.name | replace('-','_') }}_replica"
+        update:                        false
+        initialize:                    true
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Initialize backup for USA Origins
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         present
+        source_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-us-core:{{ item.name | replace('-','_') }}_origin"
+        destination_endpoint:
+          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          path:                        "gns-eu-core:{{ item.name | replace('-','_') }}_replica"
+        update:                        false
+        initialize:                    true
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+  post_tasks:
