@@ -35,6 +35,44 @@
   pre_tasks:
 
   tasks:
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "ontap_82_ex_policy"
+        vserver:                       "{{ item.name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create read-write export policy rules
+      na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "ontap_82_ex_policy"
+        vserver:                       "{{ item.name }}"
+        client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
     - name: Create write-back cache for location data
       netapp.ontap.na_ontap_flexcache:
         state:                          present
@@ -59,7 +97,24 @@
         - item.name is defined
         - item.name is regex('^gns.*')
 
-    - name: Create write-around cache for remote locations
+    - name: Export write-back cache for location data
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item.name }}"
+        name:                           "{{ item.name | replace('-','_') }}"
+        policy:                         "ontap_82_ex_policy"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create write-around caches for remote locations
       netapp.ontap.na_ontap_flexcache:
         state:                          present
         vserver:                        "{{ item[0].name }}"
@@ -90,7 +145,31 @@
         - item[0].name is regex('^gns.*')
         - item[1].name is regex('^gns.*')
 
-    - name: create read-only caches for geo remote locations
+    - name: Export write-around caches for remote locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "ontap_82_ex_policy"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product(svm_svms |
+                    selectattr('name', 'defined') |
+                    selectattr('name', 'search', 'gns-')) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name != item[1].name
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+    - name: Create read-only caches for geo remote locations
       netapp.ontap.na_ontap_flexcache:
         state:                          present
         vserver:                        "{{ item[0].name }}"
@@ -103,6 +182,28 @@
           enabled:                      true
           percentage:                   20
         junction_path:                  "/{{ item[1].name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                     selectattr('name', 'defined') |
+                     selectattr('name', 'search', 'gns-') |
+                     list) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[0].name is regex('^gns.*')
+
+    - name: Export read-only caches for geo remote locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "ro_{{ item[0].name }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -141,6 +242,44 @@
   pre_tasks:
 
   tasks:
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "ontap_82_ex_policy"
+        vserver:                       "{{ item.name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create read-write export policy rules
+      na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "ontap_82_ex_policy"
+        vserver:                       "{{ item.name }}"
+        client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
     - name: Create write-back cache for location data
       netapp.ontap.na_ontap_flexcache:
         state:                          present
@@ -165,7 +304,24 @@
         - item.name is defined
         - item.name is regex('^gns.*')
 
-    - name: Create write-around cache for remote locations
+    - name: Export write-back cache for location data
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item.name }}"
+        name:                           "{{ item.name | replace('-','_') }}"
+        policy:                         "ontap_82_ex_policy"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create write-around caches for remote locations
       netapp.ontap.na_ontap_flexcache:
         state:                          present
         vserver:                        "{{ item[0].name }}"
@@ -196,7 +352,31 @@
         - item[0].name is regex('^gns.*')
         - item[1].name is regex('^gns.*')
 
-    - name: create read-only caches for geo remote locations
+    - name: Export write-around caches for remote locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "ontap_82_ex_policy"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product(svm_svms |
+                    selectattr('name', 'defined') |
+                    selectattr('name', 'search', 'gns-')) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name != item[1].name
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+    - name: Create read-only caches for geo remote locations
       netapp.ontap.na_ontap_flexcache:
         state:                          present
         vserver:                        "{{ item[0].name }}"
@@ -217,6 +397,28 @@
                     selectattr('name', 'defined') |
                     selectattr('name', 'search', 'gns-') |
                     list) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[0].name is regex('^gns.*')
+
+    - name: Export read-only caches for geo remote locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "ro_{{ item[0].name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                     selectattr('name', 'defined') |
+                     selectattr('name', 'search', 'gns-') |
+                     list) |
             list }}"
       loop_control:
         label: "{{ item[0].name }} <-> {{ item[1].name }}"
