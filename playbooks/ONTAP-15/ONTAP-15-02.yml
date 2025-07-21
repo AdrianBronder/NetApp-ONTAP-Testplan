@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "ontap" #"secondary_storage_clusters"
   name:                                "ONTAP-15-02 - Peering"
   gather_facts:                        false
   vars_files:
