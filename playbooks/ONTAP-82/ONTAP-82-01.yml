@@ -244,7 +244,7 @@
         name:                          "ro_{{ item.svm.name }}"
         vserver:                       "{{ item.svm.name }}"
         client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                       "any"
+        ro_rule:                       "sys"
         rw_rule:                       "none"
         protocol:                      "nfs"
         super_user_security:           "none"

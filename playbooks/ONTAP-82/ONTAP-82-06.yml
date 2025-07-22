@@ -57,10 +57,10 @@
         name:                          "ontap_82_ex_policy"
         vserver:                       "{{ item.name }}"
         client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                       "any"
-        rw_rule:                       "any"
+        ro_rule:                       "sys"
+        rw_rule:                       "sys"
         protocol:                      "nfs"
-        super_user_security:           "any"
+        super_user_security:           "sys"
         allow_suid:                    true
       loop:
         "{{ (svm_svms |
