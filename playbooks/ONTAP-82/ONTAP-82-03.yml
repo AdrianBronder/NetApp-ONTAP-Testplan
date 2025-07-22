@@ -47,7 +47,7 @@
         size_unit:                     gb
         space_guarantee:               "none"
         tiering_policy:                "auto"
-        junction_path:                 "/{{ item.name | replace('-','_') }}_origin }}"
+        junction_path:                 "/{{ item.name | replace('-','_') }}_origin"
         vserver:                       "gns-eu-core"
         wait_for_completion:           True
       loop_control:
@@ -69,7 +69,7 @@
         size_unit:                     gb
         space_guarantee:               "none"
         tiering_policy:                "auto"
-        junction_path:                 "/{{ item.name | replace('-','_') }}_origin }}"
+        junction_path:                 "/{{ item.name | replace('-','_') }}_origin"
         vserver:                       "gns-us-core"
         wait_for_completion:           True
       loop_control:

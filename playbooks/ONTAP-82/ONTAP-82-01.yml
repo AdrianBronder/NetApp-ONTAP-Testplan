@@ -169,6 +169,7 @@
         nfsv3:                         "{{ 'enabled' if item.protocol.v3_enabled else 'disabled'}}"
         nfsv4:                         "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
         nfsv41:                        "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
+        nfsv4_id_domain:               "{{ item.protocol.v4_id_domain | default(omit) }}"
         showmount:                     "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
       loop:
         "{{ protocols_nfs_services }}"

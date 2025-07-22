@@ -118,11 +118,11 @@
         - item[0].name is defined
         - item[0].name is regex('^gns.*')
 
-    - name: Share cache for in geo location
+    - name: Share global namespace
       netapp.ontap.na_ontap_cifs:
         state:                         present
         name:                          "gns"
-        path:                          "/{{ item.name | replace('-','_') }}"
+        path:                          "/"
         vserver:                       "{{ item.name }}"
         browsable:                     true
         oplocks:                       true
@@ -162,7 +162,7 @@
         state:                         present
         share_name:                    "gns"
         vserver:                       "{{ item.name }}"
-        user_or_group:                 "DEMO\\Administrators"
+        user_or_group:                 "DEMO\\Administrator"
         permission:                    "full_control"
       loop:
         "{{ (svm_svms |
@@ -173,7 +173,7 @@
       when:
         - svm_svms | length > 0
         - item.name is defined
-        - item.name is regex('^gns.*')s
+        - item.name is regex('^gns.*')
 
     - name: Create ACL (read-only Everyone)
       netapp.ontap.na_ontap_cifs_acl:
@@ -195,7 +195,7 @@
 
   post_tasks:
 
-- hosts:                               "tertiary_storage_clusterss"
+- hosts:                               "tertiary_storage_clusters"
   name:                                "ONTAP-82-06 - Exports & Shares - USA"
   gather_facts:                        false
   vars_files:
@@ -298,11 +298,11 @@
         - item[0].name is defined
         - item[0].name is regex('^gns.*')
 
-    - name: Share cache for in geo location
+    - name: Share global namespace
       netapp.ontap.na_ontap_cifs:
         state:                         present
         name:                          "gns"
-        path:                          "/{{ item.name | replace('-','_') }}"
+        path:                          "/"
         vserver:                       "{{ item.name }}"
         browsable:                     true
         oplocks:                       true
@@ -342,7 +342,7 @@
         state:                         present
         share_name:                    "gns"
         vserver:                       "{{ item.name }}"
-        user_or_group:                 "DEMO\\Administrators"
+        user_or_group:                 "DEMO\\Administrator"
         permission:                    "full_control"
       loop:
         "{{ (svm_svms |
@@ -353,7 +353,7 @@
       when:
         - svm_svms | length > 0
         - item.name is defined
-        - item.name is regex('^gns.*')s
+        - item.name is regex('^gns.*')
 
     - name: Create ACL (read-only Everyone)
       netapp.ontap.na_ontap_cifs_acl:

@@ -130,6 +130,7 @@ protocols_nfs_services:
       v3_enabled:                 true
       v40_enabled:                true
       v41_enabled:                true
+      v4_id_domain:               "demo.netapp.com"
       v3_64bit_identifiers_enabled: true
       v4_64bit_identifiers_enabled: true
     showmount_enabled:            true
@@ -140,6 +141,7 @@ protocols_nfs_services:
       v3_enabled:                 true
       v40_enabled:                true
       v41_enabled:                true
+      v4_id_domain:               "demo.netapp.com"
       v3_64bit_identifiers_enabled: true
       v4_64bit_identifiers_enabled: true
     showmount_enabled:            true
