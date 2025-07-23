@@ -203,7 +203,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-management"
-  - name:                         "gns-us-ny"
+  - name:                         "gns-us-ny_mgmt"
     scope:                        "svm"
     svm:
       name:                       "gns-us-ny"
@@ -219,7 +219,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-management"
-  - name:                         "gns-us-ny-data"
+  - name:                         "gns-us-ny"
     scope:                        "svm"
     svm:
       name:                       "gns-us-ny"
@@ -235,7 +235,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-data-files"
-  - name:                         "gns-us-la"
+  - name:                         "gns-us-la_mgmt"
     scope:                        "svm"
     svm:
       name:                       "gns-us-la"
@@ -251,7 +251,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-management"
-  - name:                         "gns-us-la-data"
+  - name:                         "gns-us-la"
     scope:                        "svm"
     svm:
       name:                       "gns-us-la"

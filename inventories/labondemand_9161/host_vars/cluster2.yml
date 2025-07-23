@@ -531,7 +531,7 @@ network_ip_interfaces:
       name:                       "default-intercluster"
     ipspace:
       name:                       "Default"
-  - name:                         "gns-us-core"
+  - name:                         "gns-us-core_mgmt"
     scope:                        "svm"
     svm:
       name:                       "gns-us-core"
@@ -547,7 +547,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-management"
-  - name:                         "gns-us-core-data"
+  - name:                         "gns-us-core"
     scope:                        "svm"
     svm:
       name:                       "gns-us-core"
@@ -563,7 +563,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-data-files"
-  - name:                         "gns-eu-core"
+  - name:                         "gns-eu-core_mgmt"
     scope:                        "svm"
     svm:
       name:                       "gns-eu-core"
@@ -579,7 +579,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-management"
-  - name:                         "gns-eu-core-data"
+  - name:                         "gns-eu-core"
     scope:                        "svm"
     svm:
       name:                       "gns-eu-core"

@@ -616,7 +616,7 @@ network_ip_interfaces:
       name:                       "default-intercluster"
     ipspace:
       name:                       "Default"
-  - name:                         "gns-eu-be"
+  - name:                         "gns-eu-be_mgmts"
     scope:                        "svm"
     svm:
       name:                       "gns-eu-be"
@@ -632,7 +632,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-management"
-  - name:                         "gns-eu-be-data"
+  - name:                         "gns-eu-be"
     scope:                        "svm"
     svm:
       name:                       "gns-eu-be"
@@ -648,7 +648,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-data-files"
-  - name:                         "gns-eu-lo"
+  - name:                         "gns-eu-lo_mgmt"
     scope:                        "svm"
     svm:
       name:                       "gns-eu-lo"
@@ -664,7 +664,7 @@ network_ip_interfaces:
       auto_revert:                true
     service_policy:
       name:                       "default-management"
-  - name:                         "gns-eu-lo-data"
+  - name:                         "gns-eu-lo"
     scope:                        "svm"
     svm:
       name:                       "gns-eu-lo"

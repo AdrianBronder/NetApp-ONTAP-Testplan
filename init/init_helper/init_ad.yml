@@ -71,7 +71,8 @@
         - item.scope == "svm"
       loop:
         "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces | list + 
-            hostvars[groups['secondary_storage_clusters'][0]].network_ip_interfaces | list }}"
+            hostvars[groups['secondary_storage_clusters'][0]].network_ip_interfaces | list +
+            hostvars[groups['tertiary_storage_clusters'][0]].network_ip_interfaces | list }}"
       loop_control:
         label: "{{ item.name }}"
   
