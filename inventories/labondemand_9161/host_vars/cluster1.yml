@@ -616,7 +616,7 @@ network_ip_interfaces:
       name:                       "default-intercluster"
     ipspace:
       name:                       "Default"
-  - name:                         "gns-eu-be_mgmts"
+  - name:                         "gns-eu-be_mgmt"
     scope:                        "svm"
     svm:
       name:                       "gns-eu-be"
