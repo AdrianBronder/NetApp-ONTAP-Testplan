@@ -1,0 +1,205 @@
+################################################################################
+#
+# Title:        ONTAP-82-07 - Mount & Write
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-07-23
+# Description:  Advanced - Global Namespace
+#               - Mount & Write
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "linux"
+  name:                                ONTAP-82-07 - Mount & Write - Linux
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Ensure stale mounts are removed before proceding (in case a mount exists)
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ item.name }}.{{ all_default_dns_domain }}:/"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.name }}"
+        opts:                          "rw,sync,vers=4.1,sec=sys"
+        fstype:                        "nfs"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+  
+    - name: Create mount directories
+      ansible.builtin.file:
+        path:                          "{{ linux_82_mount_dir }}/{{ item.name }}"
+        state:                         "directory"
+        mode:                          "0755"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+  
+    - name: Mount NFS export on Linux host
+      ansible.posix.mount:
+        state:                         "mounted"
+        src:                           "{{ item.name }}.{{ all_default_dns_domain }}:/"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.name }}"
+        opts:                          "rw,sync,vers=4.1,sec=sys"
+        fstype:                        "nfs"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+  
+    - name: Create test file on each export
+      community.general.filesize:
+        path: "{{ linux_82_mount_dir }}/{{ item.name }}/{{ item.name | replace('-','_') }}/{{ item.name.split('-')[-1] }}_linux_testfile"
+        size: 50MB
+      loop_control:
+        label: "{{ item.name }}"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+  post_tasks:
+
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-82-07 - Mount & Write - Windows"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: Create mount directory
+      ansible.windows.win_file:
+        path:                          "{{ windows_82_mount_dir }}"
+        state:                         directory
+
+    - name: 
+      block:
+        - name: Save network credentials
+          community.windows.win_credential:
+            state:                     present
+            name:                      "{{ item.name }}"
+            type:                      "domain_password"
+            username:                  "{{ ontap_82_ad_admin_user }}"
+            secret:                    "{{ ontap_82_ad_admin_user_pw }}"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+          when:
+            - item.name is defined
+            - item.name is regex('^gns.*')
+
+        - name: Map shares
+          community.windows.win_shortcut:
+            state:                     present
+            src:                       "\\\\{{ item.name }}\\{{ ontap_82_gns_share_name }}"
+            dest:                      "{{ windows_82_mount_dir }}\\{{ item.name }}.lnk"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+          when:
+            - item.name is defined
+            - item.name is regex('^gns.*')
+
+        - name: Create test file on each share
+          ansible.windows.win_file:
+            path:                      "\\\\{{ item.name }}\\{{ ontap_82_gns_share_name }}\\{{ item.name | replace('-','_') }}\\{{ item.name.split('-')[-1] }}_windows_testfile"
+            state:                     touch
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+          when:
+            - item.name is defined
+            - item.name is regex('^gns.*')
+      vars:
+        # become is required to save and retrieve the credentials in the tasks
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
+
+  post_tasks:

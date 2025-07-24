@@ -38,7 +38,7 @@
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         present
-        name:                          "ontap_82_ex_policy"
+        name:                          "{{ ontap_82_policy_name }}"
         vserver:                       "{{ item.name }}"
       loop:
         "{{ (svm_svms |
@@ -54,7 +54,7 @@
     - name: Create read-write export policy rules
       na_ontap_export_policy_rule:
         state:                         present
-        name:                          "ontap_82_ex_policy"
+        name:                          "{{ ontap_82_policy_name }}"
         vserver:                       "{{ item.name }}"
         client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                       "sys"
@@ -78,7 +78,7 @@
         state:                          present
         vserver:                        "{{ item[0].name }}"
         name:                           "{{ item[1].name | replace('-','_') }}"
-        policy:                         "ontap_82_ex_policy"
+        policy:                         "{{ ontap_82_policy_name }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -121,7 +121,7 @@
     - name: Share global namespace
       netapp.ontap.na_ontap_cifs:
         state:                         present
-        name:                          "gns"
+        name:                          "{{ ontap_82_gns_share_name }}"
         path:                          "/"
         vserver:                       "{{ item.name }}"
         browsable:                     true
@@ -142,7 +142,7 @@
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
         state:                         absent
-        share_name:                    "gns"
+        share_name:                    "{{ ontap_82_gns_share_name }}"
         vserver:                       "{{ item.name }}"
         user_or_group:                 "Everyone"
         permission:                    "full_control"
@@ -160,7 +160,7 @@
     - name: Create ACL (admins - Full Control)
       netapp.ontap.na_ontap_cifs_acl:
         state:                         present
-        share_name:                    "gns"
+        share_name:                    "{{ ontap_82_gns_share_name }}"
         vserver:                       "{{ item.name }}"
         user_or_group:                 "DEMO\\Administrator"
         permission:                    "full_control"
@@ -178,7 +178,7 @@
     - name: Create ACL (read-only Everyone)
       netapp.ontap.na_ontap_cifs_acl:
         state:                         present
-        share_name:                    "gns"
+        share_name:                    "{{ ontap_82_gns_share_name }}"
         vserver:                       "{{ item.name }}"
         user_or_group:                 "Everyone"
         permission:                    "read"
@@ -218,7 +218,7 @@
     - name: Create read-write export policy
       netapp.ontap.na_ontap_export_policy:
         state:                         present
-        name:                          "ontap_82_ex_policy"
+        name:                          "{{ ontap_82_policy_name }}"
         vserver:                       "{{ item.name }}"
       loop:
         "{{ (svm_svms |
@@ -234,7 +234,7 @@
     - name: Create read-write export policy rules
       na_ontap_export_policy_rule:
         state:                         present
-        name:                          "ontap_82_ex_policy"
+        name:                          "{{ ontap_82_policy_name }}"
         vserver:                       "{{ item.name }}"
         client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
         ro_rule:                       "any"
@@ -258,7 +258,7 @@
         state:                          present
         vserver:                        "{{ item[0].name }}"
         name:                           "{{ item[1].name | replace('-','_') }}"
-        policy:                         "ontap_82_ex_policy"
+        policy:                         "{{ ontap_82_policy_name }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -301,7 +301,7 @@
     - name: Share global namespace
       netapp.ontap.na_ontap_cifs:
         state:                         present
-        name:                          "gns"
+        name:                          "{{ ontap_82_gns_share_name }}"
         path:                          "/"
         vserver:                       "{{ item.name }}"
         browsable:                     true
@@ -322,7 +322,7 @@
     - name: Remove "Full Control" for "Everyone"
       netapp.ontap.na_ontap_cifs_acl:
         state:                         absent
-        share_name:                    "gns"
+        share_name:                    "{{ ontap_82_gns_share_name }}"
         vserver:                       "{{ item.name }}"
         user_or_group:                 "Everyone"
         permission:                    "full_control"
@@ -340,7 +340,7 @@
     - name: Create ACL (admins - Full Control)
       netapp.ontap.na_ontap_cifs_acl:
         state:                         present
-        share_name:                    "gns"
+        share_name:                    "{{ ontap_82_gns_share_name }}"
         vserver:                       "{{ item.name }}"
         user_or_group:                 "DEMO\\Administrator"
         permission:                    "full_control"
@@ -358,7 +358,7 @@
     - name: Create ACL (read-only Everyone)
       netapp.ontap.na_ontap_cifs_acl:
         state:                         present
-        share_name:                    "gns"
+        share_name:                    "{{ ontap_82_gns_share_name }}"
         vserver:                       "{{ item.name }}"
         user_or_group:                 "Everyone"
         permission:                    "read"
