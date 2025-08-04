@@ -1,0 +1,157 @@
+# Ansible Variables
+
+# Custom Variables
+
+# Variables basedon ONTAP REST model
+# https://<ontap_cluster_mgmt>/docs/api
+cluster:
+  name:                           "proc1-fsx"
+
+cluster_nodes:
+
+cluster_licensing_licenses: []
+
+security_authentication_cluster_ad_proxy:
+  svm:
+    name:                        "{{ cluster.name }}_ad"       
+
+network_ethernet_ports:
+
+storage_aggregates:
+
+svm_svms:
+  - name:                         "{{ cluster.name }}_ad"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    false
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "This is the tunnel SVM for cluster AD authentication"
+  - name:                         "gns-us-aws01"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "Global Namespace with FlexCache - USA / AWS01"
+
+protocols_nfs_services:
+  - svm:
+      name:                       "gns-us-aws01"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                true
+      v4_id_domain:               "demo.netapp.com"
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+
+protocols_active_directory:
+  proc1-fsx:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  gns-us-aws01:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+
+protocols_cifs_services:
+  - name:                         "proc1-fsx_ad"
+    svm:
+      name:                       "proc1-fsx_ad"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is for cluster AD authentication"
+    enabled:                      true
+  - name:                         "gnsusaws01"
+    svm:
+      name:                       "gns-us-aws01"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "CIFS Server Global Namespace USA / AWS01"
+    enabled:                      true
+
+network_ip_interfaces:
+  - name:                         "proc1-fsx_ad"
+    scope:                        "svm"
+    svm:
+      name:                       "proc1-fsx_ad"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.230"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-us-aws01_mgmt"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-aws01"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.171"
+      family:                     "ipv4"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-us-aws01"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-aws01"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.175"
+      family:                     "ipv4"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "inter_1"
+    scope:                        "cluster"
+    ip:
+      netmask:                    "24"
+      address:                    "172.20.1.22"
+      family:                     "ipv4"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-intercluster"
+    ipspace:
+      name:                       "Default"
+  - name:                         "inter_2"
+    scope:                        "cluster"
+    ip:
+      netmask:                    "24"
+      address:                    "172.20.1.105"
+      family:                     "ipv4"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-intercluster"
+    ipspace:
+      name:                       "Default"
+
+cluster_peers:
