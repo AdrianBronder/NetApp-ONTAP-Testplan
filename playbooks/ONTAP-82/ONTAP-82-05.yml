@@ -47,7 +47,7 @@
         relative_size:
           enabled:                      true
           percentage:                   50
-        junction_path:                  "/{{ item.name | replace('-','_') }}"
+        junction_path:                  "/{{ item.name | replace('gns','') | replace('-','') }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -71,7 +71,7 @@
         relative_size:
           enabled:                      true
           percentage:                   20
-        junction_path:                  "/{{ item[1].name | replace('-','_') }}"
+        junction_path:                  "/{{ item[1].name | replace('gns','') | replace('-','') }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -102,7 +102,7 @@
         relative_size:
           enabled:                      true
           percentage:                   20
-        junction_path:                  "/{{ item[1].name | replace('-','_') }}"
+        junction_path:                  "/{{ item[1].name | replace('gns','') | replace('-','') }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -153,7 +153,7 @@
         relative_size:
           enabled:                      true
           percentage:                   50
-        junction_path:                  "/{{ item.name | replace('-','_') }}"
+        junction_path:                  "/{{ item.name | replace('gns','') | replace('-','') }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -177,7 +177,7 @@
         relative_size:
           enabled:                      true
           percentage:                   20
-        junction_path:                  "/{{ item[1].name | replace('-','_') }}"
+        junction_path:                  "/{{ item[1].name | replace('gns','') | replace('-','') }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -208,7 +208,7 @@
         relative_size:
           enabled:                      true
           percentage:                   20
-        junction_path:                  "/{{ item[1].name | replace('-','_') }}"
+        junction_path:                  "/{{ item[1].name | replace('gns','') | replace('-','') }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
