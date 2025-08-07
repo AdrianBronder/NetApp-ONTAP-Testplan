@@ -14,7 +14,15 @@
 # 
 ################################################################################
 
-- ansible.builtin.import_playbook: ../ONTAP-20/ONTAP-prepare-20.yml
+- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-10-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-10-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-10-03.yml
+- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-10-04.yml
+- ansible.builtin.import_playbook: ../ONTAP-10/ONTAP-10-05.yml
+
+- ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-01.yml
+- ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-02.yml
+- ansible.builtin.import_playbook: ../ONTAP-11/ONTAP-11-03.yml
 
 - ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-01.yml
 - ansible.builtin.import_playbook: ../ONTAP-15/ONTAP-15-02.yml
