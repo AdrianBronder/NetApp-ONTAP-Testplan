@@ -46,6 +46,7 @@
           svm.name:               "{{ global_primary_san_svm }}"
         use_python_keys:          true
       register: iscsi_info
+      ignore_errors:              true
 
     - name: Get LUNs from "{{ ansible_host }}"
       netapp.ontap.na_ontap_rest_info:
@@ -155,6 +156,7 @@
             list }}"
       when:
         - iscsi_nodes.nodes | length > 0
+        - hostvars[groups['primary_storage_clusters'][0]].iscsi_info is defined
 
     - name: Remove iSCSI targets
       ansible.builtin.command:
@@ -180,10 +182,11 @@
         state:                    "absent"
         src:                      "{{ item.device }}"
         path:                     "{{ item.mount }}"
-        # opts:                     "rw,sync,hard,vers=3"
         fstype:                   "nfs"
+      loop_control:
+        label: "{{ item.mount }} -> {{ item.device }}"
       loop:
-        "{{ ansible_mounts | selectattr('device', 'search', 'ntap*')}}"
+        "{{ ansible_mounts | selectattr('device', 'search', 'ntap-*|gns*-')}}"
   
     - name: Remove mount directories
       ansible.builtin.file:

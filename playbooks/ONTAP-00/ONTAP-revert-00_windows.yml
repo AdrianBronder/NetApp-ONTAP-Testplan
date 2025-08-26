@@ -67,7 +67,7 @@
 
     - name: 
       block:
-        - name: Remove mapped shares
+        - name: Remove mapped shares - Test frame 32
           community.windows.win_shortcut:
             state:                     absent
             dest:                      "{{ windows_32_mount_dir }}\\{{ item }}.lnk"
@@ -75,11 +75,44 @@
             "{{ ontap_32_vol_qtree_names +
                 ontap_32_fg_qtree_names }}"
 
-        - name: Remove network credentials
+        - name: Remove mapped shares - Test frame 82
+          community.windows.win_shortcut:
+            state:                     absent
+            dest:                      "{{ windows_82_mount_dir }}\\{{ item.name }}.lnk"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+
+        - name: Remove network credentials - Test frame 32
           community.windows.win_credential:
             state:                     absent
             name:                      "{{ global_primary_nas_svm }}"
             type:                      "domain_password"
+
+        - name: Remove network credentials - Test frame 82
+          community.windows.win_credential:
+            state:                     absent
+            name:                      "{{ item.name }}"
+            type:                      "domain_password"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
       vars:
         # become is required to save and retrieve the credentials in the tasks
         ansible_become:                "yes"

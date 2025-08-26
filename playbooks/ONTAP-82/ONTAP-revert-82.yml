@@ -14,8 +14,125 @@
 #
 ################################################################################
 
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespaces - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Remove mounts
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ item.name }}.{{ all_default_dns_domain }}:/"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.name }}"
+        opts:                          "rw,sync,vers=4.1,sec=sys"
+        fstype:                        "nfs"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+  
+    - name: Remove mount directories
+      ansible.builtin.file:
+        path:                          "{{ linux_82_mount_dir }}/{{ item.name }}"
+        state:                         "absent"
+        mode:                          "0755"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespaces - Windows"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: 
+      block:
+        - name: Remove mapped shares
+          community.windows.win_shortcut:
+            state:                     absent
+            dest:                      "{{ windows_82_mount_dir }}\\{{ item.name }}.lnk"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+
+        - name: Remove network credentials
+          community.windows.win_credential:
+            state:                     absent
+            name:                      "{{ item.name }}"
+            type:                      "domain_password"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+          when:
+            - item.name is defined
+            - item.name is regex('^gns.*')
+      vars:
+        # become is required to save and retrieve the credentials in the tasks
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
+
+    - name: Remove mount directory
+      ansible.windows.win_file:
+        path:                          "{{ windows_82_mount_dir }}"
+        state:                         absent
+
 - hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-revert-82 - Advanced - Global Namespacess - ONTAP Primary"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespaces - ONTAP Primary"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
