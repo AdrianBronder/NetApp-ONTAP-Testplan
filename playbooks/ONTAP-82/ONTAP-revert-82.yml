@@ -37,11 +37,11 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+        "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-') |
             list) +
-            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+            (hostvars[groups['site03_ontap'][0]].svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-') |
             list) }}"
@@ -57,11 +57,11 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+        "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-') |
             list) +
-            (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+            (hostvars[groups['site03_ontap'][0]].svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-') |
             list) }}"
@@ -91,11 +91,11 @@
           loop_control:
             label: "{{ item.name }}"
           loop:
-            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) +
-                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                (hostvars[groups['site03_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) }}"
@@ -108,11 +108,11 @@
           loop_control:
             label: "{{ item.name }}"
           loop:
-            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) +
-                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                (hostvars[groups['site03_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) }}"
@@ -131,7 +131,7 @@
         path:                          "{{ windows_82_mount_dir }}"
         state:                         absent
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-revert-82 - Advanced - Global Namespaces - ONTAP Primary"
   gather_facts:                        false
   vars_files:
@@ -163,11 +163,11 @@
         "{{ (svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-')) |
-            product ((hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list) +
-                     (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list)) |
@@ -190,11 +190,11 @@
         "{{ (svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-')) |
-            product ((hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list) +
-                     (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list)) |
@@ -210,7 +210,7 @@
 
   post_tasks:
 
-- hosts:                               "tertiary_storage_clusters"
+- hosts:                               "site03_ontap"
   name:                                "ONTAP-revert-82 - Advanced - Global Namespacess - ONTAP Tertiary"
   gather_facts:                        false
   vars_files:
@@ -242,11 +242,11 @@
         "{{ (svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-')) |
-            product ((hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list) +
-                     (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list)) |
@@ -269,11 +269,11 @@
         "{{ (svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-')) |
-            product ((hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list) +
-                     (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
                       selectattr('name', 'defined') |
                       selectattr('name', 'search', 'gns-') |
                       list)) |
@@ -289,7 +289,7 @@
 
   post_tasks:
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "site02_ontap"
   name:                                "ONTAP-revert-82 - Advanced - Global Namespacess - ONTAP Secondary"
   gather_facts:                        false
   vars_files:
@@ -359,15 +359,15 @@
         state:                         absent
         vserver:                       "gns-eu-core"
         peer_vserver:                  "{{ item.name }}"
-        peer_cluster:                  "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
         applications:
           - "flexcache"
         peer_options:
-          hostname: "{{ hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site01_ontap'][0]].ansible_host }}"
       loop_control:
         label: "gns-eu-core <-> {{ item.name }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"
@@ -377,15 +377,15 @@
         state:                         absent
         vserver:                       "gns-us-core"
         peer_vserver:                  "{{ item.name }}"
-        peer_cluster:                  "{{ hostvars[groups['tertiary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site03_ontap'][0]].cluster.name }}"
         applications:
           - "flexcache"
         peer_options:
-          hostname: "{{ hostvars[groups['tertiary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site03_ontap'][0]].ansible_host }}"
       loop_control:
         label: "gns-us-core <-> {{ item.name }}"
       loop:
-        "{{ hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"
@@ -395,11 +395,11 @@
         state:                         absent
         vserver:                       "gns-eu-core"
         peer_vserver:                  "gns-us-core"
-        peer_cluster:                  "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site02_ontap'][0]].ansible_host }}"
 
     - name: Remove Replicas - Europe
       netapp.ontap.na_ontap_volume:
@@ -409,7 +409,7 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"
@@ -422,7 +422,7 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"
@@ -435,7 +435,7 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"
@@ -448,7 +448,7 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"

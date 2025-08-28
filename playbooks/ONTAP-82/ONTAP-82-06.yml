@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-82-06 - Exports & Shares - Europe"
   gather_facts:                        false
   vars_files:
@@ -106,7 +106,7 @@
         "{{ (svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-')) |
-            product (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+            product (hostvars[groups['site03_ontap'][0]].svm_svms |
                      selectattr('name', 'defined') |
                      selectattr('name', 'search', 'gns-') |
                      list) |
@@ -195,7 +195,7 @@
 
   post_tasks:
 
-- hosts:                               "tertiary_storage_clusters"
+- hosts:                               "site03_ontap"
   name:                                "ONTAP-82-06 - Exports & Shares - USA"
   gather_facts:                        false
   vars_files:
@@ -286,7 +286,7 @@
         "{{ (svm_svms |
              selectattr('name', 'defined') |
              selectattr('name', 'search', 'gns-')) |
-            product (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            product (hostvars[groups['site01_ontap'][0]].svm_svms |
                      selectattr('name', 'defined') |
                      selectattr('name', 'search', 'gns-') |
                      list) |

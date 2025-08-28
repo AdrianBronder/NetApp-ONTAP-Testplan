@@ -59,7 +59,7 @@
         state:                         "absent"
         mode:                          "0755"
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-revert-31 - NFS - ONTAP"
   gather_facts:                        false
   vars_files:

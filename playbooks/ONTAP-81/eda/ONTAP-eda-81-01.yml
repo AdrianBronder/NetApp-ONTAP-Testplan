@@ -16,7 +16,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-81-eda-01 - React to attack"
   gather_facts:                        false
   vars_files:

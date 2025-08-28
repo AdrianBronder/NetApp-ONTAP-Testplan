@@ -16,7 +16,7 @@
 ################################################################################
 
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "site02_ontap"
   name:                                "ONTAP-self-backup-81 - Modify Backup"
   gather_facts:                        false
   vars_files:
@@ -50,10 +50,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         "{{ 'absent' if request_service_value == 'none' else 'present' }}"
         source_endpoint:
-          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
           path:                        "{{ request_svm + ':' + request_volume }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
           path:                        "{{ request_svm + '-backup:' + request_volume + '_dst' }}"
         create_destination:
           enabled:                     false
@@ -66,10 +66,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
           path:                        "{{ request_svm + ':' + request_volume }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
           path:                        "{{ request_svm + '-backup:' + request_volume + '_dst' }}"
         update:                        false
         initialize:                    true

@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-52-01 - SVM Peering"
   gather_facts:                        false
   vars_files:
@@ -40,11 +40,11 @@
         state:                         present
         vserver:                       "{{ item }}"
         peer_vserver:                  "{{ global_primary_backup_svm }}"
-        peer_cluster:                  "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site02_ontap'][0]].ansible_host }}"
       loop:
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"

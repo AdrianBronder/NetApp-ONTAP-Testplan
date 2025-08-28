@@ -40,26 +40,26 @@
         state:                         present
         vserver:                       "gns-eu-core"
         peer_vserver:                  "gns-us-core"
-        peer_cluster:                  "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site02_ontap'][0]].ansible_host }}"
 
     - name: Create SVM Peerings - Europe
       netapp.ontap.na_ontap_vserver_peer:
         state:                         present
         vserver:                       "gns-eu-core"
         peer_vserver:                  "{{ item.name }}"
-        peer_cluster:                  "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
         applications:
           - "flexcache"
         peer_options:
-          hostname: "{{ hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site01_ontap'][0]].ansible_host }}"
       loop_control:
         label: "gns-eu-core <-> {{ item.name }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"
@@ -69,15 +69,15 @@
         state:                         present
         vserver:                       "gns-us-core"
         peer_vserver:                  "{{ item.name }}"
-        peer_cluster:                  "{{ hostvars[groups['tertiary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site03_ontap'][0]].cluster.name }}"
         applications:
           - "flexcache"
         peer_options:
-          hostname: "{{ hostvars[groups['tertiary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site03_ontap'][0]].ansible_host }}"
       loop_control:
         label: "gns-us-core <-> {{ item.name }}"
       loop:
-        "{{ hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"

@@ -14,7 +14,7 @@
 #
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-revert-35 - iSCSI - ONTAP (read)"
   gather_facts:                        false
   vars_files:
@@ -89,7 +89,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
+        "{{ hostvars[groups['site01_ontap'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -108,19 +108,19 @@
     - name: Flush multipath devices
       ansible.builtin.command:
         cmd: "multipath -f {{ ontap_iscsi_vendor_id }}\
-                           {{ (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                           {{ (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                               selectattr('name', 'defined') |
                               selectattr('name', '==', item ) |
                               first ).serial_hex }}"
       when:
-        - (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+        - (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
            selectattr('name', 'defined') |
            selectattr('name', '==', item ) |
            first ).serial_hex is defined
       loop_control:
         label: "{{ item }} --> \
                 {{ ontap_iscsi_vendor_id }}\
-                {{ (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                {{ (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                     selectattr('name', 'defined') |
                     selectattr('name', '==', item ) |
                     first ).serial_hex }}"
@@ -168,7 +168,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
+        "{{ hostvars[groups['site01_ontap'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -181,7 +181,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-revert-35 - iSCSI - ONTAP"
   gather_facts:                        false
   vars_files:

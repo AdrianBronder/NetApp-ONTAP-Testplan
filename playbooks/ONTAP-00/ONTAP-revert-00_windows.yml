@@ -54,7 +54,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
+        "{{ hostvars[groups['site01_ontap'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -82,11 +82,11 @@
           loop_control:
             label: "{{ item.name }}"
           loop:
-            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) +
-                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                (hostvars[groups['site03_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) }}"
@@ -105,11 +105,11 @@
           loop_control:
             label: "{{ item.name }}"
           loop:
-            "{{ (hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+            "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) +
-                (hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+                (hostvars[groups['site03_ontap'][0]].svm_svms |
                  selectattr('name', 'defined') |
                  selectattr('name', 'search', 'gns-') |
                 list) }}"

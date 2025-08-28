@@ -53,7 +53,7 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"
@@ -75,7 +75,7 @@
       loop_control:
         label: "{{ item.name }}"
       loop:
-        "{{ hostvars[groups['tertiary_storage_clusters'][0]].svm_svms |
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
           selectattr('name', 'defined') |
           selectattr('name', 'search', 'gns-') |
           list }}"

@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-32-02 - Shares & ACLs (Volume)"
   gather_facts:                        false
   vars_files:

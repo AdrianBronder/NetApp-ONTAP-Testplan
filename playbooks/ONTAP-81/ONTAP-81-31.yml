@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Qtrees"
   gather_facts:                        false
   vars_files:
@@ -161,7 +161,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Events"
   gather_facts:                        false
   vars_files:
@@ -248,7 +248,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Dry-run ARP"
   gather_facts:                        false
   vars_files:
@@ -300,7 +300,7 @@
   
   post_tasks:
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-81-31 - Ransomware Demo Roll-out - ONTAP Activate ARP"
   gather_facts:                        false
   vars_files:
