@@ -44,7 +44,7 @@
           - "serial_number"
         parameters:
           svm.name:                    "{{ global_primary_san_svm }}"
-        use_python_keys:               true_read
+        use_python_keys:               true
       register: lun_info
 
   post_tasks:
