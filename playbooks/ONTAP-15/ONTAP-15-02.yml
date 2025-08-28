@@ -15,8 +15,9 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "ontap"
   name:                                "ONTAP-15-02 - Peering"
+  serial:                              1     # avoid parallel peering from two clusters simultaneously
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml

@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "site02_ontap"
   name:                                "ONTAP-81-21 - Backup Demo Roll-out"
   gather_facts:                        false
   vars_files:
@@ -39,10 +39,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
           path:                        "{{ item.0 + ':' + item.1 }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
           path:                        "{{ item.0 + '-backup:' + item.1 + '_dst' }}"
         create_destination:
           enabled:                     true
@@ -57,10 +57,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
           path:                        "{{ item.0 + ':' + item.1 }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
           path:                        "{{ item.0 + '-backup:' + item.1 + '_dst' }}"
         update:                        false
         initialize:                    true

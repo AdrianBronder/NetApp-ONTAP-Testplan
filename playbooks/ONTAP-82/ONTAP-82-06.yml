@@ -1,0 +1,376 @@
+################################################################################
+#
+# Title:        ONTAP-82-06 - Exports & Shares
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-07-21
+# Description:  Advanced - Global Namespace
+#               - Exports & Shares
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "site01_ontap"
+  name:                                "ONTAP-82-06 - Exports & Shares - Europe"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "{{ ontap_82_policy_name }}"
+        vserver:                       "{{ item.name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create read-write export policy rules
+      na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "{{ ontap_82_policy_name }}"
+        vserver:                       "{{ item.name }}"
+        client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "sys"
+        rw_rule:                       "sys"
+        protocol:                      "nfs"
+        super_user_security:           "sys"
+        allow_suid:                    true
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Export caches for in-geo locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "{{ ontap_82_policy_name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product(svm_svms |
+                    selectattr('name', 'defined') |
+                    selectattr('name', 'search', 'gns-')) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+    - name: Export read-only caches for remote geo locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "ro_{{ item[0].name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product (hostvars[groups['site03_ontap'][0]].svm_svms |
+                     selectattr('name', 'defined') |
+                     selectattr('name', 'search', 'gns-') |
+                     list) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[0].name is regex('^gns.*')
+
+    - name: Share global namespace
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ ontap_82_gns_share_name }}"
+        path:                          "/"
+        vserver:                       "{{ item.name }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        comment:                       "Top level share for Global Name Space"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Remove "Full Control" for "Everyone"
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         absent
+        share_name:                    "{{ ontap_82_gns_share_name }}"
+        vserver:                       "{{ item.name }}"
+        user_or_group:                 "Everyone"
+        permission:                    "full_control"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create ACL (admins - Full Control)
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         present
+        share_name:                    "{{ ontap_82_gns_share_name }}"
+        vserver:                       "{{ item.name }}"
+        user_or_group:                 "DEMO\\Administrator"
+        permission:                    "full_control"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create ACL (read-only Everyone)
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         present
+        share_name:                    "{{ ontap_82_gns_share_name }}"
+        vserver:                       "{{ item.name }}"
+        user_or_group:                 "Everyone"
+        permission:                    "read"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+  post_tasks:
+
+- hosts:                               "site03_ontap"
+  name:                                "ONTAP-82-06 - Exports & Shares - USA"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create read-write export policy
+      netapp.ontap.na_ontap_export_policy:
+        state:                         present
+        name:                          "{{ ontap_82_policy_name }}"
+        vserver:                       "{{ item.name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create read-write export policy rules
+      na_ontap_export_policy_rule:
+        state:                         present
+        name:                          "{{ ontap_82_policy_name }}"
+        vserver:                       "{{ item.name }}"
+        client_match:                  "{{ groups['linux_hosts'] | map('extract', hostvars, ['ansible_host']) }}"
+        ro_rule:                       "any"
+        rw_rule:                       "any"
+        protocol:                      "nfs"
+        super_user_security:           "any"
+        allow_suid:                    true
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Export caches for in-geo locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "{{ ontap_82_policy_name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product(svm_svms |
+                    selectattr('name', 'defined') |
+                    selectattr('name', 'search', 'gns-')) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+    - name: Export read-only caches for remote geo locations
+      netapp.ontap.na_ontap_volume:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        policy:                         "ro_{{ item[0].name }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product (hostvars[groups['site01_ontap'][0]].svm_svms |
+                     selectattr('name', 'defined') |
+                     selectattr('name', 'search', 'gns-') |
+                     list) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[0].name is regex('^gns.*')
+
+    - name: Share global namespace
+      netapp.ontap.na_ontap_cifs:
+        state:                         present
+        name:                          "{{ ontap_82_gns_share_name }}"
+        path:                          "/"
+        vserver:                       "{{ item.name }}"
+        browsable:                     true
+        oplocks:                       true
+        show_snapshot:                 true
+        comment:                       "Top level share for Global Name Space"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Remove "Full Control" for "Everyone"
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         absent
+        share_name:                    "{{ ontap_82_gns_share_name }}"
+        vserver:                       "{{ item.name }}"
+        user_or_group:                 "Everyone"
+        permission:                    "full_control"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create ACL (admins - Full Control)
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         present
+        share_name:                    "{{ ontap_82_gns_share_name }}"
+        vserver:                       "{{ item.name }}"
+        user_or_group:                 "DEMO\\Administrator"
+        permission:                    "full_control"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+    - name: Create ACL (read-only Everyone)
+      netapp.ontap.na_ontap_cifs_acl:
+        state:                         present
+        share_name:                    "{{ ontap_82_gns_share_name }}"
+        vserver:                       "{{ item.name }}"
+        user_or_group:                 "Everyone"
+        permission:                    "read"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+  post_tasks:

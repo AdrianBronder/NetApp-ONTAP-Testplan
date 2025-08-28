@@ -1,0 +1,513 @@
+################################################################################
+#
+# Title:        ONTAP-revert-82 - Advanced - Global Namespaces
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-07-18
+# Description:  Revert all steps performed in test frame 82
+# 
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+# 
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+#
+################################################################################
+
+- hosts:                               "linux"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespaces - Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.posix
+    - community.general
+
+  pre_tasks:
+
+  tasks:
+    - name: Remove mounts
+      ansible.posix.mount:
+        state:                         "absent"
+        src:                           "{{ item.name }}.{{ all_default_dns_domain }}:/"
+        path:                          "{{ linux_82_mount_dir }}/{{ item.name }}"
+        opts:                          "rw,sync,vers=4.1,sec=sys"
+        fstype:                        "nfs"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['site03_ontap'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+  
+    - name: Remove mount directories
+      ansible.builtin.file:
+        path:                          "{{ linux_82_mount_dir }}/{{ item.name }}"
+        state:                         "absent"
+        mode:                          "0755"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) +
+            (hostvars[groups['site03_ontap'][0]].svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-') |
+            list) }}"
+      when:
+        - item.name is defined
+        - item.name is regex('^gns.*')
+
+- hosts:                               "windows_hosts"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespaces - Windows"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - ansible.windows
+    - community.windows
+
+  pre_tasks:
+
+  tasks:
+    - name: 
+      block:
+        - name: Remove mapped shares
+          community.windows.win_shortcut:
+            state:                     absent
+            dest:                      "{{ windows_82_mount_dir }}\\{{ item.name }}.lnk"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['site03_ontap'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+
+        - name: Remove network credentials
+          community.windows.win_credential:
+            state:                     absent
+            name:                      "{{ item.name }}"
+            type:                      "domain_password"
+          loop_control:
+            label: "{{ item.name }}"
+          loop:
+            "{{ (hostvars[groups['site01_ontap'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) +
+                (hostvars[groups['site03_ontap'][0]].svm_svms |
+                 selectattr('name', 'defined') |
+                 selectattr('name', 'search', 'gns-') |
+                list) }}"
+          when:
+            - item.name is defined
+            - item.name is regex('^gns.*')
+      vars:
+        # become is required to save and retrieve the credentials in the tasks
+        ansible_become:                "yes"
+        ansible_become_method:         "runas"
+        ansible_become_user:           "{{ ansible_user }}"
+        ansible_become_pass:           "{{ ansible_password }}"
+
+    - name: Remove mount directory
+      ansible.windows.win_file:
+        path:                          "{{ windows_82_mount_dir }}"
+        state:                         absent
+
+- hosts:                               "site01_ontap"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespaces - ONTAP Primary"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Disable write-back and unmount cache
+      netapp.ontap.na_ontap_flexcache:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        writeback:
+          enabled:                      false
+        junction_path:                  ""
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list) +
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list)) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+    - name: Remove caches
+      netapp.ontap.na_ontap_flexcache:
+        state:                          absent
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list) +
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list)) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+  post_tasks:
+
+- hosts:                               "site03_ontap"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespacess - ONTAP Tertiary"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Disable write-back and unmount cache
+      netapp.ontap.na_ontap_flexcache:
+        state:                          present
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+        writeback:
+          enabled:                      false
+        junction_path:                  ""
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list) +
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list)) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+    - name: Remove caches
+      netapp.ontap.na_ontap_flexcache:
+        state:                          absent
+        vserver:                        "{{ item[0].name }}"
+        name:                           "{{ item[1].name | replace('-','_') }}"
+      loop:
+        "{{ (svm_svms |
+             selectattr('name', 'defined') |
+             selectattr('name', 'search', 'gns-')) |
+            product ((hostvars[groups['site01_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list) +
+                     (hostvars[groups['site03_ontap'][0]].svm_svms |
+                      selectattr('name', 'defined') |
+                      selectattr('name', 'search', 'gns-') |
+                      list)) |
+            list }}"
+      loop_control:
+        label: "{{ item[0].name }} <-> {{ item[1].name }}"
+      when:
+        - svm_svms | length > 0
+        - item[0].name is defined
+        - item[1].name is defined
+        - item[0].name is regex('^gns.*')
+        - item[1].name is regex('^gns.*')
+
+  post_tasks:
+
+- hosts:                               "site02_ontap"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespacess - ONTAP Secondary"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Get all SnapMirror relations to be deleted
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "snapmirror/relationships"
+        fields:
+          - "source"
+          - "destination"
+        parameters:
+          source.svm.name:             "gns-eu-core|gns-us-core"
+        use_python_keys:               true
+      register: snapmirror_info
+  
+    - name: Remove all volume protections in parallel
+      netapp.ontap.na_ontap_snapmirror:
+        state:                         absent
+        source_endpoint:
+          cluster:                     "{{ item.source.cluster.name }}"
+          path:                        "{{ item.source.path }}"
+        destination_endpoint:
+          path:                        "{{ item.destination.path }}"
+      loop:
+        "{{ snapmirror_info.ontap_info.snapmirror_relationships.records }}"
+      loop_control:
+        label: "{{ item.destination.path }}"
+      when:
+        - snapmirror_info.ontap_info.snapmirror_relationships.records | length > 0
+        - item.destination.path is defined
+      register: __exec_dp
+      async: 120
+      poll: 0
+
+    - name: Wait for all deletion jobs to complete
+      ansible.builtin.async_status:
+          jid: "{{ item.ansible_job_id }}"
+      register: __jobs_exec_dp
+      retries: 50
+      delay: 6
+      until: __jobs_exec_dp.finished
+      loop: "{{ __exec_dp.results }}"
+      loop_control:
+        label: "{{ item.item.destination.path }}"
+      when:
+        - __exec_dp.results | length > 0
+        - item.ansible_job_id is defined
+
+    - name: Remove SVM peerings - Europe
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "gns-eu-core"
+        peer_vserver:                  "{{ item.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
+        applications:
+          - "flexcache"
+        peer_options:
+          hostname: "{{ hostvars[groups['site01_ontap'][0]].ansible_host }}"
+      loop_control:
+        label: "gns-eu-core <-> {{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Remove SVM peerings - USA
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "gns-us-core"
+        peer_vserver:                  "{{ item.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site03_ontap'][0]].cluster.name }}"
+        applications:
+          - "flexcache"
+        peer_options:
+          hostname: "{{ hostvars[groups['site03_ontap'][0]].ansible_host }}"
+      loop_control:
+        label: "gns-us-core <-> {{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Remove SVM peerings - Core
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         absent
+        vserver:                       "gns-eu-core"
+        peer_vserver:                  "gns-us-core"
+        peer_cluster:                  "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ hostvars[groups['site02_ontap'][0]].ansible_host }}"
+
+    - name: Remove Replicas - Europe
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ item.name | replace('-','_') }}_replica"
+        vserver:                       "gns-us-core"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Remove Replicas - USA
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ item.name | replace('-','_') }}_replica"
+        vserver:                       "gns-eu-core"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Remove Origins - Europe
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ item.name | replace('-','_') }}_origin"
+        vserver:                       "gns-eu-core"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Remove Origins - USA
+      netapp.ontap.na_ontap_volume:
+        state:                         absent
+        name:                          "{{ item.name | replace('-','_') }}_origin"
+        vserver:                       "gns-us-core"
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+  post_tasks:
+
+- hosts:                               "ontap"
+  name:                                "ONTAP-revert-82 - Advanced - Global Namespacess - ONTAP"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Remove CIFS server on SVMs
+      netapp.ontap.na_ontap_cifs_server:
+        state:                         absent
+        name:                          "{{ item.name }}"
+        vserver:                       "{{ item.svm.name }}"
+        domain:                        "{{ item.ad_domain.fqdn }}"
+        ou:                            "{{ item.ad_domain.organizational_unit }}"
+        admin_user_name:               "{{ all_ad_join_user }}"
+        admin_password:                "{{ all_ad_join_password }}"
+      loop:
+        "{{ protocols_cifs_services }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - protocols_cifs_services | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+    - name: Remove SVMs
+      netapp.ontap.na_ontap_svm:
+        state:                         absent
+        name:                          "{{ item.name }}"
+      loop:
+        "{{ svm_svms }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - svm_svms | length > 0
+        - item.name is defined
+        - item.name is regex('^gns.*')
+        - security_authentication_cluster_ad_proxy.svm.name is defined and
+          security_authentication_cluster_ad_proxy.svm.name != item.name
+
+  post_tasks:

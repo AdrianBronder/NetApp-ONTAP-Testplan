@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-52-07 - Incremental Backup - ONTAP Primary"
   gather_facts:                        false
   vars_files:
@@ -46,7 +46,7 @@
 
   post_tasks:
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "site02_ontap"
   name:                                "ONTAP-52-07 - Incremental Backup - ONTAP Secondary"
   gather_facts:                        false
   vars_files:
@@ -70,10 +70,10 @@
       netapp.ontap.na_ontap_snapmirror:
         state:                         present
         source_endpoint:
-          cluster:                     "{{ hostvars[groups['primary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
           path:                        "{{ global_primary_nas_svm + ':' + ontap_52_vol_name }}"
         destination_endpoint:
-          cluster:                     "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+          cluster:                     "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
           path:                        "{{ global_primary_backup_svm + ':' + ontap_52_vol_name + '_dst' }}"
         update:                        true
       retries: 30

@@ -47,7 +47,8 @@
         label: "{{ item.name }}"
       when:
         - protocols_cifs_services | length > 0
-        - item.name is defined 
+        - item.name is defined
+        - item.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
 
@@ -61,6 +62,7 @@
         label: "{{ item.name }}"
       when:
         - svm_svms | length > 0
-        - item.name is defined 
+        - item.name is defined
+        - item.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.name

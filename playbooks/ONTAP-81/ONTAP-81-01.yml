@@ -335,7 +335,7 @@
 
   post_tasks:
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "site02_ontap"
   name:                                "ONTAP-81-01 - Base Deployment - secondary only"
   gather_facts:                        false
   vars_files:
@@ -432,7 +432,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-81-01 - Base Deployment - primary only"
   gather_facts:                        false
   vars_files:
@@ -590,11 +590,11 @@
         state:                         present
         vserver:                       "{{ item.name }}"
         peer_vserver:                  "{{ item.name }}-backup"
-        peer_cluster:                  "{{ hostvars[groups['secondary_storage_clusters'][0]].cluster.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ hostvars[groups['secondary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site02_ontap'][0]].ansible_host }}"
       loop:
         "{{ svm_svms }}"
       loop_control:

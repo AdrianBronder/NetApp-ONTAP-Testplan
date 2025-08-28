@@ -38,7 +38,7 @@
       loop:
         "{{ ontap_81_svms | product(ontap_81_volumes, ontap_81_qtrees+ontap_81_arp_qtrees) | list }}"
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "site02_ontap"
   name:                                "ONTAP-revert-81 - Advanced - Self-service - secondary only"
   gather_facts:                        false
   vars_files:
@@ -141,7 +141,7 @@
       loop:
         "{{ ontap_81_svms | product(ontap_81_volumes) | list }}"
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-revert-81 - Advanced - Self-service - primary only"
   gather_facts:                        false
   vars_files:

@@ -17,6 +17,9 @@ They can be used out of the box in Lab on Demand or - by adjusting variables - i
 # Quick Start with Lab on Demand
 For NetApp internal, partner, and customer use - ready to go in less than 15 minutes
 1. Please use one the early adopter virtual hands-on lab (log in with your NetApp support account):
+   - https://labondemand.netapp.com/lab/eapontap9171 (ONTAP 9.17.1)
+
+   Older versions can be deployed as well. Keep in mind useing the correct inventory for running your playbboks.
    - https://labondemand.netapp.com/lab/eapontap9161 (ONTAP 9.16.1)
    - https://labondemand.netapp.com/lab/eapontap9141 (ONTAP 9.14.1)
    - https://labondemand.netapp.com/lab/eapontap9131 (ONTAP 9.13.1)
@@ -31,19 +34,18 @@ For NetApp internal, partner, and customer use - ready to go in less than 15 min
    Caution: The script might end with a reboot of the Linux system. Simply reconnect to execute further steps.
    ```
    cd ./NetApp-ONTAP-Testplan
-   # based on ONTAP (lab) version: ./init/init_eapontap<ontapversion>.sh
-   # e.g.
-   ./init/init_eapontap9161.sh
+   ./init/init_eaontap_latest.sh # currently ONTAP 9.17.1
 
+   # or based on ONTAP (lab) version: ./init/init_eapontap<ontapversion>.sh
+   # e.g.:  ./init/init_eapontap9161.sh
    
    ```
 4. Execute test steps, e.g. general connection test playbook "ONTAP-01-04.yml"
    ```
-   # based on ONTAP (lab) version: ./inventories/labondemand_<ontapversion>
-   # e.g.
    ansible-playbook -i ./inventories/labondemand_latest ./playbooks/ONTAP-01/ONTAP-01-04.yml
 
-   
+   # or for other (lab) version: ansible-playbook -i ./inventories/labondemand_<version> ./playbooks/ONTAP-01/ONTAP-01-04.yml
+   # e.g.: ansible-playbook -i ./inventories/labondemand_9161 ./playbooks/ONTAP-01/ONTAP-01-04.yml
    ```
 
 
@@ -121,6 +123,11 @@ The playbooks can be executed in any other non-production environments for demos
 * Public GitHub for NetApp ONTAP Modules
   * https://github.com/ansible-collections/netapp.ontap
 
+# Known Issues
+* ONTAP-35-05 - Mount & Write (Windows)
+  * Issue: Fails, when reverting and re-running
+  * Cause: Cannot remove iSCSI targets properly with Ansible/PowerShell
+  * Workaround: Open Windows "iSCSI Initiator Properties" and remove portals & targets manually
 
 # Changelog
 ## v1.3

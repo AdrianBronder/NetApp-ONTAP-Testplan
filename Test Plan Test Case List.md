@@ -75,6 +75,13 @@
 | 81-11 | Advanced - Self-service           | CIFS Demo Roll-out                    |
 | 81-21 | Advanced - Self-service           | Backup Demo Roll-out                  |
 | 81-31 | Advanced - Self-service	        | Ransomware Demo Roll-out              |
+| 82-01 | Advanced - Global Namespace       | Storage Virtual Machines (SVMs)       |
+| 82-02 | Advanced - Global Namespace       | SVM Peering                           |
+| 82-03 | Advanced - Global Namespace       | Origin Volumes                        |
+| 82-04 | Advanced - Global Namespace       | Replicate Origins                     |
+| 82-05 | Advanced - Global Namespace       | Create Caches                         |
+| 82-06 | Advanced - Global Namespace       | Exports & Shares                      |
+| 82-07 | Advanced - Global Namespace       | Mount & Write                         |
 ||
 | Prepare-15         | Prepare test frame 15 - Cluster Peering                    | |
 | Prepare-20         | Prepare test frame 20 - Storage Virtual Machines (SVMs)    | |
@@ -87,6 +94,7 @@
 | Prepare-51         | Prepare test frame 51 - Local Versioning (Snapshots)       | |
 | Prepare-52         | Prepare test frame 52 - Backup (SnapMirror)                | |
 | Prepare-81         | Prepare test frame 81 - Advanced - Self-service            | |
+| Prepare-82         | Prepare test frame 82 - Advanced - Global Namespace        | |
 ||
 | Revert-00_linux    | Revert all systems to initial state - Linux                | |
 | Revert-00_windows  | Revert all systems to initial state - Windows              | |
@@ -101,3 +109,4 @@
 | Revert-51          | Revert test frame 51 - Local Versioning (Snapshots)        | |
 | Revert-52          | Revert test frame 52 - Backup (SnapMirror)                 | |
 | Revert-81          | Revert test frame 81 - Advanced - Self-service             | |
+| Revert-82          | Revert test frame 82 - Advanced - Global Namespace         | |

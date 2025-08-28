@@ -101,7 +101,7 @@
         state:                         "absent"
         mode:                          "0755"
 
-- hosts:                               "secondary_storage_clusters"
+- hosts:                               "site02_ontap"
   name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Secondary"
   gather_facts:                        false
   vars_files:
@@ -169,11 +169,11 @@
         state:                         absent
         vserver:                       "{{ global_primary_backup_svm }}"
         peer_vserver:                  "{{ item }}"
-        peer_cluster:                  "{{ hostvars[groups['primary_storage_clusters'][0]].ansible_host | split('.') | first }}"
+        peer_cluster:                  "{{ hostvars[groups['site01_ontap'][0]].ansible_host | split('.') | first }}"
         applications:
           - "snapmirror"
         peer_options:
-          hostname: "{{ hostvars[groups['primary_storage_clusters'][0]].ansible_host }}"
+          hostname: "{{ hostvars[groups['site01_ontap'][0]].ansible_host }}"
       loop:
         - "{{ global_primary_nas_svm }}"
         - "{{ global_primary_san_svm }}"
@@ -217,7 +217,7 @@
 
   post_tasks:
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-revert-52 - Backup (SnapMirror) - ONTAP Primary"
   gather_facts:                        false
   vars_files:
