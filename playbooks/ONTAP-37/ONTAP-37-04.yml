@@ -28,6 +28,11 @@
   pre_tasks:
 
   tasks:
+    - name: Make sure NVMe kernel module is loaded
+      community.general.modprobe:
+        name:                          "nvme_tcp"
+        state:                         "present"
+
     - name: Connect NVMe namespaces
       ansible.builtin.command:
         cmd: "nvme connect-all -t tcp -a {{ item.ip.address }}"
@@ -49,11 +54,11 @@
 
     - name: Build filesystem on namespaces (CentOS 7.9)
       community.general.filesystem:
-        fstype:                   "ext4"
-        dev:                      "{{ (linux_ontap_ns.ONTAPdevices |
-                                       selectattr('Namespace_Path', 'defined') |
-                                       selectattr('Namespace_Path', '==', item ) |
-                                       first ).Device }}"
+        fstype:                        "ext4"
+        dev:                           "{{ (linux_ontap_ns.ONTAPdevices |
+                                            selectattr('Namespace_Path', 'defined') |
+                                            selectattr('Namespace_Path', '==', item ) |
+                                            first ).Device }}"
       loop:
         "{{ ontap_37_lin_namespaces }}"
       when:
@@ -84,14 +89,14 @@
 
     - name: Mount namespaces (CentOS 7.9)
       ansible.posix.mount:
-        state:                    "mounted"
-        src:                      "{{ (linux_ontap_ns.ONTAPdevices |
-                                       selectattr('Namespace_Path', 'defined') |
-                                       selectattr('Namespace_Path', '==', item ) |
-                                       first ).Device }}"
-        path:                     "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
-        fstype:                   "ext4"
-        opts:                     "discard"
+        state:                         "mounted"
+        src:                           "{{ (linux_ontap_ns.ONTAPdevices |
+                                            selectattr('Namespace_Path', 'defined') |
+                                            selectattr('Namespace_Path', '==', item ) |
+                                            first ).Device }}"
+        path:                          "{{ linux_37_mount_dir }}/{{ item | split('/') | last }}"
+        fstype:                        "ext4"
+        opts:                          "discard"
       loop:
         "{{ ontap_37_lin_namespaces }}"
       when:
