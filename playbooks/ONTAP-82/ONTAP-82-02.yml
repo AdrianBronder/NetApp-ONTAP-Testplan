@@ -1,0 +1,85 @@
+################################################################################
+#
+# Title:        ONTAP-82-02 - SVM Peering
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-07-17
+# Description:  Advanced - Global Namespace
+#               - SVM Peering
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "cluster2"
+  name:                                "ONTAP-82-02 - SVM Peering"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create SVM Peerings - Core
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         present
+        vserver:                       "gns-eu-core"
+        peer_vserver:                  "gns-us-core"
+        peer_cluster:                  "{{ hostvars[groups['site02_ontap'][0]].cluster.name }}"
+        applications:
+          - "snapmirror"
+        peer_options:
+          hostname: "{{ hostvars[groups['site02_ontap'][0]].ansible_host }}"
+
+    - name: Create SVM Peerings - Europe
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         present
+        vserver:                       "gns-eu-core"
+        peer_vserver:                  "{{ item.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site01_ontap'][0]].cluster.name }}"
+        applications:
+          - "flexcache"
+        peer_options:
+          hostname: "{{ hostvars[groups['site01_ontap'][0]].ansible_host }}"
+      loop_control:
+        label: "gns-eu-core <-> {{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Create SVM Peerings - USA
+      netapp.ontap.na_ontap_vserver_peer:
+        state:                         present
+        vserver:                       "gns-us-core"
+        peer_vserver:                  "{{ item.name }}"
+        peer_cluster:                  "{{ hostvars[groups['site03_ontap'][0]].cluster.name }}"
+        applications:
+          - "flexcache"
+        peer_options:
+          hostname: "{{ hostvars[groups['site03_ontap'][0]].ansible_host }}"
+      loop_control:
+        label: "gns-us-core <-> {{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+  post_tasks:

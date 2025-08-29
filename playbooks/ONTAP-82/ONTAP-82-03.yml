@@ -1,0 +1,83 @@
+################################################################################
+#
+# Title:        ONTAP-82-03 - Origin Volumes
+# Author:       NetApp Inc. (badrian)
+# Initial 
+# Create Date:  2025-07-21
+# Description:  Advanced - Global Namespace
+#               - Origin Volumes
+#
+# URLs:         https://docs.netapp.com/us-en/ontap/index.html
+#               https://galaxy.ansible.com/netapp/ontap
+#
+# Built-in help:
+# ansible-doc netapp.ontap.<module_name>
+# 
+################################################################################
+
+- hosts:                               "cluster2"
+  name:                                "ONTAP-82-03 - Origin Volumes"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
+
+  pre_tasks:
+
+  tasks:
+    - name: Create Origins for Europe
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ item.name | replace('-','_') }}_origin"
+        size:                          "{{ ontap_default_fg_size_gb }}"
+        volume_security_style:         "unix"
+        snapshot_policy:               "default"
+        aggr_list:                     "{{ storage_aggregates | map(attribute='name') | flatten }}"
+        aggr_list_multiplier:          "{{ ontap_default_fg_multiplier }}"
+        size_unit:                     gb
+        space_guarantee:               "none"
+        tiering_policy:                "auto"
+        junction_path:                 "/{{ item.name | replace('-','_') }}_origin"
+        vserver:                       "gns-eu-core"
+        wait_for_completion:           True
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site01_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+    - name: Create Origins for USA
+      netapp.ontap.na_ontap_volume:
+        state:                         present
+        name:                          "{{ item.name | replace('-','_') }}_origin"
+        size:                          "{{ ontap_default_fg_size_gb }}"
+        volume_security_style:         "unix"
+        aggr_list:                     "{{ storage_aggregates | map(attribute='name') | flatten }}"
+        aggr_list_multiplier:          "{{ ontap_default_fg_multiplier }}"
+        size_unit:                     gb
+        space_guarantee:               "none"
+        tiering_policy:                "auto"
+        junction_path:                 "/{{ item.name | replace('-','_') }}_origin"
+        vserver:                       "gns-us-core"
+        wait_for_completion:           True
+      loop_control:
+        label: "{{ item.name }}"
+      loop:
+        "{{ hostvars[groups['site03_ontap'][0]].svm_svms |
+          selectattr('name', 'defined') |
+          selectattr('name', 'search', 'gns-') |
+          list }}"
+
+  post_tasks:

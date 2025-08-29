@@ -114,6 +114,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_san_iscsi_services is defined
         - protocols_san_iscsi_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')
@@ -130,6 +131,7 @@
       loop_control:
         label: "{{ item.svm.name }}"
       when:
+        - protocols_nvme_services is defined
         - protocols_nvme_services | length > 0
         - item.svm.name is defined
         - item.svm.name is regex('^ntap-svm.*')

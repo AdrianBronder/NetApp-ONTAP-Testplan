@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-51-02 - Prepare Filesystem - ONTAP"
   gather_facts:                        false
   vars_files:

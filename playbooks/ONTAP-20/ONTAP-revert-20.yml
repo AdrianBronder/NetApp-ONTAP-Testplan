@@ -62,7 +62,11 @@
         label: "{{ item.name }}"
       when:
         - svm_svms | length > 0
+<<<<<<< HEAD
         - item.name is defined 
+=======
+        - item.name is defined
+>>>>>>> dev
         - item.name is regex('^ntap-svm.*')
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.name

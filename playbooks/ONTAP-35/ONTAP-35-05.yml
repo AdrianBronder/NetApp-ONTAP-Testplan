@@ -9,7 +9,7 @@
 #
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-35-05 - Mount & Write (Windows) - ONTAP"
   gather_facts:                        false
   vars_files:
@@ -65,7 +65,7 @@
       loop_control:
         label: "{{ item.ip.address }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
+        "{{ hostvars[groups['site01_ontap'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -90,7 +90,7 @@
       loop_control:
         label: "Connect {{ item.1.ipv4.address }} to {{ item.0.ip.address }}"
       loop:
-        "{{ hostvars[groups['primary_storage_clusters'][0]].network_ip_interfaces |
+        "{{ hostvars[groups['site01_ontap'][0]].network_ip_interfaces |
             selectattr('svm.name', 'defined') |
             selectattr('svm.name', '==', global_primary_san_svm) |
             selectattr('service_policy.name', 'search', 'block') |
@@ -105,7 +105,7 @@
       community.windows.win_initialize_disk:
         disk_number:                   "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                             selectattr('serial_number', 'defined') |
-                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                            selectattr('serial_number', '==', (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
                                                                                selectattr('name', '==', item ) |
                                                                                first ).serial_number) |
@@ -122,7 +122,7 @@
         gpt_type:                      "basic_data"
         disk_number:                   "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                             selectattr('serial_number', 'defined') |
-                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                            selectattr('serial_number', '==', (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
                                                                                selectattr('name', '==', item ) |
                                                                                first ).serial_number) |
@@ -139,7 +139,7 @@
         file_system:                   "ntfs"
         path:                          "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                             selectattr('serial_number', 'defined') |
-                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                            selectattr('serial_number', '==', (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
                                                                                selectattr('name', '==', item ) |
                                                                                first ).serial_number) |
@@ -169,7 +169,7 @@
         type:                          "allow"
         path:                          "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                             selectattr('serial_number', 'defined') |
-                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                            selectattr('serial_number', '==', (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
                                                                                selectattr('name', '==', item ) |
                                                                                first ).serial_number) |
@@ -183,7 +183,7 @@
           "Add-PartitionAccessPath \
            -DiskNumber {{ (win_disk_facts.ansible_facts.ansible_disks |
                                        selectattr('serial_number', 'defined') |
-                                       selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                       selectattr('serial_number', '==', (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                                                                           selectattr('name', 'defined') |
                                                                           selectattr('name', '==', item ) |
                                                                           first ).serial_number) |
@@ -201,7 +201,7 @@
         type:                          "allow"
         path:                          "{{ (win_disk_facts.ansible_facts.ansible_disks |
                                             selectattr('serial_number', 'defined') |
-                                            selectattr('serial_number', '==', (hostvars[groups['primary_storage_clusters'][0]].lun_info.ontap_info.storage_luns.records |
+                                            selectattr('serial_number', '==', (hostvars[groups['site01_ontap'][0]].lun_info.ontap_info.storage_luns.records |
                                                                                selectattr('name', 'defined') |
                                                                                selectattr('name', '==', item ) |
                                                                                first ).serial_number) |

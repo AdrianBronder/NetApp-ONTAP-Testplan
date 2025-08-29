@@ -1,0 +1,28 @@
+################################################################################
+#
+# Title:        init_linux.yml
+# Author:       NetApp Inc. (badrian)
+# Date:         2025-07-25
+# Description:  Modify Linux host for demos
+#
+# Collections:  absible.builtin
+#
+################################################################################
+
+- hosts:                               "linux_hosts"
+  name:                                "Initialize Linux"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+
+  tasks:
+    - name: Ensure domain is set properly in idmapd.conf
+      ansible.builtin.lineinfile:
+        path:                     /etc/idmapd.conf
+        regexp:                   '^\Domain ='
+        line:                     "Domain = {{ all_default_dns_domain }}"
+
+    - name: Clear key ring for the NFS idmapper
+      ansible.builtin.shell:
+        "nfsidmap -c"

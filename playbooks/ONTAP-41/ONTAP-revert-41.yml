@@ -65,7 +65,7 @@
         - "{{ ontap_41_vol_name }}"
 
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-revert-41 - Cloning (NFS) - ONTAP"
   gather_facts:                        false
   vars_files:

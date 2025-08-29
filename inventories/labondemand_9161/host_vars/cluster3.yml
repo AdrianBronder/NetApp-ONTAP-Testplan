@@ -1,0 +1,317 @@
+# Ansible Variables
+
+# Custom Variables
+
+# Variables basedon ONTAP REST model
+# https://<ontap_cluster_mgmt>/docs/api
+cluster:
+  name:                           "cluster3"
+
+cluster_nodes:
+  - name:                         "cluster3-01"
+    location:                     "Virtual DC03 | Virtual Rack 01"
+
+cluster_licensing_licenses: []
+
+security_authentication_cluster_ad_proxy:
+  svm:
+    name:                        "{{ cluster.name }}_ad"       
+
+network_ethernet_ports:
+  - name:                         "a0a"
+    node:
+      name:                       "{{ cluster_nodes[0].name }}"
+    type:                         "lag"
+    lag:
+      member_ports:
+        - name:                   "e0f"
+        - name:                   "e0g"
+      distribution_policy:        "port"
+      mode:                       "singlemode"
+    broadcast_domain:
+      name:                       "bc_data"
+      ipspace:
+        name:                     "Default"
+  - name:                         "a0b"
+    node:
+      name:                       "{{ cluster_nodes[0].name }}"
+    type:                         "lag"
+    lag:
+      member_ports:
+        - name:                   "e0d"
+        - name:                   "e0e"
+      distribution_policy:        "port"
+      mode:                       "singlemode"
+    broadcast_domain:
+      name:                       "bc_peering"
+      ipspace:
+        name:                     "ip_peering"
+
+storage_aggregates:
+  - name:                         "{{ cluster_nodes[0].name | replace('-','_') }}_aggr01"
+    node:
+      name:                       "{{ cluster_nodes[0].name }}"
+    block_storage:
+      primary:
+        disk_count:               13
+    snaplock_type:                "non_snaplock"
+
+svm_svms:
+  - name:                         "{{ cluster.name }}_ad"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    false
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "This is the tunnel SVM for cluster AD authentication"
+  - name:                         "gns-us-ny"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "Global Namespace with FlexCache - USA / New York"
+  - name:                         "gns-us-la"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "Global Namespace with FlexCache - USA / Los Angeles"
+
+protocols_nfs_services:
+  - svm:
+      name:                       "gns-us-ny"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                true
+      v4_id_domain:               "demo.netapp.com"
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "gns-us-la"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                true
+      v4_id_domain:               "demo.netapp.com"
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+
+protocols_active_directory:
+  cluster3_ad:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  gns-us-ny:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  gns-us-la:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+
+protocols_cifs_services:
+  - name:                         "cluster3_ad"
+    svm:
+      name:                       "cluster3_ad"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "This CIFS Server is for cluster AD authentication"
+    enabled:                      true
+  - name:                         "gnsusny"
+    svm:
+      name:                       "gns-us-ny"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "CIFS Server Global Namespace USA / New York"
+    enabled:                      true
+  - name:                         "gnsusla"
+    svm:
+      name:                       "gns-us-la"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "CIFS Server Global Namespace USA / Los Angeles"
+    enabled:                      true
+
+network_ip_interfaces:
+  - name:                         "cluster3_ad"
+    scope:                        "svm"
+    svm:
+      name:                       "cluster3_ad"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.230"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-us-ny_mgmt"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-ny"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.171"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-us-ny"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-ny"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.175"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "gns-us-la_mgmt"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-la"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.172"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-us-la"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-us-la"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.176"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "{{ cluster_nodes[0].name }}_ic01"
+    scope:                        "cluster"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.125"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-intercluster"
+    ipspace:
+      name:                       "Default"
+
+cluster_peers:
+  - name:                         "cluster1"
+    authentication:
+      generate_passphrase:        false
+      passphrase:                 "{{ vault_cluster_peers.passphrase }}"
+    encryption:
+      proposed:                   "tls_psk"
+    ipspace: 
+      name:                       "Default"
+    local_network:
+      interfaces:
+        - ip_address:             "192.168.0.125"
+    remote:
+      ip_addresses:
+        - "192.168.0.121"
+        - "192.168.0.122"
+  - name:                         "cluster2"
+    authentication:
+      generate_passphrase:        false
+      passphrase:                 "{{ vault_cluster_peers.passphrase }}"
+    encryption:
+      proposed:                   "tls_psk"
+    ipspace: 
+      name:                       "Default"
+    local_network:
+      interfaces:
+        - ip_address:             "192.168.0.125"
+    remote:
+      ip_addresses:
+        - "192.168.0.123"
+        - "192.168.0.124"

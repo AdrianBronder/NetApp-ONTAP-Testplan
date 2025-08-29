@@ -15,7 +15,7 @@
 # 
 ################################################################################
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-37-02 - Namespaces"
   gather_facts:                        false
   vars_files:

@@ -50,7 +50,48 @@
         name:                          "ems_{{ item }}"
       loop:
         "{{ ontap_81_svms }}"
-    
+
+    - name: Get all FlexCaches to be deleted
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "storage/flexcache/flexcaches"
+        fields:
+          - "name"
+          - "svm.name"
+        use_python_keys:               true
+      register: flexcache_info
+
+    - name: Disable write-back and unmount caches
+      netapp.ontap.na_ontap_flexcache:
+        state:                          present
+        vserver:                        "{{ item.svm.name }}"
+        name:                           "{{ item.name }}"
+        writeback:
+          enabled:                      false
+        junction_path:                  ""
+      loop:
+        "{{ flexcache_info.ontap_info.storage_flexcache_flexcaches.records }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - flexcache_info.ontap_info.storage_flexcache_flexcaches.records | length > 0
+        - item.name is defined
+        - item.svm.name is defined
+
+    - name: Remove all FlexCaches
+      netapp.ontap.na_ontap_flexcache:
+        state:                          absent
+        vserver:                        "{{ item.svm.name }}"
+        name:                           "{{ item.name }}"
+      loop:
+        "{{ flexcache_info.ontap_info.storage_flexcache_flexcaches.records }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - flexcache_info.ontap_info.storage_flexcache_flexcaches.records | length > 0
+        - item.name is defined
+        - item.svm.name is defined
+
     - name: Get all SnapMirror relations to be deleted
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
@@ -104,7 +145,7 @@
         "{{ svm_peer_info.ontap_info.svm_peers.records }}"
       ignore_errors: true # required, if peering is deleted simultaniously on both sides
 
-    - name: Get all SVM peerings from clusters
+    - name: Get all custom SnapMirror policies to be deleted
       netapp.ontap.na_ontap_rest_info:
         gather_subset:
           - "snapmirror/policies"

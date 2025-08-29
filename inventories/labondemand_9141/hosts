@@ -1,7 +1,7 @@
-[primary_storage_clusters]
+[site01_ontap]
 cluster1 ansible_host=cluster1.demo.netapp.com
 
-[secondary_storage_clusters]
+[site02_ontap]
 cluster2 ansible_host=cluster2.demo.netapp.com
 
 [linux_hosts]
@@ -14,8 +14,8 @@ jumphost win_hostname=jumphost.demo.netapp.com
 dc1 win_hostname=dc1.demo.netapp.com
 
 [ontap:children]
-primary_storage_clusters
-secondary_storage_clusters
+site01_ontap
+site02_ontap
 
 [linux:children]
 linux_hosts

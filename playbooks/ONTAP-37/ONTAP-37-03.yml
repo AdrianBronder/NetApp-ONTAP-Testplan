@@ -32,7 +32,7 @@
   post_tasks:
   
 
-- hosts:                               "primary_storage_clusters"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-37-03 - Subsystem - ONTAP"
   gather_facts:                        false
   vars_files:

@@ -50,8 +50,8 @@
         version:                       "auto"
       loop:
         "{{ all_ntp_serveres }}"
-      retries: 10
-      delay: 3
+      retries: 5
+      delay: 15
       register: result
       until: not result.failed
 

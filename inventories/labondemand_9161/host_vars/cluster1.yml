@@ -224,6 +224,50 @@ svm_svms:
       allowed:                    false
     language:                     "utf8mb4"
     comment:                      "This is the AstraInc's SVM for multi-tenancy testing"
+  - name:                         "gns-eu-be"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "Global Namespace with FlexCache - Europe / Berlin"
+  - name:                         "gns-eu-lo"
+    dns:
+      domains:                    "{{ all_dns_domains }}"
+      servers:                    "{{ all_dns_nameservers }}"
+    auto_enable_analytics:        true
+    auto_enable_activity_tracking: true
+    ipspace:
+      name:                       "Default"
+    nfs:
+      allowed:                    true
+    cifs:
+      allowed:                    true
+    iscsi:
+      allowed:                    false
+    fcp:
+      allowed:                    false
+    ndmp:
+      allowed:                    false
+    nvme:
+      allowed:                    false
+    language:                     "utf8mb4"
+    comment:                      "Global Namespace with FlexCache - Europe / London"
 
 protocols_nfs_services:
   - svm:
@@ -266,6 +310,28 @@ protocols_nfs_services:
       v3_64bit_identifiers_enabled: true
       v4_64bit_identifiers_enabled: true
     showmount_enabled:            true
+  - svm:
+      name:                       "gns-eu-be"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                true
+      v4_id_domain:               "demo.netapp.com"
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
+  - svm:
+      name:                       "gns-eu-lo"
+    enabled:                      true
+    protocol:
+      v3_enabled:                 true
+      v40_enabled:                true
+      v41_enabled:                true
+      v4_id_domain:               "demo.netapp.com"
+      v3_64bit_identifiers_enabled: true
+      v4_64bit_identifiers_enabled: true
+    showmount_enabled:            true
 
 protocols_active_directory:
   cluster1_ad:
@@ -285,6 +351,14 @@ protocols_active_directory:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
   sp-svm-polarisltd:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  gns-eu-be:
+    preferred-domain-controllers:
+      - fqdn:                    "demo.netapp.com"
+        ip:                      "192.168.0.253"
+  gns-eu-lo:
     preferred-domain-controllers:
       - fqdn:                    "demo.netapp.com"
         ip:                      "192.168.0.253"
@@ -337,6 +411,22 @@ protocols_cifs_services:
       fqdn:                       "{{ all_ad_domain }}"
       organizational_unit:        "{{ all_storage_ad_ou_path }}"
     comment:                      "This CIFS Server is created for the tenant PolarisLtd"
+    enabled:                      true
+  - name:                         "gnseube"
+    svm:
+      name:                       "gns-eu-be"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "CIFS Server Global Namespace Europe / Berlin"
+    enabled:                      true
+  - name:                         "gnseulo"
+    svm:
+      name:                       "gns-eu-lo"
+    ad_domain:
+      fqdn:                       "{{ all_ad_domain }}"
+      organizational_unit:        "{{ all_storage_ad_ou_path }}"
+    comment:                      "CIFS Server Global Namespace Europe / London"
     enabled:                      true
 
 protocols_s3_services:
@@ -533,6 +623,70 @@ network_ip_interfaces:
       name:                       "default-intercluster"
     ipspace:
       name:                       "Default"
+  - name:                         "gns-eu-be_mgmt"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-eu-be"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.151"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-eu-be"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-eu-be"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.155"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
+  - name:                         "gns-eu-lo_mgmt"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-eu-lo"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.152"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-management"
+  - name:                         "gns-eu-lo"
+    scope:                        "svm"
+    svm:
+      name:                       "gns-eu-lo"
+    ip:
+      netmask:                    "24"
+      address:                    "192.168.0.156"
+      family:                     "ipv4"
+    location:
+      home_node:
+        name:                     "{{ cluster_nodes[0].name }}"
+      home_port:
+        name:                     "e0c"
+      auto_revert:                true
+    service_policy:
+      name:                       "default-data-files"
   - name:                         "{{ cluster_nodes[1].name }}_ic01"
     scope:                        "cluster"
     ip:
@@ -567,3 +721,18 @@ cluster_peers:
       ip_addresses:
         - "192.168.0.123"
         - "192.168.0.124"
+  - name:                         "cluster3"
+    authentication:
+      generate_passphrase:        false
+      passphrase:                 "{{ vault_cluster_peers.passphrase }}"
+    encryption:
+      proposed:                   "tls_psk"
+    ipspace: 
+      name:                       "Default"
+    local_network:
+      interfaces:
+        - ip_address:             "192.168.0.121"
+        - ip_address:             "192.168.0.122"
+    remote:
+      ip_addresses:
+        - "192.168.0.125"

@@ -133,5 +133,10 @@ ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161 $SCRIPTPATH/init_h
 
 echo ""
 echo ""
-echo "--> Prepare storage clusters in LoD (cluster1 & cluster2)"
+echo "--> Initializing Linux hosts"
+ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161 $SCRIPTPATH/init_helper/init_linux.yml
+
+echo ""
+echo ""
+echo "--> Prepare storage clusters in LoD (cluster1, cluster2, and cluster3)"
 ansible-playbook -i $PROJECTPATH/inventories/labondemand_9161 $PROJECTPATH/playbooks/ONTAP-00/ONTAP-revert-00.yml
