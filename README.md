@@ -130,6 +130,14 @@ The playbooks can be executed in any other non-production environments for demos
   * Workaround: Open Windows "iSCSI Initiator Properties" and remove portals & targets manually
 
 # Changelog
+## v1.4
+* Adding support for ONTAP 9.17.1 lab
+* Adding ONTAP-82 - Advanced Global Namespace
+  * Multi-protocol Access
+  * FlexGroups, FlexCache, and SnapMirror
+* Renamed groups in Ansible Inventory
+* Improving stability for reverting test frames and entire lab
+
 ## v1.3
 * Adding support for ONTAP 9.16.1 lab
 * Adding ONTAP-81 - Advanced Self-Service
