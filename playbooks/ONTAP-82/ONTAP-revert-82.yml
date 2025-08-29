@@ -180,6 +180,7 @@
         - item[1].name is defined
         - item[0].name is regex('^gns.*')
         - item[1].name is regex('^gns.*')
+      ignore_errors:                   true # ignore in case caches are not present
 
     - name: Remove caches
       netapp.ontap.na_ontap_flexcache:
@@ -232,12 +233,12 @@
   tasks:
     - name: Disable write-back and unmount cache
       netapp.ontap.na_ontap_flexcache:
-        state:                          present
-        vserver:                        "{{ item[0].name }}"
-        name:                           "{{ item[1].name | replace('-','_') }}"
+        state:                         present
+        vserver:                       "{{ item[0].name }}"
+        name:                          "{{ item[1].name | replace('-','_') }}"
         writeback:
-          enabled:                      false
-        junction_path:                  ""
+          enabled:                     false
+        junction_path:                 ""
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
@@ -259,12 +260,13 @@
         - item[1].name is defined
         - item[0].name is regex('^gns.*')
         - item[1].name is regex('^gns.*')
+      ignore_errors:                   true # ignore in case caches are not present
 
     - name: Remove caches
       netapp.ontap.na_ontap_flexcache:
-        state:                          absent
-        vserver:                        "{{ item[0].name }}"
-        name:                           "{{ item[1].name | replace('-','_') }}"
+        state:                         absent
+        vserver:                       "{{ item[0].name }}"
+        name:                          "{{ item[1].name | replace('-','_') }}"
       loop:
         "{{ (svm_svms |
              selectattr('name', 'defined') |
