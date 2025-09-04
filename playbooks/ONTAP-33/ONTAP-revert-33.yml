@@ -88,9 +88,32 @@
         state:                         "absent"
         mode:                          "0755"
 
+- hosts:                               "site02_ontap"
+  name:                                "ONTAP-revert-33 - S3 - ONTAP Secondary"
+  gather_facts:                        false
+  vars_files:
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
+    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  collections:
+    - netapp.ontap
+  module_defaults:
+    group/netapp.ontap.netapp_ontap:
+      hostname:                        "{{ ansible_host }}"
+      username:                        "{{ ontap_admin_user }}"
+      password:                        "{{ ontap_admin_password }}"
+      https:                           true
+      validate_certs:                  false
+      use_rest:                        "always"
 
-- hosts:                               "primary_storage_clusters"
-  name:                                "ONTAP-revert-33 - S3 - ONTAP"
+  tasks:
+    - name: Remove S3 buckets
+      netapp.ontap.na_ontap_s3_buckets:
+        state:                         absent
+        name:                          "{{ ontap_33_s3_bucket_name }}"
+        vserver:                       "{{ global_primary_backup_svm }}"
+
+- hosts:                               "site01_ontap"
+  name:                                "ONTAP-revert-33 - S3 - ONTAP Primary"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml

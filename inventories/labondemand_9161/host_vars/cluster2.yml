@@ -410,10 +410,10 @@ protocols_cifs_services:
 
 protocols_s3_services:
   - svm:
-      name:                       "{{ svm_svms[1].name }}"
-    name:                         "{{ svm_svms[1].name }}"
+      name:                       "ntap-svm03-backup"
+    name:                         "ntap-svm03-backup"
     certificate:
-      name:                       "{{ svm_svms[1].name }}"
+      name:                       "ntap-svm03-backup"
 
 protocols_san_iscsi_services:
   - svm:

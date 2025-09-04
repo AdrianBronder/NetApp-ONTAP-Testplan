@@ -1,23 +1,30 @@
 ################################################################################
 #
-# Title:        ONTAP-20-04 - SVM Data Protocol Setup
-# Author:       NetApp Inc. (badrian)
-# Initial 
-# Create Date:  2023-08-22
-# Description:  Basic Data SVM Setup
-#               - SVM Data Protocol Setup
+# Title:        ONTAP-20-04 - SVM Certificates
+# Author:       NetApp Inc. (jont)
+# Initial
+# Create Date:  2025-04-08
+# Description:  Basic SVM Setup
+#               - SVM Certificates
+# Details:      Create and install a self-signed server security certificate
+#               - Create the root-ca
+#               - Generate a certificate signing request
+#               - Sign the request using the local root-ca
+#               - install the signed certificate
 #
 # URLs:         https://docs.netapp.com/us-en/ontap/index.html
 #               https://galaxy.ansible.com/netapp/ontap
 #
 # Built-in help:
 # ansible-doc netapp.ontap.<module_name>
-# 
+#
 ################################################################################
 
 - hosts:                               "ontap"
-  name:                                "ONTAP-20-04 - SVM Data Protocol Setup"
+  name:                                "ONTAP-20-05 - SVM Certificates"
   gather_facts:                        false
+  vars:
+    intermediate_cert: {}
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
@@ -35,185 +42,63 @@
   pre_tasks:
 
   tasks:
-    - name: Configure NFS service on SVMs
-      netapp.ontap.na_ontap_nfs:
-        state:                         present
-        vserver:                       "{{ item.svm.name }}"
-        service_state:                 "{{ 'started' if item.enabled else 'stopped'}}"
-        nfsv3:                         "{{ 'enabled' if item.protocol.v3_enabled else 'disabled'}}"
-        nfsv4:                         "{{ 'enabled' if item.protocol.v40_enabled else 'disabled'}}"
-        nfsv41:                        "{{ 'enabled' if item.protocol.v41_enabled else 'disabled'}}"
-        showmount:                     "{{ 'enabled' if item.showmount_enabled else 'disabled'}}"
-      loop:
-        "{{ protocols_nfs_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_nfs_services is defined
-        - protocols_nfs_services | length > 0
-        - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-  
-    - name: Patch additional SVM NFS parameters - v3-64bit-identifiers
-      netapp.ontap.na_ontap_rest_cli:
-        command:                       'vserver/nfs'
-        verb:                          'PATCH'
-        params: 
-          vserver:                     "{{ item.svm.name }}"
-        body:
-          v3-64bit-identifiers:        "{{ 'enabled' if item.protocol.v3_64bit_identifiers_enabled else 'disabled' }}"
-      loop:
-        "{{ protocols_nfs_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_nfs_services is defined
-        - protocols_nfs_services | length > 0
-        - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
-        - item.protocol.v3_64bit_identifiers_enabled is defined
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-  
-    - name: Patch additional SVM NFS parameters - v4-64bit-identifiers
-      netapp.ontap.na_ontap_rest_cli:
-        command:                       'vserver/nfs'
-        verb:                          'PATCH'
-        params: 
-          vserver:                     "{{ item.svm.name }}"
-        body:
-          v4-64bit-identifiers:        "{{ 'enabled' if item.protocol.v4_64bit_identifiers_enabled else 'disabled' }}"
-      loop:
-        "{{ protocols_nfs_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_nfs_services is defined
-        - protocols_nfs_services | length > 0
-        - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
-        - item.protocol.v4_64bit_identifiers_enabled is defined
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-
-    - name: Create read-only export policy for NFS
-      netapp.ontap.na_ontap_export_policy:
-        state:                         present
-        name:                          "ro_{{ item.svm.name }}"
-        vserver:                       "{{ item.svm.name }}"
-      loop:
-        "{{ protocols_nfs_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_nfs_services is defined
-        - protocols_nfs_services | length > 0
-        - item.svm.name is defined 
-        - item.svm.name is regex('^ntap-svm.*')
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-  
-    - name: Create read-only export policy rules for SVM root volume for NFS
-      na_ontap_export_policy_rule:
-        state:                         present
-        name:                          "ro_{{ item.svm.name }}"
-        vserver:                       "{{ item.svm.name }}"
-        client_match:                  "{{ groups['linux'] | map('extract', hostvars, ['ansible_host']) }}"
-        ro_rule:                       "any"
-        rw_rule:                       "none"
-        protocol:                      "nfs"
-        super_user_security:           "none"
-        allow_suid:                    false
-      loop:
-        "{{ protocols_nfs_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_nfs_services is defined
-        - protocols_nfs_services | length > 0
-        - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-
-    - name: Apply read-only export policy to SVM's root volume for NFS
-      netapp.ontap.na_ontap_volume:
-        state:                         present
-        name:                          "{{ item.svm.name.replace('-','_') }}_root"
-        vserver:                       "{{ item.svm.name }}"
-        export_policy:                 "ro_{{ item.svm.name }}"
-      loop:
-        "{{ protocols_nfs_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_nfs_services is defined
-        - protocols_nfs_services | length > 0
-        - item.svm.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-
-    - name: Create active directory preferred domain controllers
-      netapp.ontap.na_ontap_active_directory_domain_controllers:
-        state:                         present
-        vserver:                       "{{ item.0.key }}"
-        fqdn:                          "{{ item.1.fqdn }}"
-        server_ip:                     "{{ item.1.ip }}"
-      loop:
-        "{{ protocols_active_directory | dict2items | subelements('value.preferred-domain-controllers') }}"
-      loop_control:
-        label: "{{ item.0.key }}"
-      when:
-        - protocols_active_directory is defined
-        - protocols_active_directory | list | length > 0
-        - item.0.key is regex('^ntap-svm.*')
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.0.key
-  
-    - name: Create CIFS server on SVMs
-      netapp.ontap.na_ontap_cifs_server:
+    - name: Create root-ca certificate
+      netapp.ontap.na_ontap_security_certificates:
         state:                         present
         name:                          "{{ item.name }}"
-        vserver:                       "{{ item.svm.name }}"
-        service_state:                 "started"
-        domain:                        "{{ item.ad_domain.fqdn }}"
-        ou:                            "{{ item.ad_domain.organizational_unit }}"
-        admin_user_name:               "{{ all_ad_join_user }}"
-        admin_password:                "{{ all_ad_join_password }}"
+        svm:                           "{{ item.svm.name }}"
+        type:                          "{{ item.type }}"
+        common_name:                   "{{ item.common_name }}"
+        expiry_time:                   "{{ item.expiry_time }}"
       loop:
-        "{{ protocols_cifs_services }}"
+        "{{ security_certificates }}"
       loop_control:
-        label: "{{ item.name }}"
+        label: "Inventory SVM: {{ item.svm.name }} | Inventory Cert: {{ item.name }} "
       when:
-        - protocols_cifs_services is defined
-        - protocols_cifs_services | length > 0
+        - security_certificates is defined
+        - security_certificates | length > 0
         - item.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
-  
-    - name: Patch additional SVM CIFS parameters - comment
-      netapp.ontap.na_ontap_rest_cli:
-        command:                       'vserver/cifs'
-        verb:                          'PATCH'
-        params: 
-          vserver:                     "{{ item.svm.name }}"
+        - item.name is regex('^ntap-svm.*')
+
+    - name: Generate certificate signing request (CSR)
+      netapp.ontap.na_ontap_restit:
+        api: /security/certificate-signing-request
+        method: POST
         body:
-          comment:                     "{{ item.comment }}"
+         subject_name: "CN={{ item.common_name }}"
       loop:
-        "{{ protocols_cifs_services }}"
+        "{{ security_certificate_signing_request }}"
       loop_control:
-        label: "{{ item.svm.name }}"
+        label: "Inventory SVM: {{ item.svm.name }} | Common Name: {{ item.common_name }} "
       when:
-        - protocols_cifs_services is defined
-        - protocols_cifs_services | length > 0
-        - item.svm.name is defined
+        - security_certificate_signing_request is defined
+        - security_certificate_signing_request | length > 0
+        - item.common_name is defined
         - item.svm.name is regex('^ntap-svm.*')
-        - item.comment is defined
-        - security_authentication_cluster_ad_proxy.svm.name is defined and
-          security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+      register: csr_result
+    
+    - debug:
+        msg:
+          - "{{ csr_result }}"
+
+    - name: sign certificate using newly create certificate
+      netapp.ontap.na_ontap_security_certificates:
+        common_name:                   "{{ ( csr_result.results |
+                                             selectattr('item.common_name', 'search', item.common_name ) |
+                                             first ).item.common_name }}"
+        type:                          "{{ cert_info.ontap_info.security_certificates.records[0].type }}"
+        svm:                           "{{ cert_info.ontap_info.security_certificates.records[0].svm.name }}"
+        signing_request:               "{{ cert_info.ontap_info.security_certificates.records[0].public_certificate | replace('\\n', '\n') }}"
+        expiry_time:                   "P180DT"
+      loop:
+        "{{ security_certificate_signing_request }}"
+      loop_control:
+        label: "Inventory SVM: {{ item.svm.name }} | Common Name: {{ item.common_name }} "
+      when:
+        - security_certificate_signing_request is defined
+        - security_certificate_signing_request | length > 0
+        - item.common_name is defined
+        - item.svm.name is regex('^ntap-svm.*')
+      register: csr_result
 
   post_tasks:

@@ -269,6 +269,20 @@ svm_svms:
     language:                     "utf8mb4"
     comment:                      "Global Namespace with FlexCache - Europe / London"
 
+security_certificates:
+  - name:                         "ntap-svm01-nas_ca"
+    common_name:                  "ntap-svm01-nas_ca"
+    svm:
+      name:                       "ntap-svm01-nas"
+    type:                         "root_ca"
+    expiry_time:                  "P365DT"
+
+security_certificate_signing_request:
+  - svm:
+      name:                       "ntap-svm01-nas"
+    common_name:                  "ntap-svm01-nas.demo.netapp.com"
+
+
 protocols_nfs_services:
   - svm:
       name:                       "{{ svm_svms[1].name }}"
@@ -429,6 +443,13 @@ protocols_cifs_services:
     comment:                      "CIFS Server Global Namespace Europe / London"
     enabled:                      true
 
+protocols_s3_services:
+  - svm:
+      name:                       "ntap-svm01-nas"
+    name:                         "ntap-svm01-nas"
+    certificate:
+      name:                       "ntap-svm01-nas"
+
 protocols_san_iscsi_services:
   - svm:
       name:                       "{{ svm_svms[2].name }}"
@@ -471,7 +492,7 @@ network_ip_interfaces:
         name:                     "e0c"
       auto_revert:                true
     service_policy:
-      name:                       "default-data-files"
+      name:                       "custom-data-s3"
   - name:                         "{{ svm_svms[2].name }}"
     scope:                        "svm"
     svm:

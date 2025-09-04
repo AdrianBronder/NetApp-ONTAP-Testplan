@@ -70,6 +70,8 @@
             allowed:                   "{{ item.nvme.allowed | default(omit) }}"
       loop:
         "{{ svm_svms }}"
+      loop_control:
+        label: "Inventory SVM: {{ item.name }}"
       when:
         - svm_svms | length > 0
         - security_authentication_cluster_ad_proxy.svm.name is defined
@@ -89,6 +91,8 @@
         is_auto_revert:                "{{ item.location.auto_revert | default(omit) }}"
       loop:
         "{{ network_ip_interfaces }}"
+      loop_control:
+        label: "Inventory SVM: {{ item.svm.name | default('<cluster-scope>') }} | Inventory LIF: {{ item.name }} "
       when:
         - network_ip_interfaces | length > 0
         - security_authentication_cluster_ad_proxy.svm.name is defined
@@ -103,6 +107,8 @@
         gateway:                       "{{ all_default_gateway }}"
       loop:
         "{{ ontap_svms }}"
+      loop_control:
+        label: "Inventory SVM: {{ item.name }}"
       when:
         - svm_svms | length > 0
         - security_authentication_cluster_ad_proxy.svm.name is defined
@@ -117,6 +123,8 @@
         nameservers:                   "{{ item.dns.servers }}"
       loop:
         "{{ svm_svms }}"
+      loop_control:
+        label: "Inventory SVM: {{ item.name }}"
       when:
         - svm_svms | length > 0
         - security_authentication_cluster_ad_proxy.svm.name is defined
@@ -150,6 +158,8 @@
         admin_password:                "{{ all_ad_join_password }}"
       loop:
         "{{ protocols_cifs_services }}"
+      loop_control:
+        label: "Inventory SVM: {{ item.svm.name }} | Inventory CIFS Server: {{ item.name }}"
       when:
         - protocols_cifs_services | length > 0
         - item.svm.name is defined 
@@ -167,7 +177,7 @@
       loop:
         "{{ protocols_cifs_services }}"
       loop_control:
-        label: "{{ item.svm.name }}"
+        label: "Inventory SVM: {{ item.svm.name }} | Inventory CIFS Server: {{ item.name }}"
       when:
         - protocols_cifs_services | length > 0
         - item.svm.name is defined

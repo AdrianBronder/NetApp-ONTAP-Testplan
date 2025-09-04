@@ -36,6 +36,10 @@
       fields: "common_name"
   register: root_ca_result
 
+- debug:
+    msg:
+      - "{{ root_ca_result }}"
+
 - name: Store CA Names
   set_fact:
     ontap_cert_root_common_name: "{{ root_ca_result.response.records[0].common_name }}"
@@ -45,6 +49,11 @@
     - root_ca_result.response.records[0].common_name is defined
     - root_ca_result.response.records[0].name is defined
 
+- debug:
+    msg:
+      - "{{ ontap_cert_root_name }}"
+      - "{{ ontap_cert_root_common_name }}"
+
 - name: Generate certificate signing request (CSR) on {{ item.name }}
   netapp.ontap.na_ontap_restit:
     api: /security/certificate-signing-request
@@ -52,6 +61,10 @@
     body:
      subject_name: "CN={{ item.name }}.demo.netapp.com"
   register: csr_result
+
+- debug:
+    msg:
+      - "{{ csr_result }}"
 
 - name: Store CSR and private key certificates on {{ item.name }}
   set_fact:
@@ -62,6 +75,11 @@
     - csr_result.response.csr is defined
     - csr_result.response.generated_private_key is defined
 
+- debug:
+    msg:
+      - "{{ csr }}"
+      - "{{ private_key }}"
+
 - name: Sign the certificate on {{ item.name }}
   netapp.ontap.na_ontap_security_certificates:
     name: "{{ ontap_cert_root_name }}"
@@ -70,11 +88,19 @@
     expiry_time: P180DT
   register: signed_cert
 
+- debug:
+    msg:
+      - "{{ signed_cert }}"
+
 - name: Store signed certificate
   set_fact:
     public_certificate: "{{ signed_cert.ontap_info.public_certificate }}"
   when:
     - signed_cert.ontap_info.public_certificate is defined
+
+- debug:
+    msg:
+      - "{{ public_certificate }}"
 
 - name: Install certificate on {{ item.name }}
   netapp.ontap.na_ontap_security_certificates:
@@ -82,7 +108,7 @@
     name: "{{ ontap_cert_root_name }}"
     public_certificate: "{{ public_certificate }}"
     private_key: "{{ private_key }}"
-    type: server_ca
+    type: server
     svm: "{{ item.name }}"
 
 - name: Gather server certificate information
@@ -94,3 +120,6 @@
       type: "server"
   register: server_result
   
+- name: Show certificate information
+  ansible.builtin.debug:
+    msg: "{{ server_result }}"

@@ -35,7 +35,7 @@
   pre_tasks:
 
   tasks:
-    - name: Create SVMs for testing"
+    - name: Create SVMs for testing
       netapp.ontap.na_ontap_svm:
         state:                         present
         name:                          "{{ item.name }}"
@@ -55,7 +55,7 @@
       loop:
         "{{ svm_svms }}"
       loop_control:
-        label: "{{ item.name }}"
+        label: "Inventory SVM: {{ item.name }}"
       when:
         - svm_svms | length > 0
         - item.name is defined
@@ -74,7 +74,7 @@
       loop:
         "{{ svm_svms }}"
       loop_control:
-        label: "{{ item.name }}"
+        label: "Inventory SVM: {{ item.name }}"
       when:
         - svm_svms | length > 0
         - item.name is defined
@@ -95,7 +95,7 @@
       loop:
         "{{ svm_svms }}"
       loop_control:
-        label: "{{ item.name }}"
+        label: "Inventory SVM: {{ item.name }}"
       when:
         - svm_svms | length > 0
         - item.name is defined
@@ -112,7 +112,7 @@
       loop:
         "{{ protocols_san_iscsi_services }}"
       loop_control:
-        label: "{{ item.svm.name }}"
+        label: "Inventory SVM: {{ item.svm.name }}"
       when:
         - protocols_san_iscsi_services is defined
         - protocols_san_iscsi_services | length > 0
@@ -129,7 +129,7 @@
       loop:
         "{{ protocols_nvme_services }}"
       loop_control:
-        label: "{{ item.svm.name }}"
+        label: "Inventory SVM: {{ item.svm.name }}"
       when:
         - protocols_nvme_services is defined
         - protocols_nvme_services | length > 0

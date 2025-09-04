@@ -266,6 +266,29 @@
       loop:
         "{{ igroup_info.ontap_info.protocols_san_igroups.records }}"
 
+    - name: Get all S3 buckets from clusters
+      netapp.ontap.na_ontap_rest_info:
+        gather_subset:
+          - "protocols/s3/buckets"
+        fields:
+          - "svm"
+          - "name"
+        use_python_keys:          true
+      register: s3_bucket_info
+
+    - name: Delete all S3 buckets from clusters
+      netapp.ontap.na_ontap_s3_buckets:
+        state:                         absent
+        name:                          "{{ item.name }}"
+        vserver:                       "{{ item.svm.name }}"
+      loop:
+        "{{ s3_bucket_info.ontap_info.protocols_s3_buckets.records }}"
+      loop_control:
+        label: "{{ item.name }}"
+      when:
+        - s3_bucket_info | length > 0
+        - item.name is defined
+
     - name: Get all non-root volumes from clusters
       netapp.ontap.na_ontap_rest_info:
         gather_subset:

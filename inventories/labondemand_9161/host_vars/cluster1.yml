@@ -432,9 +432,9 @@ protocols_cifs_services:
 protocols_s3_services:
   - svm:
       name:                       "{{ svm_svms[1].name }}"
-    name:                         "{{ svm_svms[1].name }}"
+    name:                         "{{ svm_svms[1].name }}.{{ all_default_dns_domains }}"
     certificate:
-      name:                       "{{ svm_svms[1].name }}"
+      name:                       "{{ svm_svms[1].name }}.{{ all_default_dns_domains }}"
   
 protocols_san_iscsi_services:
   - svm:

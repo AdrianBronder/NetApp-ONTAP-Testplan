@@ -92,6 +92,8 @@
         dest:                          "{{ linux_default_mount_dir }}/.s3_credentials/{{ item }}.json"
       loop:
         "{{ groups['ontap'] }}"
+      when:
+        - hostvars[item].s3_users is defined
 
   post_tasks:
 
@@ -129,5 +131,7 @@
         line:                          "{{ hostvars[item].s3_users | to_nice_json }}"
       loop:
         "{{ groups['ontap'] }}"
+      when:
+        - hostvars[item].s3_users is defined
 
   post_tasks:
