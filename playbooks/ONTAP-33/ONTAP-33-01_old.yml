@@ -15,12 +15,14 @@
 #
 ################################################################################
 
-- hosts:                               "site01_ontap"
+- hosts:                               "ontap"
   name:                                "ONTAP-33-01 - User and Group"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
     - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
+  vars:
+    s3_users: {}
   collections:
     - netapp.ontap
   module_defaults:
@@ -35,26 +37,21 @@
   pre_tasks:
 
   tasks:
-    - name: Create or regenerate the S3 user
-      netapp.ontap.na_ontap_s3_users:
-        state:                           present
-        name:                            "{{ ontap_33_s3_user_name }}"
-        vserver:                         "{{ global_primary_nas_svm }}"
-        regenerate_keys:                 true
-      register: s3_user
-  
-    - name: Add SVM name to credential details
-      ansible.builtin.set_fact:
-        s3_user:                         "{{ ({global_primary_nas_svm: s3_user}) }}"
-
-    - name: Print user details
-      debug:
-        var: s3_user
+    - name: Create or regenerate S3 users and return access tokens
+      include_tasks: Tasks-33-01.yml
+      loop:
+       "{{ protocols_s3_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
+      when:
+        - protocols_s3_services | length > 0
+        - item.name is defined
+        - item.svm.name is regex('^ntap-svm.*')
 
     - name: Create S3 Groups
       netapp.ontap.na_ontap_s3_groups:
         state:                         present
-        name:                          "{{ global_primary_nas_svm }}"
+        name:                          "{{ ontap_33_s3_group_name }}"
         vserver:                       "{{ item.svm.name }}"
         users:
           - name:                      "{{ ontap_33_s3_user_name }}"
@@ -89,12 +86,14 @@
         state:                         directory
         path:                          "{{ linux_default_mount_dir }}/.s3_credentials/"
 
-    - name: Create credential file for S3 User
+    - name: Create files
       ansible.builtin.copy:
-        content:                       "{{ hostvars['cluster1'].s3_user | to_nice_json }}"
-        dest:                          "{{ linux_default_mount_dir }}/.s3_credentials/{{ global_primary_nas_svm }}.json"
+        content:                       "{{ hostvars[item].s3_users | to_nice_json }}"
+        dest:                          "{{ linux_default_mount_dir }}/.s3_credentials/{{ item }}.json"
+      loop:
+        "{{ groups['ontap'] }}"
       when:
-        - hostvars['cluster1'].s3_user is defined
+        - hostvars[item].s3_users is defined
 
   post_tasks:
 
@@ -120,17 +119,19 @@
     - name: Remove existing credential files
       ansible.windows.win_file:
         state:                         absent
-        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ global_primary_nas_svm }}.json"
-      when:
-        - hostvars['cluster1'].s3_user is defined
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.json"
+      loop:
+        "{{ groups['ontap'] }}"
 
     - name: Write credentials to files
       community.windows.win_lineinfile:
         state:                         present
-        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ global_primary_nas_svm }}.json"
+        path:                          "{{ windows_default_mount_dir }}\\s3_credentials\\{{ item }}.json"
         create:                        true
-        line:                          "{{ hostvars['cluster1'].s3_user | to_nice_json }}"
+        line:                          "{{ hostvars[item].s3_users | to_nice_json }}"
+      loop:
+        "{{ groups['ontap'] }}"
       when:
-        - hostvars['cluster1'].s3_user is defined
+        - hostvars[item].s3_users is defined
 
   post_tasks:

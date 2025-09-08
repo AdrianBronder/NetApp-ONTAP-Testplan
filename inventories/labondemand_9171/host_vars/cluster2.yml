@@ -251,6 +251,18 @@ svm_svms:
     language:                     "utf8mb4"
     comment:                      "Global Namespace with FlexCache - Europe / Core"
 
+security_certificates:
+  - name:                         "ntap-svm03-backup_default_cert"
+    common_name:                  "ntap-svm03-backup.demo.netapp.com_ca"
+    svm:
+      name:                       "ntap-svm03-backup"
+    type:                         "root_ca"
+    expiry_time:                  "P365DT"
+
+security_certificate_signing_request:
+  - svm:
+      name:                       "ntap-svm03-backup"
+    common_name:                  "ntap-svm03-backup.demo.netapp.com"
 
 protocols_nfs_services:
   - svm:
@@ -413,7 +425,7 @@ protocols_s3_services:
       name:                       "ntap-svm03-backup"
     name:                         "ntap-svm03-backup"
     certificate:
-      name:                       "ntap-svm03-backup"
+      name:                       "ntap-svm03-backup_default_cert_signed"
 
 protocols_san_iscsi_services:
   - svm:

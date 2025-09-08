@@ -32,14 +32,11 @@
         dir:                           "{{ linux_default_mount_dir }}/.s3_credentials"
         name:                          s3_credentials
 
-    - debug:
-        var: s3_credentials
-
     - name: Simple PUT operation
       amazon.aws.s3_object:
-        bucket:                        "{{ ontap_33_s3_bucket_name }}"
-        object:                        "{{ global_primary_nas_svm }}"
-        src:                           "{{ linux_default_mount_dir }}/.s3_credentials/{{ global_primary_nas_svm }}.json"
+        bucket:                        "foo-test-bucket"
+        object:                        "cluster1"
+        src:                           "{{ linux_default_mount_dir }}/.s3_credentials/cluster1.json"
         mode:                          put
         permission:                    []
         endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"

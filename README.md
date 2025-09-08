@@ -104,15 +104,17 @@ https://docs.ansible.com/ansible/2.8/user_guide/vault.html
 
 # Instructions for Changing the Environment
 The playbooks can be executed in any other non-production environments for demos and testing.
-* Ansible host is configured with minimum recommended versions (as of now - August 2023):
-  - Python 3.8+
-  - Ansible 2.12+
+* Ansible host is configured with minimum recommended versions (as of Sep 2025):
+  - Python 3.9+
+  - Ansible 2.15+
 * Variables are defined at various levels. There are generally two categories of variables for this test:
   * **Environment**, or: Desired state of a system or a group of systems
+    * Affects mainly Cluster and SVM setup (ONTAP-1* & ONTAP-2*)
     * Inventory folder id created for new environment in ./inventories (as per exmple "labondemand")
     * hosts file and variables have to match specific environment
     * a sinlge file can be used as well, but is not recommended with a large amount of variables and secrets like passwords
   * **Runtime**, or: Configuration, that is created or changed as part of the test plan
+    * Affects mainly Day 2 operations and tests on top of clusterst and SVMs (ONTAP-2* and higher)
     * Variable folder is created for new environment in ./vars (as per example "labondemand")
     * it can be a single file, but is not recommended with a large amount of variables and secrets like passwords
 

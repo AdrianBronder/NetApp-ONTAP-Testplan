@@ -62,10 +62,10 @@
 
     - name: Generate certificate signing request (CSR)
       netapp.ontap.na_ontap_restit:
-        api: /security/certificate-signing-request
-        method: POST
+        api:                           /security/certificate-signing-request
+        method:                        POST
         body:
-         subject_name: "CN={{ item.common_name }}"
+         subject_name:                 "CN={{ item.common_name }}"
       loop:
         "{{ security_certificate_signing_request }}"
       loop_control:
@@ -76,19 +76,16 @@
         - item.common_name is defined
         - item.svm.name is regex('^ntap-svm.*')
       register: csr_result
-    
-    - debug:
-        msg:
-          - "{{ csr_result }}"
 
-    - name: sign certificate using newly create certificate
+    - name: Sign certificate
       netapp.ontap.na_ontap_security_certificates:
-        common_name:                   "{{ ( csr_result.results |
-                                             selectattr('item.common_name', 'search', item.common_name ) |
-                                             first ).item.common_name }}"
-        type:                          "{{ cert_info.ontap_info.security_certificates.records[0].type }}"
-        svm:                           "{{ cert_info.ontap_info.security_certificates.records[0].svm.name }}"
-        signing_request:               "{{ cert_info.ontap_info.security_certificates.records[0].public_certificate | replace('\\n', '\n') }}"
+        svm:                           "{{ item.svm.name }}"
+        name:                          "{{ ( security_certificates |
+                                             selectattr('common_name', 'equalto', item.common_name+'_ca' ) |
+                                             first ).name }}"
+        signing_request:               "{{ ( csr_result.results |
+                                             selectattr('item.common_name', 'equalto', item.common_name ) |
+                                             first ).response.csr }}"
         expiry_time:                   "P180DT"
       loop:
         "{{ security_certificate_signing_request }}"
@@ -96,9 +93,33 @@
         label: "Inventory SVM: {{ item.svm.name }} | Common Name: {{ item.common_name }} "
       when:
         - security_certificate_signing_request is defined
+        - security_certificates is defined
+        - csr_result.results is defined
         - security_certificate_signing_request | length > 0
         - item.common_name is defined
         - item.svm.name is regex('^ntap-svm.*')
-      register: csr_result
+      register: cert_signing_result
+
+    - name: Install Certificate
+      netapp.ontap.na_ontap_security_certificates:
+        common_name:                   "{{ item.common_name }}"
+        svm:                           "{{ item.svm.name }}"
+        type:                          server
+        name:                          "{{ ( security_certificates |
+                                             selectattr('common_name', 'equalto', item.common_name+'_ca' ) |
+                                             first ).name }}_signed"
+        public_certificate:            "{{ ( cert_signing_result.results |
+                                             selectattr('item.common_name', 'equalto', item.common_name ) |
+                                             first ).ontap_info.public_certificate }}"
+        private_key:                   "{{ ( csr_result.results |
+                                             selectattr('item.common_name', 'equalto', item.common_name ) |
+                                             first ).response.generated_private_key }}"
+      loop:
+        "{{ security_certificate_signing_request }}"
+      loop_control:
+        label: "Inventory SVM: {{ item.svm.name }} | Common Name: {{ item.common_name }} "
+      when:
+        - security_certificate_signing_request is defined
+    
 
   post_tasks:

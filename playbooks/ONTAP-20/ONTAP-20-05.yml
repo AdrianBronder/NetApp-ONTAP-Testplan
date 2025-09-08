@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-20-04 - SVM Data Protocol Setup
+# Title:        ONTAP-20-05 - SVM Data Protocol Setup
 # Author:       NetApp Inc. (badrian)
 # Initial 
 # Create Date:  2023-08-22
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "ontap"
-  name:                                "ONTAP-20-04 - SVM Data Protocol Setup"
+  name:                                "ONTAP-20-05 - SVM Data Protocol Setup"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -215,5 +215,20 @@
         - item.comment is defined
         - security_authentication_cluster_ad_proxy.svm.name is defined and
           security_authentication_cluster_ad_proxy.svm.name != item.svm.name
+
+    - name: Configure S3 service
+      netapp.ontap.na_ontap_s3_services:
+        state:                         present
+        vserver:                       "{{ item.svm.name }}"
+        name:                          "{{ item.name }}"
+        certificate_name:              "{{ item.certificate.name }}"
+        enabled:                       true
+      loop:
+        "{{ protocols_s3_services }}"
+      loop_control:
+        label: "{{ item.svm.name }}"
+      when:
+        - protocols_s3_services is defined
+        - protocols_s3_services | length > 0
 
   post_tasks:

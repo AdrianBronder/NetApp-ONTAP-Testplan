@@ -270,8 +270,8 @@ svm_svms:
     comment:                      "Global Namespace with FlexCache - Europe / London"
 
 security_certificates:
-  - name:                         "ntap-svm01-nas_ca"
-    common_name:                  "ntap-svm01-nas_ca"
+  - name:                         "ntap-svm01-nas_default_cert"
+    common_name:                  "ntap-svm01-nas.demo.netapp.com_ca"
     svm:
       name:                       "ntap-svm01-nas"
     type:                         "root_ca"
@@ -281,7 +281,6 @@ security_certificate_signing_request:
   - svm:
       name:                       "ntap-svm01-nas"
     common_name:                  "ntap-svm01-nas.demo.netapp.com"
-
 
 protocols_nfs_services:
   - svm:
@@ -446,9 +445,9 @@ protocols_cifs_services:
 protocols_s3_services:
   - svm:
       name:                       "ntap-svm01-nas"
-    name:                         "ntap-svm01-nas"
+    name:                         "ntap-svm01-nas.demo.netapp.com"
     certificate:
-      name:                       "ntap-svm01-nas"
+      name:                       "ntap-svm01-nas_default_cert_signed"
 
 protocols_san_iscsi_services:
   - svm:

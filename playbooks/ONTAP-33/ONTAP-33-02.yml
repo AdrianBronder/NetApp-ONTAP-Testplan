@@ -15,7 +15,7 @@
 #
 ################################################################################
 
-- hosts:                               "ontap"
+- hosts:                               "site01_ontap"
   name:                                "ONTAP-33-02 - Bucket"
   gather_facts:                        false
   vars_files:
@@ -38,17 +38,9 @@
     - name: Create S3 buckets
       netapp.ontap.na_ontap_s3_buckets:
         state:                         present
+        vserver:                       "{{ global_primary_nas_svm }}"
         name:                          "{{ ontap_33_s3_bucket_name }}"
         size:                          "{{ ontap_33_s3_bucket_size }}"
-        vserver:                       "{{ item.svm.name }}"
-      loop:
-        "{{ protocols_s3_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_s3_services | length > 0
-        - item.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
 
   post_tasks:
   
