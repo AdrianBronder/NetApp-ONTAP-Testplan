@@ -37,37 +37,29 @@
   tasks:
     - name: Create or regenerate the S3 user
       netapp.ontap.na_ontap_s3_users:
-        state:                           present
-        name:                            "{{ ontap_33_s3_user_name }}"
-        vserver:                         "{{ global_primary_nas_svm }}"
-        regenerate_keys:                 true
+        state:                         present
+        name:                          "{{ ontap_33_s3_user_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+        regenerate_keys:               true
       register: s3_user
   
     - name: Add SVM name to credential details
       ansible.builtin.set_fact:
-        s3_user:                         "{{ ({global_primary_nas_svm: s3_user}) }}"
+        s3_user:                       "{{ ({global_primary_nas_svm: s3_user}) }}"
 
     - name: Print user details
       debug:
         var: s3_user
 
-    - name: Create S3 Groups
+    - name: Create S3 Group with full access
       netapp.ontap.na_ontap_s3_groups:
         state:                         present
-        name:                          "{{ global_primary_nas_svm }}"
-        vserver:                       "{{ item.svm.name }}"
+        name:                          "{{ ontap_33_s3_group_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
         users:
           - name:                      "{{ ontap_33_s3_user_name }}"
         policies:
-          - name:                      "{{ ontap_33_s3_group_policy }}"
-      loop:
-       "{{ protocols_s3_services }}"
-      loop_control:
-        label: "{{ item.svm.name }}"
-      when:
-        - protocols_s3_services | length > 0
-        - item.name is defined
-        - item.svm.name is regex('^ntap-svm.*')
+          - name:                      "FullAccess"
 
   post_tasks:
 

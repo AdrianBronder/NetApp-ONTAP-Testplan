@@ -1,11 +1,11 @@
 ################################################################################
 #
-# Title:        ONTAP-20-04 - SVM Certificates
+# Title:        ONTAP-20-04 - SVM Certificate
 # Author:       NetApp Inc. (jont)
 # Initial
 # Create Date:  2025-04-08
 # Description:  Basic SVM Setup
-#               - SVM Certificates
+#               - SVM Certificate
 # Details:      Create and install a self-signed server security certificate
 #               - Create the root-ca
 #               - Generate a certificate signing request
@@ -21,7 +21,7 @@
 ################################################################################
 
 - hosts:                               "ontap"
-  name:                                "ONTAP-20-05 - SVM Certificates"
+  name:                                "ONTAP-20-05 - SVM Certificate"
   gather_facts:                        false
   vars:
     intermediate_cert: {}

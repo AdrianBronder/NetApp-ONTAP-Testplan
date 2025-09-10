@@ -33,7 +33,7 @@
 
     - name: Get bucket content
       amazon.aws.s3_object_info:
-        bucket_name:                   "foo-test-bucket"
+        bucket_name:                   "{{ ontap_33_s3_bucket_name }}"
         endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
         access_key:                    "{{ s3_credentials['ntap-svm01-nas'].access_key }}"
         secret_key:                    "{{ s3_credentials['ntap-svm01-nas'].secret_key }}"
@@ -42,7 +42,7 @@
 
     - name: Remove bucket contents
       amazon.aws.s3_object:
-        bucket:                        "foo-test-bucket"
+        bucket:                        "{{ ontap_33_s3_bucket_name }}"
         object:                        "{{ item }}"
         mode:                          delobj
         endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
@@ -88,32 +88,9 @@
         state:                         "absent"
         mode:                          "0755"
 
-- hosts:                               "site02_ontap"
-  name:                                "ONTAP-revert-33 - S3 - ONTAP Secondary"
-  gather_facts:                        false
-  vars_files:
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
-    - ../../vars/{{ inventory_dir | split('/') | last }}/vault.yml
-  collections:
-    - netapp.ontap
-  module_defaults:
-    group/netapp.ontap.netapp_ontap:
-      hostname:                        "{{ ansible_host }}"
-      username:                        "{{ ontap_admin_user }}"
-      password:                        "{{ ontap_admin_password }}"
-      https:                           true
-      validate_certs:                  false
-      use_rest:                        "always"
-
-  tasks:
-    - name: Remove S3 buckets
-      netapp.ontap.na_ontap_s3_buckets:
-        state:                         absent
-        name:                          "{{ ontap_33_s3_bucket_name }}"
-        vserver:                       "{{ global_primary_backup_svm }}"
 
 - hosts:                               "site01_ontap"
-  name:                                "ONTAP-revert-33 - S3 - ONTAP Primary"
+  name:                                "ONTAP-revert-33 - S3 - ONTAP"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ inventory_dir | split('/') | last }}/vars.yml
@@ -134,4 +111,16 @@
       netapp.ontap.na_ontap_s3_buckets:
         state:                         absent
         name:                          "{{ ontap_33_s3_bucket_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+
+    - name: Remove S3 user
+      netapp.ontap.na_ontap_s3_users:
+        state:                         absent
+        name:                          "{{ ontap_33_s3_user_name }}"
+        vserver:                       "{{ global_primary_nas_svm }}"
+
+    - name: Remove S3 group
+      netapp.ontap.na_ontap_s3_groups:
+        state:                         absent
+        name:                          "{{ ontap_33_s3_group_name }}"
         vserver:                       "{{ global_primary_nas_svm }}"

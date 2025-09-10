@@ -16,8 +16,6 @@
 #
 ################################################################################
 
-- 
-
 - hosts:                               "ontap"
   name:                                "ONTAP-revert-00 - Return to Day0 - ONTAP"
   gather_facts:                        false        
@@ -489,11 +487,13 @@
       netapp.ontap.na_ontap_aggregate:
         state:                    absent
         name:                     "{{ item.name }}"
+      loop:
+        "{{ aggr_info.ontap_info.storage_aggregates.records }}"
+      loop_control:
+        label: "{{ item.name }}"
       when:
         - aggr_info.ontap_info.storage_aggregates.num_records|int > 0
         - item.name is defined
-      loop:
-        "{{ aggr_info.ontap_info.storage_aggregates.records }}"
   
     - name: Remove DNS config from cluster
       netapp.ontap.na_ontap_dns:
@@ -517,6 +517,8 @@
         - item.server is defined
       loop:
         "{{ ntp_servers_info.ontap_info.cluster_ntp_servers.records }}"
+      loop_control:
+        label: "{{ item.server }}"
   
     - name: Reset timezone on storage cluster to Etc/UTC
       netapp.ontap.na_ontap_cluster:

@@ -1,6 +1,6 @@
 ################################################################################
 #
-# Title:        ONTAP-33-03 - Objects
+# Title:        ONTAP-33-03 - Put Objects
 # Author:       NetApp Inc. (badrian)
 # Initial
 # Create Date:  2025-04-25
@@ -16,7 +16,7 @@
 ################################################################################
 
 - hosts:                               "localhost"
-  name:                                "ONTAP-33-03 - Objects"
+  name:                                "ONTAP-33-03 - Put Objects"
   gather_facts:                        false
   vars_files:
     - ../../vars/{{ ansible_inventory_sources[-1] | split('/') | last }}/vars.yml
@@ -32,9 +32,6 @@
         dir:                           "{{ linux_default_mount_dir }}/.s3_credentials"
         name:                          s3_credentials
 
-    - debug:
-        var: s3_credentials
-
     - name: Simple PUT operation
       amazon.aws.s3_object:
         bucket:                        "{{ ontap_33_s3_bucket_name }}"
@@ -49,7 +46,7 @@
 
     - name: Get bucket content
       amazon.aws.s3_object_info:
-        bucket_name:                   "foo-test-bucket"
+        bucket_name:                   "{{ ontap_33_s3_bucket_name }}"
         endpoint_url:                  "https://{{ global_primary_nas_svm }}.demo.netapp.com"
         access_key:                    "{{ s3_credentials['ntap-svm01-nas'].access_key }}"
         secret_key:                    "{{ s3_credentials['ntap-svm01-nas'].secret_key }}"

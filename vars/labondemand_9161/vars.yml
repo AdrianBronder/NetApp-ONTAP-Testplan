@@ -79,7 +79,6 @@ ontap_32_ad_admin_user_pw:        "{{ ontap_12_ad_admin_user_pw }}"
 # ONTAP-33  - S3
 ontap_33_s3_user_name:            "ontap_33_s3_user"
 ontap_33_s3_group_name:           "ontap_33_s3_group"
-ontap_33_s3_group_policy:         "FullAccess"
 ontap_33_s3_bucket_name:          "ontap-33-bucket-01"
 ontap_33_s3_bucket_size:          "{{ ontap_default_fg_size_gb * 1024**3 }}"
 
