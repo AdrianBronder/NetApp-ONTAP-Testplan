@@ -134,9 +134,13 @@ The playbooks can be executed in any other non-production environments for demos
 # Changelog
 ## v1.4
 * Adding support for ONTAP 9.17.1 lab
+* Adding ONTAP-33 - S3
 * Adding ONTAP-82 - Advanced Global Namespace
   * Multi-protocol Access
   * FlexGroups, FlexCache, and SnapMirror
+* Expanding ONTAP-20
+  * Moving ONTAP-20-04 to ONTAP-20-05 - SVM Data Protocol Setup
+  * Adding ONTAP-20-05 - SVM Certificate
 * Renamed groups in Ansible Inventory
 * Improving stability for reverting test frames and entire lab
 
@@ -151,7 +155,7 @@ The playbooks can be executed in any other non-production environments for demos
 * Consistent use of module defaults vs. vars for default connection parameters
 
 ## v1.2
-* Adding ONTAP-11-04  Event Config
+* Adding ONTAP-11-04 - Event Config
 * Adding Ansible Drive Ansible
 * Adding support for ONTAP 9.14.1 lab
 * General Clean-up (comments, format...)
